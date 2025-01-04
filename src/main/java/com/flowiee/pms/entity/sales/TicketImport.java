@@ -3,7 +3,7 @@ package com.flowiee.pms.entity.sales;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.product.MaterialTemp;
@@ -11,7 +11,7 @@ import com.flowiee.pms.entity.product.ProductVariantExim;
 import com.flowiee.pms.entity.storage.Storage;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.model.dto.TicketImportDTO;
-import com.flowiee.pms.utils.constants.TicketImportStatus;
+import com.flowiee.pms.common.enumeration.TicketImportStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

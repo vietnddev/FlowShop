@@ -1,7 +1,7 @@
 package com.flowiee.pms.model.payload;
 
 import com.flowiee.pms.model.dto.OrderDTO;
-import com.flowiee.pms.utils.constants.OrderStatus;
+import com.flowiee.pms.common.enumeration.OrderStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -24,6 +24,11 @@ public class CreateOrderReq {
     private String recipientEmail;
     private String shippingAddress;
     private BigDecimal amountDiscount;
+    private BigDecimal packagingCost;
+    private BigDecimal shippingCost;
+    private BigDecimal giftWrapCost;
+    private BigDecimal codFee;
+    private Boolean accumulateBonusPoints;
 
     public OrderDTO toDTO() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a");

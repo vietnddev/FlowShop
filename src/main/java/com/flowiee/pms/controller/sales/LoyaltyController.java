@@ -1,12 +1,11 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.product.GiftCatalog;
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.service.product.GiftCatalogService;
 import com.flowiee.pms.service.sales.GiftRedemptionService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

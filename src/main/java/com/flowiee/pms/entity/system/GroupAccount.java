@@ -2,7 +2,7 @@ package com.flowiee.pms.entity.system;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -24,7 +24,7 @@ public class GroupAccount extends BaseEntity implements Serializable {
     @Serial
     static final long serialVersionUID = 1L;
 
-    @Column(name = "group_code")
+    @Column(name = "group_code", nullable = false, unique = true)
     String groupCode;
 
     @Column(name = "group_name", nullable = false)

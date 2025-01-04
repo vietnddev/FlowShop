@@ -1,8 +1,8 @@
 package com.flowiee.pms.controller.product;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.service.product.*;
-import com.flowiee.pms.utils.constants.Pages;
+import com.flowiee.pms.common.enumeration.Pages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

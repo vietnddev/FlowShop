@@ -1,13 +1,13 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.service.product.*;
 import com.flowiee.pms.service.sales.TicketExportService;
 import com.flowiee.pms.service.sales.TicketImportService;
 import com.flowiee.pms.service.system.FileStorageService;
 
-import com.flowiee.pms.utils.FileUtils;
+import com.flowiee.pms.common.utils.FileUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class FileStorageControllerView extends BaseController {
         if (file.isEmpty()) {
             throw new ResourceNotFoundException("File attach not found!");
         }
-        productImageService.saveImageProduct(file, productId);
+        productImageService.saveImageProduct(file, productId, false);
         return refreshPage(request);
     }
 

@@ -2,11 +2,10 @@ package com.flowiee.pms.service.product.impl;
 
 import com.flowiee.pms.entity.product.ProductReview;
 import com.flowiee.pms.exception.EntityNotFoundException;
-import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.repository.product.ProductReviewRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.ProductReviewService;
-import com.flowiee.pms.utils.constants.MessageCode;
+import com.flowiee.pms.common.enumeration.MessageCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

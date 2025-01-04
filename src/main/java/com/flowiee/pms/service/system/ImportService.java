@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.system;
 
-import com.flowiee.pms.service.BaseCurdService;
+import com.flowiee.pms.base.service.BaseCurdService;
 import com.flowiee.pms.entity.system.FileImportHistory;
 
 import java.util.List;

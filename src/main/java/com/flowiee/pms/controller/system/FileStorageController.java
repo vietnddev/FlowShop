@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.service.system.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

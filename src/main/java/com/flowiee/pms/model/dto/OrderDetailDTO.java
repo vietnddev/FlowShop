@@ -1,7 +1,7 @@
 package com.flowiee.pms.model.dto;
 
 import com.flowiee.pms.entity.sales.OrderDetail;
-import com.flowiee.pms.utils.converter.ProductVariantConvert;
+import com.flowiee.pms.common.converter.ProductVariantConvert;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

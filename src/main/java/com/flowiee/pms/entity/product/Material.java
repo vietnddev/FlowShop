@@ -2,10 +2,11 @@ package com.flowiee.pms.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.sales.Supplier;
+import com.flowiee.pms.entity.storage.TransactionGoodsItem;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.model.dto.MaterialDTO;
 import lombok.*;
@@ -79,6 +80,10 @@ public class Material extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "material", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     List<MaterialTemp> listMaterialTemp;
+
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "material", fetch = FetchType.LAZY)
+//    List<TransactionGoodsItem> transactionGoodsItemList;
 
     public Material(long id) {
         super.id = id;

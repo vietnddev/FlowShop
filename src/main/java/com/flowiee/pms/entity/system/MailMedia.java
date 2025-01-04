@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class MailMedia implements Serializable {
-    public static String EMAIL_ADDRESS_SPERATOR = ";";
+    public static String EMAIL_ADDRESS_SEPARATOR = ";";
     public static String SUBJECT = "emailSubject";
     public static String DESTINATION = "emailDestination";
     public static String ROWs = "ROWs";

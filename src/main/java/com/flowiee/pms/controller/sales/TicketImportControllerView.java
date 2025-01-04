@@ -8,9 +8,9 @@ import com.flowiee.pms.service.product.ProductVariantService;
 import com.flowiee.pms.service.sales.SupplierService;
 import com.flowiee.pms.service.sales.TicketImportService;
 import com.flowiee.pms.service.storage.StorageService;
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 
-import com.flowiee.pms.utils.constants.Pages;
+import com.flowiee.pms.common.enumeration.Pages;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

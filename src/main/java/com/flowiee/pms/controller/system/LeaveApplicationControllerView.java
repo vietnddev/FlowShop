@@ -1,11 +1,11 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.model.payload.LeaveApplicationReq;
 import com.flowiee.pms.service.system.LeaveApplicationService;
-import com.flowiee.pms.utils.CoreUtils;
-import com.flowiee.pms.utils.constants.Pages;
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.enumeration.Pages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

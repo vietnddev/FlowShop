@@ -31,32 +31,18 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
-                        <!-- small box -->
-                        <div class="small-box bg-success">
-                            <div class="inner">
-                                <h3>[[${totalProducts}]]</h3>
-                                <p>Total products available</p>
-                            </div>
-                            <div class="icon">
-                                <i class="ion ion-stats-bars"></i>
-                            </div>
-                            <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-
                     <div class="col-lg-3 col-6">
                         <!-- small box -->
                         <div class="small-box bg-info">
                             <div class="inner">
                                 <h3>[[${soLuongDonHangHomNay}]]</h3>
-                                <p>Orders today</p>
+                                <p>Số lượng hơn hàng hôm nay</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
                             </div>
-                            <a href="#" class="small-box-footer"
-                               data-toggle="modal" data-target="#modalDanhSachDonHangToDay">Detail <i class="fas fa-arrow-circle-right"></i>
+                            <a href="#" class="small-box-footer mr-1"
+                               data-toggle="modal" data-target="#modalDanhSachDonHangToDay">Detail <i class="fa-solid fa-circle-info ml-1"></i></i>
                             </a>
                             <div class="modal fade" id="modalDanhSachDonHangToDay">
                                 <div class="modal-dialog modal-lg">
@@ -104,12 +90,12 @@
                         <div class="small-box bg-success">
                             <div class="inner">
                                 <h3>[[${doanhThuHomNay}]]</h3>
-                                <p>Revenue today</p>
+                                <p>Doanh thu hôm nay</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
                             </div>
-                            <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="#" class="small-box-footer">Detail <i class="fa-solid fa-circle-info ml-1"></i></a>
                         </div>
                     </div>
                     <!-- ./col -->
@@ -118,12 +104,12 @@
                         <div class="small-box bg-primary">
                             <div class="inner">
                                 <h3>[[${doanhThuThangNay}]]</h3>
-                                <p>Revenue this month</p>
+                                <p>Doanh thu tháng này</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-pie-graph"></i>
                             </div>
-                            <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="#" class="small-box-footer">Detail <i class="fa-solid fa-circle-info ml-1"></i></a>
                         </div>
                     </div>
                     <!-- ./col -->
@@ -132,12 +118,12 @@
                         <div class="small-box bg-warning">
                             <div class="inner">
                                 <h3>[[${khachHangMoiTrongThang}]]</h3>
-                                <p>Customers new</p>
+                                <p>Khách hàng mới</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-person-add"></i>
                             </div>
-                            <a href="#" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="#" class="small-box-footer">Detail <i class="fa-solid fa-circle-info ml-1"></i></a>
                         </div>
                     </div>
                     <!-- ./col -->

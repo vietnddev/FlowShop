@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.product;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
@@ -10,7 +10,7 @@ import com.flowiee.pms.service.product.ProductImageService;
 import com.flowiee.pms.service.product.ProductInfoService;
 import com.flowiee.pms.service.product.ProductVariantService;
 import com.flowiee.pms.service.system.FileStorageService;
-import com.flowiee.pms.utils.constants.ErrorCode;
+import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -47,7 +47,7 @@ public class ProductImageController extends BaseController {
             if (file.isEmpty()) {
                 throw new FileNotFoundException();
             }
-            return success(mvProductImageService.saveImageProduct(file, productId));
+            return success(mvProductImageService.saveImageProduct(file, productId, false));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "image"), ex);
         } catch (IOException e) {

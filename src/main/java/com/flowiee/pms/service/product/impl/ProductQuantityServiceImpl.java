@@ -1,38 +1,29 @@
 package com.flowiee.pms.service.product.impl;
 
+import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.product.ProductDetail;
-import com.flowiee.pms.entity.system.Account;
-import com.flowiee.pms.entity.system.SystemConfig;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
-import com.flowiee.pms.repository.system.AccountRepository;
 import com.flowiee.pms.service.system.ConfigService;
-import com.flowiee.pms.service.system.MailMediaService;
-import com.flowiee.pms.utils.AppConstants;
-import com.flowiee.pms.utils.constants.*;
+import com.flowiee.pms.service.system.SendOperatorNotificationService;
+import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.repository.product.ProductDetailRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.ProductQuantityService;
 import com.flowiee.pms.service.system.SystemLogService;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class ProductQuantityServiceImpl extends BaseService implements ProductQuantityService {
-    ProductDetailRepository mvProductVariantRepository;
-    AccountRepository mvAccountRepository;
-    SystemLogService mvSystemLogService;
-    MailMediaService mvMailMediaService;
-    ConfigService mvConfigService;
+    private final SendOperatorNotificationService sendOperatorNotificationService;
+    private final ProductDetailRepository mvProductVariantRepository;
+    private final SystemLogService mvSystemLogService;
+    private final ConfigService mvConfigService;
 
     @Transactional
     @Override
@@ -62,15 +53,14 @@ public class ProductQuantityServiceImpl extends BaseService implements ProductQu
                 ProductDetail productDetailUpdated = mvProductVariantRepository.save(lvProductDetail);
 
                 if (lvLowStockThreshold != null && productDetailUpdated.getStorageQty() <= lvLowStockThreshold) {
-                    SystemConfig lvLowStockAlertMdl = mvConfigService.getSystemConfig(ConfigCode.lowStockAlert.name());
-                    if (isConfigAvailable(lvLowStockAlertMdl) && lvLowStockAlertMdl.isYesOption()) {
-                        sendNotifyWarningLowStock(productDetailUpdated);
+                    if (SysConfigUtils.isYesOption(ConfigCode.lowStockAlert)) {
+                        sendOperatorNotificationService.notifyWarningLowStock(productDetailUpdated);
                     }
                 }
 
                 //Hết hàng
                 if (productDetailUpdated.getAvailableSalesQty() == 0) {
-                    productDetailUpdated.setStatus(ProductStatus.OOS.name());
+                    productDetailUpdated.setStatus(ProductStatus.OOS);
                     productDetailUpdated.setOutOfStockDate(LocalDateTime.now());
                     mvProductVariantRepository.save(productDetailUpdated);
                 }
@@ -79,23 +69,5 @@ public class ProductQuantityServiceImpl extends BaseService implements ProductQu
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "product quantity"), ex);
         }
-    }
-
-    private void sendNotifyWarningLowStock(ProductDetail pProductDetail) {
-        Account lvAdmin = mvAccountRepository.findByUsername(AppConstants.ADMINISTRATOR);
-        if (lvAdmin == null)
-            return;
-
-        String lvDestination = lvAdmin.getEmail();
-        if (lvDestination == null || lvDestination.isBlank())
-            return;
-
-        Map<String, Object> lvNotificationParameter = new HashMap<>();
-        lvNotificationParameter.put(NotificationType.LowStockAlert.name(), lvDestination);
-        lvNotificationParameter.put("productName", pProductDetail.getVariantName());
-        lvNotificationParameter.put("currentQuantity", pProductDetail.getStorageQty());
-        lvNotificationParameter.put("threshold", pProductDetail.getLowStockThreshold());
-
-        mvMailMediaService.send(NotificationType.LowStockAlert, lvNotificationParameter);
     }
 }

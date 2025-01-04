@@ -2,7 +2,7 @@ package com.flowiee.pms.service.sales;
 
 import com.flowiee.pms.entity.product.ProductVariantExim;
 import com.flowiee.pms.model.dto.TicketImportDTO;
-import com.flowiee.pms.service.BaseCurdService;
+import com.flowiee.pms.base.service.BaseCurdService;
 import com.flowiee.pms.entity.product.MaterialTemp;
 import com.flowiee.pms.entity.sales.TicketImport;
 import org.springframework.data.domain.Page;

@@ -1,10 +1,10 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.system.SystemConfig;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.service.system.ConfigService;
-import com.flowiee.pms.utils.constants.Pages;
+import com.flowiee.pms.common.enumeration.Pages;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -1,7 +1,7 @@
 package com.flowiee.pms.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -22,7 +22,7 @@ public class ProductAttribute extends BaseEntity implements Serializable {
     @Serial
 	static final long serialVersionUID = 1L;
 
-	@JsonIgnoreProperties("listThuocTinh")
+	@JsonIgnoreProperties("listAttributes")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_variant_id", nullable = false)
     ProductDetail productDetail;
@@ -39,7 +39,7 @@ public class ProductAttribute extends BaseEntity implements Serializable {
     @Column(name = "status", nullable = false)
     boolean status;
 
-    @OneToMany(mappedBy = "productAttribute", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "productAttribute", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<ProductHistory> listProductHistory;
 
     public ProductAttribute(Long id) {
@@ -48,7 +48,7 @@ public class ProductAttribute extends BaseEntity implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ProductAttribute [id=" + super.id + ", productVariant=" + productDetail + ", tenThuocTinh=" + attributeName
-				+ ", giaTriThuocTinh=" + attributeValue + ", sort=" + sort + ", trangThai=" + status + "]";
+		return "ProductAttribute [id=" + super.id + ", productVariant=" + productDetail + ", attributeName=" + attributeName
+				+ ", attributeValue=" + attributeValue + ", sort=" + sort + ", status=" + status + "]";
 	}
 }

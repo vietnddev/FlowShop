@@ -1,10 +1,10 @@
 package com.flowiee.pms.entity.system;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 
-import com.flowiee.pms.utils.CoreUtils;
-import com.flowiee.pms.utils.constants.ConfigCode;
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.enumeration.ConfigCode;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

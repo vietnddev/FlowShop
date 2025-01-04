@@ -1,11 +1,11 @@
 package com.flowiee.pms.service.category;
 
-import com.flowiee.pms.service.BaseCurdService;
+import com.flowiee.pms.base.service.BaseCurdService;
 
 import java.util.List;
 
 import com.flowiee.pms.entity.category.Category;
-import com.flowiee.pms.utils.constants.CategoryType;
+import com.flowiee.pms.common.enumeration.CategoryType;
 import org.springframework.data.domain.Page;
 
 public interface CategoryService extends BaseCurdService<Category> {

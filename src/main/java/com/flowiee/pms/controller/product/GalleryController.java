@@ -1,11 +1,11 @@
 package com.flowiee.pms.controller.product;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.service.product.ProductImageService;
-import com.flowiee.pms.utils.constants.ErrorCode;
+import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;

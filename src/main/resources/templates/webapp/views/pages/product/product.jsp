@@ -48,8 +48,7 @@
                                                 <th></th>
                                                 <th>Tên sản phẩm</th>
                                                 <th>Loại</th>
-                                                <th>Màu sắc</th>
-                                                <th>Số lượng</th>
+                                                <th>Màu sắc & số lượng</th>
                                                 <th>Đơn vị tính</th>
                                                 <th>Khuyến mãi</th>
                                                 <th>Trạng thái</th>
@@ -176,10 +175,6 @@
                                 <td><a href="/san-pham/${p.id}">${p.productName}</a></td>
                                 <td>${p.productTypeName}</td>
                                 <td>${variantBlock}</td>
-                                <td>
-                                <div className="span">Hiện có: ${p.totalQtyStorage}</div>
-                                <div className="span">Đã bán: ${p.totalQtySell}</div>
-                                </td>
                                 <td>${p.unitName}</td>
                                 <td>${voucherBlock}</td>
                                 <td>${mvProductStatus[p.status]}</td>
@@ -239,12 +234,12 @@
         }
 
         function createProduct() {
-            let params = "?PID=CL";
+            let params = "?PID_=CL";
             let apiURL = mvHostURLCallApi + "/product/create" + params;
-            let productTypeId = $("#productTypeField").val();
-            let brandId = $("#brandField").val();
+            let productTypeId = parseInt($("#productTypeField").val());
+            let brandId = parseInt($("#brandField").val());
             let productName = $("#productNameField").val();
-            let unitId = $("#unitField").val();
+            let unitId = parseInt($("#unitField").val());
             let body = {productTypeId: productTypeId, brandId: brandId, productName: productName, unitId: unitId};
             $.ajax({
                 url: apiURL,

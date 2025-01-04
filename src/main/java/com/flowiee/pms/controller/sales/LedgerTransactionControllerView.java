@@ -1,14 +1,14 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.sales.LedgerTransaction;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.service.category.CategoryService;
 import com.flowiee.pms.service.sales.LedgerPaymentService;
 import com.flowiee.pms.service.sales.LedgerReceiptService;
-import com.flowiee.pms.utils.constants.CategoryType;
-import com.flowiee.pms.utils.constants.Pages;
-import com.flowiee.pms.utils.constants.LedgerTranType;
+import com.flowiee.pms.common.enumeration.CategoryType;
+import com.flowiee.pms.common.enumeration.Pages;
+import com.flowiee.pms.common.enumeration.LedgerTranType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

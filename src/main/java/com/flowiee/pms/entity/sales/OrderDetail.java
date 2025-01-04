@@ -2,7 +2,7 @@ package com.flowiee.pms.entity.sales;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 import com.flowiee.pms.entity.product.ProductDetail;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -35,6 +35,9 @@ public class OrderDetail extends BaseEntity implements java.io.Serializable {
 	@JoinColumn(name = "product_variant_id", nullable = false)
 	ProductDetail productDetail;
 
+	@Column(name = "warehouse_code")
+	String warehouseCode;
+
 	@Column(name = "price_type", nullable = false)
 	String priceType;//S or L
 
@@ -49,6 +52,9 @@ public class OrderDetail extends BaseEntity implements java.io.Serializable {
 
 	@Column(name = "quantity", nullable = false)
 	int quantity;
+
+	@Column(name = "currency")
+	String currency;
 
 	@Column(name = "note", length = 500)
 	String note;

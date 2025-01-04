@@ -1,94 +1,43 @@
-# Config webapp
-server:
-  port: 8085
-  servlet:
-    session:
-      timeout: 3600
+#API prefix
+app:
+  api:
+    prefix: /api/v1
+#spring config
 spring:
+  profiles:
+    active: dev
   application:
     name: sms
   main:
     allow-circular-references: true
-  resources:
-    static-locations:
-      - classpath:/static/**
-      - file:/static/uploads/**
-
-  # Database
-  jpa:
-    hibernate:
-      ddl-auto: none
-    naming:
-      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    show-sql: false
-    properties:
-      hibernate:
-        show_sql: false
-        format_sql: false
-
-  # MySQL TTL
-  # datasource:
-  #   driver-class-name: com.mysql.cj.jdbc.Driver
-  #   url: jdbc:mysql://localhost:3306/flowiee
-  #   username: root
-  #   password: 080100
-
-  # Oracle local
-  datasource:
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@127.0.0.1:1521:orcl
-    username: flowiee
-    password: 080100
-
-  # MySQL Google cloud
-  # datasource:
-  #   driver-class-name: com.mysql.cj.jdbc.Driver
-  #   url: jdbc:mysql://35.225.47.208:3306/flowiee
-  #   username: root
-  #   password: 123qwe!@#
-
+    resources:
+      static-locations:
+        - classpath:/static/**
+        - file:/static/uploads/**
   # Config package chứa file view JSP
   thymeleaf:
     prefix: classpath:/templates/webapp/views/
     suffix: .jsp
     cache: false
     encoding: UTF-8
-
-  # Config dung lượng file upload
-  servlet:
-    multipart:
-      max-file-size: 20MB
-      max-request-size: 100MB
-
-  # Config send email
-  mail:
-    host: smtp.gmail.com
-    port: 587
+  #banner
+  banner:
+    location: classpath:banner.txt
+  # Database
+  jpa:
+    hibernate:
+      ddl-auto: none
+#    naming:
+#      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+#    properties:
+#      hibernate:
+#        format_sql: false
     properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-    username: vietnd.stg008@gmail.com
-    password: khpsawxcfkntzfbe
-#   host:
-#   port:
-#   properties:
-#     mail:
-#       smtp:
-#         auth: true
-#         starttls:
-#           enable: true
-#   username:
-#   password:
-
-  # Devtools config
-  devtools:
-    restart:
-      enabled: true
-
-# App API prefix
-app:
-  api:
-    prefix: /api/v1
+      hibernate:
+        session_factory:
+          statement_inspector: com.flowiee.pms.config.CustomHibernateInterceptor
+#Log
+logging:
+  level:
+    org.hibernate.SQL: DEBUG  #Log câu SQL
+    #org.hibernate.type.descriptor.sql.BasicBinder: TRACE  #Log tham số truyền vào

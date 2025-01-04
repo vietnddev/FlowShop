@@ -4,13 +4,13 @@ import com.flowiee.pms.entity.sales.VoucherApply;
 import com.flowiee.pms.entity.sales.VoucherInfo;
 import com.flowiee.pms.entity.sales.VoucherTicket;
 import com.flowiee.pms.exception.*;
-import com.flowiee.pms.utils.ChangeLog;
-import com.flowiee.pms.utils.constants.*;
+import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.dto.ProductDTO;
 import com.flowiee.pms.model.dto.VoucherInfoDTO;
 import com.flowiee.pms.repository.sales.VoucherInfoRepository;
 
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.sales.VoucherApplyService;
 import com.flowiee.pms.service.sales.VoucherService;
 import com.flowiee.pms.service.sales.VoucherTicketService;
@@ -54,13 +54,10 @@ public class VoucherInfoServiceImpl extends BaseService implements VoucherServic
     @Override
     public Page<VoucherInfoDTO> findAll(int pageSize, int pageNum, List<Long> pIds, String pTitle, LocalDateTime pStartTime, LocalDateTime pEndTime, String pStatus) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("createdAt").descending());
-        if (pEndTime == null) {
-            pEndTime = LocalDateTime.of(2100, 12, 31, 0, 0);
-        }
-        if (pStartTime == null) {
-            pStartTime = LocalDateTime.of(1900, 1, 1, 0, 0);
-        }
-        Page<VoucherInfo> pageVoucherInfoDTOs = mvVoucherInfoRepository.findAll(null, pTitle, pStartTime, pEndTime, pStatus, pageable);
+        LocalDateTime lvStartTime = getFilterStartTime(pStartTime);
+        LocalDateTime lvEndTime = getFilterEndTime(pEndTime);
+
+        Page<VoucherInfo> pageVoucherInfoDTOs = mvVoucherInfoRepository.findAll(null, pTitle, lvStartTime, lvEndTime, pStatus, pageable);
 
         Type listType = new TypeToken<List<VoucherInfoDTO>>() {}.getType();
         List<VoucherInfoDTO> voucherInfoDTOs = mvModelMapper.map(pageVoucherInfoDTOs.getContent(), listType);

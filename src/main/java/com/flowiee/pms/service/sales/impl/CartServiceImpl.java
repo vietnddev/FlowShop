@@ -1,5 +1,6 @@
 package com.flowiee.pms.service.sales.impl;
 
+import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.product.ProductPrice;
 import com.flowiee.pms.entity.sales.Items;
@@ -8,11 +9,12 @@ import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.model.payload.CartItemsReq;
-import com.flowiee.pms.utils.constants.*;
+import com.flowiee.pms.model.payload.CartReq;
+import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.repository.sales.CartItemsRepository;
 import com.flowiee.pms.repository.sales.OrderCartRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.ProductVariantService;
 import com.flowiee.pms.service.sales.CartItemsService;
 import com.flowiee.pms.service.sales.CartService;
@@ -20,6 +22,7 @@ import com.flowiee.pms.service.sales.CartService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +44,13 @@ public class CartServiceImpl extends BaseService implements CartService {
     @Override
     public List<OrderCart> findCartByAccountId(Long accountId) {
         List<OrderCart> listCart = mvCartRepository.findByAccountId(accountId);
+        if (CollectionUtils.isEmpty(listCart)) {
+            return List.of();
+        }
         for (OrderCart cart : listCart) {
+            if (CollectionUtils.isEmpty(cart.getListItems())) {
+                continue;
+            }
             for (Items item : cart.getListItems()) {
                 ProductPrice itemPrice = item.getProductDetail().getVariantPrice();//mvProductPriceRepository.findPricePresent(null, item.getProductDetail().getId());
                 if (itemPrice != null) {
@@ -158,21 +167,21 @@ public class CartServiceImpl extends BaseService implements CartService {
 
     @Transactional
     @Override
-    public void addItemsToCart(CartItemsReq cartItemsReq) {
-        Long lvCartId = cartItemsReq.getCartId();
+    public void addItemsToCart(CartReq cartReq) {
+        Long lvCartId = cartReq.getCartId();
         OrderCart orderCart = findById(lvCartId, true);
 
-        List<Items> itemsList = cartItemsReq.getItems();
+        List<CartItemsReq> itemsList = cartReq.getItems();
         if (ObjectUtils.isEmpty(itemsList)) {
             throw new BadRequestException("Please choose at least one product!");
         }
 
-        for (Items item : itemsList) {
+        for (CartItemsReq item : itemsList) {
             ProductVariantDTO lvProductVariant = mvProductVariantService.findById(item.getProductVariantId(), false);
             if (lvProductVariant == null) {
                 continue;
             }
-            Integer lvItemQty = item.getQuantity();
+            Integer lvItemQty = CoreUtils.coalesce(item.getQuantity(), 1);
             if (lvItemQty <= 0) {
                 throw new BadRequestException("Vui lòng nhập số lượng cho sản phẩm: " + lvProductVariant.getVariantName());
             }
@@ -205,40 +214,40 @@ public class CartServiceImpl extends BaseService implements CartService {
     }
 
     @Override
-    public void updateItemsOfCart(Items itemToUpdate, Long itemId) {
-        Items item = mvCartItemsService.findById(itemId, true);
-        if (itemToUpdate.getQuantity() <= 0) {
-            mvCartItemsService.delete(item.getId());
+    public void updateItemsOfCart(Items pItemToUpdate, Long itemId) {
+        Items lvItem = mvCartItemsService.findById(itemId, true);
+        if (pItemToUpdate.getQuantity() <= 0) {
+            mvCartItemsService.delete(lvItem.getId());
         } else {
-            ProductDetail productVariant = item.getProductDetail();
-            if (itemToUpdate.getQuantity() > productVariant.getAvailableSalesQty()) {
+            ProductDetail productVariant = lvItem.getProductDetail();
+            if (pItemToUpdate.getQuantity() > productVariant.getAvailableSalesQty()) {
                 throw new AppException(ErrorCode.ProductOutOfStock, new Object[]{productVariant.getVariantName()}, null, getClass(), null);
             }
             ProductPrice productVariantPrice = productVariant.getVariantPrice();//mvProductPriceRepository.findPricePresent(null, productVariant.getId());
-            String lvPriceType = itemToUpdate.getPriceType();
+            String lvPriceType = pItemToUpdate.getPriceType();
             BigDecimal lvRetailPrice = productVariantPrice.getRetailPrice();
             BigDecimal lvRetailPriceDiscount = productVariantPrice.getRetailPriceDiscount();
             BigDecimal lvWholesalePrice = productVariantPrice.getWholesalePrice();
             BigDecimal lvWholesalePriceDiscount = productVariantPrice.getWholesalePriceDiscount();
 
-            item.setNote(itemToUpdate.getNote());
-            item.setQuantity(itemToUpdate.getQuantity());
-            if (lvPriceType != null && (!item.getPriceType().equals(lvPriceType))) {
+            lvItem.setNote(pItemToUpdate.getNote());
+            lvItem.setQuantity(pItemToUpdate.getQuantity());
+            if (lvPriceType != null && (!lvItem.getPriceType().equals(lvPriceType))) {
                 if (lvPriceType.equals(PriceType.L.name())) {
-                    item.setPrice(lvRetailPriceDiscount);
-                    item.setPriceOriginal(lvRetailPrice);
-                    item.setPriceType(PriceType.L.name());
+                    lvItem.setPrice(lvRetailPriceDiscount);
+                    lvItem.setPriceOriginal(lvRetailPrice);
+                    lvItem.setPriceType(PriceType.L.name());
                 }
                 if (lvPriceType.equals(PriceType.S.name())) {
-                    item.setPrice(lvWholesalePriceDiscount);
-                    item.setPriceOriginal(lvWholesalePrice);
-                    item.setPriceType(PriceType.S.name());
+                    lvItem.setPrice(lvWholesalePriceDiscount);
+                    lvItem.setPriceOriginal(lvWholesalePrice);
+                    lvItem.setPriceType(PriceType.S.name());
                 }
             }
-            if (itemToUpdate.getExtraDiscount() != null) {
-                item.setExtraDiscount(itemToUpdate.getExtraDiscount());
+            if (pItemToUpdate.getExtraDiscount() != null) {
+                lvItem.setExtraDiscount(pItemToUpdate.getExtraDiscount());
             }
-            mvCartItemsService.update(item, item.getId());
+            mvCartItemsService.update(lvItem, lvItem.getId());
         }
     }
 }

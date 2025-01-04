@@ -21,26 +21,26 @@ function createProductVariant() {
                     productId : mvProductId,
                     variantName : mvProductVariantNameField.val(),
                     variantCode : mvProductVariantCodeField.val(),
-                    fabricTypeId : $("#fabricTypeField").val(),
-                    colorId : $("#colorField").val(),
-                    sizeId : $("#sizeField").val(),
-                    originalPrice : $("#originalPriceField").val().replaceAll(',', ''),
-                    discountPrice : $("#promotionPriceField").val().replaceAll(',', ''),
+                    fabricTypeId : parseInt($("#fabricTypeField").val()),
+                    colorId : parseInt($("#colorField").val()),
+                    sizeId : parseInt($("#sizeField").val()),
+                    originalPrice : parseFloat($("#originalPriceField").val().replaceAll(',', '')),
+                    discountPrice : parseFloat($("#promotionPriceField").val().replaceAll(',', '')),
                     price : {
-                        purchasePrice : mvPurchasePriceField.val().replaceAll(',', ''),
-                        costPrice : mvCostPriceField.val().replaceAll(',', ''),
-                        retailPrice : mvRetailPriceField.val().replaceAll(',', ''),
-                        retailPriceDiscount : mvRetailPriceDiscountField.val().replaceAll(',', ''),
-                        wholesalePrice : mvWholesalePriceField.val().replaceAll(',', ''),
-                        wholesalePriceDiscount : mvWholesalePriceDiscountField.val().replaceAll(',', '')
+                        purchasePrice : parseFloat(mvPurchasePriceField.val().replaceAll(',', '')),
+                        costPrice : parseFloat(mvCostPriceField.val().replaceAll(',', '')),
+                        retailPrice : parseFloat(mvRetailPriceField.val().replaceAll(',', '')),
+                        retailPriceDiscount : parseFloat(mvRetailPriceDiscountField.val().replaceAll(',', '')),
+                        wholesalePrice : parseFloat(mvWholesalePriceField.val().replaceAll(',', '')),
+                        wholesalePriceDiscount : parseFloat(mvWholesalePriceDiscountField.val().replaceAll(',', ''))
                     },
-                    storageQty : mvStorageQtyField.val(),
-                    soldQty : mvSoldQtyField.val(),
-                    defectiveQty : mvDefectiveQtyField.val(),
+                    storageQty : parseInt(mvStorageQtyField.val()),
+                    soldQty : parseInt(mvSoldQtyField.val()),
+                    defectiveQty : parseInt(mvDefectiveQtyField.val()),
                     weight : mvWeightField.val(),
                     note : mvVariantNoteField.val(),
-                    storageIdInitStorageQty : mvKhoTonKhoInit.val(),
-                    storageIdInitSoldQty : mvKhoDaBanInit.val()
+                    storageIdInitStorageQty : parseInt(mvKhoTonKhoInit.val()),
+                    storageIdInitSoldQty : parseInt(mvKhoDaBanInit.val())
                 };
                 $.ajax({
                     url: apiURL,

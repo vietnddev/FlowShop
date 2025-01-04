@@ -1,19 +1,21 @@
 package com.flowiee.pms.service.sales.impl;
 
 import com.flowiee.pms.entity.product.ProductPrice;
+import com.flowiee.pms.entity.sales.Items;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.entity.sales.OrderDetail;
 import com.flowiee.pms.exception.AppException;
+import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
-import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.repository.product.ProductPriceRepository;
+import com.flowiee.pms.repository.sales.CartItemsRepository;
 import com.flowiee.pms.service.product.ProductVariantService;
-import com.flowiee.pms.utils.ChangeLog;
-import com.flowiee.pms.utils.CoreUtils;
-import com.flowiee.pms.utils.constants.*;
+import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.repository.sales.OrderDetailRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.sales.OrderHistoryService;
 import com.flowiee.pms.service.sales.OrderItemsService;
 import com.flowiee.pms.service.system.SystemLogService;
@@ -43,6 +45,7 @@ public class OrderItemsServiceImpl extends BaseService implements OrderItemsServ
     @NonFinal
     @Lazy
     ProductVariantService mvProductVariantService;
+    CartItemsRepository   mvCartItemsRepository;
 
     @Override
     public List<OrderDetail> findAll() {
@@ -64,12 +67,12 @@ public class OrderItemsServiceImpl extends BaseService implements OrderItemsServ
     }
 
     @Override
-    public List<OrderDetail> save(OrderDTO pOrderDto, List<String> productVariantIds) {
+    public List<OrderDetail> save(Order pOrder, List<String> productVariantIds) {
         List<OrderDetail> itemAdded = new ArrayList<>();
         for (String productVariantId : productVariantIds) {
             ProductVariantDTO productDetail = mvProductVariantService.findById(Long.parseLong(productVariantId), false);
             if (productDetail != null) {
-                OrderDetail orderDetail = mvOrderDetailRepository.findByOrderIdAndProductVariantId(pOrderDto.getId(), productDetail.getId());
+                OrderDetail orderDetail = mvOrderDetailRepository.findByOrderIdAndProductVariantId(pOrder.getId(), productDetail.getId());
                 if (orderDetail != null) {
                     orderDetail.setQuantity(orderDetail.getQuantity() + 1);
                     itemAdded.add(mvOrderDetailRepository.save(orderDetail));
@@ -79,7 +82,7 @@ public class OrderItemsServiceImpl extends BaseService implements OrderItemsServ
                         throw new AppException(String.format("Sản phẩm %s chưa được thiết lập giá bán!", productDetail.getVariantName()));
                     }
                     itemAdded.add(this.save(OrderDetail.builder()
-                            .order(new Order(pOrderDto.getId()))
+                            .order(new Order(pOrder.getId()))
                             .productDetail(productDetail)
                             .quantity(1)
                             .status(true)
@@ -92,6 +95,38 @@ public class OrderItemsServiceImpl extends BaseService implements OrderItemsServ
             }
         }
         return itemAdded;
+    }
+
+    @Override
+    public List<OrderDetail> save(Long pCartId, Long pOrderId, List<Items> pItemsList) {
+        List<OrderDetail> lvOrderDetailList = new ArrayList<>();
+        if (pItemsList == null || pItemsList.isEmpty()) {
+            return lvOrderDetailList;
+        }
+        for (Items items : pItemsList) {
+            Long lvProductVariantId = items.getProductDetail().getId();
+            ProductVariantDTO productDetail = mvProductVariantService.findById(lvProductVariantId, true);
+            String productVariantName = productDetail.getVariantName();
+            int lvItemQuantity = mvCartItemsRepository.findQuantityByProductVariantId(pCartId, lvProductVariantId);
+            if (lvItemQuantity <= 0) {
+                throw new BadRequestException(String.format("The quantity of product %s must greater than zero!", productVariantName));
+            }
+            if (lvItemQuantity > productDetail.getAvailableSalesQty()) {
+                throw new AppException(ErrorCode.ProductOutOfStock, new Object[]{productVariantName}, null, getClass(), null);
+            }
+            lvOrderDetailList.add(save(OrderDetail.builder()
+                    .order(new Order(pOrderId))
+                    .productDetail(productDetail)
+                    .quantity(lvItemQuantity)
+                    .status(true)
+                    .note(items.getNote())
+                    .price(items.getPrice())
+                    .priceOriginal(items.getPriceOriginal())
+                    .extraDiscount(CoreUtils.coalesce(items.getExtraDiscount()))
+                    .priceType(items.getPriceType())
+                    .build()));
+        }
+        return lvOrderDetailList;
     }
 
     @Override

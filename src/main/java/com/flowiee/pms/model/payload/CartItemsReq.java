@@ -1,21 +1,9 @@
 package com.flowiee.pms.model.payload;
 
-import com.flowiee.pms.entity.sales.Items;
-import lombok.*;
+import lombok.Data;
 
-import java.util.List;
-
-@Builder
 @Data
-@ToString
 public class CartItemsReq {
-    private Long cartId;
-    private List<Items> items;
-
-//    @Data
-//    @ToString
-//    public class Item {
-//        private Long productVariantId;
-//        private Integer quantity;
-//    }
+    private Long productVariantId;
+    private Integer quantity;
 }

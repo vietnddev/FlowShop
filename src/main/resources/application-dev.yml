@@ -1,0 +1,65 @@
+# Config webapp
+server:
+  port: 8085
+  servlet:
+    session:
+      timeout: 3600
+spring:
+  # MySQL TTL
+  # datasource:
+  #   driver-class-name: com.mysql.cj.jdbc.Driver
+  #   url: jdbc:mysql://localhost:3306/flowiee
+  #   username: root
+  #   password: 080100
+
+  # Oracle local
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@127.0.0.1:1521:orcl
+    username: flowiee
+    password: 080100
+
+  # MySQL Google cloud
+  # datasource:
+  #   driver-class-name: com.mysql.cj.jdbc.Driver
+  #   url: jdbc:mysql://35.225.47.208:3306/flowiee
+  #   username: root
+  #   password: 123qwe!@#
+
+  # Config dung lượng file upload
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
+
+  # Config send email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    username: vietnd.stg008@gmail.com
+    password: khpsawxcfkntzfbe
+  #   host:
+  #   port:
+  #   properties:
+  #     mail:
+  #       smtp:
+  #         auth: true
+  #         starttls:
+  #           enable: true
+  #   username:
+  #   password:
+
+  # Auto restart
+  devtools:
+    restart:
+      enabled: true
+
+system:
+  login:
+    bypass: true

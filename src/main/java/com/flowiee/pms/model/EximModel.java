@@ -1,7 +1,7 @@
 package com.flowiee.pms.model;
 
-import com.flowiee.pms.utils.FileUtils;
-import com.flowiee.pms.utils.constants.TemplateExport;
+import com.flowiee.pms.common.utils.FileUtils;
+import com.flowiee.pms.common.enumeration.TemplateExport;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.product.impl;
 
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.ProductPriceService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

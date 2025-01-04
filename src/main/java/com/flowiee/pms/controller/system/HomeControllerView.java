@@ -1,13 +1,10 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.controller.BaseController;
-import com.flowiee.pms.service.system.AccountService;
-import com.flowiee.pms.service.system.SendMailService;
-import com.flowiee.pms.utils.CommonUtils;
-import com.flowiee.pms.utils.constants.Pages;
+import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.service.system.ResetPasswordService;
+import com.flowiee.pms.common.enumeration.Pages;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +23,7 @@ import java.io.UnsupportedEncodingException;
 @RestController
 @RequiredArgsConstructor
 public class HomeControllerView extends BaseController {
-    private final AccountService mvAccountService;
-    private final SendMailService mvSendMailService;
-    private final PasswordEncoder mvPasswordEncoder;
+    private final ResetPasswordService mvResetPasswordService;
 
     @GetMapping(value = "/change-password")
     public ModelAndView showPageChangePassword() {
@@ -48,7 +43,7 @@ public class HomeControllerView extends BaseController {
     @GetMapping(value = "/reset-password")
     public ModelAndView requestResetPassword(@RequestParam("email") String pEmail, HttpSession session, HttpServletRequest request) throws UnsupportedEncodingException, MessagingException {
         if(!ObjectUtils.isEmpty(pEmail)) {
-            if (mvAccountService.sendTokenForResetPassword(pEmail, request)) {
+            if (mvResetPasswordService.sendToken(pEmail, request)) {
                 session.setAttribute("successMsg", "Please check your email, password reset link has been sent to your email.");
             } else {
                 session.setAttribute("errorMsg", "Something wrong on server. Email Not Sent!");
@@ -63,7 +58,7 @@ public class HomeControllerView extends BaseController {
     public void doResetPassword(@RequestParam String token, @RequestParam String password,
                                HttpServletRequest request, HttpServletResponse response,
                                HttpSession session, Model model) throws IOException {
-        if (mvAccountService.resetPasswordWithToken(token, password)) {
+        if (mvResetPasswordService.resetPasswordWithToken(token, password)) {
             session.setAttribute("successMsg", "Password Changed Successfully");
             model.addAttribute("msg", "Password Changed Successfully");
             response.sendRedirect(request.getServletPath());

@@ -2,11 +2,11 @@ package com.flowiee.pms.entity.system;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 
 import com.flowiee.pms.entity.sales.Customer;
 import com.flowiee.pms.entity.sales.Order;
-import com.flowiee.pms.utils.constants.AccountStatus;
+import com.flowiee.pms.common.enumeration.AccountStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.util.Assert;
@@ -22,6 +22,13 @@ import java.util.Objects;
 @Builder
 @Entity
 @Table(name = "account")
+@NamedEntityGraph(
+	name = "Account.withBranchAndGroupAccount",
+	attributeNodes = {
+		@NamedAttributeNode("branch"),
+		@NamedAttributeNode("groupAccount")
+	}
+)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

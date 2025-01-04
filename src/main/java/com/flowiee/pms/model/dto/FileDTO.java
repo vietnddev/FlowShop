@@ -2,7 +2,7 @@ package com.flowiee.pms.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.flowiee.pms.entity.system.FileStorage;
-import com.flowiee.pms.utils.FileUtils;
+import com.flowiee.pms.common.utils.FileUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

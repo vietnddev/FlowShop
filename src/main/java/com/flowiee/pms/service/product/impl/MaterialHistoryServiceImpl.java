@@ -7,7 +7,7 @@ import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.repository.product.MaterialHistoryRepository;
 import com.flowiee.pms.service.product.MaterialHistoryService;
 
-import com.flowiee.pms.utils.constants.MessageCode;
+import com.flowiee.pms.common.enumeration.MessageCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

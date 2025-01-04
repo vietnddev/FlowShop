@@ -6,15 +6,16 @@ import com.flowiee.pms.entity.sales.OrderCart;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.model.CartItemModel;
+import com.flowiee.pms.model.ProductVariantParameter;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.repository.sales.CartItemsRepository;
 import com.flowiee.pms.repository.sales.OrderCartRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.ProductComboService;
 import com.flowiee.pms.service.product.ProductVariantService;
 import com.flowiee.pms.service.sales.CartItemsService;
-import com.flowiee.pms.utils.CommonUtils;
-import com.flowiee.pms.utils.constants.MessageCode;
+import com.flowiee.pms.common.utils.CommonUtils;
+import com.flowiee.pms.common.enumeration.MessageCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -53,7 +54,11 @@ public class CartItemsServiceImpl extends BaseService implements CartItemsServic
         List<CartItemModel> cartItemModelList = new ArrayList<>();
         OrderCart cart = cartRepository.findByAccountId(CommonUtils.getUserPrincipal().getId()).get(0);
         List<ProductCombo> productCombos = mvProductComboService.findAll();
-        List<ProductVariantDTO> productVariantDTOs = mvProductVariantService.findAll(-1, -1, null, null, null, null, null, true, false).getContent();
+        List<ProductVariantDTO> productVariantDTOs = mvProductVariantService.findAll(ProductVariantParameter.builder()
+                .availableForSales(true)
+                .checkInAnyCart(false)
+                .build()
+        ).getContent();
         for (ProductCombo productCbo : productCombos) {
             int availableQty = productCbo.getQuantity();
             if (availableQty < 1)
@@ -137,7 +142,7 @@ public class CartItemsServiceImpl extends BaseService implements CartItemsServic
 
     @Transactional
     @Override
-    public void deleteAllItems() {
-        mvCartItemsRepository.deleteAllItems();
+    public void deleteAllItems(Long cartId) {
+        mvCartItemsRepository.deleteAllItems(cartId);
     }
 }

@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.sales.impl;
 
 import com.flowiee.pms.service.sales.LedgerPaymentService;
-import com.flowiee.pms.utils.constants.LedgerTranType;
+import com.flowiee.pms.common.enumeration.LedgerTranType;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -472,7 +472,7 @@
                             <div class="card-header p-0">
                                 <div class="row col-12 input-group mb-3 p-0">
                                     <div class="col-6 mr-1">
-                                        <input class="form-control" id="txtFilter"/>
+                                        <input class="form-control" id="txtSearchModal"/>
                                     </div>
                                     <div class="col-5 row mr-1">
                                         <select class="col form-control custom-select search-selection mr-1" id="brandSearchModal"></select>

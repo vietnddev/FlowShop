@@ -208,8 +208,8 @@
                     return;
                 }
                 let applicableProducts = [];
-                $.each(mvApplicableProductIds.val(), function (index, d) {
-                    applicableProducts.push({id : d});
+                $.each(mvApplicableProductIds.val(), function (index, productId) {
+                    applicableProducts.push(productId);
                 })
                 let apiURL = mvHostURLCallApi + "/voucher/create";
                 let body = {
@@ -217,12 +217,12 @@
                     description : mvDescription.val(),
                     applicableObjects : mvApplicableObjects.val(),
                     voucherType : mvType.val(),
-                    quantity : mvQuantity.val(),
-                    length : mvLength.val(),
-                    discount : mvDiscountPercent.val(),
-                    discountPriceMax : mvDiscountMaxPrice.val(),
-                    startTimeStr : mvStartTime.val(),
-                    endTimeStr : mvEndTime.val(),
+                    quantity : parseInt(mvQuantity.val()),
+                    length : parseInt(mvLength.val()),
+                    discount : parseInt(mvDiscountPercent.val()),
+                    discountPriceMax : parseFloat(mvDiscountMaxPrice.val()),
+                    startTime : mvStartTime.val(),
+                    endTime : mvEndTime.val(),
                     applicableProducts : applicableProducts
                 };
                 $.ajax({

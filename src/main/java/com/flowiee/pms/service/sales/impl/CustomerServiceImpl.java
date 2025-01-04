@@ -1,13 +1,13 @@
 package com.flowiee.pms.service.sales.impl;
 
+import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.sales.Order;
-import com.flowiee.pms.entity.system.SystemConfig;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.service.system.ConfigService;
-import com.flowiee.pms.utils.CoreUtils;
-import com.flowiee.pms.utils.constants.*;
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.PurchaseHistory;
 import com.flowiee.pms.model.dto.CustomerDTO;
 import com.flowiee.pms.entity.sales.CustomerContact;
@@ -16,11 +16,11 @@ import com.flowiee.pms.entity.sales.Customer;
 import com.flowiee.pms.repository.sales.CustomerContactRepository;
 import com.flowiee.pms.repository.sales.CustomerRepository;
 import com.flowiee.pms.repository.sales.OrderRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.sales.CustomerContactService;
 import com.flowiee.pms.service.sales.CustomerService;
 
-import com.flowiee.pms.utils.CommonUtils;
+import com.flowiee.pms.common.utils.CommonUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -105,6 +105,7 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
         customer.setCreatedBy(dto.getCreatedBy() != null ? dto.getCreatedBy() : CommonUtils.getUserPrincipal().getId());
         customer.setBonusPoints(0);
         customer.setIsBlackList(false);
+        customer.setIsVIP(dto.getIsVIP() != null ? dto.getIsVIP() : false);
         Customer customerInserted = mvCustomerRepository.save(customer);
 
         CustomerContact customerContact = CustomerContact.builder()
@@ -118,8 +119,7 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
 
             if (!CoreUtils.validateEmail(lvPhoneDefault))
                 throw new BadRequestException("Phone number invalid");
-            SystemConfig lvConfig = mvConfigService.getSystemConfig(ConfigCode.allowDuplicateCustomerPhoneNumber.name());
-            if (isConfigAvailable(lvConfig) && !lvConfig.isYesOption()) {
+            if (!SysConfigUtils.isYesOption(ConfigCode.allowDuplicateCustomerPhoneNumber)) {
                 if ( mvCustomerContactRepository.findByContactTypeAndValue(lvContactType.name(), lvPhoneDefault) != null) {
                     throw new BadRequestException(String.format("Phone %s already used!", dto.getEmailDefault()));
                 }

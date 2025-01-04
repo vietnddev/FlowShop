@@ -1,16 +1,16 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.model.dto.CustomerDTO;
 import com.flowiee.pms.entity.sales.CustomerContact;
 import com.flowiee.pms.service.sales.CustomerContactService;
-import com.flowiee.pms.utils.*;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.service.sales.CustomerService;
-import com.flowiee.pms.service.sales.OrderService;
+import com.flowiee.pms.service.sales.OrderReadService;
 
-import com.flowiee.pms.utils.constants.ContactType;
-import com.flowiee.pms.utils.constants.Pages;
+import com.flowiee.pms.common.enumeration.ContactType;
+import com.flowiee.pms.common.enumeration.Pages;
+import com.flowiee.pms.common.utils.DateUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,14 +21,13 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/customer")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class CustomerControllerView extends BaseController {
-    OrderService mvOrderService;
+    OrderReadService mvOrderReadService;
     CustomerService mvCustomerService;
     CustomerContactService mvCustomerContactService;
 
@@ -65,7 +64,7 @@ public class CustomerControllerView extends BaseController {
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_CUSTOMER_DETAIL.getTemplate());
         modelAndView.addObject("customerDetail", customerDTO);
         modelAndView.addObject("listCustomerContact", listContacts);
-        modelAndView.addObject("listDonHang", mvOrderService.getOrdersByCustomer(-1, -1, customerId).getContent());
+        modelAndView.addObject("listDonHang", mvOrderReadService.getOrdersByCustomer(-1, -1, customerId).getContent());
         return baseView(modelAndView);
     }
 

@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.sales;
 
 import com.flowiee.pms.model.CartItemModel;
-import com.flowiee.pms.service.BaseCurdService;
+import com.flowiee.pms.base.service.BaseCurdService;
 import com.flowiee.pms.entity.sales.Items;
 
 import java.util.List;
@@ -17,5 +17,5 @@ public interface CartItemsService extends BaseCurdService<Items> {
 
     void increaseItemQtyInCart(Long itemId, int quantity);
 
-    void deleteAllItems();
+    void deleteAllItems(Long cartId);
 }

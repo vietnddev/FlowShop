@@ -1,17 +1,15 @@
 package com.flowiee.pms.exception;
 
-import com.flowiee.pms.config.Core;
-import com.flowiee.pms.controller.BaseController;
-import com.flowiee.pms.entity.system.Account;
+import com.flowiee.pms.base.exception.BaseException;
+import com.flowiee.pms.base.system.Core;
+import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.system.SystemConfig;
 import com.flowiee.pms.model.AppResponse;
-import com.flowiee.pms.repository.system.AccountRepository;
-import com.flowiee.pms.service.BaseService;
 import com.flowiee.pms.service.system.MailMediaService;
-import com.flowiee.pms.utils.AppConstants;
-import com.flowiee.pms.utils.CoreUtils;
-import com.flowiee.pms.utils.constants.ConfigCode;
-import com.flowiee.pms.utils.constants.Pages;
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.enumeration.ConfigCode;
+import com.flowiee.pms.common.enumeration.Pages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +17,36 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @ControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends BaseController {
     private final MailMediaService mailMediaService;
-    private final AccountRepository accountRepository;
+
+    private Map<Class, Boolean> mvExceptionNotifyEmail = new HashMap<>();
+
+    {
+        mvExceptionNotifyEmail.put(AppException.class, true);
+    }
+
+    private void notifyEmail(BaseException pEx) {
+        if (mvExceptionNotifyEmail.get(pEx.getClass()) == null) {
+            return;
+        }
+
+        if (!SysConfigUtils.isYesOption(ConfigCode.sendNotifyAdminExceptionRuntime)) {
+            return;
+        }
+
+        SystemConfig lvRecipientConfig = Core.mvSystemConfigList.get(ConfigCode.adminEmailRecipientExceptionNotification);
+        String lvRecipients = lvRecipientConfig.getValue();
+        String lvMessage = CoreUtils.isNullStr(pEx.getFullStackTrace())
+                ? pEx.getMessage() : pEx.getFullStackTrace();
+
+        mailMediaService.send(lvRecipients, "[Flowiee] Thông báo hệ thống!", lvMessage);
+    }
 
     @ExceptionHandler
     public ModelAndView exceptionHandler(AuthenticationException ex) {
@@ -49,7 +72,7 @@ public class GlobalExceptionHandler extends BaseController {
     @ExceptionHandler
     public ResponseEntity<AppResponse<?>> exceptionHandler(DataExistsException ex) {
         mvLogger.error(ex.getMessage(), ex);
-        notifyEmail(ex.getMessage());
+        notifyEmail(ex);
         return ResponseEntity.badRequest().body(fail(HttpStatus.CONFLICT, ex.getMessage()));
     }
 
@@ -84,7 +107,7 @@ public class GlobalExceptionHandler extends BaseController {
     @ExceptionHandler
     public ResponseEntity<AppResponse<Object>> exceptionHandler(AppException ex) {
         mvLogger.info(ex.getMessage(), ex);
-        notifyEmail(ex.getFullStackTrace());
+        notifyEmail(ex);
         return ResponseEntity.internalServerError ().body(fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
     }
 
@@ -92,25 +115,23 @@ public class GlobalExceptionHandler extends BaseController {
     public ResponseEntity<AppResponse<?>> exceptionHandler(RuntimeException ex) {
         mvLogger.error(ex.getMessage(), ex);
         ex.printStackTrace();
-        notifyEmail(ex.getMessage());
+
+        BaseException lvBaseException = new BaseException();
+        lvBaseException.setMessage(ex.getMessage());
+        notifyEmail(lvBaseException);
+
         return ResponseEntity.internalServerError().body(fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<AppResponse<?>> exceptionHandler(Exception ex) {
         mvLogger.error(ex.getMessage(), ex);
-        notifyEmail(ex.getMessage());
-        return ResponseEntity.internalServerError().body(fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
-    }
+        ex.printStackTrace();
 
-    private void notifyEmail(String message) {
-        SystemConfig lvNotifyFlag = Core.mvSystemConfigList.get(ConfigCode.sendNotifyAdminExceptionRuntime);
-        if (BaseService.isConfigAvailable(lvNotifyFlag) && lvNotifyFlag.isYesOption()) {
-            Account account = accountRepository.findByUsername(AppConstants.ADMINISTRATOR);
-            if (account == null || CoreUtils.isNullStr(account.getEmail())) {
-                return;
-            }
-            mailMediaService.send(account.getEmail(), "[Flowiee] Thông báo hệ thống!", message);
-        }
+        BaseException lvBaseException = new BaseException();
+        lvBaseException.setMessage(ex.getMessage());
+        notifyEmail(lvBaseException);
+
+        return ResponseEntity.internalServerError().body(fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
     }
 }

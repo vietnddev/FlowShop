@@ -3,12 +3,12 @@ package com.flowiee.pms.entity.sales;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.product.ProductReview;
 import com.flowiee.pms.model.dto.CustomerDTO;
 
-import com.flowiee.pms.utils.constants.ContactType;
+import com.flowiee.pms.common.enumeration.ContactType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
@@ -33,6 +33,9 @@ import java.util.List;
 public class Customer extends BaseEntity implements Serializable {
 	@Serial
 	static final long serialVersionUID = 1L;
+
+	@Column(name = "customer_code", length = 20)
+	String code;
 
 	@Column(name = "customer_name", length = 100, nullable = false)
 	String customerName;
@@ -95,6 +98,10 @@ public class Customer extends BaseEntity implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
 	List<GiftRedemption> giftRedemptionList;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+	List<CustomerDebt> customerDebtList;
 
 	public Customer(long id) {
 		super.id = id;

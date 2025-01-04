@@ -115,7 +115,7 @@
                                             </div>
                                             <div class="modal-footer justify-content-end">
                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
-                                                <button type="button" class="btn btn-primary" id="btn-insert-update-submit">Lưu</button>
+                                                <button type="button" class="btn btn-primary" id="btn-insert-update-submit-">Lưu</button>
                                             </div>
                                         </div>
                                     </div>
@@ -152,14 +152,14 @@
             loadPromotions(mvPageSizeDefault, 1);
             updateTableContentWhenOnClickPagination(loadPromotions);
 
-            loadProducts();
-            preCreateStorage();
-            preUpdateStorage();
-            submitInsertOrUpdate();
-            deleteStorage();
+            //loadProducts();
+            //preCreateStorage();
+            //preUpdateStorage();
+            //submitInsertOrUpdate();
+            //deleteStorage();
         });
 
-        function loadProducts() {
+        /*function loadProducts() {
             let apiURL = mvHostURLCallApi + '/product/all';
             let params = {fullInfo: false}
             $.get(apiURL, params, function (response) {
@@ -212,17 +212,16 @@
             $("#btn-insert-update-submit").on("click", function () {
                 let actionType = $(this).attr("actionType");
                 let applicableProducts = [];
-                $.each(mvApplicableProductIds.val(), function (index, d) {
-                    applicableProducts.push({id : d});
+                $.each(mvApplicableProductIds.val(), function (index, productId) {
+                    applicableProducts.push(productId);
                 })
                 let promotion = {
-                    id : mvId,
                     title : mvTitle.val(),
-                    discountPercent : mvDiscountPercent.val(),
-                    discountPrice : mvDiscountPrice.val(),
-                    discountPriceMax : mvDiscountPriceMax.val(),
-                    startTimeStr : mvStartTime.val(),
-                    endTimeStr : mvEndTime.val(),
+                    discountPercent : parseInt(mvDiscountPercent.val()),
+                    discountPrice : parseFloat(mvDiscountPrice.val()),
+                    discountPriceMax : parseFloat(mvDiscountPriceMax.val()),
+                    startTime : mvStartTime.val(),
+                    endTime : mvEndTime.val(),
                     description : mvDescription.val(),
                     applicableProducts : applicableProducts
                 }
@@ -276,7 +275,7 @@
                 let apiURL = mvHostURLCallApi + "/promotion/delete/" + mvId;
                 callApiDelete(apiURL);
             });
-        }
+        }*/
 
         function loadPromotions(pageSize, pageNum) {
             let apiURL = mvHostURLCallApi + '/promotion/all';

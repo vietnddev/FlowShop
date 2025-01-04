@@ -1,12 +1,13 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.sales.PromotionInfo;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.model.dto.PromotionInfoDTO;
+import com.flowiee.pms.model.payload.CreatePromotionReq;
 import com.flowiee.pms.service.sales.PromotionService;
-import com.flowiee.pms.utils.constants.ErrorCode;
+import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -45,9 +46,9 @@ public class PromotionController extends BaseController {
     @Operation(summary = "Create promotion")
     @PostMapping("/create")
     @PreAuthorize("@vldModuleSales.insertPromotion(true)")
-    public AppResponse<PromotionInfoDTO> createPromotion(@RequestBody PromotionInfoDTO promotion) {
+    public AppResponse<PromotionInfoDTO> createPromotion(@RequestBody CreatePromotionReq request) {
         try {
-            return success(mvPromotionService.save(promotion));
+            return success(mvPromotionService.save(request.toPromotionInfoDTO()));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "promotion"), ex);
         }

@@ -1,11 +1,11 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.dto.VoucherInfoDTO;
 import com.flowiee.pms.service.sales.VoucherService;
-import com.flowiee.pms.utils.constants.Pages;
+import com.flowiee.pms.common.enumeration.Pages;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

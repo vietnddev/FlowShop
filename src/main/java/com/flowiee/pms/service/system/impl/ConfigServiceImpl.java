@@ -1,17 +1,19 @@
 package com.flowiee.pms.service.system.impl;
 
-import com.flowiee.pms.config.Core;
+import com.flowiee.pms.base.system.Core;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.system.SystemConfig;
 import com.flowiee.pms.entity.system.SystemLog;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.model.ShopInfo;
-import com.flowiee.pms.utils.ChangeLog;
-import com.flowiee.pms.utils.CommonUtils;
-import com.flowiee.pms.utils.constants.*;
+import com.flowiee.pms.repository.category.CategoryRepository;
+import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.CommonUtils;
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.repository.system.ConfigRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.category.CategoryService;
 import com.flowiee.pms.service.system.ConfigService;
 
@@ -21,6 +23,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +31,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ConfigServiceImpl extends BaseService implements ConfigService {
     private final CategoryService mvCategoryService;
+    private final CategoryRepository mvCategoryRepository;
     private final LanguageService mvLanguageService;
     private final ConfigRepository mvSysConfigRepository;
 
@@ -74,7 +78,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
             List<SystemConfig> systemConfigList = this.findAll();
             Core.mvSystemConfigList.clear();
             for (SystemConfig systemConfig : systemConfigList) {
-                ConfigCode lvConfigCode = ConfigCode.valueOf(systemConfig.getCode());
+                ConfigCode lvConfigCode = ConfigCode.get(systemConfig.getCode());
                 String lvConfigValue = systemConfig.getValue();
 
                 if (lvConfigCode == null) continue;
@@ -90,7 +94,9 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
             }
             CommonUtils.mvShopInfo = lvShopInfo;
 
-            //Reload category label
+            reloadCategoryLabel();
+
+            //Root category's label
             List<Category> rootCategories = mvCategoryService.findRootCategory();
             for (Category c : rootCategories) {
                 if (c.getType() != null && !c.getType().trim().isEmpty()) {
@@ -144,5 +150,35 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
     @Override
     public List<SystemConfig> getSystemConfigs(List<String> configCodes) {
         return mvSysConfigRepository.findByCode(configCodes);
+    }
+
+    private void reloadCategoryLabel() {
+        List<String> lvCategoryTypeList = new ArrayList<>();
+        lvCategoryTypeList.add(CategoryType.PRODUCT_STATUS.getName());
+
+        List<Category> lvCategoryList = mvCategoryRepository.findSubCategory(lvCategoryTypeList);
+        if (lvCategoryList == null) {
+            return;
+        }
+
+        for (Category lvCategory : lvCategoryList) {
+            String lvLabel = CoreUtils.trim(lvCategory.getName());
+            String lvCode = CoreUtils.trim(lvCategory.getCode());
+            CategoryType lvCategoryType = CategoryType.valueOf(CoreUtils.trim(lvCategory.getType()));
+            switch (lvCategoryType) {
+                case PRODUCT_STATUS:
+                    for (ProductStatus lvPS : ProductStatus.values()) {
+                        if (lvPS.name().equals(lvCode))
+                            lvPS.setLabel(lvLabel);
+                    }
+                    break;
+                case ORDER_STATUS:
+                    for (OrderStatus lvOS : OrderStatus.values()) {
+                        if (lvOS.name().equals(lvCode))
+                            lvOS.setDescription(lvLabel);
+                    }
+                    break;
+            }
+        }
     }
 }

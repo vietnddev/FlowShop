@@ -7,38 +7,39 @@ import com.flowiee.pms.entity.sales.OrderDetail;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.*;
 import com.flowiee.pms.model.ProductHeld;
+import com.flowiee.pms.model.ProductVariantParameter;
 import com.flowiee.pms.repository.product.ProductDescriptionRepository;
 import com.flowiee.pms.repository.sales.OrderRepository;
 import com.flowiee.pms.service.category.CategoryService;
-import com.flowiee.pms.utils.ChangeLog;
-import com.flowiee.pms.utils.CoreUtils;
-import com.flowiee.pms.utils.FileUtils;
-import com.flowiee.pms.utils.constants.*;
+import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.utils.FileUtils;
+import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.dto.ProductDTO;
 import com.flowiee.pms.model.dto.VoucherApplyDTO;
 import com.flowiee.pms.model.dto.VoucherInfoDTO;
 import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.repository.product.ProductRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.*;
 import com.flowiee.pms.service.sales.VoucherApplyService;
 import com.flowiee.pms.service.sales.VoucherService;
-import com.flowiee.pms.utils.converter.ProductConvert;
-import lombok.AccessLevel;
+import com.flowiee.pms.common.converter.ProductConvert;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class ProductInfoServiceImpl extends BaseService implements ProductInfoService {
     private final ProductDescriptionRepository mvProductDescriptionRepository;
-    private final ProductStatisticsService mvProductStatisticsService;
+    private final ProductStatisticsService_0 mvProductStatisticsService;
     private final ProductVariantService mvProductVariantService;
     private final ProductHistoryService mvProductHistoryService;
     private final VoucherApplyService mvVoucherApplyService;
@@ -47,43 +48,68 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
     private final VoucherService mvVoucherInfoService;
     private final OrderRepository mvOrderRepository;
     private final CategoryService mvCategoryService;
-    //ProductImageService mvProductImageService;
 
     @Override
     public List<ProductDTO> findAll() {
-        return this.findAll(null, -1, -1, null, null, null, null, null, null, null).getContent();
+        return this.findAll(null, -1, -1, null, null, null, null, null, null, null, null, null, null).getContent();
     }
 
     @Override
-    public Page<ProductDTO> findAll(PID pPID , int pageSize, int pageNum, String pTxtSearch, Long pBrand, Long pProductType,
-                                    Long pColor, Long pSize, Long pUnit, String pStatus) {
-        Pageable pageable = getPageable(pageNum, pageSize, Sort.by("createdAt").descending());
-        Page<Product> products = mvProductRepository.findAll(pPID.getId(), pTxtSearch, pBrand, pProductType, pColor, pSize, pUnit, pStatus, pageable);
-        List<ProductDTO> productDTOs = ProductConvert.convertToDTOs(products);
-        this.setImageActiveAndLoadVoucherApply(productDTOs);
-        this.setInfoVariantOfProduct(productDTOs);
-        return new PageImpl<>(productDTOs, pageable, products.getTotalElements());
+    public Page<ProductDTO> findAll(PID pPID , int pageSize, int pageNum, String pTxtSearch, Long pBrandId, Long pProductTypeId,
+                                    Long pColorId, Long pSizeId, Long pUnitId, String pGender, Boolean pIsSaleOff, Boolean pIsHotTrend, String pStatus) {
+        Pageable lvPageable = getPageable(pageNum, pageSize, Sort.by("createdAt").descending());
+
+        CriteriaBuilder lvCriteriaBuilder = mvEntityManager.getCriteriaBuilder();
+        CriteriaQuery<Product> lvCriteriaQuery = lvCriteriaBuilder.createQuery(Product.class);
+        Root<Product> lvRoot = lvCriteriaQuery.from(Product.class);
+
+        Join<Product, ProductDetail> lvJoinProductVariant = lvRoot.join("productVariantList", JoinType.LEFT);
+
+        List<Predicate> lvPredicates = new ArrayList<>();
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("PID"), pPID.getId());
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("brand").get("id"), pBrandId);
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("productType").get("id"), pProductTypeId);
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("unit").get("id"), pUnitId);
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvJoinProductVariant.get("color").get("id"), pColorId);
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvJoinProductVariant.get("size").get("id"), pSizeId);
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("gender"), pGender);
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("isSaleOff"), pIsSaleOff);
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("isHotTrend"), pIsHotTrend);
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("status"), pStatus);
+        addLikeCondition(lvCriteriaBuilder, lvPredicates, pTxtSearch, lvRoot.get("productName"));
+
+        TypedQuery<Product> lvTypedQuery = initCriteriaQuery(lvCriteriaBuilder, lvCriteriaQuery, lvRoot, lvPredicates, lvPageable);
+        TypedQuery<Long> lvCountQuery = initCriteriaCountQuery(lvCriteriaBuilder, lvPredicates, Product.class);
+        long lvTotalRecords = lvCountQuery.getSingleResult();
+
+        List<Product> lvResultList = lvTypedQuery.getResultList();
+        List<ProductDTO> lvResultListDto = ProductConvert.convertToDTOs(lvResultList);
+
+        this.setImageActiveAndLoadVoucherApply(lvResultListDto);
+        this.setInfoVariantOfProduct(lvResultListDto);
+
+        return new PageImpl<>(lvResultListDto, lvPageable, lvTotalRecords);
     }
 
     @Override
-    public Page<ProductDTO> findClothes(int pageSize, int pageNum, String pTxtSearch, Long pBrand, Long pProductType, Long pColor, Long pSize, Long pUnit, String pStatus) {
-        return findAll(PID.CLOTHES, pageSize, pageNum, pTxtSearch, pBrand, pProductType, pColor, pSize, pUnit, pStatus);
+    public Page<ProductDTO> findClothes(int pageSize, int pageNum, String pTxtSearch, Long pBrand, Long pProductType, Long pColor, Long pSize, Long pUnit, String pGender, Boolean pIsSaleOff, Boolean pIsHotTrend, String pStatus) {
+        return findAll(PID.CLOTHES, pageSize, pageNum, pTxtSearch, pBrand, pProductType, pColor, pSize, pUnit, pGender, pIsSaleOff, pIsHotTrend, pStatus);
     }
 
     @Override
     public Page<ProductDTO> findFruits(int pageSize, int pageNum, String pTxtSearch, String pStatus) {
-        return findAll(PID.FRUIT, pageSize, pageNum, pTxtSearch, null, null, null, null, null, pStatus);
+        return findAll(PID.FRUIT, pageSize, pageNum, pTxtSearch, null, null, null, null, null, null, null, null, pStatus);
     }
 
     @Override
     public Page<ProductDTO> findSouvenirs(int pageSize, int pageNum, String pTxtSearch, Long pColor, String pStatus) {
-        return findAll(PID.SOUVENIR, pageSize, pageNum, pTxtSearch, null, null, pColor, null, null, pStatus);
+        return findAll(PID.SOUVENIR, pageSize, pageNum, pTxtSearch, null, null, pColor, null, null, null, null, null, pStatus);
     }
 
     @Override
     public List<Product> findProductsIdAndProductName() {
         List<Product> products = new ArrayList<>();
-        for (Object[] objects : mvProductRepository.findIdAndName(ProductStatus.A.name())) {
+        for (Object[] objects : mvProductRepository.findIdAndName(ProductStatus.ACT.name())) {
             products.add(new Product(Integer.parseInt(String.valueOf(objects[0])), String.valueOf(objects[1])));
         }
         return products;
@@ -132,7 +158,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
                 throw new BadRequestException("Product name is not null!");
 
             //productToSave.setCreatedBy(CommonUtils.getUserPrincipal().getId());
-            productToSave.setStatus(ProductStatus.I.name());
+            productToSave.setStatus(ProductStatus.ACT);
             Product productSaved = mvProductRepository.save(productToSave);
 
             ProductDescription productDescription = null;
@@ -144,7 +170,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
 
             systemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_C, MasterObject.Product, "Thêm mới sản phẩm", product.getProductName());
             logger.info("Insert product success! {}", product);
-            return ProductConvert.convertToDTO(productSaved, productDescription.getDescription());
+            return ProductConvert.convertToDTO(productSaved, productDescription != null ? productDescription.getDescription() : null);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "product"), ex);
         }
@@ -217,7 +243,11 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
 
     @Override
     public boolean productInUse(Long productId) throws RuntimeException {
-        return !mvProductVariantService.findAll(-1, -1, productId, null, null, null, null, null, false).getContent().isEmpty();
+        return !mvProductVariantService.findAll(ProductVariantParameter.builder()
+                .productId(productId)
+                .checkInAnyCart(false)
+                .build()
+        ).getContent().isEmpty();
     }
 
     @Override
@@ -251,6 +281,11 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
             }
         }
         return productHeldList;
+    }
+
+    @Override
+    public List<ProductDTO> getDiscontinuedProducts() {
+        return findAll(null, -1, -1, null, null, null, null, null, null, null, null, null, ProductStatus.INA.name()).getContent();
     }
 
     private void setImageActiveAndLoadVoucherApply(List<ProductDTO> products) {

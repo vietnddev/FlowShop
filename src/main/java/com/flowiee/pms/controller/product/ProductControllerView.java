@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.product;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.product.ProductAttribute;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.model.EximModel;
@@ -13,9 +13,9 @@ import com.flowiee.pms.service.product.ProductAttributeService;
 import com.flowiee.pms.service.product.ProductImageService;
 import com.flowiee.pms.service.product.ProductInfoService;
 import com.flowiee.pms.service.product.ProductVariantService;
-import com.flowiee.pms.utils.constants.CategoryType;
-import com.flowiee.pms.utils.constants.Pages;
-import com.flowiee.pms.utils.constants.TemplateExport;
+import com.flowiee.pms.common.enumeration.CategoryType;
+import com.flowiee.pms.common.enumeration.Pages;
+import com.flowiee.pms.common.enumeration.TemplateExport;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

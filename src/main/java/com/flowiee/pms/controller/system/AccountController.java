@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
@@ -9,7 +9,7 @@ import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.model.role.RoleModel;
 import com.flowiee.pms.service.system.AccountService;
 import com.flowiee.pms.service.system.RoleService;
-import com.flowiee.pms.utils.constants.ErrorCode;
+import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;

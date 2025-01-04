@@ -1,7 +1,8 @@
 package com.flowiee.pms.service.system;
 
+import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.AccountRole;
-import com.flowiee.pms.utils.constants.ACTION;
+import com.flowiee.pms.common.enumeration.ACTION;
 import com.flowiee.pms.model.role.ActionModel;
 import com.flowiee.pms.model.role.RoleModel;
 
@@ -20,7 +21,7 @@ public interface RoleService {
 
     List<AccountRole> findByGroupId(Long accountId);
 
-    String updatePermission(String moduleKey, String actionKey, Long accountId);
+    String updatePermission(Account accountId, List<ActionModel> actionModelList);
 
     boolean isAuthorized(long accountId, String module, String action);
 
@@ -29,4 +30,6 @@ public interface RoleService {
     List<RoleModel> updateRightsOfGroup(List<RoleModel> rights, Long groupId);
 
     List<AccountRole> findByAction(ACTION action);
+
+    boolean checkTempRights(String pAccountId, String pRight);
 }

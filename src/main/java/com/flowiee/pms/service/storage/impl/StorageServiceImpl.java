@@ -4,14 +4,14 @@ import com.flowiee.pms.entity.storage.Storage;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
-import com.flowiee.pms.utils.ChangeLog;
-import com.flowiee.pms.utils.constants.*;
+import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.StorageItems;
 import com.flowiee.pms.model.dto.StorageDTO;
 import com.flowiee.pms.repository.storage.StorageRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.storage.StorageService;
-import com.flowiee.pms.utils.converter.StorageConvert;
+import com.flowiee.pms.common.converter.StorageConvert;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -104,6 +104,8 @@ public class StorageServiceImpl extends BaseService implements StorageService {
 
         if (mvStorageRepository.findByCode(lvCode) != null)
             throw new BadRequestException(String.format("Storage code %s existed!", lvCode));
+
+        storage.setStatus("Y");
 
         Storage storageSaved = mvStorageRepository.save(storage);
         return StorageDTO.convertToDTO(storageSaved);

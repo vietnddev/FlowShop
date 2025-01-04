@@ -5,8 +5,8 @@ import com.flowiee.pms.entity.system.ScheduleStatus;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.repository.system.ScheduleRepository;
 import com.flowiee.pms.repository.system.ScheduleStatusRepository;
-import com.flowiee.pms.service.BaseService;
-import com.flowiee.pms.utils.constants.ScheduleTask;
+import com.flowiee.pms.base.service.BaseService;
+import com.flowiee.pms.common.enumeration.ScheduleTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +23,13 @@ public abstract class ScheduleExecutor extends BaseService {
 
     private ScheduleStatus mvScheduleStatus;
     private ScheduleTask mvScheduleTask;
+    protected boolean enableLog = false;
 
-    public abstract void execute() throws AppException;
+    public ScheduleExecutor() {
+        super();
+    }
+
+    public abstract void init() throws AppException;
     public abstract void doProcesses() throws AppException;
 
     public void init(ScheduleTask pScheduleTask) throws AppException {
@@ -47,13 +52,14 @@ public abstract class ScheduleExecutor extends BaseService {
         if (lvScheduleTask == null) {
             return;
         }
-        logger.info("Schedule task " + lvScheduleTask.name() + " start");
-        Optional<Schedule> schedule = scheduleRepository.findById(lvScheduleTask.name());
-        if (schedule.isEmpty()) {
-            throw new AppException(String.format("Schedule %s is not defined in the database!", lvScheduleTask.name()));
+        if (enableLog) {
+            logger.info("Schedule task " + lvScheduleTask.name() + " start");
         }
-        if (!schedule.get().isEnable()) {
-            throw new AppException(String.format("Schedule %s is not enable!", lvScheduleTask.name()));
+        Optional<Schedule> schedule = scheduleRepository.findById(lvScheduleTask.name());
+        if (schedule.isEmpty() || !schedule.get().isEnable()) {
+            //logger.warn(String.format("Schedule %s is not defined in the database!", lvScheduleTask.name()));
+            //throw new AppException(String.format("Schedule %s is not defined in the database!", lvScheduleTask.name()));
+            return;
         }
         mvScheduleStatus = scheduleStatusRepository.save(ScheduleStatus.builder()
                 .schedule(schedule.get())
@@ -74,10 +80,16 @@ public abstract class ScheduleExecutor extends BaseService {
         lvScheduleStatus.setDuration(ChronoUnit.SECONDS.between(lvScheduleStatus.getStartTime(), lvScheduleStatus.getEndTime()) + " SECOND");
         lvScheduleStatus.setStatus(lvScheduleStatus.getErrorMsg() == null ? "success" : "fail");
         scheduleStatusRepository.save(lvScheduleStatus);
-        logger.info("Schedule task " + lvScheduleStatus.getSchedule().getScheduleId() + " end");
+        if (enableLog) {
+            logger.info("Schedule task " + lvScheduleStatus.getSchedule().getScheduleId() + " end");
+        }
     }
 
     protected void setErrorMsg(String pMessage) {
         mvScheduleStatus.setErrorMsg(pMessage);
+    }
+
+    public ScheduleTask getScheduleTask() {
+        return mvScheduleTask;
     }
 }

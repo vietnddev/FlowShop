@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.product.impl;
 
-import com.flowiee.pms.service.BaseImportService;
+import com.flowiee.pms.base.service.BaseImportService;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.product;
 
-import com.flowiee.pms.service.BaseCurdService;
+import com.flowiee.pms.base.service.BaseCurdService;
 import com.flowiee.pms.entity.product.ProductAttribute;
 import org.springframework.data.domain.Page;
 

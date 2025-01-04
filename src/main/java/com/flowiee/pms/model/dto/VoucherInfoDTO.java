@@ -2,7 +2,7 @@ package com.flowiee.pms.model.dto;
 
 import com.flowiee.pms.entity.sales.VoucherInfo;
 import com.flowiee.pms.entity.sales.VoucherTicket;
-import com.flowiee.pms.utils.constants.VoucherStatus;
+import com.flowiee.pms.common.enumeration.VoucherStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -14,26 +14,6 @@ import java.util.List;
 
 @Repository
 public interface ProductDetailRepository extends JpaRepository <ProductDetail, Long>{
-    @Query("select v from ProductDetail v " +
-           "left join v.product p " +
-           "left join v.garmentFactory g " +
-           "left join v.supplier sp " +
-           "left join v.color c on c.type = 'COLOR' " +
-           "left join v.size s on s.type = 'SIZE' " +
-           "left join v.fabricType f on f.type = 'FABRIC_TYPE' " +
-           "where (:productId is null or v.product.id = :productId) " +
-           "    and (:colorId is null or c.id = :colorId) " +
-           "    and (:sizeId is null or s.id = :sizeId) " +
-           "    and (:fabricTypeId is null or f.id = :fabricTypeId) " +
-           "    and (:availableForSales is null or :availableForSales = false or v.storageQty - v.defectiveQty > 0) " +
-           "order by v.variantName, s.name, c.name")
-    Page<ProductDetail> findAll(@Param("productId") Long productId,
-                                @Param("colorId") Long colorId,
-                                @Param("sizeId") Long sizeId,
-                                @Param("fabricTypeId") Long fabricTypeId,
-                                @Param("availableForSales") Boolean availableForSales,
-                                Pageable pageable);
-    
     @Query("from ProductDetail b where b.product.id=:productId and b.color.id=:colorId and b.size.id=:sizeId and b.fabricType.id=:fabricTypeId")
     ProductDetail findByColorAndSize(@Param("productId") Long productId, @Param("colorId") Long colorId, @Param("sizeId")  Long sizeId, @Param("fabricTypeId")  Long fabricTypeId);
 
@@ -59,4 +39,7 @@ public interface ProductDetailRepository extends JpaRepository <ProductDetail, L
 
     @Query("from ProductDetail p where p.expiryDate = :expiryDate")
     List<ProductDetail> findByExpiryDate(LocalDate expiryDate);
+
+    @Query("from ProductDetail p where p.defectiveQty > 0")
+    List<ProductDetail> findDefective();
 }

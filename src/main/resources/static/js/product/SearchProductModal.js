@@ -5,6 +5,17 @@ function setupSearchModalInCreateOrderPage() {
     getListOfProductsOnSearchModal(mvPageSizeDefault, 1);
     updateTableContentWhenOnClickPagination(getListOfProductsOnSearchModal);
     chooseProductOnSearchModal();
+    searchItemsOnModal();
+
+    setupSearchSelector($('#brandSearchModal'), 'Chọn nhãn hiệu', mvHostURLCallApi + '/category/brand');
+    setupSearchSelector($('#colorSearchModal'), 'Chọn màu sắc', mvHostURLCallApi + '/category/color');
+    setupSearchSelector($('#sizeSearchModal'), 'Chọn size', mvHostURLCallApi + '/category/size');
+}
+
+function searchItemsOnModal() {
+    $("#btnSearchModal").on("click", function () {
+        getListOfProductsOnSearchModal(mvPageSizeDefault, 1);
+    })
 }
 
 function getListOfProductsOnSearchModal(pageSize, pageNum) {
@@ -12,7 +23,11 @@ function getListOfProductsOnSearchModal(pageSize, pageNum) {
     let params = {
         pageSize: pageSize,
         pageNum: pageNum,
-        readyForSales: true
+        readyForSales: true,
+        txtSearch: $("#txtSearchModal").val(),
+        brandId: $("#brandSearchModal").val(),
+        colorId: $("#colorSearchModal").val(),
+        sizeId: $("#sizeSearchModal").val()
     }
     $.get(apiURL, params, function (response) {
         if (response.status === "OK") {
@@ -58,10 +73,6 @@ function getListOfProductsOnSearchModal(pageSize, pageNum) {
     }).fail(function () {
         showErrorModal("Could not connect to the server");
     });
-
-    setupSearchSelector($('#brandSearchModal'), 'Chọn nhãn hiệu', mvHostURLCallApi + '/category/brand');
-    setupSearchSelector($('#colorSearchModal'), 'Chọn màu sắc', mvHostURLCallApi + '/category/color');
-    setupSearchSelector($('#sizeSearchModal'), 'Chọn size', mvHostURLCallApi + '/category/size');
 }
 
 let getItemName = (itemId) => {
@@ -79,7 +90,7 @@ function chooseProductOnSearchModal() {
         let isChecked = $(this).is(':checked');
         let productModel = {
             productVariantId: productVariantId,
-            productVariantName: getItemName(productVariantId),
+            //productVariantName: getItemName(productVariantId),
             quantity: getItemQuantity(productVariantId)
         }
 
@@ -100,7 +111,7 @@ function chooseProductOnSearchModal() {
             let productVariantId = $(this).attr("productVariantId");
             let productModel = {
                 productVariantId: productVariantId,
-                productVariantName: getItemName(productVariantId),
+                //productVariantName: getItemName(productVariantId),
                 quantity: getItemQuantity(productVariantId)
             }
             if (isChecked) {
@@ -122,8 +133,8 @@ function submitProductOnSearchModal(functionId) {
 
     $.each(mvProductSearchModalListSelected, function (index, d) {
         let lvProductVariantId = d.productVariantId;
-        d.productVariantName = getItemName(lvProductVariantId);
-        d.quantity = getItemQuantity(lvProductVariantId);
+        //d.productVariantName = getItemName(lvProductVariantId);
+        d.quantity = parseInt(getItemQuantity(lvProductVariantId));
     });
 
     if (functionId === "createOrder") {

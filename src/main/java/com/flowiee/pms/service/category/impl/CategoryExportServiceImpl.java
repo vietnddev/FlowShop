@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.category.impl;
 
 import com.flowiee.pms.entity.category.Category;
-import com.flowiee.pms.service.BaseExportService;
+import com.flowiee.pms.base.service.BaseExportService;
 import com.flowiee.pms.service.category.CategoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

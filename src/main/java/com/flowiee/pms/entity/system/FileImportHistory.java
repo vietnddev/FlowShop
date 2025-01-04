@@ -1,8 +1,7 @@
 package com.flowiee.pms.entity.system;
 
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 
-import com.flowiee.pms.utils.CommonUtils;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,7 +10,6 @@ import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Builder
 @Entity

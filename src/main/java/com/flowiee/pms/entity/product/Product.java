@@ -2,10 +2,11 @@ package com.flowiee.pms.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.system.FileStorage;
+import com.flowiee.pms.common.enumeration.ProductStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
@@ -78,13 +79,17 @@ public class Product extends BaseEntity implements Serializable {
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL)
     ProductDescription productDescription;
 
+    @Column(name = "notes")
+    String internalNotes;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 10)
-    String status;
+    ProductStatus status;
 
     @JsonIgnore
     @JsonIgnoreProperties("product")
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    List<ProductDetail> listVariants;
+    List<ProductDetail> productVariantList;
 
     @JsonIgnore
     @JsonIgnoreProperties("product")
@@ -109,6 +114,9 @@ public class Product extends BaseEntity implements Serializable {
     @JsonIgnore
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     List<ProductDamaged> productDamagedList;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    List<ProductRelated> ProductRelatedList;
 
     public Product(long id) {
         super.id = id;
@@ -164,15 +172,15 @@ public class Product extends BaseEntity implements Serializable {
     }
 
     public boolean isClothes() {
-        return com.flowiee.pms.utils.constants.PID.CLOTHES.getId().equals(PID);
+        return com.flowiee.pms.common.enumeration.PID.CLOTHES.getId().equals(PID);
     }
 
     public boolean isFruit() {
-        return com.flowiee.pms.utils.constants.PID.FRUIT.getId().equals(PID);
+        return com.flowiee.pms.common.enumeration.PID.FRUIT.getId().equals(PID);
     }
 
     public boolean isSouvenir() {
-        return com.flowiee.pms.utils.constants.PID.SOUVENIR.getId().equals(PID);
+        return com.flowiee.pms.common.enumeration.PID.SOUVENIR.getId().equals(PID);
     }
 
 	@Override

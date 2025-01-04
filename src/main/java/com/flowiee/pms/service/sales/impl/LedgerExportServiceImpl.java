@@ -2,7 +2,7 @@ package com.flowiee.pms.service.sales.impl;
 
 import com.flowiee.pms.entity.sales.LedgerTransaction;
 import com.flowiee.pms.model.GeneralLedger;
-import com.flowiee.pms.service.BaseExportService;
+import com.flowiee.pms.base.service.BaseExportService;
 import com.flowiee.pms.service.sales.LedgerService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

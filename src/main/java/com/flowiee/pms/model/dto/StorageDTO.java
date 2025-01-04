@@ -14,13 +14,23 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class StorageDTO extends Storage implements Serializable {
+public class StorageDTO implements Serializable {
 	@Serial
 	static final long serialVersionUID = 1L;
-	
+
+	Long id;
+    String name;
+    String code;
+    String location;
+    Double area;
+    Integer holdableQty;
+    Integer holdWarningPercent;
+    String description;
+    Boolean isDefault;
+    String status;
+
 	Integer totalItems;
     BigDecimal totalInventoryValue;
     List<TicketImportDTO> listTicketImportDTO;

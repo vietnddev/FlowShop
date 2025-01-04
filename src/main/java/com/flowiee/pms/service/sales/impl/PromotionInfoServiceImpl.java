@@ -6,16 +6,18 @@ import com.flowiee.pms.model.dto.ProductDTO;
 import com.flowiee.pms.model.dto.PromotionApplyDTO;
 import com.flowiee.pms.model.dto.PromotionInfoDTO;
 import com.flowiee.pms.repository.sales.PromotionInfoRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.ProductInfoService;
 import com.flowiee.pms.service.sales.PromotionApplyService;
 import com.flowiee.pms.service.sales.PromotionService;
-import com.flowiee.pms.utils.constants.ErrorCode;
-import com.flowiee.pms.utils.constants.MessageCode;
-import com.flowiee.pms.utils.constants.PromotionStatus;
+import com.flowiee.pms.service.system.MailMediaService;
+import com.flowiee.pms.common.enumeration.ErrorCode;
+import com.flowiee.pms.common.enumeration.MessageCode;
+import com.flowiee.pms.common.enumeration.PromotionStatus;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.*;
@@ -33,6 +35,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PromotionInfoServiceImpl extends BaseService implements PromotionService {
     ModelMapper             mvModelMapper;
+    MailMediaService        mvMailMediaService;
     ProductInfoService      mvProductInfoService;
     PromotionApplyService   mvPromotionApplyService;
     PromotionInfoRepository mvPromotionInfoRepository;
@@ -46,13 +49,10 @@ public class PromotionInfoServiceImpl extends BaseService implements PromotionSe
     @Override
     public Page<PromotionInfoDTO> findAll(int pageSize, int pageNum, String pTitle, LocalDateTime pStartTime, LocalDateTime pEndTime, String pStatus) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("createdAt").descending());
-        if (pEndTime == null) {
-            pEndTime = LocalDateTime.of(2100, 12, 31, 0, 0);
-        }
-        if (pStartTime == null) {
-            pStartTime = LocalDateTime.of(1900, 1, 1, 0, 0);
-        }
-        Page<PromotionInfo> pagePromotionInfos = mvPromotionInfoRepository.findAll(pTitle, pStartTime, pEndTime, pStatus, pageable);
+        LocalDateTime lvStartTime = getFilterStartTime(pStartTime);
+        LocalDateTime lvEndTime = getFilterEndTime(pEndTime);
+
+        Page<PromotionInfo> pagePromotionInfos = mvPromotionInfoRepository.findAll(pTitle, lvStartTime, lvEndTime, pStatus, pageable);
 
         Type listType = new TypeToken<List<PromotionInfoDTO>>() {}.getType();
         List<PromotionInfoDTO> promotionInfoDTOs = mvModelMapper.map(pagePromotionInfos.getContent(), listType);
@@ -102,6 +102,7 @@ public class PromotionInfoServiceImpl extends BaseService implements PromotionSe
 
             PromotionInfo promotionInfoSaved = mvPromotionInfoRepository.save(promotionInfo);
             for (ProductDTO product : promotionInfoDTO.getApplicableProducts()) {
+                mvProductInfoService.findById(product.getId(), true);
                 PromotionApplyDTO promotionApply = new PromotionApplyDTO();
                 promotionApply.setPromotionId(promotionInfoSaved.getId());
                 promotionApply.setProductId(product.getId());
@@ -156,6 +157,21 @@ public class PromotionInfoServiceImpl extends BaseService implements PromotionSe
             return PromotionStatus.A.getLabel();
         } else {
             return PromotionStatus.I.getLabel();
+        }
+    }
+
+    @Override
+    public void notifyToCustomer(List<Long> pCustomerIdList, Long pPromotionId) {
+        if (ObjectUtils.isEmpty(pCustomerIdList)) {
+            throw new BadRequestException("Vui lòng chọn khách hàng cần gửi thông báo!");
+        }
+
+        PromotionInfoDTO lvPromotionInfo = this.findById(pPromotionId, true);
+        String lvPromotionName = lvPromotionInfo.getTitle();
+
+        for (Long lvCustomerId : pCustomerIdList) {
+            //write more business here
+            //mvMailMediaService.send(null, null);
         }
     }
 }

@@ -437,18 +437,19 @@
 
         $(".link-delete").on("click", function(e) {
             e.preventDefault();
+            $(this).attr("entityName", $(this).attr("entityType"));
             showConfirmModal($(this));
         });
 
         $('#yesButton').on("click", async function () {
             let apiURL = mvHostURLCallApi
-            let entityType = $(this).attr("entityType")
+            let entityName = $(this).attr("entityName")
             let entityId = $(this).attr("entityId")
-            if (entityType === 'image') {
+            if (entityName === 'image') {
                 apiURL += '/file/delete/' + entityId
             }
-            if (entityType === 'productAttribute') {
-                apiURL += '/san-pham/attribute/delete/' + entityId
+            if (entityName === 'productAttribute') {
+                apiURL += '/product/attribute/delete/' + entityId
             }
             await callApiDelete(apiURL);
         });

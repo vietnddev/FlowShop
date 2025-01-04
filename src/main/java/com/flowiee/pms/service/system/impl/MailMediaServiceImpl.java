@@ -1,14 +1,14 @@
 package com.flowiee.pms.service.system.impl;
 
-import com.flowiee.pms.config.Core;
+import com.flowiee.pms.base.system.Core;
 import com.flowiee.pms.config.TemplateSendEmail;
 import com.flowiee.pms.entity.system.MailMedia;
 import com.flowiee.pms.repository.system.MailMediaRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.system.MailMediaService;
-import com.flowiee.pms.utils.CoreUtils;
-import com.flowiee.pms.utils.SendMailUtils;
-import com.flowiee.pms.utils.constants.NotificationType;
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.utils.SendMailUtils;
+import com.flowiee.pms.common.enumeration.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,7 @@ public class MailMediaServiceImpl extends BaseService implements MailMediaServic
 
     @Override
     public void send(String pDestination, String pSubject, String pMessage, String pLanguage, boolean pIsHtml, int pPriority) {
-        String[] emailDestinationArray = pDestination.split(MailMedia.EMAIL_ADDRESS_SPERATOR);
+        String[] emailDestinationArray = pDestination.split(MailMedia.EMAIL_ADDRESS_SEPARATOR);
         Set<String> lvRecipients = new HashSet<>();
         for (String emailDestination : emailDestinationArray) {
             lvRecipients.add(emailDestination.trim());

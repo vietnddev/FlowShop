@@ -11,7 +11,7 @@ public interface ProductImageService {
 
     List<FileStorage> getImageOfProductVariant(Long pProductVariantId);
 
-    FileStorage saveImageProduct(MultipartFile fileUpload, long pProductId) throws IOException;
+    FileStorage saveImageProduct(MultipartFile fileUpload, long pProductId, boolean makeActive) throws IOException;
 
     FileStorage saveImageProductVariant(MultipartFile fileUpload, long pProductId) throws IOException;
 

@@ -1,9 +1,9 @@
 package com.flowiee.pms.service.product.impl;
 
 import com.flowiee.pms.model.dto.ProductVariantDTO;
-import com.flowiee.pms.service.BaseExportService;
+import com.flowiee.pms.base.service.BaseExportService;
 import com.flowiee.pms.service.product.ProductVariantService;
-import com.flowiee.pms.utils.CommonUtils;
+import com.flowiee.pms.common.utils.CommonUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -36,7 +36,7 @@ public class ProductExportServiceImpl extends BaseExportService {
             row.createCell(7).setCellValue(CommonUtils.formatToVND(productVariant.getDiscountPrice()));
             row.createCell(8).setCellValue(productVariant.getStorageQty());
             row.createCell(9).setCellValue(productVariant.getSoldQty());
-            row.createCell(10).setCellValue(productVariant.getStatus());
+            row.createCell(10).setCellValue(productVariant.getStatus().getLabel());
 
             setBorderCell(row, 0, 10);
         }

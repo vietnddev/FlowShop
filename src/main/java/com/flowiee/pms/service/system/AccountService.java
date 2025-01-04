@@ -1,18 +1,19 @@
 package com.flowiee.pms.service.system;
 
-import com.flowiee.pms.service.BaseCurdService;
 import com.flowiee.pms.entity.system.Account;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
-public interface AccountService extends BaseCurdService<Account> {
+public interface AccountService {
     Account findByUsername(String username);
 
-    Account getUserByResetTokens(String token);
+    List<Account> findAll();
 
-    void updateTokenForResetPassword(String email, String resetToken);
+    Account findById(Long pAccountId, boolean pThrowException);
 
-    boolean sendTokenForResetPassword(String email, HttpServletRequest request);
+    Account save(Account pAccount);
 
-    boolean resetPasswordWithToken(String token, String newPassword);
+    Account update(Account pAccount, Long pAccountId);
+
+    String delete(Long pAccountId);
 }

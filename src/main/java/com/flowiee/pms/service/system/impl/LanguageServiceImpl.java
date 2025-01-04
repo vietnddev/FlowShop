@@ -7,7 +7,7 @@ import java.util.*;
 
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.EntityNotFoundException;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

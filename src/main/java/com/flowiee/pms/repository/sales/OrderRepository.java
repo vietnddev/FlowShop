@@ -2,50 +2,19 @@ package com.flowiee.pms.repository.sales;
 
 import com.flowiee.pms.entity.sales.Order;
 
-import com.flowiee.pms.utils.constants.CategoryType;
-import com.flowiee.pms.utils.constants.OrderStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.flowiee.pms.common.enumeration.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    @Query(value = "select distinct o from Order o " +
-            "left join o.customer c " +
-            "left join o.kenhBanHang sc on sc.type = 'SALES_CHANNEL' " +
-            "left join o.paymentMethod pm on pm.type = 'PAYMENT_METHOD' " +
-            "left join FileStorage f on f.order.id = o.id " +
-            "left join Account a on a.id = o.createdBy " +
-            "where (:txtSearch is null or (o.receiverName like %:txtSearch%)) " +
-            "and (:orderId is null or o.id=:orderId) " +
-            "and (:paymentMethodId is null or o.paymentMethod.id=:paymentMethodId) " +
-            "and (:orderStatus is null or o.orderStatus = :orderStatus) " + // So sánh trực tiếp với enum
-            "and (:salesChannelId is null or o.kenhBanHang.id=:salesChannelId) " +
-            "and (:sellerId is null or o.nhanVienBanHang.id=:sellerId) " +
-            "and (:customerId is null or o.customer.id=:customerId) " +
-            "and (:branchId is null or a.branch.id = :branchId) " +
-            "and (:groupCustomerId is null or 1=1) " +
-            "and ((trunc(o.orderTime) >= trunc(:orderTimeFrom)) and (trunc(o.orderTime) <= trunc(:orderTimeTo)))")
-    Page<Order> findAll(@Param("txtSearch") String txtSearch,
-                        @Param("orderId") Long orderId,
-                        @Param("paymentMethodId") Long paymentMethodId,
-                        @Param("orderStatus") OrderStatus orderStatus,
-                        @Param("salesChannelId") Long salesChannelId,
-                        @Param("sellerId") Long sellerId,
-                        @Param("customerId") Long customerId,
-                        @Param("branchId") Long branchId,
-                        @Param("groupCustomerId") Long groupCustomerId,
-                        @Param("orderTimeFrom") LocalDateTime orderTimeFrom,
-                        @Param("orderTimeTo") LocalDateTime orderTimeTo,
-                        Pageable pageable);
-
     @Query(value = "select sum((select sum(d.price * d.quantity) from order_detail d where d.order_id = o.id) - o.amount_discount) from orders o where trunc(o.order_time) = trunc(current_date)", nativeQuery = true)
     Double findRevenueToday();
 
@@ -57,7 +26,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Modifying
     @Query("update Order set paymentTime=:paymentTime, paymentMethod.id=:paymentMethod, paymentAmount=:paymentAmount, paymentNote=:paymentNote, paymentStatus = true where id=:orderId")
-    void updatePaymentStatus(@Param("orderId") Long orderId, @Param("paymentTime") LocalDateTime paymentTime, @Param("paymentMethod") Long paymentMethod, @Param("paymentAmount") Float paymentAmount, @Param("paymentNote") String paymentNote);
+    void updatePaymentStatus(@Param("orderId") Long orderId, @Param("paymentTime") LocalDateTime paymentTime, @Param("paymentMethod") Long paymentMethod, @Param("paymentAmount") BigDecimal paymentAmount, @Param("paymentNote") String paymentNote);
 
 //    @Query("select " +
 //           "sum(case when extract(month from o.thoiGianDatHang) = 1 then o.totalAmountDiscount else 0 end) as JAN, " +
@@ -109,4 +78,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("from Order where customer.id = :customerId")
     List<Order> findByCustomer(@Param("customerId") Long customerId);
+
+    @Query("from Order where successfulDeliveryTime between :fromDate and :toDate")
+    List<Order> findBySuccessfulDeliveryTime(@Param("fromDate") LocalDateTime pFromDate, @Param("toDate") LocalDateTime pToDate);
+
+    @Query("from Order o where o.kenhBanHang.id = :salesChannelId")
+    List<Order> countBySalesChannel(@Param("salesChannelId") Long salesChannelId);
+
+    @Query("from Order o where o.kenhBanHang.code = :salesChannelCode")
+    List<Order> countBySalesChannel(@Param("salesChannelCode") String salesChannelCode);
 }

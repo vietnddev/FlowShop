@@ -150,7 +150,7 @@
             updateTableContentWhenOnClickPagination(loadStorages);
 
             preCreateStorage();
-            preUpdateStorage();
+            //preUpdateStorage();
             submitInsertOrUpdate();
             deleteStorage();
         });
@@ -171,7 +171,7 @@
         }
 
         function submitInsertOrUpdate() {
-            $("#btn-insert-update-submit").on("click", function () {
+            $(document).on("click", "#btn-insert-update-submit", function () {
                 let actionType = $(this).attr("actionType");
                 let group = {
                     id : mvId,

@@ -1,13 +1,13 @@
 package com.flowiee.pms.controller.category;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.service.category.CategoryService;
-import com.flowiee.pms.utils.CommonUtils;
-import com.flowiee.pms.utils.constants.ErrorCode;
+import com.flowiee.pms.common.utils.CommonUtils;
+import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;

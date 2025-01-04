@@ -2,14 +2,14 @@ package com.flowiee.pms.entity.system;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 
 import com.flowiee.pms.entity.product.*;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.entity.sales.TicketExport;
 import com.flowiee.pms.entity.sales.TicketImport;
-import com.flowiee.pms.utils.CommonUtils;
-import com.flowiee.pms.utils.FileUtils;
+import com.flowiee.pms.common.utils.CommonUtils;
+import com.flowiee.pms.common.utils.FileUtils;
 import lombok.*;
 
 import lombok.experimental.FieldDefaults;
@@ -32,6 +32,11 @@ import java.util.Arrays;
 public class FileStorage extends BaseEntity implements Serializable {
     @Serial
 	static final long serialVersionUID = 1L;
+
+    public static final String QRCODE = "Q";
+    public static final String BARCODE = "B";
+    public static final String DOCUMENT = "D";
+    public static final String IMAGE = "I";
 
 	@Column(name = "customize_name")
     String customizeName;
@@ -57,6 +62,9 @@ public class FileStorage extends BaseEntity implements Serializable {
     @Column(name = "content")
     byte[] content;
 
+    @Column(name = "content_base_64")
+    String contentBase64;
+
     @Column(name = "directory_path", length = 500)
     String directoryPath;
 
@@ -68,6 +76,9 @@ public class FileStorage extends BaseEntity implements Serializable {
 
     @Column(name = "module", nullable = false)
     String module;
+
+    @Column(name = "file_type")
+    String fileType;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

@@ -2,15 +2,15 @@ package com.flowiee.pms.service.product.impl;
 
 import com.flowiee.pms.entity.product.ProductAttribute;
 import com.flowiee.pms.exception.EntityNotFoundException;
-import com.flowiee.pms.utils.ChangeLog;
-import com.flowiee.pms.utils.constants.ACTION;
-import com.flowiee.pms.utils.constants.MODULE;
+import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.enumeration.ACTION;
+import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.repository.product.ProductAttributeRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.ProductAttributeService;
 import com.flowiee.pms.service.product.ProductHistoryService;
-import com.flowiee.pms.utils.constants.MasterObject;
-import com.flowiee.pms.utils.constants.MessageCode;
+import com.flowiee.pms.common.enumeration.MasterObject;
+import com.flowiee.pms.common.enumeration.MessageCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -58,11 +58,16 @@ public class ProductAttributeServiceImpl extends BaseService implements ProductA
     }
 
     @Override
-    public ProductAttribute update(ProductAttribute attribute, Long attributeId) {
-        ProductAttribute attributeOptional = this.findById(attributeId, true);
+    public ProductAttribute update(ProductAttribute pAttribute, Long attributeId) {
+        ProductAttribute attribute = this.findById(attributeId, true);
         //enhance later
-        ProductAttribute attributeBefore = ObjectUtils.clone(attributeOptional);
-        attribute.setId(attributeId);
+        ProductAttribute attributeBefore = ObjectUtils.clone(attribute);
+
+        attribute.setAttributeName(pAttribute.getAttributeName());
+        attribute.setAttributeValue(pAttribute.getAttributeValue());
+        attribute.setSort(pAttribute.getSort());
+        attribute.setStatus(pAttribute.isStatus());
+
         ProductAttribute attributeUpdated = mvProductAttributeRepository.save(attribute);
 
         String logTitle = "Cập nhật thuộc tính sản phẩm";

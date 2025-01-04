@@ -103,10 +103,7 @@
                         if (d.customer != null) {
                             customerName = d.customer.customerName;
                         }
-                        let status = "Chưa sử dụng";
-                        if (d.status === true) {
-                            status = "Đã sử dụng";
-                        }
+                        let status = d.status ? "Đã sử dụng" : "Chưa sử dụng";
                         contentTable.append(`
                             <tr>
                                 <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>

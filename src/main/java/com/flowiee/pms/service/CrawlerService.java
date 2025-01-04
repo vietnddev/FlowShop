@@ -1,24 +1,29 @@
 package com.flowiee.pms.service;
 
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.product.*;
 import com.flowiee.pms.entity.system.SystemLog;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.repository.product.*;
-import com.flowiee.pms.utils.CommonUtils;
-import com.flowiee.pms.utils.CoreUtils;
-import com.flowiee.pms.utils.FileUtils;
-import com.flowiee.pms.utils.constants.*;
+import com.flowiee.pms.common.utils.CommonUtils;
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.utils.FileUtils;
+import com.flowiee.pms.common.enumeration.*;
+import com.flowiee.pms.service.product.ProductImageService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -38,6 +43,7 @@ public class CrawlerService extends BaseService {
     private final ProductDetailRepository productVariantRepository;
     private final CategoryRepository categoryRepository;
     private final ProductPriceRepository productPriceRepository;
+    private final ProductImageService productImageService;
 
     private String baseURL = "https://juno.vn";
     private final String PRODUCT_CODE = "Mã sản phẩm:";
@@ -82,7 +88,7 @@ public class CrawlerService extends BaseService {
                     .productName(CoreUtils.trim(p.getProductName()))
                     .originCountry(CoreUtils.trim(p.getOriginCountry()))
                     .isSaleOff(discountPrice.doubleValue() < originalPrice.doubleValue())
-                    .status(ProductStatus.A.name())
+                    .status(ProductStatus.ACT)
                     .build());
 
             String[] sizeList = CoreUtils.trim(p.getSize()).split("-");
@@ -114,7 +120,7 @@ public class CrawlerService extends BaseService {
                             .storageQty(100)
                             .soldQty(0)
                             .defectiveQty(0)
-                            .status(ProductStatus.A.name())
+                            .status(ProductStatus.ACT)
                             .build());
 
                     productPriceRepository.save(ProductPrice.builder()
@@ -131,7 +137,22 @@ public class CrawlerService extends BaseService {
                 }
                 colorNameSaved.add(sizeMdl.getName());
             }
+
+            List<ImageCrawled> imageList = imageCrawlerRepository.findByProductId(p.getId());
+            if (CollectionUtils.isNotEmpty(imageList)) {
+                for (ImageCrawled img : imageList) {
+                    boolean lvIsMainImage = Boolean.TRUE.equals(img.isMainImage());
+                    File imgFile = new File(img.getPath());
+                    try {
+                        MultipartFile imgMultipartFile = FileUtils.convertFileToMultipartFile(imgFile);
+                        productImageService.saveImageProduct(imgMultipartFile, productSaved.getId(), lvIsMainImage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
+
         systemLogService.writeLogCreate(MODULE.SYSTEM, ACTION.SYS_DATA_MERGE, MasterObject.Master, "Merge data temp into system", SystemLog.EMPTY);
         logger.info("Merge temp data: finish");
     }

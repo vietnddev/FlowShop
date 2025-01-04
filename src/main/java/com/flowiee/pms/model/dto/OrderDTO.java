@@ -1,18 +1,19 @@
 package com.flowiee.pms.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.sales.Customer;
 import com.flowiee.pms.entity.sales.Order;
+import com.flowiee.pms.entity.sales.OrderDetail;
 import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.FileStorage;
-import com.flowiee.pms.utils.FileUtils;
-import com.flowiee.pms.utils.OrderUtils;
-import com.flowiee.pms.utils.constants.OrderStatus;
-import lombok.AccessLevel;
+import com.flowiee.pms.common.utils.FileUtils;
+import com.flowiee.pms.common.utils.OrderUtils;
+import com.flowiee.pms.common.enumeration.OrderStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serial;
@@ -25,32 +26,54 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderDTO extends Order implements Serializable {
+public class OrderDTO implements Serializable {
 	@Serial
-	static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-	Long customerId;
-    String customerName;
-	Long salesChannelId;
-    String salesChannelName;
-	Long orderStatusId;
-    String orderStatusName;
-	Long payMethodId;
-    String payMethodName;
-	Long cashierId;
-    String cashierName;
-	BigDecimal totalAmount;
-	BigDecimal totalAmountDiscount;
-	Integer totalProduct;
-    String qrCode;
-	Long cartId;
-	Long ticketExportId;
-	Boolean accumulateBonusPoints;
-	List<OrderDetailDTO> listOrderDetailDTO;
+	private Long id;
+	@JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+	private LocalDateTime createdAt;
+	private String code;
+	@JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+	private LocalDateTime orderTime;
+	private String receiverAddress;
+	private String receiverName;
+	private String receiverPhone;
+	private String receiverEmail;
+	private String voucherUsedCode;
+	private BigDecimal shippingCost;
+	private BigDecimal codFee;
+	private BigDecimal amountDiscount;
+	private Boolean paymentStatus;
+	private LocalDateTime paymentTime;
+	private BigDecimal paymentAmount;
+	private String paymentNote;
+	private String note;
 
-	public OrderDTO(Long id, String code, LocalDateTime orderTime, String receiptName, String receiptPhone, String receiptEmail, String receiptAddress,
-					Customer customer, Category salesChannel, Category paymentMethod, Account cashier, OrderStatus orderStatus) {
+	private Long customerId;
+	private String customerName;
+	private Long salesChannelId;
+	private String salesChannelName;
+	private OrderStatus orderStatus;
+	private Long orderStatusId;
+	private String orderStatusName;
+	private Long payMethodId;
+	private String payMethodName;
+	private Long cashierId;
+	private String cashierName;
+
+	private BigDecimal totalAmount;
+	private BigDecimal totalAmountDiscount;
+	private Integer totalProduct;
+	private String qrCode;
+	private Long cartId;
+	private Long ticketExportId;
+	private Boolean accumulateBonusPoints;
+	private List<OrderDetailDTO> listOrderDetailDTO;
+	@JsonIgnore
+	private List<OrderDetail> listOrderDetail;
+
+	public OrderDTO(Long id, String code, LocalDateTime orderTime, String receiptName, String receiptPhone, String receiptEmail, String receiptAddress, OrderStatus orderStatus) {
 		this.id = id;
 		setCode(code);
 		setOrderTime(orderTime);
@@ -58,17 +81,12 @@ public class OrderDTO extends Order implements Serializable {
 		setReceiverPhone(receiptPhone);
 		setReceiverEmail(receiptEmail);
 		setReceiverAddress(receiptAddress);
-		setCustomer(customer);
-		setKenhBanHang(salesChannel);
-		setPaymentMethod(paymentMethod);
-		setNhanVienBanHang(cashier);
-		//setTrangThaiDonHang(orderStatus);
 		setOrderStatus(orderStatus);
 	}
 
 	public static OrderDTO fromOrder(Order order) {
-		OrderDTO dto = new OrderDTO(order.getId(), order.getCode(), order.getOrderTime(), order.getReceiverName(), order.getReceiverPhone(), order.getReceiverEmail(), order.getReceiverAddress(),
-									order.getCustomer(), order.getKenhBanHang(), order.getPaymentMethod(), order.getNhanVienBanHang(), order.getOrderStatus());
+		OrderDTO dto = new OrderDTO(order.getId(), order.getCode(), order.getOrderTime(), order.getReceiverName(),
+				order.getReceiverPhone(), order.getReceiverEmail(), order.getReceiverAddress(), order.getOrderStatus());
 		dto.setCreatedAt(order.getCreatedAt());
 
 		dto.setCustomerId(order.getCustomer().getId());
@@ -82,8 +100,8 @@ public class OrderDTO extends Order implements Serializable {
 		dto.setOrderStatus(dto.getOrderStatus());
 		dto.setOrderStatusName(dto.getOrderStatus().getName());
 
-		dto.setPayMethodId(dto.getPaymentMethod() != null ? order.getPaymentMethod().getId() : null);
-		dto.setPayMethodName(dto.getPaymentMethod() != null ? order.getPaymentMethod().getName() : null);
+		dto.setPayMethodId(order.getPaymentMethod() != null ? order.getPaymentMethod().getId() : null);
+		dto.setPayMethodName(order.getPaymentMethod() != null ? order.getPaymentMethod().getName() : null);
 
 		dto.setCashierId(order.getNhanVienBanHang().getId());
 		dto.setCashierName(order.getNhanVienBanHang().getFullName());
@@ -91,14 +109,15 @@ public class OrderDTO extends Order implements Serializable {
 		dto.setTicketExportId(order.getTicketExport() != null ? order.getTicketExport().getId() : null);
 
 		if (ObjectUtils.isNotEmpty(order.getListImageQR())) {
-			FileStorage imageQRCode = order.getListImageQR().get(0);
+			FileStorage imageQRCode = order.getListImageQR().get(0);//
 			dto.setQrCode(FileUtils.getImageUrl(imageQRCode, false));
 		}
-
+		dto.setShippingCost(order.getShippingCost());
+		dto.setCodFee(order.getCodFee());
 		dto.setAmountDiscount(order.getAmountDiscount() != null ? order.getAmountDiscount() : new BigDecimal(0));
 		dto.setTotalAmount(OrderUtils.calTotalAmount(order.getListOrderDetail(), BigDecimal.ZERO));
 		dto.setTotalAmountDiscount(OrderUtils.calTotalAmount(order.getListOrderDetail(), order.getAmountDiscount()));
-		dto.setTotalProduct(OrderUtils.countTotalItems(order.getListOrderDetail()));
+		dto.setTotalProduct(OrderUtils.countItemsEachOrder(order.getListOrderDetail()));
 		dto.setVoucherUsedCode(order.getVoucherUsedCode());
 		dto.setPaymentStatus(order.getPaymentStatus() != null && order.getPaymentStatus());
 		dto.setPaymentTime(order.getPaymentTime());
@@ -107,7 +126,6 @@ public class OrderDTO extends Order implements Serializable {
 		dto.setNote(order.getNote());
 
 		dto.setListOrderDetailDTO(OrderDetailDTO.fromOrderDetails(order.getListOrderDetail()));
-		dto.setListOrderDetail(order.getListOrderDetail());
 
 		return dto;
 	}

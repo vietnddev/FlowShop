@@ -1,9 +1,9 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.exception.ErrorModel;
-import com.flowiee.pms.utils.constants.Pages;
-import com.flowiee.pms.utils.constants.ErrorCode;
+import com.flowiee.pms.common.enumeration.Pages;
+import com.flowiee.pms.common.enumeration.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

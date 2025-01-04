@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.product.impl;
 
-import com.flowiee.pms.config.Core;
+import com.flowiee.pms.base.system.Core;
 import com.flowiee.pms.entity.product.ProductCombo;
 import com.flowiee.pms.entity.product.ProductDamaged;
 import com.flowiee.pms.entity.sales.TicketExport;
@@ -10,16 +10,16 @@ import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.repository.product.ProductDamagedRepository;
 import com.flowiee.pms.service.product.ProductComboService;
 import com.flowiee.pms.service.system.FileStorageService;
-import com.flowiee.pms.utils.constants.MODULE;
+import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.repository.system.FileStorageRepository;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.ProductImageService;
 import com.flowiee.pms.service.product.ProductVariantService;
 import com.flowiee.pms.service.sales.TicketExportService;
 import com.flowiee.pms.service.sales.TicketImportService;
-import com.flowiee.pms.utils.CommonUtils;
-import com.flowiee.pms.utils.FileUtils;
+import com.flowiee.pms.common.utils.CommonUtils;
+import com.flowiee.pms.common.utils.FileUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -59,8 +59,9 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
 
     @Override
     @Transactional
-    public FileStorage saveImageProduct(MultipartFile fileUpload, long pProductId) throws IOException {
+    public FileStorage saveImageProduct(MultipartFile fileUpload, long pProductId, boolean makeActive) throws IOException {
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), pProductId);
+        fileInfo.setActive(makeActive);
         return mvFileStorageService.save(fileInfo);
     }
 

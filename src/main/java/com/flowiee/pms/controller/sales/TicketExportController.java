@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.model.dto.TicketExportDTO;

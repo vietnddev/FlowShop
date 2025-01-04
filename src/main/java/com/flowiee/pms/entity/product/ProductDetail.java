@@ -3,7 +3,7 @@ package com.flowiee.pms.entity.product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import com.flowiee.pms.entity.BaseEntity;
+import com.flowiee.pms.base.entity.BaseEntity;
 
 import com.flowiee.pms.entity.sales.Items;
 import com.flowiee.pms.entity.sales.OrderDetail;
@@ -11,10 +11,12 @@ import com.flowiee.pms.entity.sales.Supplier;
 import com.flowiee.pms.entity.sales.GarmentFactory;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.system.FileStorage;
+import com.flowiee.pms.common.enumeration.ProductStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import java.io.Serial;
@@ -126,8 +128,9 @@ public class ProductDetail extends BaseEntity implements Serializable {
     @OneToOne(mappedBy = "productVariant", cascade = CascadeType.ALL)
     ProductDescription productDescription;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    String status;
+    ProductStatus status;
 
     @JsonIgnore
     @OneToMany(mappedBy = "productDetail", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -165,6 +168,10 @@ public class ProductDetail extends BaseEntity implements Serializable {
     @JsonIgnore
     @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
     List<ProductDamaged> productDamagedList;
+
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
+//    List<TransactionGoodsItem> transactionGoodsItemList;
 
     @Transient
     Integer availableSalesQty;
@@ -223,6 +230,11 @@ public class ProductDetail extends BaseEntity implements Serializable {
 
     public boolean isExpiredDate() {
         return expiryDate != null && expiryDate.isBefore(LocalDate.now());
+    }
+
+    private boolean isSalable() {
+        Assert.notNull(status, "Status can't null!");
+        return status.equals(ProductStatus.ACT);
     }
 
 	@Override

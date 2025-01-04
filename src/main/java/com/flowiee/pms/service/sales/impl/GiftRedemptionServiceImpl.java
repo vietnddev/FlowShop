@@ -8,10 +8,9 @@ import com.flowiee.pms.repository.product.GiftCatalogRepository;
 import com.flowiee.pms.repository.sales.CustomerRepository;
 import com.flowiee.pms.repository.sales.GiftRedemptionRepository;
 import com.flowiee.pms.repository.sales.LoyaltyTransactionRepository;
-import com.flowiee.pms.service.BaseService;
-import com.flowiee.pms.service.sales.CustomerService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.sales.GiftRedemptionService;
-import com.flowiee.pms.utils.constants.LoyaltyTransactionType;
+import com.flowiee.pms.common.enumeration.LoyaltyTransactionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

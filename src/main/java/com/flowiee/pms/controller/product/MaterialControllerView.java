@@ -1,12 +1,12 @@
 package com.flowiee.pms.controller.product;
 
 import com.flowiee.pms.entity.product.Material;
-import com.flowiee.pms.utils.constants.Pages;
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.common.enumeration.Pages;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.service.product.MaterialService;
 
-import com.flowiee.pms.utils.constants.EndPoint;
+import com.flowiee.pms.common.enumeration.EndPoint;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

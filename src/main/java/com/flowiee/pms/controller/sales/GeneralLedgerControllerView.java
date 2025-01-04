@@ -1,7 +1,7 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.controller.BaseController;
-import com.flowiee.pms.utils.constants.Pages;
+import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.common.enumeration.Pages;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;

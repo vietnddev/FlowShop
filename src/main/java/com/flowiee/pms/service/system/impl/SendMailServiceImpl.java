@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.system.impl;
 
 import com.flowiee.pms.exception.AppException;
-import com.flowiee.pms.service.BaseService;
+import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.system.SendMailService;
 
 import lombok.AccessLevel;

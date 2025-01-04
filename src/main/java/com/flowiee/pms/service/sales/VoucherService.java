@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.sales;
 
-import com.flowiee.pms.service.BaseCurdService;
+import com.flowiee.pms.base.service.BaseCurdService;
 import com.flowiee.pms.model.dto.VoucherInfoDTO;
 import org.springframework.data.domain.Page;
 

@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.storage;
 
-import com.flowiee.pms.controller.BaseController;
+import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.storage.Storage;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.AppResponse;
@@ -9,8 +9,8 @@ import com.flowiee.pms.model.StorageItems;
 import com.flowiee.pms.model.dto.StorageDTO;
 import com.flowiee.pms.service.ExportService;
 import com.flowiee.pms.service.storage.StorageService;
-import com.flowiee.pms.utils.constants.ErrorCode;
-import com.flowiee.pms.utils.constants.TemplateExport;
+import com.flowiee.pms.common.enumeration.ErrorCode;
+import com.flowiee.pms.common.enumeration.TemplateExport;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -66,9 +66,9 @@ public class StorageController extends BaseController {
     @Operation(summary = "Create storage")
     @PostMapping("/create")
     @PreAuthorize("@vldModuleStorage.insertStorage(true)")
-    public AppResponse<StorageDTO> createStorage(@RequestBody StorageDTO storage) {
+    public AppResponse<StorageDTO> createStorage(StorageDTO storageDTO) {
         try {
-            return success(mvStorageService.save(storage));
+            return success(mvStorageService.save(storageDTO));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "storage"), ex);
         }

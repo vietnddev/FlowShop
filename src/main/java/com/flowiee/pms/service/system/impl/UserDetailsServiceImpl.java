@@ -1,5 +1,7 @@
 package com.flowiee.pms.service.system.impl;
 
+import com.flowiee.pms.common.utils.CommonUtils;
+import com.flowiee.pms.common.utils.PasswordUtils;
 import com.flowiee.pms.entity.system.SystemLog;
 import com.flowiee.pms.exception.*;
 import com.flowiee.pms.entity.system.Account;
@@ -12,6 +14,7 @@ import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.system.RoleService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,6 +34,9 @@ public class UserDetailsServiceImpl extends BaseService implements UserDetailsSe
 	private final AccountRepository mvAccountRepository;
 	private final SystemLogRepository mvSystemLogRepository;
 
+	@Value("${system.login.bypass}")
+	private boolean mvSystemByPass;
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Account accountEntity = mvAccountRepository.findByUsername(username);
@@ -44,6 +50,10 @@ public class UserDetailsServiceImpl extends BaseService implements UserDetailsSe
 			}
 
 			userPrincipal = new UserPrincipal(accountEntity);
+
+			if (mvSystemByPass) {
+				userPrincipal.setPassword(PasswordUtils.encodePassword(CommonUtils.defaultNewPassword));
+			}
 
 			Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 			grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + accountEntity.getRole()));
@@ -85,6 +95,7 @@ public class UserDetailsServiceImpl extends BaseService implements UserDetailsSe
 		} else {
             logger.error("User not found with username: {}", username);
 		}
+
 		return userPrincipal;
 	}
 }

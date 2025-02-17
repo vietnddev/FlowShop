@@ -27,10 +27,12 @@ import javax.servlet.http.HttpServletRequest;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	UserDetailsServiceImpl userDetailsServiceImpl;
+	@Autowired
+	DevAuthBypassFilter devAuthBypassFilter;
 
-	public DevAuthBypassFilter devAuthBypassFilter() {
-		return new DevAuthBypassFilter();
-	}
+//	public DevAuthBypassFilter devAuthBypassFilter() {
+//		return new DevAuthBypassFilter();
+//	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -81,7 +83,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.defaultSuccessUrl("/")
 				.authenticationDetailsSource(authenticationDetailsSource())
 				.and()
-				.addFilterBefore(devAuthBypassFilter(), UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(devAuthBypassFilter, UsernamePasswordAuthenticationFilter.class)
 				.httpBasic()
 				.and()
 				.logout()

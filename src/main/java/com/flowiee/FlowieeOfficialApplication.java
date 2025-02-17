@@ -16,7 +16,6 @@ public class FlowieeOfficialApplication {
     public static void main(String[] args) {
         SpringApplication.run(FlowieeOfficialApplication.class, args);
         LoggerFactory.getLogger(FlowieeOfficialApplication.class).info("Welcome");
-        LoggerFactory.getLogger(FlowieeOfficialApplication.class).error("WelcomeERROR");
     }
 
 }

@@ -85,7 +85,7 @@ public class ProductVariantConvert {
         outputDTO.setNote(inputEntity.getNote());
         outputDTO.setStatus(inputEntity.getStatus());
 
-        outputDTO.setListImages(inputEntity.getListImages());
+        //outputDTO.setListImages(inputEntity.getListImages());
         outputDTO.setListProductVariantPrice(inputEntity.getListProductVariantPrice());
 
         return outputDTO;

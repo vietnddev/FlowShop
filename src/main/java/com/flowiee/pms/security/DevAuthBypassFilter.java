@@ -3,6 +3,7 @@ package com.flowiee.pms.security;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.CoreUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -11,7 +12,8 @@ import java.io.IOException;
 
 @Component
 public class DevAuthBypassFilter implements Filter {
-    private static final boolean mvSystemByPass = true;
+    @Value("${system.login.bypass}")
+    private boolean mvSystemByPass;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

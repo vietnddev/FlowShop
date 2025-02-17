@@ -77,7 +77,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
     public Page<OrderDTO> findAll(int pPageSize, int pPageNum, String pTxtSearch, Long pOrderId, Long pPaymentMethodId,
                                   OrderStatus pOrderStatus, Long pSalesChannelId, Long pSellerId, Long pCustomerId,
                                   Long pBranchId, Long pGroupCustomerId, String pDateFilter, LocalDateTime pOrderTimeFrom, LocalDateTime pOrderTimeTo, String pSortBy) {
-        Pageable lvPageable = getPageable(pPageNum, pPageSize, Sort.by(pSortBy != null ? pSortBy : "orderTime").ascending());
+        Pageable lvPageable = getPageable(pPageNum, pPageSize, Sort.by(pSortBy != null ? pSortBy : "orderTime").descending());
         LocalDateTime lvOrderTimeFrom = getFilterStartTime(pOrderTimeFrom);
         LocalDateTime lvOrderTimeTo = getFilterEndTime(pOrderTimeTo);
         if (!CoreUtils.isNullStr(pDateFilter)) {

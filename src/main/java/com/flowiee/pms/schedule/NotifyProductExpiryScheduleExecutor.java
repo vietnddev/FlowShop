@@ -13,8 +13,8 @@ import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.enumeration.ConfigCode;
 import com.flowiee.pms.common.enumeration.NotificationType;
 import com.flowiee.pms.common.enumeration.ScheduleTask;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -26,12 +26,19 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@RequiredArgsConstructor
 public class NotifyProductExpiryScheduleExecutor extends ScheduleExecutor {
-    private final ProductDetailRepository productDetailRepository;
-    private final AccountRepository accountRepository;
-    private final ConfigRepository configRepository;
-    private final MailMediaService mailMediaService;
+    @Autowired
+    private ProductDetailRepository productDetailRepository;
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private ConfigRepository configRepository;
+    @Autowired
+    private MailMediaService mailMediaService;
+
+    public NotifyProductExpiryScheduleExecutor() {
+        super();
+    }
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * ?")//Run at 0h every day

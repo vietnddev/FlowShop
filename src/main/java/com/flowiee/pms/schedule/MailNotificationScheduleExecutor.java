@@ -7,7 +7,7 @@ import com.flowiee.pms.repository.system.MailMediaRepository;
 import com.flowiee.pms.repository.system.MailStatusRepository;
 import com.flowiee.pms.service.system.SendMailService;
 import com.flowiee.pms.common.enumeration.ScheduleTask;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +17,17 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-@RequiredArgsConstructor
 public class MailNotificationScheduleExecutor extends ScheduleExecutor {
-    private final MailStatusRepository mailStatusRepository;
-    private final MailMediaRepository mailMediaRepository;
-    private final SendMailService sendMailService;
+    @Autowired
+    private MailStatusRepository mailStatusRepository;
+    @Autowired
+    private MailMediaRepository mailMediaRepository;
+    @Autowired
+    private SendMailService sendMailService;
+
+    public MailNotificationScheduleExecutor() {
+        super();
+    }
 
     @Scheduled(cron = "*/15 * * * * ?")
     @Override

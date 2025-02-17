@@ -1,5 +1,6 @@
 package com.flowiee.pms.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.sales.Customer;
@@ -30,9 +31,10 @@ public class OrderDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
+	@JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
 	private LocalDateTime createdAt;
-
 	private String code;
+	@JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
 	private LocalDateTime orderTime;
 	private String receiverAddress;
 	private String receiverName;
@@ -71,8 +73,7 @@ public class OrderDTO implements Serializable {
 	@JsonIgnore
 	private List<OrderDetail> listOrderDetail;
 
-	public OrderDTO(Long id, String code, LocalDateTime orderTime, String receiptName, String receiptPhone, String receiptEmail, String receiptAddress,
-					Customer customer, Category salesChannel, Category paymentMethod, Account cashier, OrderStatus orderStatus) {
+	public OrderDTO(Long id, String code, LocalDateTime orderTime, String receiptName, String receiptPhone, String receiptEmail, String receiptAddress, OrderStatus orderStatus) {
 		this.id = id;
 		setCode(code);
 		setOrderTime(orderTime);
@@ -80,17 +81,12 @@ public class OrderDTO implements Serializable {
 		setReceiverPhone(receiptPhone);
 		setReceiverEmail(receiptEmail);
 		setReceiverAddress(receiptAddress);
-		//setCustomer(customer);
-		//setKenhBanHang(salesChannel);
-		//setPaymentMethod(paymentMethod);
-		//setNhanVienBanHang(cashier);
-		//setTrangThaiDonHang(orderStatus);
 		setOrderStatus(orderStatus);
 	}
 
 	public static OrderDTO fromOrder(Order order) {
-		OrderDTO dto = new OrderDTO(order.getId(), order.getCode(), order.getOrderTime(), order.getReceiverName(), order.getReceiverPhone(), order.getReceiverEmail(), order.getReceiverAddress(),
-									order.getCustomer(), order.getKenhBanHang(), order.getPaymentMethod(), order.getNhanVienBanHang(), order.getOrderStatus());
+		OrderDTO dto = new OrderDTO(order.getId(), order.getCode(), order.getOrderTime(), order.getReceiverName(),
+				order.getReceiverPhone(), order.getReceiverEmail(), order.getReceiverAddress(), order.getOrderStatus());
 		dto.setCreatedAt(order.getCreatedAt());
 
 		dto.setCustomerId(order.getCustomer().getId());
@@ -113,7 +109,7 @@ public class OrderDTO implements Serializable {
 		dto.setTicketExportId(order.getTicketExport() != null ? order.getTicketExport().getId() : null);
 
 		if (ObjectUtils.isNotEmpty(order.getListImageQR())) {
-			FileStorage imageQRCode = order.getListImageQR().get(0);
+			FileStorage imageQRCode = order.getListImageQR().get(0);//
 			dto.setQrCode(FileUtils.getImageUrl(imageQRCode, false));
 		}
 		dto.setShippingCost(order.getShippingCost());

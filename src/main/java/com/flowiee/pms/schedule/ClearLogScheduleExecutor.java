@@ -10,7 +10,7 @@ import com.flowiee.pms.repository.system.EventLogRepository;
 import com.flowiee.pms.repository.system.SystemLogRepository;
 import com.flowiee.pms.common.enumeration.ConfigCode;
 import com.flowiee.pms.common.enumeration.ScheduleTask;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,11 +19,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class ClearLogScheduleExecutor extends ScheduleExecutor {
-    private final SystemLogRepository systemLogRepository;
-    private final EventLogRepository eventLogRepository;
-    private final ConfigRepository configRepository;
+    @Autowired
+    private SystemLogRepository systemLogRepository;
+    @Autowired
+    private EventLogRepository eventLogRepository;
+    @Autowired
+    private ConfigRepository configRepository;
+
+    public ClearLogScheduleExecutor() {
+        super();
+    }
 
     @Transactional
     @Scheduled(cron = "0 0 1 * * ?")

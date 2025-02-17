@@ -55,7 +55,11 @@ spring:
   #   username:
   #   password:
 
-  # Devtools config
+  # Auto restart
   devtools:
     restart:
       enabled: true
+
+system:
+  login:
+    bypass: true

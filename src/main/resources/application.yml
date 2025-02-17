@@ -32,6 +32,10 @@ spring:
 #    properties:
 #      hibernate:
 #        format_sql: false
+    properties:
+      hibernate:
+        session_factory:
+          statement_inspector: com.flowiee.pms.config.CustomHibernateInterceptor
 #Log
 logging:
   level:

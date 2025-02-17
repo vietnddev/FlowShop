@@ -25,6 +25,10 @@ public abstract class ScheduleExecutor extends BaseService {
     private ScheduleTask mvScheduleTask;
     protected boolean enableLog = false;
 
+    public ScheduleExecutor() {
+        super();
+    }
+
     public abstract void init() throws AppException;
     public abstract void doProcesses() throws AppException;
 
@@ -83,5 +87,9 @@ public abstract class ScheduleExecutor extends BaseService {
 
     protected void setErrorMsg(String pMessage) {
         mvScheduleStatus.setErrorMsg(pMessage);
+    }
+
+    public ScheduleTask getScheduleTask() {
+        return mvScheduleTask;
     }
 }

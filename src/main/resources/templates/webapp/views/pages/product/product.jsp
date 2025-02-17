@@ -48,7 +48,7 @@
                                                 <th></th>
                                                 <th>Tên sản phẩm</th>
                                                 <th>Loại</th>
-                                                <th>Màu sắc</th>
+                                                <th>Màu sắc & số lượng từng size</th>
                                                 <th>Số lượng</th>
                                                 <th>Đơn vị tính</th>
                                                 <th>Khuyến mãi</th>

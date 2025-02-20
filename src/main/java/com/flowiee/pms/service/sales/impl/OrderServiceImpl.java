@@ -52,9 +52,9 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
     private final OrderRepository       mvOrderRepository;
     private final ConfigRepository      mvConfigRepository;
     private final CartItemsService      mvCartItemsService;
-    private final OrderItemsService     mvOrderItemsService;
-    private final GenerateQRCodeService mvGenerateQRCodeService;
-    private final CustomerRepository    mvCustomerRepository;
+    private final OrderItemsService          mvOrderItemsService;
+    private final OrderGenerateQRCodeService mvOrderGenerateQRCodeService;
+    private final CustomerRepository         mvCustomerRepository;
     private final OrderHistoryService   mvOrderHistoryService;
     private final TicketImportService   mvTicketImportService;
     private final VoucherTicketService  mvVoucherTicketService;
@@ -225,7 +225,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         Order lvOrderSaved = mvOrderRepository.save(order);
         //Create QRCode
         try {
-            mvGenerateQRCodeService.generateOrderQRCode(lvOrderSaved.getId());
+            mvOrderGenerateQRCodeService.generateOrderQRCode(lvOrderSaved.getId());
         } catch (IOException | WriterException e ) {
             e.printStackTrace();
             logger.error(String.format("Can't generate QR Code for Order %s", lvOrderSaved.getCode()), e);

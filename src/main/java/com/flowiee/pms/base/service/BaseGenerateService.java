@@ -7,19 +7,12 @@ import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.FileUtils;
-import com.flowiee.pms.common.enumeration.FileExtension;
 import com.flowiee.pms.common.enumeration.MODULE;
 import org.springframework.stereotype.Component;
 
-@Component
-public class BaseGenerateService extends BaseService {
-    protected FileExtension mvQRCodeFormat = FileExtension.PNG;
-    protected int mvQRCodeWidth = 200;
-    protected int mvQRCodeHeight = 200;
-    protected FileExtension mvBarcodeFormat = FileExtension.PNG;
-    protected int mvBarcodeWidth = 300;
-    protected int mvBarcodeHeight = 100;
 
+@Component
+public abstract class BaseGenerateService extends BaseService {
     protected String getStorageName(long pCurrentTime, String pQRCodeName) {
         return pCurrentTime + "_" + pQRCodeName;
     }

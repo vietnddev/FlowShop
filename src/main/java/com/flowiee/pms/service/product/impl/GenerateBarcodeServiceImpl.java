@@ -6,8 +6,7 @@ import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.repository.product.ProductDetailRepository;
 import com.flowiee.pms.repository.system.FileStorageRepository;
-import com.flowiee.pms.base.service.BaseGenerateService;
-import com.flowiee.pms.service.product.GenerateBarcodeService;
+import com.flowiee.pms.base.service.GenerateBarcodeService;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.enumeration.FileExtension;
 import com.flowiee.pms.common.enumeration.MODULE;
@@ -27,7 +26,7 @@ import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
-public class GenerateBarcodeServiceImpl extends BaseGenerateService implements GenerateBarcodeService {
+public class GenerateBarcodeServiceImpl extends GenerateBarcodeService {
     private final ProductDetailRepository mvProductVariantRepository;
     private final FileStorageRepository mvFileStorageRepository;
 

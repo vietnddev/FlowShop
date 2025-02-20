@@ -8,8 +8,8 @@ import com.flowiee.pms.model.OrderDetailRpt;
 import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.model.dto.OrderDetailDTO;
 import com.flowiee.pms.base.service.BaseService;
+import com.flowiee.pms.service.sales.OrderGenerateQRCodeService;
 import com.flowiee.pms.service.sales.OrderPrintInvoiceService;
-import com.flowiee.pms.service.sales.GenerateQRCodeService;
 import com.flowiee.pms.service.sales.OrderReadService;
 import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.utils.ReportUtils;
@@ -33,8 +33,8 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class OrderPrintInvoiceServiceImpl extends BaseService implements OrderPrintInvoiceService {
-    OrderReadService mvOrderReadService;
-    GenerateQRCodeService mvGenerateQRCodeService;
+    OrderReadService           mvOrderReadService;
+    OrderGenerateQRCodeService mvOrderGenerateQRCodeService;
 
     @Override
     public void printInvoicePDF(Order pOrder, List<Integer> pOrderIds, boolean isExportAll, HttpServletResponse response) {
@@ -58,7 +58,7 @@ public class OrderPrintInvoiceServiceImpl extends BaseService implements OrderPr
         parameterMap.put("invoiceNumber", lvOrderDto.getCode());
         parameterMap.put("orderDate", lvOrderDto.getOrderTime());
         parameterMap.put("nowDate", new Date());
-        FileStorage f = mvGenerateQRCodeService.findQRCodeOfOrder(lvOrderDto.getId());
+        FileStorage f = mvOrderGenerateQRCodeService.findOrderQRCode(lvOrderDto.getId());
         if (f != null) {
             Path barcodePath = Path.of(Core.getResourceUploadPath() + FileUtils.getImageUrl(f, true));
             if (barcodePath.toFile().exists()) {

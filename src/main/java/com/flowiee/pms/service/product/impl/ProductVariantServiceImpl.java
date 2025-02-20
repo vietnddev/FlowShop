@@ -18,9 +18,9 @@ import com.flowiee.pms.repository.sales.OrderCartRepository;
 import com.flowiee.pms.repository.storage.StorageRepository;
 import com.flowiee.pms.repository.system.FileStorageRepository;
 import com.flowiee.pms.service.category.CategoryService;
-import com.flowiee.pms.service.product.GenerateBarcodeService;
+import com.flowiee.pms.base.service.GenerateBarcodeService;
+import com.flowiee.pms.service.product.ProductGenerateQRCodeService;
 import com.flowiee.pms.service.sales.CartService;
-import com.flowiee.pms.service.sales.GenerateQRCodeService;
 import com.flowiee.pms.service.storage.StorageService;
 import com.flowiee.pms.common.ChangeLog;
 import com.flowiee.pms.common.utils.CoreUtils;
@@ -70,7 +70,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
     private final ProductDetailRepository mvProductVariantRepository;
     private final ProductPriceRepository mvProductPriceRepository;
     private final FileStorageRepository mvFileStorageRepository;
-    private final GenerateQRCodeService mvGenerateQRCodeService;
+    private final ProductGenerateQRCodeService mvProductGenerateQRCodeService;
     private final ProductHistoryService mvProductHistoryService;
     private final TicketImportService mvTicketImportService;
     private final TicketExportService mvTicketExportService;
@@ -186,7 +186,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
             savePrice(productDetailSaved, priceDTO);
 
             try {
-                mvGenerateQRCodeService.generateProductVariantQRCode(productDetailSaved.getId());
+                mvProductGenerateQRCodeService.generateProductVariantQRCode(productDetailSaved.getId());
             } catch (IOException | WriterException e ) {
                 e.printStackTrace();
                 logger.error(String.format("Can't generate QR Code for Product %s", productDetailSaved.getVariantCode()), e);

@@ -40,7 +40,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
-@RequestMapping("${app.api.prefix}/order")
+@RequestMapping("${app.api.prefix}/sls/order")
 @Tag(name = "Order API", description = "Quản lý đơn hàng")
 @RequiredArgsConstructor
 public class OrderController extends BaseController {

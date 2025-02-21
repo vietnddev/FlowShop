@@ -56,10 +56,13 @@ public class Order extends BaseEntity implements Serializable {
 	String confirmedBy;
 
 	@Column(name = "confirmed_time")
-	String confirmedTime;
+	LocalDateTime confirmedTime;
 
 	@Column(name = "delivery_method")
 	String deliveryMethod;
+
+	@Column(name = "tracking_code")
+	String trackingCode;
 
 	@Column(name = "note", length = 500)
 	String note;

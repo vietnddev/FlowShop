@@ -20,7 +20,7 @@ function createOrder() {
         let receiveEmail = $('#receiveEmailField').val();
         let receiveAddress = $('#receiveAddressField').val();
 
-        let apiURL = mvHostURLCallApi + '/order/insert';
+        let apiURL = mvHostURLCallApi + '/sls/order/insert';
         let body = {
             customerId: customerId,
             salesAssistantId : accountId,
@@ -45,7 +45,7 @@ function createOrder() {
             success: function (response) {
                 if (response.status === "OK") {
                     alert('Create new order success!')
-                    window.location =  mvHostURL + '/order';
+                    window.location =  mvHostURL + '/sls/order';
                 }
             },
             error: function (xhr) {

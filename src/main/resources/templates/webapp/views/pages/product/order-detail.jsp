@@ -302,7 +302,7 @@
 
                     <div class="modal fade" id="addProductModal">
                         <div class="modal-dialog">
-                            <form class="row mt-3" th:action="@{/order/{orderId}/item/add(orderId=${orderDetailId})}" method="POST">
+                            <form class="row mt-3" th:action="@{/sls/order/{orderId}/item/add(orderId=${orderDetailId})}" method="POST">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <strong class="modal-title">Thêm sản phẩm</strong>

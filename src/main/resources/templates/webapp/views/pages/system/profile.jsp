@@ -162,7 +162,7 @@
                                             <tr th:each="list, index : ${listDonHangDaBan}">
                                                 <td th:text="${index.index + 1}"></td>
                                                 <td>
-                                                    <a th:href="@{/order/{id}(id=${list.id})}"
+                                                    <a th:href="@{/sls/order/{id}(id=${list.id})}"
                                                        th:text="${list.code}"></a>
                                                 </td>
                                                 <td th:text="${list.orderTime}"></td>

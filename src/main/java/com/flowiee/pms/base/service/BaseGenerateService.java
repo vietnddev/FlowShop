@@ -10,7 +10,6 @@ import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.enumeration.MODULE;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public abstract class BaseGenerateService extends BaseService {
     protected String getStorageName(long pCurrentTime, String pQRCodeName) {
@@ -45,7 +44,7 @@ public abstract class BaseGenerateService extends BaseService {
         return FileUtils.genRandomFileName() + "." + getImageExtension();
     }
 
-    protected String getGenContent(BaseEntity baseEntity) {
+    protected String getGenContent(Object pObj) {
         return null;
     }
 

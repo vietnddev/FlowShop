@@ -16,6 +16,7 @@ public enum Pages {
     SYS_PROFILE("profile",                              MODULE.SYSTEM),
     SYS_UNAUTHORIZED("unauthorized",                    MODULE.SYSTEM),
     SYS_ERROR("error",                                  MODULE.SYSTEM),
+    SYS_ERROR_BASIC("error-basic",                      MODULE.SYSTEM),
     SYS_DATA_TEMP("data-temp",                          MODULE.SYSTEM),
 
     PRO_DASHBOARD("dashboard",                          MODULE.PRODUCT),
@@ -38,6 +39,7 @@ public enum Pages {
     PRO_COMBO("product-combo",                          MODULE.PRODUCT),
     PRO_COMBO_DETAIL("product-combo-detail",            MODULE.PRODUCT),
 
+    SLS_ORDER_TRACKING("order-tracking",                                 MODULE.SALES),
     SLS_LEDGER("ledger/general-ledger",                                  MODULE.SALES),
     SLS_LEDGER_TRANS("ledger/ledger-trans",                              MODULE.SALES),
     SLS_LEDGER_TRANS_DETAIL("ledger/ledger-trans-detail",                MODULE.SALES),

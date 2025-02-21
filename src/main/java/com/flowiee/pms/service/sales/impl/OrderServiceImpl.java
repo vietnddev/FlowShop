@@ -126,6 +126,11 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         return null;
     }
 
+    @Override
+    public Order findByTrackingCode(String pTrackingCode) {
+        return mvOrderRepository.findByTrackingCode(pTrackingCode);
+    }
+
     private VldModel vldBeforeCreateOrder(CreateOrderReq pOrderRequest, Long pCartId, String pVoucherCode, Long pPaymentMethodId, Long pSaleChannelId, Long pCustomerId, Long pSalesAssistantId) {
         OrderCart lvCart = mvCartService.findById(pCartId, true);
         if (ObjectUtils.isEmpty(lvCart.getListItems()))

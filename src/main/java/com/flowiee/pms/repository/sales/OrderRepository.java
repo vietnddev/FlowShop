@@ -52,6 +52,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("from Order where ticketExport.id=:ticketExportId")
     Order findByTicketExport(@Param("ticketExportId") Long ticketExportId);
 
+    @Query("from Order where trackingCode = :trackingCode")
+    Order findByTrackingCode(@Param("trackingCode") String trackingCode);
+
     @Query("select " +
            "    extract(year from o.orderTime) AS year, " +
            "    extract(month from o.orderTime) AS month, " +

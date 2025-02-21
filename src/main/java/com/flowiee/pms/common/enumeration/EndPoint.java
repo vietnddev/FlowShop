@@ -11,8 +11,8 @@ public enum EndPoint {
 
     URL_CATEGORY("/system/category", "SIDEBAR", true),
     URL_PRODUCT("/san-pham", "SIDEBAR", true),
-    URL_PRODUCT_ORDER("/order", "SIDEBAR", true),
-    URL_PRODUCT_CREATE_ORDER("/order/ban-hang", "SIDEBAR", true),
+    URL_PRODUCT_ORDER("/sls/order", "SIDEBAR", true),
+    URL_PRODUCT_CREATE_ORDER("/sls/order/ban-hang", "SIDEBAR", true),
     URL_PRODUCT_CUSTOMER("/customer", "SIDEBAR", true),
     URL_PRODUCT_SUPPLIER("/san-pham/supplier", "SIDEBAR", true),
     URL_PRODUCT_GALLERY("/gallery", "SIDEBAR", true),

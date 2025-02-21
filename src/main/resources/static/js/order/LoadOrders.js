@@ -1,5 +1,5 @@
 function loadOrders(pageSize, pageNum) {
-    let apiURL = mvHostURLCallApi + '/order/all';
+    let apiURL = mvHostURLCallApi + '/sls/order/all';
     let params = {
         pageSize: pageSize,
         pageNum: pageNum,
@@ -24,7 +24,7 @@ function loadOrders(pageSize, pageNum) {
                 contentTable.append(`
                                <tr>
                                     <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>
-                                    <td><a href="/order/${d.id}">${d.code}</a></td>
+                                    <td><a href="/sls/order/${d.id}">${d.code}</a></td>
                                     <td>${d.orderTime}</td>
                                     <td>${d.receiverAddress}</td>
                                     <td>${d.receiverName}</td>
@@ -33,7 +33,7 @@ function loadOrders(pageSize, pageNum) {
                                     <td>${d.salesChannelName}</td>
                                     <td>${d.paymentStatus == true ? "<span class=\"badge bg-success\">Đã thanh toán</span>" : "Chưa thanh toán"}</td>
                                     <td>${d.orderStatusName}</td>
-                                    <td><a class="btn btn-sm btn-info btn-print-invoice" href="/order/print-invoice/${d.id}" orderId="${d.id}"><i class="fa-solid fa-print"></i></a></td>
+                                    <td><a class="btn btn-sm btn-info btn-print-invoice" href="/sls/order/print-invoice/${d.id}" orderId="${d.id}"><i class="fa-solid fa-print"></i></a></td>
                                 </tr>
                             `);
             });

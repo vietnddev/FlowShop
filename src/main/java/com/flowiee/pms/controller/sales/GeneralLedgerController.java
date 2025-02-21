@@ -3,7 +3,7 @@ package com.flowiee.pms.controller.sales;
 import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.AppResponse;
-import com.flowiee.pms.model.EximModel;
+import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.model.GeneralLedger;
 import com.flowiee.pms.service.ExportService;
 import com.flowiee.pms.service.sales.LedgerService;
@@ -58,7 +58,7 @@ public class GeneralLedgerController extends BaseController {
     @GetMapping("/export")
     @PreAuthorize("@vldModuleSales.readGeneralLedger(true)")
     public ResponseEntity<InputStreamResource> exportData() {
-        EximModel model = mvExportService.exportToExcel(TemplateExport.EX_LEDGER_TRANSACTIONS, null, false);
+        EximResult model = mvExportService.exportToExcel(TemplateExport.EX_LEDGER_TRANSACTIONS, null, false);
         return ResponseEntity.ok().headers(model.getHttpHeaders()).body(model.getContent());
     }
 }

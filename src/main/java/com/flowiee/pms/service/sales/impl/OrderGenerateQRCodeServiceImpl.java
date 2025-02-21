@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,12 +34,16 @@ public class OrderGenerateQRCodeServiceImpl extends GenerateQRCodeService implem
     public void generateOrderQRCode(long orderId) throws IOException, WriterException {
         Order lvOrder = mvOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException(new Object[] {"order"}, null, null));
+        String lvTrackingCode = UUID.randomUUID().toString();
+        lvOrder.setTrackingCode(lvTrackingCode);
 
         FileStorage lvQRCodeModel = getFileModel(lvOrder, MODULE.SALES, orderId, null);
         mvFileStorageRepository.save(lvQRCodeModel);
 
         Path lvGenPath = Paths.get(super.getGenPath(MODULE.SALES) + "/" + lvQRCodeModel.getStorageName());
-        generateQRCode(getGenContent(lvOrder), mvQRCodeFormat, lvGenPath);
+        generateQRCode(getGenContent(lvTrackingCode), mvQRCodeFormat, lvGenPath);
+
+        mvOrderRepository.save(lvOrder);
     }
 
     @Override
@@ -47,7 +52,7 @@ public class OrderGenerateQRCodeServiceImpl extends GenerateQRCodeService implem
     }
 
     @Override
-    protected String getGenContent(BaseEntity baseEntity) {
-        return CommonUtils.getServerURL() + "/product/" + baseEntity.getId();
+    protected String getGenContent(Object pObj) {
+        return CommonUtils.getServerURL() + "/sls/order/tracking?code=" + pObj.toString();
     }
 }

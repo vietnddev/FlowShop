@@ -5,7 +5,7 @@
     <div class="modal fade" th:id="'modalUpdateItems_' + ${list.id}">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form th:action="@{|/order/{orderId}/item/update/{itemId}|(orderId=${list.order.id}, itemId=${list.id})}"
+                <form th:action="@{|/sls/order/{orderId}/item/update/{itemId}|(orderId=${list.order.id}, itemId=${list.id})}"
                       th:object="${items}" method="POST">
                     <div class="modal-header">
                         <strong class="modal-title">Cập nhật sản phẩm</strong>
@@ -40,7 +40,7 @@
     <div class="modal fade" th:id="'modalDeleteItems_' + ${list.id}">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form th:action="@{|/order/{orderId}/item/delete/{itemId}|(orderId=${list.order.id}, itemId=${list.id})}" method="POST">
+                <form th:action="@{|/sls/order/{orderId}/item/delete/{itemId}|(orderId=${list.order.id}, itemId=${list.id})}" method="POST">
                     <div class="modal-header">
                         <strong class="modal-title">Cập nhật đơn hàng</strong>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>

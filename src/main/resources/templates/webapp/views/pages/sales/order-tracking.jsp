@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Flowiee official | Tracking order</title>
+        <div th:replace="header :: stylesheets"></div>
+    </head>
+
+    <body class="hold-transition sidebar-mini layout-fixed">
+        <div class="wrapper">
+            <section class="content w-50 mx-auto mt-5">
+                <div class="card">
+                    <div class="card-header mx-auto mt-3 bg-warning">
+                        <h3>Order information</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card card-widget widget-user-2 shadow-sm">
+                                    <div class="card-footer p-0">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <a class="nav-link text-secondary">
+                                                    Order code <span class="float-right" th:text="${orderCode}"></span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-secondary">
+                                                    Order time <span class="float-right" th:text="${orderTime}"></span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-secondary">
+                                                    Status <span class="float-right badge bg-success" th:text="${orderStatus}"></span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-secondary">
+                                                    Customer name <span class="float-right" th:text="${receiverName}"></span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-secondary">
+                                                    Phone number <span class="float-right" th:text="${receiverPhone}"></span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-secondary">
+                                                    Address <span class="float-right" th:text="${receiverAddress}"></span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-secondary">
+                                                    Total amount <span class="float-right badge bg-info" th:text="${#numbers.formatDecimal(totalAmount, 0, 'COMMA', 0, 'NONE')} + ' đ'"></span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Items</h3>
+                                        <!--<div class="card-tools">
+                                            <div class="input-group input-group-sm" style="width: 150px;">
+                                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+                                                <div class="input-group-append">
+                                                    <button type="submit" class="btn btn-default">
+                                                        <i class="fas fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>-->
+                                    </div>
+                                    <div class="card-body table-responsive p-0" style="height: 450px;">
+                                        <table class="table table-head-fixed text-nowrap">
+                                            <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Name</th>
+                                                <th>Unit price</th>
+                                                <th>Quantity</th>
+                                                <th>Amount</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="i, index : ${orderItems}">
+                                                <td th:text="${index.index + 1}"></td>
+                                                <td th:text="${i.productDetail.variantName}"></td>
+                                                <td th:text="${#numbers.formatDecimal(i.price, 0, 'COMMA', 0, 'NONE')} + ' đ'"></td>
+                                                <td th:text="${i.quantity}"></td>
+                                                <td th:text="${#numbers.formatDecimal(i.price * i.quantity, 0, 'COMMA', 0, 'NONE')} + ' đ'"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </body>
+</html>

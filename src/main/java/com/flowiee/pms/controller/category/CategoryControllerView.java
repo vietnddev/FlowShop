@@ -3,7 +3,7 @@ package com.flowiee.pms.controller.category;
 import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.exception.ResourceNotFoundException;
-import com.flowiee.pms.model.EximModel;
+import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.service.ExportService;
 import com.flowiee.pms.service.ImportService;
 import com.flowiee.pms.service.category.CategoryService;
@@ -70,7 +70,7 @@ public class CategoryControllerView extends BaseController {
     @GetMapping("/{type}/template")
     @PreAuthorize("@vldModuleCategory.importCategory(true)")
     public ResponseEntity<InputStreamResource> exportTemplate(@PathVariable("type") String categoryType) {
-        EximModel model = mvExportService.exportToExcel(TemplateExport.EX_LIST_OF_CATEGORIES, null, true);
+        EximResult model = mvExportService.exportToExcel(TemplateExport.EX_LIST_OF_CATEGORIES, null, true);
         return ResponseEntity.ok().headers(model.getHttpHeaders()).body(model.getContent());
     }
 
@@ -87,7 +87,7 @@ public class CategoryControllerView extends BaseController {
     @GetMapping("/{type}/export")
     @PreAuthorize("@vldModuleCategory.readCategory(true)")
     public ResponseEntity<InputStreamResource> exportData(@PathVariable("type") String categoryType) {
-        EximModel model = mvExportService.exportToExcel(TemplateExport.EX_LIST_OF_CATEGORIES, null, false);
+        EximResult model = mvExportService.exportToExcel(TemplateExport.EX_LIST_OF_CATEGORIES, null, false);
         return ResponseEntity.ok().headers(model.getHttpHeaders()).body(model.getContent());
     }
 }

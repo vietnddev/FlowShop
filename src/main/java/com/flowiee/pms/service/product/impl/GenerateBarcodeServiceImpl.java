@@ -79,8 +79,8 @@ public class GenerateBarcodeServiceImpl extends GenerateBarcodeService {
     }
 
     @Override
-    protected String getGenContent(BaseEntity baseEntity) {
-        return CommonUtils.getServerURL() + "/product/" + baseEntity.getId();
+    protected String getGenContent(Object pObj) {
+        return CommonUtils.getServerURL() + "/product/" + null;
     }
 
     @Override

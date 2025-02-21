@@ -18,6 +18,8 @@ public interface OrderReadService {
 
     Order findById(Long orderId, boolean throwException);
 
+    Order findByTrackingCode(String pTrackingCode);
+
     List<Order> findOrdersToday();
 
     Page<OrderDTO> getOrdersByCustomer(int pageSize, int pageNum, Long pCustomerId);

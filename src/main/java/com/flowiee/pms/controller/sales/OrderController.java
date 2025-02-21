@@ -7,7 +7,7 @@ import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.model.AppResponse;
-import com.flowiee.pms.model.EximModel;
+import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.payload.CreateOrderReq;
@@ -40,7 +40,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
-@RequestMapping("${app.api.prefix}/order")
+@RequestMapping("${app.api.prefix}/sls/order")
 @Tag(name = "Order API", description = "Quản lý đơn hàng")
 @RequiredArgsConstructor
 public class OrderController extends BaseController {
@@ -133,7 +133,7 @@ public class OrderController extends BaseController {
     @GetMapping("/export")
     @PreAuthorize("@vldModuleSales.readOrder(true)")
     public ResponseEntity<InputStreamResource> exportToExcel() {
-        EximModel model = mvExportService.exportToExcel(TemplateExport.EX_LIST_OF_ORDERS, null, false);
+        EximResult model = mvExportService.exportToExcel(TemplateExport.EX_LIST_OF_ORDERS, null, false);
         return ResponseEntity.ok().headers(model.getHttpHeaders()).body(model.getContent());
     }
 

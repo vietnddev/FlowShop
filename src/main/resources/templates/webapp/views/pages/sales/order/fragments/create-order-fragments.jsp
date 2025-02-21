@@ -5,7 +5,7 @@
         <div class="modal fade" th:id="'modalUpdateItems_' + ${item.id}">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form th:action="@{/order/ban-hang/cart/item/update/{itemId}(itemId=${item.id})}"
+                    <form th:action="@{/sls/order/ban-hang/cart/item/update/{itemId}(itemId=${item.id})}"
                           th:object="${items}" method="POST">
                         <div class="modal-header">
                             <strong class="modal-title">Cập nhật sản phẩm</strong>
@@ -56,7 +56,7 @@
         <div class="modal fade" th:id="'modalDeleteItems_' + ${item.id}">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form th:action="@{/order/ban-hang/cart/item/delete/{itemId}(itemId=${item.id})}" method="POST">
+                    <form th:action="@{/sls/order/ban-hang/cart/item/delete/{itemId}(itemId=${item.id})}" method="POST">
                         <div class="modal-header">
                             <strong class="modal-title">Cập nhật giỏ hàng</strong>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -82,7 +82,7 @@
         <div class="modal fade" th:id="'modalDeleteCart_' + ${cart.id}">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form th:action="@{/order/ban-hang/cart/{id}/reset(id=${cart.id})}"
+                    <form th:action="@{/sls/order/ban-hang/cart/{id}/reset(id=${cart.id})}"
                           method="POST">
                         <div class="modal-header">
                             <strong class="modal-title">Thông báo xác nhận</strong>

@@ -42,7 +42,7 @@ public class ProductGenerateQRCodeServiceImpl extends GenerateQRCodeService impl
     }
 
     @Override
-    protected String getGenContent(BaseEntity baseEntity) {
-        return CommonUtils.getServerURL() + "/product/" + baseEntity.getId();
+    protected String getGenContent(Object pObj) {
+        return CommonUtils.getServerURL() + "/product/" + null;
     }
 }

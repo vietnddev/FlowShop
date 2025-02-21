@@ -1,8 +1,13 @@
 package com.flowiee.pms.controller.sales;
 
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.utils.DateTimeUtil;
+import com.flowiee.pms.common.utils.OrderUtils;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.entity.sales.OrderDetail;
 import com.flowiee.pms.exception.AppException;
+import com.flowiee.pms.exception.EntityNotFoundException;
+import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.service.sales.*;
@@ -20,10 +25,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/sls/order")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class OrderControllerView extends BaseController {
@@ -75,7 +81,7 @@ public class OrderControllerView extends BaseController {
     @PostMapping("/ban-hang/cart/add-voucher/{code}")
     @PreAuthorize("@vldModuleSales.readVoucher(true)")
     public ModelAndView checkToUse(@PathVariable("code") String code) {
-        ModelAndView modelAndView = new ModelAndView("redirect:/order/ban-hang");
+        ModelAndView modelAndView = new ModelAndView("redirect:/sls/order/ban-hang");
         modelAndView.addObject("ticket_code", code);
         modelAndView.addObject("ticket_status", mvVoucherTicketService.checkTicketToUse(code));
         modelAndView.addObject("ticket_info", mvVoucherTicketService.findTicketByCode(code));
@@ -86,12 +92,27 @@ public class OrderControllerView extends BaseController {
     @PreAuthorize("@vldModuleSales.deleteOrder(true)")
     public ModelAndView delete(@PathVariable("id") Long orderId) {
         mvOrderWriteService.deleteOrder(orderId);
-        return new ModelAndView("redirect:/order");
+        return new ModelAndView("redirect:/sls/order");
     }
 
-    @GetMapping("/abc")
-    public ModelAndView getOrderInfoByScanQRCode() {
-        return null;
+    @GetMapping("/tracking")
+    public ModelAndView getOrderInfoByScanQRCode(@RequestParam(name = "code") String pTrackingCode) {
+        Order lvOrder = mvOrderReadService.findByTrackingCode(CoreUtils.trim(pTrackingCode));
+        if (Objects.isNull(lvOrder)) {
+            ResourceNotFoundException lvResourceNotFoundException = new ResourceNotFoundException(new Object[]{"order"}, null, getClass(), null, true);
+            lvResourceNotFoundException.setView(Pages.SYS_ERROR_BASIC.getTemplate());
+            throw lvResourceNotFoundException;
+        }
+        ModelAndView modelAndView = new ModelAndView(Pages.SLS_ORDER_TRACKING.getTemplate());
+        modelAndView.addObject("orderCode", lvOrder.getCode());
+        modelAndView.addObject("orderTime", lvOrder.getOrderTime().format(DateTimeFormatter.ofPattern(DateTimeUtil.FORMAT_DATE_TIME)));
+        modelAndView.addObject("orderStatus", lvOrder.getOrderStatus());
+        modelAndView.addObject("orderItems", lvOrder.getListOrderDetail());
+        modelAndView.addObject("receiverName", lvOrder.getReceiverName());
+        modelAndView.addObject("receiverPhone", lvOrder.getReceiverPhone());
+        modelAndView.addObject("receiverAddress", lvOrder.getReceiverAddress());
+        modelAndView.addObject("totalAmount", OrderUtils.calTotalAmount(lvOrder.getListOrderDetail(), lvOrder.getAmountDiscount()));
+        return modelAndView;
     }
 
     @GetMapping("/print-invoice/{id}")
@@ -115,7 +136,7 @@ public class OrderControllerView extends BaseController {
             throw new BadRequestException("Vui lòng chọn sản phẩm!");
         }
         mvOrderItemsService.save(lvOrder, Arrays.stream(productVariantSelectedId).toList());
-        return new ModelAndView("redirect:/order/" + orderId);
+        return new ModelAndView("redirect:/sls/order/" + orderId);
     }
 
     @PostMapping("/{orderId}/item/update/{itemId}")
@@ -129,7 +150,7 @@ public class OrderControllerView extends BaseController {
             throw new BadRequestException("Số lượng không được nhỏ hơn 1!");
         }
         mvOrderItemsService.update(item, itemId);
-        return new ModelAndView("redirect:/order/" + orderId);
+        return new ModelAndView("redirect:/sls/order/" + orderId);
     }
 
     @PostMapping("/{orderId}/item/delete/{itemId}")
@@ -140,6 +161,6 @@ public class OrderControllerView extends BaseController {
             throw new BadRequestException("Đơn hàng đang ở trạng thái không cho phép xóa!");
         }
         mvOrderItemsService.delete(itemId);
-        return new ModelAndView("redirect:/order/" + orderId);
+        return new ModelAndView("redirect:/sls/order/" + orderId);
     }
 }

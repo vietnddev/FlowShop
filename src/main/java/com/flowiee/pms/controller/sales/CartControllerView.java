@@ -27,7 +27,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/sls/order")
 @Tag(name = "Order API", description = "Quản lý giỏ hàng")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -81,7 +81,7 @@ public class CartControllerView extends BaseController {
     public ModelAndView addItemsToCart(@RequestParam("cartId") Long cartId, @RequestParam("bienTheSanPhamId") String[] bienTheSanPhamId) {
         OrderCart cart = mvCartService.findById(cartId, true);
         mvCartService.addItemsToCart(cart.getId(), bienTheSanPhamId);
-        return new ModelAndView("redirect:/order/ban-hang");
+        return new ModelAndView("redirect:/sls/order/ban-hang");
     }
 
     @PostMapping("/ban-hang/cart/item/update/{itemId}")
@@ -93,7 +93,7 @@ public class CartControllerView extends BaseController {
             throw new ResourceNotFoundException("Cart not found!");
         }
         mvCartService.updateItemsOfCart(items, itemId);
-        return new ModelAndView("redirect:/order/ban-hang");
+        return new ModelAndView("redirect:/sls/order/ban-hang");
     }
 
     @PostMapping("/ban-hang/cart/item/delete/{itemId}")
@@ -103,7 +103,7 @@ public class CartControllerView extends BaseController {
             throw new BadRequestException("Sản phẩm cần xóa trong giỏ hàng không tồn tại! cartId=" + cartId + ", itemId=" + itemId);
         }
         mvCartItemsService.delete(itemId);
-        return new ModelAndView("redirect:/order/ban-hang");
+        return new ModelAndView("redirect:/sls/order/ban-hang");
     }
 
     @PostMapping("/ban-hang/cart/{cartId}/reset")
@@ -113,7 +113,7 @@ public class CartControllerView extends BaseController {
             throw new BadRequestException("Cart not found! cartId=" + cartId);
         }
         mvCartService.resetCart(cartId);
-        return new ModelAndView("redirect:/order/ban-hang");
+        return new ModelAndView("redirect:/sls/order/ban-hang");
     }
 
 //    @PutMapping("/cart/{cartId}/item/update/{itemId}")

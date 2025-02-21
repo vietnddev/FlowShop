@@ -70,7 +70,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(EndPoint.URL_SYS_CONFIG.getValue(),
 							 EndPoint.URL_SYS_ACCOUNT.getValue(),
 							 EndPoint.URL_SYS_LOG.getValue()).hasRole("ADMIN")
-				.antMatchers("/build/**", "/dist/**", "/js/**", "/plugins/**", "/uploads/**", "/actuator/**", "/swagger-ui/**").permitAll()
+				.antMatchers("/build/**", "/dist/**", "/js/**", "/plugins/**", "/uploads/**", "/actuator/**", "/swagger-ui/**",
+						"/sls/order/tracking/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				//Page login

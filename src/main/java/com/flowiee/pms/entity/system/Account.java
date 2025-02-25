@@ -118,7 +118,7 @@ public class Account extends BaseEntity implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-	List<FileImportHistory> listHistoryImportData;
+	List<ImportHistory> listHistoryImportData;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)

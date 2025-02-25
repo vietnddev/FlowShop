@@ -1,5 +1,6 @@
 package com.flowiee.pms.entity.system;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flowiee.pms.base.entity.BaseEntity;
 
 import lombok.*;
@@ -10,16 +11,17 @@ import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalTime;
+import java.util.List;
 
 @Builder
 @Entity
-@Table(name = "file_import_history")
+@Table(name = "import_history")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FileImportHistory extends BaseEntity implements Serializable {
+public class ImportHistory extends BaseEntity implements Serializable {
     @Serial
 	static final long serialVersionUID = 1L;
 
@@ -50,6 +52,10 @@ public class FileImportHistory extends BaseEntity implements Serializable {
 
     @Column(name = "file_path", nullable = false)
     String filePath;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "importHistory", fetch = FetchType.LAZY)
+    List<ImportHistoryDetail> importHistoryDetailList;
 
 	@Override
 	public String toString() {

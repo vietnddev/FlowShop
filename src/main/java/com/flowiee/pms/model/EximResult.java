@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EximModel {
+public class EximResult {
     LocalTime beginTime;
     LocalTime finishTime;
     Path pathSource;
@@ -25,8 +25,9 @@ public class EximModel {
     String defaultOutputName;
     HttpHeaders httpHeaders;
     String result;
+    Object data;
 
-    public EximModel(TemplateExport templateExport) {
+    public EximResult(TemplateExport templateExport) {
         beginTime = LocalTime.now();
         long currentTime = beginTime.toNanoOfDay();
         pathSource = Path.of(FileUtils.excelTemplatePath + "/" + templateExport.getTemplateName());

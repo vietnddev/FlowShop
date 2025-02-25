@@ -4,7 +4,7 @@ import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.storage.Storage;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.AppResponse;
-import com.flowiee.pms.model.EximModel;
+import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.model.StorageItems;
 import com.flowiee.pms.model.dto.StorageDTO;
 import com.flowiee.pms.service.ExportService;
@@ -111,7 +111,7 @@ public class StorageController extends BaseController {
     @GetMapping("/export/{storageId}")
     @PreAuthorize("@vldModuleStorage.readStorage(true)")
     public ResponseEntity<InputStreamResource> exportData(@PathVariable("storageId") Long storageId) {
-        EximModel model = mvExportService.exportToExcel(TemplateExport.EX_STORAGE_ITEMS, new Storage(storageId), false);
+        EximResult model = mvExportService.exportToExcel(TemplateExport.EX_STORAGE_ITEMS, new Storage(storageId), false);
         return ResponseEntity.ok().headers(model.getHttpHeaders()).body(model.getContent());
     }
 }

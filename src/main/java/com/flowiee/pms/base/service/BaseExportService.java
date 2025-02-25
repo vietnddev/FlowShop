@@ -1,7 +1,7 @@
 package com.flowiee.pms.base.service;
 
 import com.flowiee.pms.exception.AppException;
-import com.flowiee.pms.model.EximModel;
+import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.service.ExportService;
 import com.flowiee.pms.common.enumeration.TemplateExport;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -23,13 +23,13 @@ public abstract class BaseExportService extends BaseService implements ExportSer
     protected abstract void writeData(Object pCondition);
 
     protected XSSFWorkbook mvWorkbook;
-    protected EximModel    mvEximModel;
+    protected EximResult   mvEximResult;
 
     @Override
-    public EximModel exportToExcel(TemplateExport templateExport, Object pCondition, boolean templateOnly) {
+    public EximResult exportToExcel(TemplateExport templateExport, Object pCondition, boolean templateOnly) {
         try {
-            mvEximModel = new EximModel(templateExport);
-            mvWorkbook = new XSSFWorkbook(Files.copy(mvEximModel.getPathSource(), mvEximModel.getPathTarget(), StandardCopyOption.REPLACE_EXISTING).toFile());
+            mvEximResult = new EximResult(templateExport);
+            mvWorkbook = new XSSFWorkbook(Files.copy(mvEximResult.getPathSource(), mvEximResult.getPathTarget(), StandardCopyOption.REPLACE_EXISTING).toFile());
             if (!templateOnly) {
                 writeData(pCondition);
             }
@@ -37,16 +37,16 @@ public abstract class BaseExportService extends BaseService implements ExportSer
             mvWorkbook.write(byteArrayOutputStream);
             setFileContent(byteArrayOutputStream);
             setHttpHeaders();
-            mvEximModel.setResult("OK");
-            return mvEximModel;
+            mvEximResult.setResult("OK");
+            return mvEximResult;
         } catch (Exception e) {
-            mvEximModel.setResult("NOK");
+            mvEximResult.setResult("NOK");
             throw new AppException("Error when export data!", e);
         } finally {
             try {
                 if (mvWorkbook != null) mvWorkbook.close();
-                Files.deleteIfExists(mvEximModel.getPathTarget());
-                mvEximModel.setFinishTime(LocalTime.now());
+                Files.deleteIfExists(mvEximResult.getPathTarget());
+                mvEximResult.setFinishTime(LocalTime.now());
             } catch (IOException e) {
                 logger.error("Error when export data!", e);
             }
@@ -56,14 +56,14 @@ public abstract class BaseExportService extends BaseService implements ExportSer
     private void setHttpHeaders() {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        httpHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + mvEximModel.getDefaultOutputName());
-        mvEximModel.setHttpHeaders(httpHeaders);
+        httpHeaders.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + mvEximResult.getDefaultOutputName());
+        mvEximResult.setHttpHeaders(httpHeaders);
     }
 
     private void setFileContent(ByteArrayOutputStream byteArrayOS) {
         ByteArrayInputStream byteArrayIS = new ByteArrayInputStream(byteArrayOS.toByteArray());
         InputStreamResource inputStreamResource = new InputStreamResource(byteArrayIS);
-        mvEximModel.setContent(inputStreamResource);
+        mvEximResult.setContent(inputStreamResource);
     }
 
     protected void setBorderCell(XSSFRow pRow, int pColFrom, int pColTo) {

@@ -1,8 +1,8 @@
 package com.flowiee.pms.base.service;
 
-import com.flowiee.pms.entity.system.FileImportHistory;
+import com.flowiee.pms.entity.system.ImportHistory;
 import com.flowiee.pms.exception.AppException;
-import com.flowiee.pms.model.EximModel;
+import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.repository.system.AppImportRepository;
 import com.flowiee.pms.service.ImportService;
 import com.flowiee.pms.common.utils.CommonUtils;
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,47 +23,78 @@ import java.time.LocalTime;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseImportService extends BaseService implements ImportService {
-    protected abstract void writeData();
+    protected abstract void writeData() throws AppException;
 
     @Autowired
-    AppImportRepository         mvFileImportRepository;
-    protected XSSFWorkbook      mvWorkbook;
-    protected EximModel         mvEximModel;
-    protected FileImportHistory mvFileImportHistory;
+    protected AppImportRepository mvFileImportRepository;
+
+    protected XSSFWorkbook  mvWorkbook;
+    protected EximResult    mvEximResult;
+    protected ImportHistory mvImportHistory;
 
     @Transactional
     @Override
-    public EximModel importFromExcel(TemplateExport templateExport, MultipartFile multipartFile) {
+    public EximResult importFromExcel(TemplateExport templateExport, MultipartFile multipartFile) {
         try {
-            mvEximModel = new EximModel(templateExport);
+            preImport(templateExport, multipartFile);
+
+            mvEximResult = new EximResult(templateExport);
             mvWorkbook = new XSSFWorkbook(multipartFile.getInputStream());
+
             writeData();
 
-            Path path = Paths.get(CommonUtils.getPathDirectory(templateExport.getModule()) + "/" + mvEximModel.getBeginTime().toNanoOfDay() + "_" + multipartFile.getOriginalFilename());
-            multipartFile.transferTo(path);
+            Path lvPath = getPath(templateExport, multipartFile);
+            multipartFile.transferTo(lvPath);
 
-            mvFileImportRepository.save(FileImportHistory.builder()
+            ImportHistory lvImportInfoMdl = mvFileImportRepository.save(ImportHistory.builder()
                     .module(templateExport.getModule().name())
                     .entity(templateExport.getEntity())
-                    .beginTime(mvEximModel.getBeginTime())
+                    .beginTime(mvEximResult.getBeginTime())
                     .finishTime(LocalTime.now())
-                    .filePath(path.toString())
+                    .filePath(lvPath.toString())
                     .account(CommonUtils.getUserPrincipal().toEntity())
                     .build());
 
-            mvEximModel.setResult("OK");
-            return mvEximModel;
+            postImport(templateExport, lvImportInfoMdl);
+
+            mvEximResult.setResult("OK");
+
+            return mvEximResult;
         } catch (Exception e) {
-            mvEximModel.setResult("NOK");
+            mvEximResult.setResult("NOK");
+            logger.error("Error when import data!" + e.getMessage(), e);
             throw new AppException("Error when import data!", e);
         } finally {
             try {
                 if (mvWorkbook != null) mvWorkbook.close();
-                Files.deleteIfExists(mvEximModel.getPathTarget());
-                mvEximModel.setFinishTime(mvFileImportHistory.getFinishTime());
+                Files.deleteIfExists(mvEximResult.getPathTarget());
+                mvEximResult.setFinishTime(mvImportHistory.getFinishTime());
             } catch (IOException e) {
                 logger.error("Error when import data!", e);
             }
         }
+    }
+
+    public void preImport(TemplateExport pTemplateExport, MultipartFile pMultipartFile) throws AppException {
+
+    }
+
+    public void postImport(TemplateExport pTemplateExport, ImportHistory pImportInfoMdl) throws AppException {
+
+    }
+
+    public XSSFWorkbook getWorkbook() {
+        return mvWorkbook;
+    }
+
+    public void setData(Object pObj) {
+        mvEximResult.setData(pObj);
+    }
+
+    public Path getPath(TemplateExport templateExport, MultipartFile multipartFile) {
+        String lvPathStorage = CommonUtils.getPathDirectory(templateExport.getModule());
+        long lvBeginTime = mvEximResult.getBeginTime().toNanoOfDay();
+        String lvOriginalFileImportName = multipartFile.getOriginalFilename();
+        return Paths.get(lvPathStorage + File.separator + lvBeginTime + "_" + lvOriginalFileImportName);
     }
 }

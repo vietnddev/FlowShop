@@ -1,6 +1,7 @@
 package com.flowiee.pms.service.category.impl;
 
 import com.flowiee.pms.entity.category.Category;
+import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.base.service.BaseImportService;
 import com.flowiee.pms.common.utils.CommonUtils;
@@ -20,7 +21,7 @@ public class CategoryImportServiceImpl extends BaseImportService {
     CategoryRepository mvCategoryRepository;
 
     @Override
-    protected void writeData() {
+    protected void writeData() throws AppException {
         List<Category> lvListToImport = new ArrayList<>();
         try {
             XSSFSheet sheet = mvWorkbook.getSheetAt(0);
@@ -47,10 +48,10 @@ public class CategoryImportServiceImpl extends BaseImportService {
                 }
             }
             List<Category> listCategorySaved = mvCategoryRepository.saveAll(lvListToImport);
-            mvFileImportHistory.setTotalRecord(listCategorySaved.size());
-            mvFileImportHistory.setResult("OK");
+            mvImportHistory.setTotalRecord(listCategorySaved.size());
+            mvImportHistory.setResult("OK");
         } catch (Exception ex) {
-            mvFileImportHistory.setResult("NOK");
+            mvImportHistory.setResult("NOK");
         }
     }
 }

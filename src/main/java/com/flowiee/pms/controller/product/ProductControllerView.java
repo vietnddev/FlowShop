@@ -3,7 +3,7 @@ package com.flowiee.pms.controller.product;
 import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.entity.product.ProductAttribute;
 import com.flowiee.pms.entity.system.FileStorage;
-import com.flowiee.pms.model.EximModel;
+import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.model.dto.ProductDTO;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
@@ -124,7 +124,7 @@ public class ProductControllerView extends BaseController {
         if (isTemplateOnly == null) {
             isTemplateOnly = false;
         }
-        EximModel model = null;
+        EximResult model = null;
         if (isTemplateOnly) {
             model = exportService.exportToExcel(TemplateExport.IM_LIST_OF_PRODUCTS, null, true);
         } else {

@@ -7,7 +7,7 @@ import com.flowiee.pms.entity.system.SystemLog;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.ForbiddenException;
 import com.flowiee.pms.model.AppResponse;
-import com.flowiee.pms.model.EximModel;
+import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.repository.product.ProductCrawlerRepository;
 import com.flowiee.pms.service.CrawlerService;
 import com.flowiee.pms.service.ExportService;
@@ -67,7 +67,7 @@ public class SystemController extends BaseController {
     @GetMapping("/log/export")
     @PreAuthorize("@vldModuleSystem.readLog(true)")
     public ResponseEntity<InputStreamResource> exportToExcel() {
-        EximModel model = exportService.exportToExcel(TemplateExport.EX_LIST_OF_LOGS, null, false);
+        EximResult model = exportService.exportToExcel(TemplateExport.EX_LIST_OF_LOGS, null, false);
         return ResponseEntity.ok().headers(model.getHttpHeaders()).body(model.getContent());
     }
 

@@ -56,8 +56,8 @@ public class OrderPayServiceImpl extends BaseService implements OrderPayService 
 
         logger.info("Begin generate receipt issued when completed an order");
         BigDecimal lvOrderAmount = OrderUtils.calTotalAmount(lvOrder.getListOrderDetail(), lvOrder.getAmountDiscount());
-        Category groupObject = categoryRepository.findByTypeAndCode(CategoryType.GROUP_OBJECT.name(), "KH");//Customer
-        Category receiptType = categoryRepository.findByTypeAndCode(CategoryType.RECEIPT_TYPE.name(), "PO");//Payment for order
+        Category groupObject = categoryRepository.findByTypeAndCode(CATEGORY.GROUP_OBJECT.name(), "KH");//Customer
+        Category receiptType = categoryRepository.findByTypeAndCode(CATEGORY.RECEIPT_TYPE.name(), "PO");//Payment for order
         mvLedgerReceiptService.save(LedgerTransaction.builder()
                 .tranType(LedgerTranType.PT.name())
                 .groupObject(groupObject)

@@ -18,6 +18,11 @@ public class LedgerExportServiceImpl extends BaseExportService {
     LedgerService mvLedgerService;
 
     @Override
+    protected void prepareData(Object pCondition, boolean pTemplateOnly) {
+
+    }
+
+    @Override
     protected void writeData(Object pCondition) {
         GeneralLedger lvData = mvLedgerService.findGeneralLedger(-1, -1, null, null);
         XSSFSheet lvSheet = mvWorkbook.getSheetAt(0);

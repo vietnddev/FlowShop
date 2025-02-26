@@ -13,7 +13,7 @@ import com.flowiee.pms.service.product.ProductAttributeService;
 import com.flowiee.pms.service.product.ProductImageService;
 import com.flowiee.pms.service.product.ProductInfoService;
 import com.flowiee.pms.service.product.ProductVariantService;
-import com.flowiee.pms.common.enumeration.CategoryType;
+import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.common.enumeration.Pages;
 import com.flowiee.pms.common.enumeration.TemplateExport;
 import lombok.AccessLevel;
@@ -47,7 +47,7 @@ public class ProductControllerView extends BaseController {
     @GetMapping
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public ModelAndView loadProductPage() {
-        setupSearchTool(true, List.of(CategoryType.SIZE, CategoryType.COLOR, CategoryType.PRODUCT_TYPE));
+        setupSearchTool(true, List.of(CATEGORY.SIZE, CATEGORY.COLOR, CATEGORY.PRODUCT_TYPE));
         return baseView(new ModelAndView(Pages.PRO_PRODUCT.getTemplate()));
     }
 

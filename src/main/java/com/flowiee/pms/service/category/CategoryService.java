@@ -3,15 +3,16 @@ package com.flowiee.pms.service.category;
 import com.flowiee.pms.base.service.BaseCurdService;
 
 import java.util.List;
+import java.util.Map;
 
 import com.flowiee.pms.entity.category.Category;
-import com.flowiee.pms.common.enumeration.CategoryType;
+import com.flowiee.pms.common.enumeration.CATEGORY;
 import org.springframework.data.domain.Page;
 
 public interface CategoryService extends BaseCurdService<Category> {
     List<Category> findRootCategory();
 
-    Page<Category> findSubCategory(CategoryType categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum);
+    Page<Category> findSubCategory(CATEGORY categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum);
 
     List<Category> findUnits();
 
@@ -32,4 +33,6 @@ public interface CategoryService extends BaseCurdService<Category> {
     List<Category> findLedgerPaymentTypes();
 
     boolean categoryInUse(Long categoryId);
+
+    Map<CATEGORY, List<Category>> findByType(List<CATEGORY> categoryTypeList);
 }

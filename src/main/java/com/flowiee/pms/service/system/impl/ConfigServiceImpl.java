@@ -100,7 +100,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
             List<Category> rootCategories = mvCategoryService.findRootCategory();
             for (Category c : rootCategories) {
                 if (c.getType() != null && !c.getType().trim().isEmpty()) {
-                    CategoryType.valueOf(c.getType()).setLabel(c.getName());
+                    CATEGORY.valueOf(c.getType()).setLabel(c.getName());
                 }
             }
 
@@ -154,7 +154,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
 
     private void reloadCategoryLabel() {
         List<String> lvCategoryTypeList = new ArrayList<>();
-        lvCategoryTypeList.add(CategoryType.PRODUCT_STATUS.getName());
+        lvCategoryTypeList.add(CATEGORY.PRODUCT_STATUS.getName());
 
         List<Category> lvCategoryList = mvCategoryRepository.findSubCategory(lvCategoryTypeList);
         if (lvCategoryList == null) {
@@ -164,7 +164,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
         for (Category lvCategory : lvCategoryList) {
             String lvLabel = CoreUtils.trim(lvCategory.getName());
             String lvCode = CoreUtils.trim(lvCategory.getCode());
-            CategoryType lvCategoryType = CategoryType.valueOf(CoreUtils.trim(lvCategory.getType()));
+            CATEGORY lvCategoryType = CATEGORY.valueOf(CoreUtils.trim(lvCategory.getType()));
             switch (lvCategoryType) {
                 case PRODUCT_STATUS:
                     for (ProductStatus lvPS : ProductStatus.values()) {

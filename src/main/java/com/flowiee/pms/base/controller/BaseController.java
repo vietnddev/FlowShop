@@ -2,7 +2,7 @@ package com.flowiee.pms.base.controller;
 
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.common.enumeration.CategoryType;
+import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.base.auth.BaseAuthorize;
 import lombok.Getter;
 import lombok.Setter;
@@ -66,8 +66,8 @@ public class BaseController extends BaseAuthorize {
 		List<String> filters = new ArrayList<>();
 		if (pFilters != null) {
 			for (Object obj : pFilters) {
-				if (obj instanceof CategoryType) {
-					filters.add(((CategoryType) obj).name());
+				if (obj instanceof CATEGORY) {
+					filters.add(((CATEGORY) obj).name());
 				} else if (obj instanceof String) {
 					filters.add(obj.toString());
 				}

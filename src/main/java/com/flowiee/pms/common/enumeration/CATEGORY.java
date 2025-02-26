@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public enum CategoryType {
+public enum CATEGORY {
     SIZE("size", "SIZE", "Kích cỡ"),
     COLOR("color", "COLOR", "Màu sắc"),
     UNIT("unit", "UNIT", "Đơn vị tính"),
@@ -34,7 +34,7 @@ public enum CategoryType {
     @Setter
     private String label;
 
-    CategoryType(String key, String name, String label) {
+    CATEGORY(String key, String name, String label) {
         this.key = key;
         this.name = name;
         this.label = label;

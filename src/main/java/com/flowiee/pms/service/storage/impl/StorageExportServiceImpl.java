@@ -25,6 +25,11 @@ public class StorageExportServiceImpl extends BaseExportService {
     private DateTimeFormatter DF_DDMMYYYY = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Override
+    protected void prepareData(Object pCondition, boolean pTemplateOnly) {
+
+    }
+
+    @Override
     protected void writeData(Object pCondition) {
         Storage lvCondition = (Storage) pCondition;
 

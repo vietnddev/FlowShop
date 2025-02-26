@@ -63,17 +63,17 @@ public class CrawlerService extends BaseService {
         }
         logger.info("Merge temp data: " + productCrawledList.size() + " record(s)");
 
-        List<Category> fullColorList = categoryRepository.findSubCategory(List.of(CategoryType.COLOR.name()));
-        List<Category> fullSizeList = categoryRepository.findSubCategory(List.of(CategoryType.SIZE.name()));
-        Category brand = categoryRepository.findByTypeAndCode(CategoryType.BRAND.name(), "FW");
-        Category unit = categoryRepository.findByTypeAndCode(CategoryType.UNIT.name(), "1");
+        List<Category> fullColorList = categoryRepository.findSubCategory(List.of(CATEGORY.COLOR.name()));
+        List<Category> fullSizeList = categoryRepository.findSubCategory(List.of(CATEGORY.SIZE.name()));
+        Category brand = categoryRepository.findByTypeAndCode(CATEGORY.BRAND.name(), "FW");
+        Category unit = categoryRepository.findByTypeAndCode(CATEGORY.UNIT.name(), "1");
 
         for (ProductCrawled p : productCrawledList) {
-            Category productType = categoryRepository.findByTypeAndName(CategoryType.PRODUCT_TYPE.name(), CoreUtils.trim(p.getProductType()));
+            Category productType = categoryRepository.findByTypeAndName(CATEGORY.PRODUCT_TYPE.name(), CoreUtils.trim(p.getProductType()));
             if (productType == null) {
                 productType = getRandomProductType();
             }
-            Category fabric = categoryRepository.findByTypeAndName(CategoryType.FABRIC_TYPE.name(), p.getFabric());
+            Category fabric = categoryRepository.findByTypeAndName(CATEGORY.FABRIC_TYPE.name(), p.getFabric());
             if (fabric == null) {
                 fabric = getRandomFabric();
             }
@@ -95,7 +95,7 @@ public class CrawlerService extends BaseService {
             List<String> sizeNameSaved = new ArrayList<>();
             int skuIndex = 1;
             for (String size : sizeList) {
-                Category sizeMdl = categoryRepository.findByTypeAndCode(CategoryType.SIZE.name(), size);
+                Category sizeMdl = categoryRepository.findByTypeAndCode(CATEGORY.SIZE.name(), size);
                 if (sizeMdl == null) {
                     sizeMdl = getRandomSize(fullSizeList, sizeNameSaved);
                 }
@@ -104,7 +104,7 @@ public class CrawlerService extends BaseService {
                 String[] colorList = CoreUtils.trim(p.getColor()).split("-");
                 List<String> colorNameSaved = new ArrayList<>();
                 for (String color : colorList) {
-                    Category colorMdl = categoryRepository.findByTypeAndName(CategoryType.COLOR.name(), color);
+                    Category colorMdl = categoryRepository.findByTypeAndName(CATEGORY.COLOR.name(), color);
                     if (colorMdl == null) {
                         colorMdl = getRandomColor(fullColorList, colorNameSaved);
                     }
@@ -176,7 +176,7 @@ public class CrawlerService extends BaseService {
     }
 
     private Category getRandomFabric() {
-        List<Category> fabricList = categoryRepository.findSubCategory(List.of(CategoryType.FABRIC_TYPE.name()));
+        List<Category> fabricList = categoryRepository.findSubCategory(List.of(CATEGORY.FABRIC_TYPE.name()));
         if (fabricList == null) {
             return null;
         }
@@ -186,7 +186,7 @@ public class CrawlerService extends BaseService {
     }
 
     private Category getRandomProductType() {
-        List<Category> productTypeList = categoryRepository.findSubCategory(List.of(CategoryType.PRODUCT_TYPE.name()));
+        List<Category> productTypeList = categoryRepository.findSubCategory(List.of(CATEGORY.PRODUCT_TYPE.name()));
         if (productTypeList == null) {
             return null;
         }

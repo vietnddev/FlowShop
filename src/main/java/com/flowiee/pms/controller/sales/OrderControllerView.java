@@ -6,7 +6,6 @@ import com.flowiee.pms.common.utils.OrderUtils;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.entity.sales.OrderDetail;
 import com.flowiee.pms.exception.AppException;
-import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.exception.BadRequestException;
@@ -14,7 +13,7 @@ import com.flowiee.pms.service.sales.*;
 import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.service.category.CategoryService;
 
-import com.flowiee.pms.common.enumeration.CategoryType;
+import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.common.enumeration.OrderStatus;
 import com.flowiee.pms.common.enumeration.Pages;
 import lombok.AccessLevel;
@@ -47,7 +46,7 @@ public class OrderControllerView extends BaseController {
     @GetMapping
     @PreAuthorize("@vldModuleSales.readOrder(true)")
     public ModelAndView viewAllOrders() {
-        setupSearchTool(true, List.of("BRANCH", CategoryType.GROUP_CUSTOMER, CategoryType.PAYMENT_METHOD, CategoryType.ORDER_STATUS, CategoryType.SALES_CHANNEL, "DATE_FILTER"));
+        setupSearchTool(true, List.of("BRANCH", CATEGORY.GROUP_CUSTOMER, CATEGORY.PAYMENT_METHOD, CATEGORY.ORDER_STATUS, CATEGORY.SALES_CHANNEL, "DATE_FILTER"));
         return baseView(new ModelAndView(Pages.PRO_ORDER.getTemplate()));
     }
 
@@ -69,7 +68,7 @@ public class OrderControllerView extends BaseController {
         modelAndView.addObject("orderDetailId", orderId);
         modelAndView.addObject("orderDetail", lvOrderDetail);
         modelAndView.addObject("listOrderDetail", lvOrderDetail.getListOrderDetailDTO());
-        modelAndView.addObject("listPaymentMethod", mvCategoryService.findSubCategory(CategoryType.PAYMENT_METHOD, null, null, -1, -1).getContent());
+        modelAndView.addObject("listPaymentMethod", mvCategoryService.findSubCategory(CATEGORY.PAYMENT_METHOD, null, null, -1, -1).getContent());
         modelAndView.addObject("orderStatus", statusMap);
         modelAndView.addObject("allowEditItem", mvOrderStatusCanModifyItem.contains(lvOrderStatus));
         modelAndView.addObject("allowEditGeneral", !mvOrderStatusDoesNotAllowModify.contains(lvOrderStatus));

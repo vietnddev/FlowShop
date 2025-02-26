@@ -22,6 +22,11 @@ public class LogExportServiceImpl extends BaseExportService {
     private DateTimeFormatter mvDateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     @Override
+    protected void prepareData(Object pCondition, boolean pTemplateOnly) {
+
+    }
+
+    @Override
     protected void writeData(Object pCondition) {
         XSSFSheet sheet = mvWorkbook.getSheetAt(0);
 

@@ -10,7 +10,7 @@ import com.flowiee.pms.service.category.CategoryService;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.enumeration.Pages;
 
-import com.flowiee.pms.common.enumeration.CategoryType;
+import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.common.enumeration.TemplateExport;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +59,7 @@ public class CategoryControllerView extends BaseController {
         }
         ModelAndView modelAndView = new ModelAndView(Pages.CTG_CATEGORY_DETAIL.getTemplate());
         modelAndView.addObject("categoryType", categoryType);
-        modelAndView.addObject("ctgRootName", CategoryType.valueOf(CommonUtils.getCategoryType(categoryType)).getLabel());
+        modelAndView.addObject("ctgRootName", CATEGORY.valueOf(CommonUtils.getCategoryType(categoryType)).getLabel());
         modelAndView.addObject("templateImportName", TemplateExport.EX_LIST_OF_CATEGORIES);
         modelAndView.addObject("url_template", "");
         modelAndView.addObject("url_import", "");

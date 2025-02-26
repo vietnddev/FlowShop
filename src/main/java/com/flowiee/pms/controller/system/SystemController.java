@@ -97,7 +97,7 @@ public class SystemController extends BaseController {
     @PostMapping("/crawler-data")
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
     public AppResponse<List<ProductCrawled>> crawlerData() {
-        if (!CommonUtils.getUserPrincipal().isAdmin()) {
+        if (!mvUserSession.getUserPrincipal().isAdmin()) {
             throw new ForbiddenException("403");
         }
         if (mvSystemCrawlingData) {
@@ -121,7 +121,7 @@ public class SystemController extends BaseController {
 
     @PostMapping("/data-temp/merge")
     public AppResponse<String> getDataTemp() {
-        if (!CommonUtils.getUserPrincipal().isAdmin()) {
+        if (!mvUserSession.getUserPrincipal().isAdmin()) {
             throw new ForbiddenException("403");
         }
         if (mvSystemMergingData) {

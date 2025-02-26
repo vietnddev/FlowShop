@@ -204,11 +204,11 @@ public class TicketImportServiceImpl extends BaseService implements TicketImport
         TicketImport ticketImport = TicketImport.builder()
             .title(pTicketImport.getTitle())
             .status(TicketImportStatus.DRAFT.name())
-            .importer(CommonUtils.getUserPrincipal().getUsername())
+            .importer(mvUserSession.getUserPrincipal().getUsername())
             .importTime(LocalDateTime.now())
             .storage(new Storage(pTicketImport.getStorageId()))
             .build();
-        ticketImport.setCreatedBy(CommonUtils.getUserPrincipal().getId());
+        ticketImport.setCreatedBy(mvUserSession.getUserPrincipal().getId());
         return this.save(ticketImport);
     }
 

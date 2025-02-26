@@ -113,7 +113,7 @@ public class TicketExportServiceImpl extends BaseService implements TicketExport
         }
         TicketExport ticketExportSaved = this.save(TicketExport.builder()
                 .title("Xuất hàng cho đơn " + orderDTO.getCode())
-                .exporter(CommonUtils.getUserPrincipal().getUsername())
+                .exporter(mvUserSession.getUserPrincipal().getUsername())
                 .exportTime(LocalDateTime.now())
                 .status(TicketExportStatus.DRAFT.name())
                 .build());
@@ -138,7 +138,7 @@ public class TicketExportServiceImpl extends BaseService implements TicketExport
         TicketExport ticketExportSaved = this.save(TicketExport.builder()
                 .title(title)
                 .status(TicketExportStatus.DRAFT.name())
-                .exporter(CommonUtils.getUserPrincipal().getUsername())
+                .exporter(mvUserSession.getUserPrincipal().getUsername())
                 .exportTime(LocalDateTime.now())
                 .storage(new Storage(storageId))
                 .note(order != null ? "Phiếu xuất hàng cho đơn " + order.getCode() : "")

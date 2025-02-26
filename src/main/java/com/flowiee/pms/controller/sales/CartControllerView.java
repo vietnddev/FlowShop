@@ -42,14 +42,14 @@ public class CartControllerView extends BaseController {
     @PreAuthorize("@vldModuleSales.insertOrder(true)")
     public ModelAndView showPageBanHang() {
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_ORDER_SELL.getTemplate());
-        List<OrderCart> orderCartCurrent = mvCartService.findCartByAccountId(CommonUtils.getUserPrincipal().getId());
+        List<OrderCart> orderCartCurrent = mvCartService.findCartByAccountId(mvUserSession.getUserPrincipal().getId());
         if (orderCartCurrent.isEmpty()) {
             OrderCart orderCart = new OrderCart();
-            orderCart.setCreatedBy(CommonUtils.getUserPrincipal().getId());
+            orderCart.setCreatedBy(mvUserSession.getUserPrincipal().getId());
             mvCartService.save(orderCart);
         }
 
-        List<OrderCart> listOrderCart = mvCartService.findCartByAccountId(CommonUtils.getUserPrincipal().getId());
+        List<OrderCart> listOrderCart = mvCartService.findCartByAccountId(mvUserSession.getUserPrincipal().getId());
         modelAndView.addObject("listCart", listOrderCart);
         modelAndView.addObject("listAccount", mvAccountService.findAll());
         modelAndView.addObject("listSalesChannel", mvCategoryService.findSalesChannels());

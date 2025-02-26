@@ -111,7 +111,7 @@ public class CategoryServiceImpl extends BaseService implements CategoryService 
     }
 
     @Override
-    public Page<Category> findSubCategory(CategoryType categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum) {
+    public Page<Category> findSubCategory(CATEGORY categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("createdAt").descending());
         Page<Category> categoryPage = mvCategoryRepository.findSubCategory(categoryType.name(), parentId, ignoreIds, pageable);
         for (Category c : categoryPage.getContent()) {
@@ -128,53 +128,53 @@ public class CategoryServiceImpl extends BaseService implements CategoryService 
 
     @Override
     public List<Category> findUnits() {
-        return findSubCategory(CategoryType.UNIT, null, null, -1, -1).getContent();
+        return findSubCategory(CATEGORY.UNIT, null, null, -1, -1).getContent();
     }
 
     @Override
     public List<Category> findColors() {
-        return findSubCategory(CategoryType.COLOR, null, null, -1, -1).getContent();
+        return findSubCategory(CATEGORY.COLOR, null, null, -1, -1).getContent();
     }
 
     @Override
     public List<Category> findSizes() {
-        return findSubCategory(CategoryType.SIZE, null, null, -1, -1).getContent();
+        return findSubCategory(CATEGORY.SIZE, null, null, -1, -1).getContent();
     }
 
     @Override
     public List<Category> findSalesChannels() {
-        return findSubCategory(CategoryType.SALES_CHANNEL, null, null, -1, -1).getContent();
+        return findSubCategory(CATEGORY.SALES_CHANNEL, null, null, -1, -1).getContent();
     }
 
     @Override
     public List<Category> findPaymentMethods() {
-        return findSubCategory(CategoryType.PAYMENT_METHOD, null, null, -1, -1).getContent();
+        return findSubCategory(CATEGORY.PAYMENT_METHOD, null, null, -1, -1).getContent();
     }
 
     @Override
     public List<Category> findOrderStatus(Long ignoreId) {
-        return findSubCategory(CategoryType.ORDER_STATUS, null, ignoreId != null ? List.of(ignoreId) : null, -1, -1).getContent();
+        return findSubCategory(CATEGORY.ORDER_STATUS, null, ignoreId != null ? List.of(ignoreId) : null, -1, -1).getContent();
     }
 
     @Override
     public List<Category> findLedgerGroupObjects() {
-        return findSubCategory(CategoryType.GROUP_OBJECT, null, null, -1, -1).getContent();
+        return findSubCategory(CATEGORY.GROUP_OBJECT, null, null, -1, -1).getContent();
     }
 
     @Override
     public List<Category> findLedgerReceiptTypes() {
-        return findSubCategory(CategoryType.RECEIPT_TYPE, null, null, -1, -1).getContent();
+        return findSubCategory(CATEGORY.RECEIPT_TYPE, null, null, -1, -1).getContent();
     }
 
     @Override
     public List<Category> findLedgerPaymentTypes() {
-        return findSubCategory(CategoryType.PAYMENT_TYPE, null, null, -1, -1).getContent();
+        return findSubCategory(CATEGORY.PAYMENT_TYPE, null, null, -1, -1).getContent();
     }
 
     @Override
     public boolean categoryInUse(Long categoryId) {
         Category lvCategoryMdl = this.findById(categoryId, true);
-        CategoryType lvCategoryType = CategoryType.valueOf(lvCategoryMdl.getType().toUpperCase());
+        CATEGORY lvCategoryType = CATEGORY.valueOf(lvCategoryMdl.getType().toUpperCase());
 
         switch (lvCategoryType) {
             case UNIT:
@@ -238,5 +238,16 @@ public class CategoryServiceImpl extends BaseService implements CategoryService 
                 logger.info("Unexpected value: " + lvCategoryMdl.getType());
         }
         return false;
+    }
+
+    @Override
+    public Map<CATEGORY, List<Category>> findByType(List<CATEGORY> pCategoryTypeList) {
+        Map<CATEGORY, List<Category>> categoryMap = new HashMap<>();
+        for (CATEGORY type : pCategoryTypeList) {
+            categoryMap.put(type, new ArrayList<>());
+        }
+        mvCategoryRepository.findSubCategory(pCategoryTypeList.stream().map(CATEGORY::name).toList())
+                .forEach(c -> categoryMap.get(CATEGORY.valueOf(c.getType())).add(c));
+        return categoryMap;
     }
 }

@@ -8,6 +8,7 @@ import com.flowiee.pms.entity.sales.TicketImport;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.repository.product.ProductDamagedRepository;
+import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.product.ProductComboService;
 import com.flowiee.pms.service.system.FileStorageService;
 import com.flowiee.pms.common.enumeration.MODULE;
@@ -46,6 +47,7 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
     ProductVariantService mvProductVariantService;
     FileStorageRepository mvFileStorageRepository;
     ProductDamagedRepository mvProductDamagedRepository;
+    UserSession userSession;
 
     @Override
     public List<FileStorage> getImageOfProduct(Long productId) {
@@ -202,7 +204,7 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
         fileToChange.setExtension(FileUtils.getFileExtension(fileAttached.getOriginalFilename()));
         fileToChange.setContentType(fileAttached.getContentType());
         fileToChange.setDirectoryPath(CommonUtils.getPathDirectory(MODULE.PRODUCT).substring(CommonUtils.getPathDirectory(MODULE.PRODUCT).indexOf("uploads")));
-        fileToChange.setAccount(CommonUtils.getUserPrincipal().toEntity());
+        fileToChange.setAccount(userSession.getUserPrincipal().toEntity());
         FileStorage imageSaved = mvFileStorageRepository.save(fileToChange);
 
         //Lưu file mới vào thư mục chứa file upload

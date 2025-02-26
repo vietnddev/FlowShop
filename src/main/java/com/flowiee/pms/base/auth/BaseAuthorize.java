@@ -72,7 +72,7 @@ public class BaseAuthorize {
     }
 
     protected boolean vldAdminRole() {
-        if (CommonUtils.getUserPrincipal().isAdmin()) {
+        if (userSession.getUserPrincipal().isAdmin()) {
             return true;
         }
         throw new ForbiddenException("This function is for administrator use only!");

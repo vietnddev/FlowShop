@@ -6,7 +6,6 @@ import com.flowiee.pms.base.entity.BaseEntity;
 
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.system.FileStorage;
-import com.flowiee.pms.common.enumeration.ProductStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
@@ -82,9 +81,9 @@ public class Product extends BaseEntity implements Serializable {
     @Column(name = "notes")
     String internalNotes;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 10)
-    ProductStatus status;
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "status", nullable = false, length = 10)
+//    ProductStatus status;
 
     @JsonIgnore
     @JsonIgnoreProperties("product")
@@ -185,6 +184,6 @@ public class Product extends BaseEntity implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Product [id=" + super.id + ", productType=" + productType + ", brand=" + brand + ", productName=" + productName + ", unit=" + unit + ", status=" + status + "]";
+		return "Product [id=" + super.id + ", productType=" + productType + ", brand=" + brand + ", productName=" + productName + ", unit=" + unit + "]";
 	}
 }

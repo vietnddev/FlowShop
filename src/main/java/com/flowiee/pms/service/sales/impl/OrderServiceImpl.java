@@ -12,6 +12,7 @@ import com.flowiee.pms.model.payload.CreateOrderReq;
 import com.flowiee.pms.model.payload.UpdateOrderReq;
 import com.flowiee.pms.repository.sales.CustomerRepository;
 import com.flowiee.pms.repository.system.ConfigRepository;
+import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.category.CategoryService;
 import com.flowiee.pms.service.system.AccountService;
 import com.flowiee.pms.service.system.SendCustomerNotificationService;
@@ -62,6 +63,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
     private final CategoryService       mvCategoryService;
     private final CustomerService       mvCustomerService;
     private final AccountService        mvAccountService;
+    private final UserSession           mvUserSession;
 
     private BigDecimal mvDefaultShippingCost = BigDecimal.ZERO;
     private BigDecimal mvDefaultPackagingCost = BigDecimal.ZERO;
@@ -253,7 +255,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
 
         //Log
         systemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_ORD_C, MasterObject.Order, "Thêm mới đơn hàng", lvOrderSaved.getCode());
-        logger.info("Insert new order success! insertBy={}", CommonUtils.getUserPrincipal().getUsername());
+        logger.info("Insert new order success! insertBy={}", mvUserSession.getUserPrincipal().getUsername());
 
         return OrderDTO.fromOrder(lvOrderSaved);
     }

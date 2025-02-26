@@ -2,12 +2,14 @@ package com.flowiee.pms.base.controller;
 
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.common.enumeration.CategoryType;
+import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.base.auth.BaseAuthorize;
+import com.flowiee.pms.security.UserSession;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,9 @@ import java.util.Map;
 @Component
 @Getter
 public class BaseController extends BaseAuthorize {
+	@Autowired
+	protected UserSession mvUserSession;
+
 	@Getter
 	@Setter
 	class SearchTool {
@@ -38,7 +43,7 @@ public class BaseController extends BaseAuthorize {
 	protected ModelAndView baseView(ModelAndView modelAndView) {
 		SearchTool searchTool = getSearchTool();
 		modelAndView.addObject("configSearchTool", searchTool != null ? searchTool : new SearchTool());
-		modelAndView.addObject("USERNAME_LOGIN", CommonUtils.getUserPrincipal().getUsername());
+		modelAndView.addObject("USERNAME_LOGIN", mvUserSession.getUserPrincipal().getUsername());
 		setURLHeader(modelAndView);
 		setURLSidebar(modelAndView);
 		return modelAndView;
@@ -66,8 +71,8 @@ public class BaseController extends BaseAuthorize {
 		List<String> filters = new ArrayList<>();
 		if (pFilters != null) {
 			for (Object obj : pFilters) {
-				if (obj instanceof CategoryType) {
-					filters.add(((CategoryType) obj).name());
+				if (obj instanceof CATEGORY) {
+					filters.add(((CATEGORY) obj).name());
 				} else if (obj instanceof String) {
 					filters.add(obj.toString());
 				}

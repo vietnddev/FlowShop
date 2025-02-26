@@ -6,6 +6,7 @@ import com.flowiee.pms.entity.sales.Customer;
 import com.flowiee.pms.entity.sales.OrderCart;
 import com.flowiee.pms.entity.sales.VoucherTicket;
 import com.flowiee.pms.entity.system.Account;
+import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.system.SystemLogService;
 import com.flowiee.pms.common.enumeration.FilterDate;
 import lombok.Data;
@@ -35,6 +36,8 @@ public class BaseService {
     protected SystemLogService systemLogService;
     @Autowired
     protected EntityManager mvEntityManager;
+    @Autowired
+    protected UserSession mvUserSession;
 
     protected Pageable getPageable(int pageNum, int pageSize) {
         return getPageable(pageNum, pageSize, null);

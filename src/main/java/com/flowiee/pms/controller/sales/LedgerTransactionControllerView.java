@@ -6,7 +6,7 @@ import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.service.category.CategoryService;
 import com.flowiee.pms.service.sales.LedgerPaymentService;
 import com.flowiee.pms.service.sales.LedgerReceiptService;
-import com.flowiee.pms.common.enumeration.CategoryType;
+import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.common.enumeration.Pages;
 import com.flowiee.pms.common.enumeration.LedgerTranType;
 import lombok.AccessLevel;
@@ -30,7 +30,7 @@ public class LedgerTransactionControllerView extends BaseController {
     @GetMapping("/receipt")
     @PreAuthorize("@vldModuleSales.readLedgerTransaction(true)")
     public ModelAndView getLedgerReceipts() {
-        setupSearchTool(true, List.of(CategoryType.PAYMENT_METHOD.name()));
+        setupSearchTool(true, List.of(CATEGORY.PAYMENT_METHOD.name()));
         ModelAndView modelAndView = new ModelAndView(Pages.SLS_LEDGER_TRANS.getTemplate());
         modelAndView.addObject("tranTypeKey", LedgerTranType.PT.name());
         modelAndView.addObject("tranTypeName", LedgerTranType.PT.getDescription());
@@ -41,7 +41,7 @@ public class LedgerTransactionControllerView extends BaseController {
     @GetMapping("/payment")
     @PreAuthorize("@vldModuleSales.readLedgerTransaction(true)")
     public ModelAndView getLedgerPayments() {
-        setupSearchTool(true, List.of(CategoryType.PAYMENT_METHOD.name()));
+        setupSearchTool(true, List.of(CATEGORY.PAYMENT_METHOD.name()));
         ModelAndView modelAndView = new ModelAndView(Pages.SLS_LEDGER_TRANS.getTemplate());
         modelAndView.addObject("tranTypeKey", LedgerTranType.PC.name());
         modelAndView.addObject("tranTypeName", LedgerTranType.PC.getDescription());

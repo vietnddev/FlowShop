@@ -27,6 +27,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
                                    @Param("ignoreId") List<Long> ignoreId,
                                    Pageable pageable);
 
+    @Query("from Category c where c.type = :type and (c.code is null or c.code <> 'ROOT') order by c.sort")
+    List<Category> findSubCategory(@Param("type") String type);
+
     @Query("from Category c where c.type in (:type) and (c.code is null or c.code <> 'ROOT') order by c.sort")
     List<Category> findSubCategory(@Param("type") List<String> type);
 

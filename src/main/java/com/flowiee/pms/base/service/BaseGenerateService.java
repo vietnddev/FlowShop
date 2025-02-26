@@ -8,10 +8,15 @@ import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.enumeration.MODULE;
+import com.flowiee.pms.security.UserSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public abstract class BaseGenerateService extends BaseService {
+    @Autowired
+    private UserSession userSession;
+
     protected String getStorageName(long pCurrentTime, String pQRCodeName) {
         return pCurrentTime + "_" + pQRCodeName;
     }
@@ -24,7 +29,7 @@ public abstract class BaseGenerateService extends BaseService {
                 .storageName(getImageStorageName())
                 .extension(getImageExtension())
                 .directoryPath(CommonUtils.getPathDirectory(pModule).substring(CommonUtils.getPathDirectory(pModule).indexOf("uploads")))
-                .account(new Account(CommonUtils.getUserPrincipal().getId()))
+                .account(new Account(userSession.getUserPrincipal().getId()))
                 .isActive(false)
                 .order(pOrderId != null ? new Order(pOrderId) : null)
                 .productDetail(pProductVariantId != null ? new ProductDetail(pProductVariantId) : null)

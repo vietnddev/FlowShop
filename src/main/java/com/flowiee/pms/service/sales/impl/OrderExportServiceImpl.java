@@ -19,6 +19,11 @@ public class OrderExportServiceImpl extends BaseExportService {
     private DateTimeFormatter DF_DDMMYYYY = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Override
+    protected void prepareData(Object pCondition, boolean pTemplateOnly) {
+
+    }
+
+    @Override
     protected void writeData(Object pCondition) {
         XSSFSheet sheet = mvWorkbook.getSheetAt(0);
 

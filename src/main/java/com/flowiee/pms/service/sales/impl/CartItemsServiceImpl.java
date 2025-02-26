@@ -11,6 +11,7 @@ import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.repository.sales.CartItemsRepository;
 import com.flowiee.pms.repository.sales.OrderCartRepository;
 import com.flowiee.pms.base.service.BaseService;
+import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.product.ProductComboService;
 import com.flowiee.pms.service.product.ProductVariantService;
 import com.flowiee.pms.service.sales.CartItemsService;
@@ -34,6 +35,7 @@ public class CartItemsServiceImpl extends BaseService implements CartItemsServic
     CartItemsRepository mvCartItemsRepository;
     ProductComboService mvProductComboService;
     ProductVariantService mvProductVariantService;
+    UserSession userSession;
 
     @Override
     public List<Items> findAll() {
@@ -52,7 +54,7 @@ public class CartItemsServiceImpl extends BaseService implements CartItemsServic
     @Override
     public List<CartItemModel> findAllItemsForSales() {
         List<CartItemModel> cartItemModelList = new ArrayList<>();
-        OrderCart cart = cartRepository.findByAccountId(CommonUtils.getUserPrincipal().getId()).get(0);
+        OrderCart cart = cartRepository.findByAccountId(userSession.getUserPrincipal().getId()).get(0);
         List<ProductCombo> productCombos = mvProductComboService.findAll();
         List<ProductVariantDTO> productVariantDTOs = mvProductVariantService.findAll(ProductVariantParameter.builder()
                 .availableForSales(true)

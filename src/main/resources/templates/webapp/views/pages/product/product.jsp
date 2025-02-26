@@ -34,7 +34,7 @@
                                         </div>
                                         <div class="col-6 text-right">
                                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#import"><i class="fa-solid fa-cloud-arrow-up mr-2"></i>Import</button>
-                                            <a th:href="@{/san-pham/export}" class="btn btn-info btn-sm"><i class="fa-solid fa-cloud-arrow-down mr-2"></i>Export data</a>
+                                            <a th:href="@{/api/v1/product/export}" class="btn btn-info btn-sm"><i class="fa-solid fa-cloud-arrow-down mr-2"></i>Export data</a>
                                             <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#insert" id="createProduct"><i class="fa-solid fa-circle-plus mr-2"></i>Thêm mới</button>
                                         </div>
                                     </div>

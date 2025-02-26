@@ -5,6 +5,7 @@ import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.exception.ResourceNotFoundException;
+import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.system.ConfigService;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.enumeration.*;
@@ -46,6 +47,7 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
     CustomerRepository mvCustomerRepository;
     OrderRepository mvOrderRepository;
     ConfigService mvConfigService;
+    UserSession userSession;
 
     @Override
     public List<CustomerDTO> findAll() {
@@ -102,7 +104,7 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
         if (lvBirthday != null && lvBirthday.isAfter(LocalDate.now()))
             throw new BadRequestException("Date of birth can't in the future date!");
 
-        customer.setCreatedBy(dto.getCreatedBy() != null ? dto.getCreatedBy() : CommonUtils.getUserPrincipal().getId());
+        customer.setCreatedBy(dto.getCreatedBy() != null ? dto.getCreatedBy() : userSession.getUserPrincipal().getId());
         customer.setBonusPoints(0);
         customer.setIsBlackList(false);
         customer.setIsVIP(dto.getIsVIP() != null ? dto.getIsVIP() : false);

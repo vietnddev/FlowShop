@@ -5,6 +5,7 @@ import com.flowiee.pms.entity.system.SystemLog;
 import com.flowiee.pms.common.ChangeLog;
 import com.flowiee.pms.repository.system.SystemLogRepository;
 import com.flowiee.pms.base.service.BaseService;
+import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.system.SystemLogService;
 
 import com.flowiee.pms.common.utils.CommonUtils;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SystemLogServiceImpl extends BaseService implements SystemLogService {
     SystemLogRepository mvSystemLogRepository;
+    UserSession userSession;
 
     @Override
     public Page<SystemLog> findAll(int pageSize, int pageNum) {
@@ -77,8 +79,8 @@ public class SystemLogServiceImpl extends BaseService implements SystemLogServic
                 .title(title)
                 .content(lvContent)
                 .contentChange(lvContentChange)
-                .ip(CommonUtils.getUserPrincipal().getIp())
-                .account(CommonUtils.getUserPrincipal().toEntity())
+                .ip(userSession.getUserPrincipal().getIp())
+                .account(userSession.getUserPrincipal().toEntity())
                 .build());
     }
 }

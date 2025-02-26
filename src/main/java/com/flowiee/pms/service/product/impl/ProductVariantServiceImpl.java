@@ -17,6 +17,7 @@ import com.flowiee.pms.repository.product.ProductPriceRepository;
 import com.flowiee.pms.repository.sales.OrderCartRepository;
 import com.flowiee.pms.repository.storage.StorageRepository;
 import com.flowiee.pms.repository.system.FileStorageRepository;
+import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.category.CategoryService;
 import com.flowiee.pms.base.service.GenerateBarcodeService;
 import com.flowiee.pms.service.product.ProductGenerateQRCodeService;
@@ -82,6 +83,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
     @Lazy
     private CartService mvCartService;
     private final GenerateBarcodeService mvGenerateBarcodeService;
+    private final UserSession userSession;
 
     @Override
     public List<ProductVariantDTO> findAll() {
@@ -141,7 +143,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
 
     private OrderCart getCurrentCart(boolean checkInAnyCart) {
         if (checkInAnyCart) {
-            List<OrderCart> cartList = mvCartRepository.findByAccountId(CommonUtils.getUserPrincipal().getId());
+            List<OrderCart> cartList = mvCartRepository.findByAccountId(userSession.getUserPrincipal().getId());
             if (ObjectUtils.isNotEmpty(cartList)) {
                 return cartList.get(0);
             }
@@ -206,7 +208,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
 
                 TicketImport ticketImportSaved = mvTicketImportService.save(TicketImport.builder()
                         .title("Initialize storage")
-                        .importer(CommonUtils.getUserPrincipal().getUsername())
+                        .importer(userSession.getUserPrincipal().getUsername())
                         .importTime(LocalDateTime.now())
                         .note(initMessage)
                         .status(TicketImportStatus.COMPLETED.name())
@@ -227,7 +229,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
 
                 TicketExport ticketExportSaved = mvTicketExportService.save(TicketExport.builder()
                         .title("Initialize storage")
-                        .exporter(CommonUtils.getUserPrincipal().getUsername())
+                        .exporter(userSession.getUserPrincipal().getUsername())
                         .exportTime(LocalDateTime.now())
                         .note(initMessage)
                         .status(TicketExportStatus.COMPLETED.name())

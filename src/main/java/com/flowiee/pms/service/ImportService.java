@@ -6,4 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ImportService {
     EximResult importFromExcel(TemplateExport templateExport, MultipartFile multipartFile);
+
+    String approveData();
 }

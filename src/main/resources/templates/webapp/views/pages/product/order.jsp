@@ -33,7 +33,7 @@
                                     <div class="row justify-content-between">
                                         <div class="col-4" style="display: flex; align-items: center"></div>
                                         <div class="col-6 text-right">
-                                            <a th:href="@{/api/v1/order/export}" class="btn btn-info btn-sm">
+                                            <a th:href="@{/api/v1/sls/order/export}" class="btn btn-info btn-sm">
                                                 <i class="fa-solid fa-cloud-arrow-down mr-2"></i>Xuất dữ liệu
                                             </a>
                                         </div>

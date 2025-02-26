@@ -5,6 +5,7 @@ import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.RequestUtils;
 import com.flowiee.pms.entity.system.EventLog;
 import com.flowiee.pms.repository.system.EventLogRepository;
+import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.system.EventLogService;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class EventLogServiceImpl extends BaseService implements EventLogService {
     private final EventLogRepository eventLogRepository;
+    private final UserSession userSession;
 
     @Override
     public EventLog writeLog(ServletRequestAttributes pServletRequestAttributes, JoinPoint pJoinPoint, LocalDateTime pCreateTime, String pApplication) {
@@ -32,8 +34,8 @@ public class EventLogServiceImpl extends BaseService implements EventLogService 
         String lvRequestUrl = RequestUtils.getRequestUrl(pServletRequestAttributes);
         String lvProcessClass = lvSignature.getDeclaringTypeName();
         String lvProcessMethod = lvSignature.getName();
-        String lvUsername = RequestUtils.isLoginPage(pServletRequestAttributes) ? null : CommonUtils.getUserPrincipal().getUsername();
-        String lvIpAddress = RequestUtils.isLoginPage(pServletRequestAttributes) ? null : CommonUtils.getUserPrincipal().getIp();
+        String lvUsername = RequestUtils.isLoginPage(pServletRequestAttributes) ? null : userSession.getUserPrincipal().getUsername();
+        String lvIpAddress = RequestUtils.isLoginPage(pServletRequestAttributes) ? null : userSession.getUserPrincipal().getIp();
 
         return eventLogRepository.save(EventLog.builder()
                 .httpMethod(lvHttpMethod)

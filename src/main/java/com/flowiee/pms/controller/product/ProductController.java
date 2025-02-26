@@ -2,15 +2,16 @@ package com.flowiee.pms.controller.product;
 
 import com.flowiee.pms.base.controller.BaseController;
 import com.flowiee.pms.common.constants.Constants;
-import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.entity.product.Product;
 import com.flowiee.pms.entity.product.ProductHistory;
 import com.flowiee.pms.entity.product.ProductRelated;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.AppResponse;
+import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.model.dto.ProductDTO;
 import com.flowiee.pms.exception.AppException;
+import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.service.ExportService;
 import com.flowiee.pms.service.ImportService;
 import com.flowiee.pms.service.product.*;
@@ -28,6 +29,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -129,12 +131,6 @@ public class ProductController extends BaseController {
         return success(mvProductHistoryService.findByProduct(productId));
     }
 
-    @GetMapping("/import")
-    @PreAuthorize("@vldModuleProduct.insertProduct(true)")
-    public void importData(@RequestParam("file") MultipartFile file) {
-        mvImportService.importFromExcel(TemplateExport.IM_LIST_OF_PRODUCTS, file);
-    }
-
     @Operation(summary = "Add related product")
     @PostMapping("/{productId}/related/{relatedProductId}")
     public AppResponse<String> addRelatedProduct(@PathVariable Long productId, @PathVariable Long relatedProductId) {
@@ -158,5 +154,36 @@ public class ProductController extends BaseController {
     @GetMapping("/discontinued")
     public AppResponse<List<ProductDTO>> getDiscontinuedProducts() {
         return success(mvProductInfoService.getDiscontinuedProducts());
+    }
+
+    @GetMapping("/import/template")
+    @PreAuthorize("@vldModuleProduct.readProduct(true)")
+    public ResponseEntity<?> downloadTemplate() {
+        EximResult model = mvExportService.exportToExcel(TemplateExport.IE_LIST_OF_PRODUCTS, null, true);
+        return ResponseEntity.ok().headers(model.getHttpHeaders()).body(model.getContent());
+    }
+
+    @GetMapping("/import")
+    @PreAuthorize("@vldModuleProduct.insertProduct(true)")
+    public String importData(@RequestParam("file") MultipartFile file) {
+        EximResult eximResult = mvImportService.importFromExcel(TemplateExport.IM_LIST_OF_PRODUCTS, file);
+        return eximResult.getResultStatus();
+    }
+
+    @GetMapping("/export")
+    @PreAuthorize("@vldModuleProduct.readProduct(true)")
+    public ResponseEntity<?> exportData(@RequestParam(name = "productType", required = false) Long pProductTypeId,
+                                        @RequestParam(name = "color", required = false) Long pColorId,
+                                        @RequestParam(name = "size", required = false) Long pSizeId,
+                                        @RequestParam(name = "fabricType", required = false) Long pFabricTypeId) {
+        ProductVariantDTO condition = new ProductVariantDTO();
+        condition.setProductTypeId(pProductTypeId);
+        condition.setColorId(pColorId);
+        condition.setSizeId(pSizeId);
+        condition.setFabricTypeId(pFabricTypeId);
+
+        EximResult result = mvExportService.exportToExcel(TemplateExport.IE_LIST_OF_PRODUCTS, condition, false);
+
+        return ResponseEntity.ok().headers(result.getHttpHeaders()).body(result.getContent());
     }
 }

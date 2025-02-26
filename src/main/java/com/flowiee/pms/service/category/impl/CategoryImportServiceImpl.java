@@ -34,9 +34,9 @@ public class CategoryImportServiceImpl extends BaseImportService {
                     if (categoryName == null || categoryName.isEmpty()) {
                         XSSFCellStyle cellStyle = mvWorkbook.createCellStyle();
                         XSSFFont fontStyle = mvWorkbook.createFont();
-                        row.getCell(1).setCellStyle(CommonUtils.highlightDataImportError(cellStyle, fontStyle));
-                        row.getCell(2).setCellStyle(CommonUtils.highlightDataImportError(cellStyle, fontStyle));
-                        row.getCell(3).setCellStyle(CommonUtils.highlightDataImportError(cellStyle, fontStyle));
+                        row.getCell(1).setCellStyle(CommonUtils.highlightCellInvalidValue(cellStyle, fontStyle));
+                        row.getCell(2).setCellStyle(CommonUtils.highlightCellInvalidValue(cellStyle, fontStyle));
+                        row.getCell(3).setCellStyle(CommonUtils.highlightCellInvalidValue(cellStyle, fontStyle));
                         continue;
                     }
                     lvListToImport.add(Category.builder()
@@ -48,10 +48,12 @@ public class CategoryImportServiceImpl extends BaseImportService {
                 }
             }
             List<Category> listCategorySaved = mvCategoryRepository.saveAll(lvListToImport);
-            mvImportHistory.setTotalRecord(listCategorySaved.size());
-            mvImportHistory.setResult("OK");
         } catch (Exception ex) {
-            mvImportHistory.setResult("NOK");
         }
+    }
+
+    @Override
+    public String approveData() {
+        return null;
     }
 }

@@ -9,4 +9,9 @@ public class OrderImportService extends BaseImportService {
     protected void writeData() {
 
     }
+
+    @Override
+    public String approveData() {
+        return null;
+    }
 }

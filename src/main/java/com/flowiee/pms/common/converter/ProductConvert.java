@@ -18,7 +18,7 @@ public class ProductConvert {
             .PID(inputDTO.getPID())
             .productName(inputDTO.getProductName())
             //.description(inputDTO.getDescription())
-            .status(inputDTO.getStatus())
+            //.status(inputDTO.getStatus())
             .productType(inputDTO.getProductType())
             .brand(inputDTO.getBrand())
             .unit(inputDTO.getUnit())
@@ -65,7 +65,7 @@ public class ProductConvert {
                 dto.setUnitName(inputEntity.getUnit().getName());
             }
             dto.setDescription(description);
-            dto.setStatus(inputEntity.getStatus());
+            //dto.setStatus(inputEntity.getStatus());
             if (ObjectUtils.isNotEmpty(inputEntity.getProductVariantList())) {
                 dto.setProductVariantQty(inputEntity.getProductVariantList().size());
             }

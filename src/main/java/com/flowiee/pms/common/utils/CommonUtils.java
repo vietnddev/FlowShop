@@ -4,7 +4,7 @@ import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.model.ServerInfo;
 import com.flowiee.pms.model.ShopInfo;
 import com.flowiee.pms.security.UserPrincipal;
-import com.flowiee.pms.common.enumeration.CategoryType;
+import com.flowiee.pms.common.enumeration.CATEGORY;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -65,7 +65,7 @@ public class CommonUtils {
 
     public static String getCategoryType(String key) {
         Map<String, String> map = new HashMap<>();
-        for (CategoryType c : CategoryType.values()) {
+        for (CATEGORY c : CATEGORY.values()) {
             map.put(c.getKey(), c.getName());
         }
         return map.get(key);
@@ -157,7 +157,7 @@ public class CommonUtils {
         return stream.toByteArray();
     }
 
-    public static XSSFCellStyle highlightDataImportError(XSSFCellStyle cellStyle, XSSFFont fontStyle) {
+    public static XSSFCellStyle highlightCellInvalidValue(XSSFCellStyle cellStyle, XSSFFont fontStyle) {
         cellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
         cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
@@ -178,8 +178,8 @@ public class CommonUtils {
         return UserPrincipal.anonymousUser();
     }
 
-    public static CategoryType getCategoryEnum(String name) {
-        for (CategoryType c : CategoryType.values()) {
+    public static CATEGORY getCategoryEnum(String name) {
+        for (CATEGORY c : CATEGORY.values()) {
             if (c.name().equals(name) || c.name().equals(getCategoryType(name))) {
                 return c;
             }

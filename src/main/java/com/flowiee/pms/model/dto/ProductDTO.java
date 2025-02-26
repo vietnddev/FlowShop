@@ -42,7 +42,7 @@ public class ProductDTO extends Product implements Serializable {
 		builder.append(", productTypeId=").append(productTypeId);
 		builder.append(", brandId=").append(brandId);
 		builder.append(", unitId=").append(unitId);
-		builder.append(", status=").append(getStatus());
+		//builder.append(", status=").append(getStatus());
 		builder.append(", productVariantQty=").append(productVariantQty);
 		builder.append(", soldQty=").append(soldQty);
 		builder.append(", createdAt=").append(getCreatedAt());

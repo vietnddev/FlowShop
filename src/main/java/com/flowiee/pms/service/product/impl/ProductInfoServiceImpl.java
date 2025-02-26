@@ -109,7 +109,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
     @Override
     public List<Product> findProductsIdAndProductName() {
         List<Product> products = new ArrayList<>();
-        for (Object[] objects : mvProductRepository.findIdAndName(ProductStatus.ACT.name())) {
+        for (Object[] objects : mvProductRepository.findIdAndName()) {
             products.add(new Product(Integer.parseInt(String.valueOf(objects[0])), String.valueOf(objects[1])));
         }
         return products;
@@ -158,7 +158,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
                 throw new BadRequestException("Product name is not null!");
 
             //productToSave.setCreatedBy(CommonUtils.getUserPrincipal().getId());
-            productToSave.setStatus(ProductStatus.ACT);
+            //productToSave.setStatus(ProductStatus.ACT);
             Product productSaved = mvProductRepository.save(productToSave);
 
             ProductDescription productDescription = null;
@@ -201,7 +201,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
         lvProduct.setProductType(lvProductType);
         lvProduct.setBrand(lvBrand);
         lvProduct.setUnit(lvUnit);
-        lvProduct.setStatus(productDTO.getStatus());
+        //lvProduct.setStatus(productDTO.getStatus());
 
         ProductDescription productDescription = lvProduct.getProductDescription();
         if (productDescription != null) {

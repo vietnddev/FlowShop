@@ -39,7 +39,7 @@ public class ProductDetail extends BaseEntity implements Serializable {
     static final long serialVersionUID = 1L;
 
     @JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
     Product product;
     
@@ -162,8 +162,8 @@ public class ProductDetail extends BaseEntity implements Serializable {
     List<ProductVariantExim> listProductVariantTemp;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
-    List<ProductPrice> listProductVariantPrice;
+    @OneToMany(mappedBy = "productVariant", fetch = FetchType.EAGER)
+    List<ProductPrice> priceList;
 
     @JsonIgnore
     @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
@@ -185,8 +185,8 @@ public class ProductDetail extends BaseEntity implements Serializable {
     }
 
     public ProductPrice getVariantPrice(Long pPriceId) {
-        if (getListProductVariantPrice() != null) {
-            for (ProductPrice price : getListProductVariantPrice()) {
+        if (getPriceList() != null) {
+            for (ProductPrice price : getPriceList()) {
                 Long lvPriceId = price.getId();
                 if (lvPriceId.equals(pPriceId))
                     return price;
@@ -197,8 +197,8 @@ public class ProductDetail extends BaseEntity implements Serializable {
     }
 
     public ProductPrice getVariantPrice() {
-        if (getListProductVariantPrice() != null) {
-            for (ProductPrice price : getListProductVariantPrice()) {
+        if (getPriceList() != null) {
+            for (ProductPrice price : getPriceList()) {
                 if (ProductPrice.STATE_ACTIVE.equals(price.getState()))
                     return price;
             }

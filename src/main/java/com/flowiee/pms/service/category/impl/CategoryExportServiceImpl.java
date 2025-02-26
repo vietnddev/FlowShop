@@ -19,6 +19,11 @@ public class CategoryExportServiceImpl extends BaseExportService {
     CategoryService mvCategoryService;
 
     @Override
+    protected void prepareData(Object pCondition, boolean pTemplateOnly) {
+
+    }
+
+    @Override
     protected void writeData(Object pCondition) {
         XSSFSheet sheet = mvWorkbook.getSheetAt(0);
         List<Category> listData = mvCategoryService.findAll();

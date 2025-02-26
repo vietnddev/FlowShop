@@ -32,7 +32,7 @@ public class ProfileControllerView extends BaseController {
 
 	@GetMapping("/sys/profile")
 	public ModelAndView showInformation(@ModelAttribute("message") String message) {
-		Account profile = accountService.findById(CommonUtils.getUserPrincipal().getId(), true);
+		Account profile = accountService.findById(mvUserSession.getUserPrincipal().getId(), true);
 
 		ModelAndView modelAndView = new ModelAndView(Pages.SYS_PROFILE.getTemplate());
 		modelAndView.addObject("message", message);
@@ -61,7 +61,7 @@ public class ProfileControllerView extends BaseController {
 		String password_new = request.getParameter("password_new");
 		String password_renew = request.getParameter("password_renew");
 
-		Account profile = accountService.findById(CommonUtils.getUserPrincipal().getId(), true);
+		Account profile = accountService.findById(mvUserSession.getUserPrincipal().getId(), true);
 
 		BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
 		if (bCrypt.matches(password_old, accountService.findByUsername(profile.getUsername()).getPassword())) {

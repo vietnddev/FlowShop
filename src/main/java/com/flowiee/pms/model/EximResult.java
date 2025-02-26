@@ -24,7 +24,7 @@ public class EximResult {
     String fileType;
     String defaultOutputName;
     HttpHeaders httpHeaders;
-    String result;
+    String resultStatus;
     Object data;
 
     public EximResult(TemplateExport templateExport) {

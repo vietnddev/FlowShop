@@ -2,7 +2,7 @@ package com.flowiee.pms.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -34,22 +34,22 @@ public class ProductPrice extends BaseEntity implements Serializable {
     ProductDetail productVariant;
 
     @Column(name = "purchase_price")
-    BigDecimal purchasePrice;
+    BigDecimal purchasePrice = BigDecimal.ZERO;
 
     @Column(name = "cost_price")
-    BigDecimal costPrice;
+    BigDecimal costPrice = BigDecimal.ZERO;
 
     @Column(name = "retail_price", nullable = false)
-    BigDecimal retailPrice;
+    BigDecimal retailPrice = BigDecimal.ZERO;
 
     @Column(name = "retail_price_discount")
-    BigDecimal retailPriceDiscount;
+    BigDecimal retailPriceDiscount = BigDecimal.ZERO;
 
     @Column(name = "wholesale_price", nullable = false)
-    BigDecimal wholesalePrice;
+    BigDecimal wholesalePrice = BigDecimal.ZERO;
 
     @Column(name = "wholesale_price_discount")
-    BigDecimal wholesalePriceDiscount;
+    BigDecimal wholesalePriceDiscount = BigDecimal.ZERO;
 
     @Column(name = "note")
     String note;

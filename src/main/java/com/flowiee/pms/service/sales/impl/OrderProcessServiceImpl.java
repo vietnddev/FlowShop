@@ -54,7 +54,7 @@ public class OrderProcessServiceImpl extends BaseService implements OrderProcess
     public void completeOrder(Order pOrder) {
         Order lvOrder = pOrder;
         lvOrder.setOrderStatus(OrderStatus.DLVD);
-        lvOrder.setSuccessfulDeliveryTime(LocalDateTime.now());
+        lvOrder.setDeliverySuccessTime(LocalDateTime.now());
         Order lvOrderUpdated = orderRepository.save(lvOrder);
 
         Long lvProgramId = null;

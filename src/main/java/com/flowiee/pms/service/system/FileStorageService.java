@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.system;
 
-import com.flowiee.pms.base.service.BaseCurdService;
+import com.flowiee.pms.base.BaseCurdService;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.flowiee.pms.entity.system.FileStorage;

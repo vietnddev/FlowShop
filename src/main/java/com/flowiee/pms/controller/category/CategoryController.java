@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.category;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.ResourceNotFoundException;

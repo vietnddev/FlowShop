@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.product.impl;
 
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 import com.flowiee.pms.base.service.GenerateQRCodeService;
 import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.common.utils.CommonUtils;

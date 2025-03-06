@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.product;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.product.ProductHistory;
@@ -49,7 +49,8 @@ public class ProductVariantController extends BaseController {
                                                                     @RequestParam(value = "colorId", required = false) Long pColorId,
                                                                     @RequestParam(value = "sizeId", required = false) Long pSizeId,
                                                                     @RequestParam(value = "fabricTypeId", required = false) Long fabricTypeId) {
-        Page<ProductVariantDTO> data = mvProductVariantService.findAll(CoreUtils.coalesce(pageSize), CoreUtils.coalesce(pageNum) - 1, pTxtSearch, productId, null, pBrandId, pColorId, pSizeId, fabricTypeId, readyForSales, true);
+        Page<ProductVariantDTO> data = mvProductVariantService.findAll(CoreUtils.coalesce(pageSize), CoreUtils.coalesce(pageNum) - 1,
+                pTxtSearch, productId, null, pBrandId, pColorId, pSizeId, fabricTypeId, readyForSales, true);
         return success(data.getContent(), data.getNumber() + 1, data.getSize(), data.getTotalPages(), data.getTotalElements());
     }
 

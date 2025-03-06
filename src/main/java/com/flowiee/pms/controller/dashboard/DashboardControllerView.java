@@ -1,7 +1,7 @@
 package com.flowiee.pms.controller.dashboard;
 
 import com.flowiee.pms.model.DashboardModel;
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.common.enumeration.Pages;
 import com.flowiee.pms.service.dashboard.DashboardService;
 

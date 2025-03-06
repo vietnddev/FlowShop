@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.model.dto.CustomerDTO;
 import com.flowiee.pms.entity.sales.CustomerContact;
 import com.flowiee.pms.service.sales.CustomerContactService;

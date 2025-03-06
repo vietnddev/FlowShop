@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.system;
 
 import com.flowiee.pms.entity.system.SystemLog;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.ACTION;
 import com.flowiee.pms.common.enumeration.LogType;
 import com.flowiee.pms.common.enumeration.MODULE;

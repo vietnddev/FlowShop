@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface ProductImageService {
     List<FileStorage> getImageOfProduct(Long pProductId);
@@ -29,7 +30,7 @@ public interface ProductImageService {
 
     FileStorage findImageActiveOfProduct(long pProductId);
 
-    FileStorage findImageActiveOfProductVariant(long pProductVariantId);
+    Map<Long, FileStorage> getImageActiveOfProductVariants(List<Long> pProductVariantIds);
 
     FileStorage changeImageProduct(MultipartFile fileToChange, long fileId);
 }

@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.entity.sales.Order;

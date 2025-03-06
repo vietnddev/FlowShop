@@ -5,6 +5,7 @@ import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.product.ProductPrice;
 import com.flowiee.pms.entity.sales.Items;
 import com.flowiee.pms.entity.sales.OrderCart;
+import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
@@ -12,6 +13,7 @@ import com.flowiee.pms.model.payload.CartItemsReq;
 import com.flowiee.pms.model.payload.CartReq;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
+import com.flowiee.pms.repository.product.ProductPriceRepository;
 import com.flowiee.pms.repository.sales.CartItemsRepository;
 import com.flowiee.pms.repository.sales.OrderCartRepository;
 import com.flowiee.pms.base.service.BaseService;
@@ -28,9 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -40,6 +41,7 @@ public class CartServiceImpl extends BaseService implements CartService {
     OrderCartRepository mvCartRepository;
     CartItemsRepository mvCartItemsRepository;
     ProductVariantService mvProductVariantService;
+    ProductPriceRepository mvProductPriceRepository;
 
     @Override
     public List<OrderCart> findCartByAccountId(Long accountId) {
@@ -122,6 +124,22 @@ public class CartServiceImpl extends BaseService implements CartService {
         return item != null;
     }
 
+    @Override
+    public List<Items> getItems(Long cartId, List<Long> productVariantIds) {
+        if (CollectionUtils.isEmpty(productVariantIds)) {
+            return List.of();
+        }
+
+        List<Items> lvItemList = new ArrayList<>();
+        int batchSize = 1000; // Số lượng tối đa trong một truy vấn
+        for (int i = 0; i < productVariantIds.size(); i += batchSize) {
+            List<Long> batch = productVariantIds.subList(i, Math.min(i + batchSize, productVariantIds.size()));
+            lvItemList.addAll(mvCartItemsRepository.findItems(cartId, batch));
+        }
+
+        return lvItemList;
+    }
+
     @Transactional
     @Override
     public void resetCart(Long cartId) {
@@ -192,7 +210,7 @@ public class CartServiceImpl extends BaseService implements CartService {
                 Items items = mvCartItemsService.findItemByCartAndProductVariant(lvCartId, lvProductVariant.getId());
                 mvCartItemsService.increaseItemQtyInCart(items.getId(), items.getQuantity() + 1);
             } else {
-                ProductPrice productVariantPrice = lvProductVariant.getVariantPrice();//mvProductPriceRepository.findPricePresent(null, Long.parseLong(productVariantId));
+                ProductPrice productVariantPrice = mvProductPriceRepository.findPricePresent(null, lvProductVariant.getId());
                 if (productVariantPrice == null) {
                     throw new AppException(String.format("Sản phẩm %s chưa được thiết lập giá bán!", lvProductVariant.getVariantName()));
                 }
@@ -200,7 +218,7 @@ public class CartServiceImpl extends BaseService implements CartService {
                 BigDecimal lvRetailPriceDiscount = productVariantPrice.getRetailPriceDiscount();
                 Items items = Items.builder()
                         .orderCart(orderCart)
-                        .productDetail(lvProductVariant)
+                        .productDetail(new ProductDetail(lvProductVariant.getId()))
                         .priceType(PriceType.L.name())
                         .price(lvRetailPriceDiscount != null ? lvRetailPriceDiscount : lvRetailPrice)
                         .priceOriginal(lvRetailPrice)

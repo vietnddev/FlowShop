@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.product;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.model.dto.MaterialDTO;
 import com.flowiee.pms.entity.product.Material;

@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.sales.impl;
 
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.entity.sales.Order;

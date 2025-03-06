@@ -82,12 +82,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("from Order where customer.id = :customerId")
     List<Order> findByCustomer(@Param("customerId") Long customerId);
 
-    @Query("from Order where successfulDeliveryTime between :fromDate and :toDate")
+    @Query("from Order where DeliverySuccessTime between :fromDate and :toDate")
     List<Order> findBySuccessfulDeliveryTime(@Param("fromDate") LocalDateTime pFromDate, @Param("toDate") LocalDateTime pToDate);
 
-    @Query("from Order o where o.kenhBanHang.id = :salesChannelId")
+    @Query("from Order o where o.salesChannel.id = :salesChannelId")
     List<Order> countBySalesChannel(@Param("salesChannelId") Long salesChannelId);
 
-    @Query("from Order o where o.kenhBanHang.code = :salesChannelCode")
+    @Query("from Order o where o.salesChannel.code = :salesChannelCode")
     List<Order> countBySalesChannel(@Param("salesChannelCode") String salesChannelCode);
 }

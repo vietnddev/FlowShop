@@ -3,7 +3,7 @@ package com.flowiee.pms.entity.sales;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.FileStorage;
@@ -21,7 +21,12 @@ import java.util.*;
 
 @Builder
 @Entity
-@Table(name = "orders")
+@Table(name = "orders",
+       indexes = {@Index(name = "idx_Order_code", columnList = "code"),
+                  @Index(name = "idx_Order_receiverPhone", columnList = "receiver_phone"),
+                  @Index(name = "idx_Order_salesAssistantId", columnList = "sales"),
+                  @Index(name = "idx_Order_channelId", columnList = "channel"),
+                  @Index(name = "idx_Order_customerId", columnList = "customer_id")})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -52,27 +57,27 @@ public class Order extends BaseEntity implements Serializable {
 	@JoinColumn(name = "customer_id", nullable = false)
 	Customer customer;
 
+	@Column(name = "customer_type")
+	String customerType;
+
 	@Column(name = "confirmed_by")
 	String confirmedBy;
 
 	@Column(name = "confirmed_time")
 	LocalDateTime confirmedTime;
 
-	@Column(name = "delivery_method")
-	String deliveryMethod;
-
-	@Column(name = "tracking_code")
-	String trackingCode;
-
-	@Column(name = "note", length = 500)
+	@Column(name = "internal_note", length = 500)
 	String note;
+
+	@Column(name = "customer_note", length = 500)
+	String customerNote;
 
 	@JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
 	@Column(name = "order_time", nullable = false)
 	LocalDateTime orderTime;
 
-	@Column(name = "voucher_used")
-	String voucherUsedCode;
+	@Column(name = "coupon_code")
+	String couponCode;
 
 	@Column(name = "amount_discount", nullable = false)
 	BigDecimal amountDiscount;
@@ -97,7 +102,7 @@ public class Order extends BaseEntity implements Serializable {
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "channel", nullable = false)
-	Category kenhBanHang;
+	Category salesChannel;
 
 	@JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
 	@Column(name = "payment_time")
@@ -137,11 +142,41 @@ public class Order extends BaseEntity implements Serializable {
 	Long cancellationReason;
 
 	@Column(name = "successful_delivery_time")
-	LocalDateTime successfulDeliveryTime;
+	LocalDateTime deliverySuccessTime;
+
+	@Column(name = "delivery_expected_time")
+	LocalDateTime deliveryExpectedTime;
+
+	@Column(name = "delivery_method")
+	String deliveryMethod;
+
+	@Column(name = "delivered_by")
+	String deliveredBy;
+
+	@Column(name = "delivery_status")
+	String deliveredStatus;
+
+	@Column(name = "delivery_priority")
+	String deliveryPriority;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "priority_level")
 	PriorityLevel priorityLevel;
+
+	@Column(name = "refund_amount")
+	String refundAmount;
+
+	@Column(name = "refund_status")
+	String refundStatus;
+
+	@Column(name = "referrer_code")
+	String referrerCode;
+
+	@Column(name = "tracking_code")
+	String trackingCode;
+
+	@Column(name = "total_weight")
+	BigDecimal totalWeight;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "order_status", length = 10)
@@ -183,8 +218,8 @@ public class Order extends BaseEntity implements Serializable {
 		return "Order [id=" + super.id + ", maDonHang=" + code + ", receiverName=" + receiverName + ", receiverPhone=" + receiverPhone
 				+ ", receiverEmail=" + receiverEmail + ", receiverAddress=" + receiverAddress + ", customer=" + customer
 				+ ", ghiChu=" + note + ", orderTime=" + orderTime
-				+ ", voucherUsedCode=" + voucherUsedCode + ", amountDiscount=" + amountDiscount
+				+ ", couponCode=" + couponCode + ", amountDiscount=" + amountDiscount
 				+ ", nhanVienBanHang=" + nhanVienBanHang
-				+ ", kenhBanHang=" + kenhBanHang + ", orderStatus=" + orderStatus + "]";
+				+ ", salesChannel=" + salesChannel + ", orderStatus=" + orderStatus + "]";
 	}
 }

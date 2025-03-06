@@ -3,7 +3,7 @@ package com.flowiee.pms.entity.sales;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.product.ProductReview;
 import com.flowiee.pms.model.dto.CustomerDTO;
@@ -44,8 +44,8 @@ public class Customer extends BaseEntity implements Serializable {
 	@Column(name = "birthday")
 	LocalDate dateOfBirth;
 
-	@Column(name = "sex", nullable = false)
-	boolean sex;
+	@Column(name = "gender", nullable = false, length = 10)
+	String gender;
 
 	@Column(name = "marital_status")
 	String maritalStatus;
@@ -60,16 +60,16 @@ public class Customer extends BaseEntity implements Serializable {
 	String blackListReason;
 
 	@Column(name = "bonus_points")
-	Integer bonusPoints;
+	Integer bonusPoints = 0;
 
 	@Column(name = "has_outstanding_balance")
-	Boolean hasOutstandingBalance;
+	Boolean hasOutstandingBalance = false;
 
 	@Column(name = "outstanding_balance_amount")
-	BigDecimal outstandingBalanceAmount;
+	BigDecimal outstandingBalanceAmount = BigDecimal.ZERO;
 
 	@Column(name = "is_vip")
-	Boolean isVIP;
+	Boolean isVIP = false;
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -100,7 +100,7 @@ public class Customer extends BaseEntity implements Serializable {
 	List<GiftRedemption> giftRedemptionList;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "customer", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
 	List<CustomerDebt> customerDebtList;
 
 	public Customer(long id) {
@@ -116,7 +116,7 @@ public class Customer extends BaseEntity implements Serializable {
 		Customer customer = Customer.builder()
 			.customerName(dto.getCustomerName())
 			.dateOfBirth(dto.getDateOfBirth())
-			.sex(dto.isSex())
+			.gender(dto.getGender())
 			.build();
 		customer.setId(dto.getId());
 		return customer;
@@ -150,6 +150,6 @@ public class Customer extends BaseEntity implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Customer [id=" + super.id + ", customerName=" + customerName + ", birthday=" + dateOfBirth + ", sex=" + sex  + "]";
+		return "Customer [id=" + super.id + ", customerName=" + customerName + ", birthday=" + dateOfBirth + ", sex=" + gender + "]";
 	}
 }

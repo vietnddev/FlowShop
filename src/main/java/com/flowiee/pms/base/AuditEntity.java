@@ -1,4 +1,4 @@
-package com.flowiee.pms.base.entity;
+package com.flowiee.pms.base;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;

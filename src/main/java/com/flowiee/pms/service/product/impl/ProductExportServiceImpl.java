@@ -8,7 +8,7 @@ import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.product.Product;
 import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.product.ProductPrice;
-import com.flowiee.pms.base.service.BaseExportService;
+import com.flowiee.pms.base.BaseExportService;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.service.category.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +64,9 @@ public class ProductExportServiceImpl extends BaseExportService {
             CriteriaQuery<ProductDetail> lvCriteriaQuery = lvCriteriaBuilder.createQuery(ProductDetail.class);
             Root<ProductDetail> lvRoot = lvCriteriaQuery.from(ProductDetail.class);
 
+            lvRoot.fetch("product", JoinType.LEFT);
+            lvRoot.fetch("priceList", JoinType.LEFT);
+
             List<Predicate> lvPredicates = new ArrayList<>();
             addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("product").get("productType").get("id"), lvCondition.getProductTypeId());
             addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("product").get("brand").get("id"), lvCondition.getBrandId());
@@ -89,11 +92,9 @@ public class ProductExportServiceImpl extends BaseExportService {
         XSSFRow lvRowHead = getRowHeadKey();
 
         for (int i = 0; i < mvDataExportSize; i++) {
-            ProductDetail productVariant = lvDataExportList.get(i);
-            ProductPrice lvProductPrice = productVariant.getVariantPrice();
-            if (lvProductPrice == null) {
-                lvProductPrice = new ProductPrice();
-            }
+            ProductDetail lvProductVariant = lvDataExportList.get(i);
+            Product lvProduct = lvProductVariant.getProduct();
+            ProductPrice lvProductPrice = lvProductVariant.getVariantPrice();
 
             XSSFRow lvRow = mvDataSheet.createRow(i + mvDataBeginLine);
 
@@ -103,27 +104,27 @@ public class ProductExportServiceImpl extends BaseExportService {
 
                 switch (lvHeadKey) {
                     case product_name ->
-                            lvCell.setCellValue(productVariant.getVariantName());
+                            lvCell.setCellValue(lvProductVariant.getVariantName());
                     case product_code ->
-                            lvCell.setCellValue(productVariant.getVariantCode());
+                            lvCell.setCellValue(lvProductVariant.getVariantCode());
                     case product_type_code ->
-                            lvCell.setCellValue(productVariant.getProduct().getProductType().getName());
+                            lvCell.setCellValue(lvProduct.getProductType().getName());
                     case brand_code ->
-                            lvCell.setCellValue(productVariant.getProduct().getBrand().getName());
+                            lvCell.setCellValue(lvProduct.getBrand().getName());
                     case unit_code ->
-                            lvCell.setCellValue(productVariant.getProduct().getUnit().getName());
+                            lvCell.setCellValue(lvProduct.getUnit().getName());
                     case color_code ->
-                            lvCell.setCellValue(productVariant.getColor().getName());
+                            lvCell.setCellValue(lvProductVariant.getColor().getName());
                     case size_code ->
-                            lvCell.setCellValue(productVariant.getSize().getName());
+                            lvCell.setCellValue(lvProductVariant.getSize().getName());
                     case fabric_type_code ->
-                            lvCell.setCellValue(productVariant.getFabricType().getName());
+                            lvCell.setCellValue(lvProductVariant.getFabricType().getName());
                     case storage_qty ->
-                            lvCell.setCellValue(productVariant.getStorageQty());
+                            lvCell.setCellValue(lvProductVariant.getStorageQty());
                     case sold_qty ->
-                            lvCell.setCellValue(productVariant.getSoldQty());
+                            lvCell.setCellValue(lvProductVariant.getSoldQty());
                     case defective_qty ->
-                            lvCell.setCellValue(productVariant.getDefectiveQty());
+                            lvCell.setCellValue(lvProductVariant.getDefectiveQty());
                     case retail_price ->
                             lvCell.setCellValue(CoreUtils.coalesce(lvProductPrice.getRetailPrice()).toPlainString());
                     case wholesale_price ->
@@ -133,7 +134,7 @@ public class ProductExportServiceImpl extends BaseExportService {
                     case cost_price ->
                             lvCell.setCellValue(CoreUtils.coalesce(lvProductPrice.getCostPrice()).toPlainString());
                     case product_status ->
-                            lvCell.setCellValue(productVariant.getStatus().getLabel());
+                            lvCell.setCellValue(lvProductVariant.getStatus().getLabel());
                     default ->
                             throw new IllegalStateException("Unexpected value: " + lvHeadKey);
                 }

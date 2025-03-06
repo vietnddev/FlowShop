@@ -2,7 +2,7 @@ package com.flowiee.pms.entity.category;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 import com.flowiee.pms.entity.sales.*;
 import com.flowiee.pms.entity.product.Product;
 import com.flowiee.pms.entity.product.ProductDetail;
@@ -71,7 +71,7 @@ public class Category extends BaseEntity implements Serializable {
 	List<TicketImport> listPaymentMethod;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "kenhBanHang", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "salesChannel", fetch = FetchType.LAZY)
 	List<Order> listKenhBanHang;
 
 	@JsonIgnore

@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.product.impl;
 
-import com.flowiee.pms.base.system.Core;
+import com.flowiee.pms.base.Core;
 import com.flowiee.pms.entity.product.ProductCombo;
 import com.flowiee.pms.entity.product.ProductDamaged;
 import com.flowiee.pms.entity.sales.TicketExport;
@@ -24,6 +24,7 @@ import com.flowiee.pms.common.utils.FileUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +34,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -146,7 +150,7 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
         FileStorage imageToActive = mvFileStorageService.findById(pImageId, true);
 
         //Bỏ image default hiện tại
-        FileStorage imageActiving = mvFileStorageRepository.findActiveImage(pProductId, null);
+        FileStorage imageActiving = mvFileStorageRepository.findProductImageActive(pProductId, null);
         if (imageActiving != null) {
             imageActiving.setActive(false);
             mvFileStorageRepository.save(imageActiving);
@@ -161,7 +165,7 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
         FileStorage imageToActive = mvFileStorageService.findById(pImageId, true);
 
         //Bỏ image default hiện tại
-        FileStorage imageActivating = mvFileStorageRepository.findActiveImage(null, pProductVariantId);
+        FileStorage imageActivating = mvFileStorageRepository.findProductImageActive(null, pProductVariantId);
         if (ObjectUtils.isNotEmpty(imageActivating)) {
             imageActivating.setActive(false);
             mvFileStorageRepository.save(imageActivating);
@@ -173,12 +177,32 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
 
     @Override
     public FileStorage findImageActiveOfProduct(long pProductId) {
-        return mvFileStorageRepository.findActiveImage(pProductId, null);
+        return mvFileStorageRepository.findProductImageActive(pProductId, null);
     }
 
     @Override
-    public FileStorage findImageActiveOfProductVariant(long pProductVariantId) {
-        return mvFileStorageRepository.findActiveImage(null, pProductVariantId);
+    public Map<Long, FileStorage> getImageActiveOfProductVariants(List<Long> pProductVariantIds) {
+        if (CollectionUtils.isEmpty(pProductVariantIds)) {
+            return Map.of();
+        }
+
+        List<FileStorage> lvImageList = new ArrayList<>();
+        int batchSize = 1000; // Số lượng tối đa trong một truy vấn
+        for (int i = 0; i < pProductVariantIds.size(); i += batchSize) {
+            List<Long> batch = pProductVariantIds.subList(i, Math.min(i + batchSize, pProductVariantIds.size()));
+            lvImageList.addAll(mvFileStorageRepository.findProductVariantImageActive(batch));
+        }
+
+        //Map<productId, imageUrl>
+        Map<Long, FileStorage> lvImageMap = lvImageList.stream()
+                .filter(img -> img.getProductDetail() != null)
+                .collect(Collectors.toMap(
+                        img -> img.getProductDetail().getId(),
+                        img -> img,
+                        (existing, replacement) -> existing
+                ));
+
+        return lvImageMap;
     }
 
     @Transactional
@@ -204,7 +228,7 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
         fileToChange.setExtension(FileUtils.getFileExtension(fileAttached.getOriginalFilename()));
         fileToChange.setContentType(fileAttached.getContentType());
         fileToChange.setDirectoryPath(CommonUtils.getPathDirectory(MODULE.PRODUCT).substring(CommonUtils.getPathDirectory(MODULE.PRODUCT).indexOf("uploads")));
-        fileToChange.setAccount(userSession.getUserPrincipal().toEntity());
+        fileToChange.setAccount(userSession.getUserPrincipal().getEntity());
         FileStorage imageSaved = mvFileStorageRepository.save(fileToChange);
 
         //Lưu file mới vào thư mục chứa file upload

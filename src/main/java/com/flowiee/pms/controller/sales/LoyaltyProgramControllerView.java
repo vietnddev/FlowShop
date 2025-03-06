@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.entity.sales.LoyaltyProgram;
 import com.flowiee.pms.service.sales.LoyaltyProgramService;
 import com.flowiee.pms.common.enumeration.Pages;

@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.system;
 
-import com.flowiee.pms.base.service.BaseCurdService;
+import com.flowiee.pms.base.BaseCurdService;
 import com.flowiee.pms.entity.system.GroupAccount;
 import org.springframework.data.domain.Page;
 

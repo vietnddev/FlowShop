@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.service.system.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;

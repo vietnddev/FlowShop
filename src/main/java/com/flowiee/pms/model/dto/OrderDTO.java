@@ -2,11 +2,8 @@ package com.flowiee.pms.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flowiee.pms.entity.category.Category;
-import com.flowiee.pms.entity.sales.Customer;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.entity.sales.OrderDetail;
-import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.utils.OrderUtils;
@@ -40,7 +37,7 @@ public class OrderDTO implements Serializable {
 	private String receiverName;
 	private String receiverPhone;
 	private String receiverEmail;
-	private String voucherUsedCode;
+	private String couponCode;
 	private BigDecimal shippingCost;
 	private BigDecimal codFee;
 	private BigDecimal amountDiscount;
@@ -92,8 +89,8 @@ public class OrderDTO implements Serializable {
 		dto.setCustomerId(order.getCustomer().getId());
 		dto.setCustomerName(order.getCustomer().getCustomerName());
 
-		dto.setSalesChannelId(order.getKenhBanHang().getId());
-		dto.setSalesChannelName(order.getKenhBanHang().getName());
+		dto.setSalesChannelId(order.getSalesChannel().getId());
+		dto.setSalesChannelName(order.getSalesChannel().getName());
 
 		//dto.setOrderStatusId(dto.getPaymentMethod() != null ? order.getTrangThaiDonHang().getId() : null);
 		//dto.setOrderStatusName(dto.getPaymentMethod() != null ? order.getTrangThaiDonHang().getName() : null);
@@ -118,7 +115,7 @@ public class OrderDTO implements Serializable {
 		dto.setTotalAmount(OrderUtils.calTotalAmount(order.getListOrderDetail(), BigDecimal.ZERO));
 		dto.setTotalAmountDiscount(OrderUtils.calTotalAmount(order.getListOrderDetail(), order.getAmountDiscount()));
 		dto.setTotalProduct(OrderUtils.countItemsEachOrder(order.getListOrderDetail()));
-		dto.setVoucherUsedCode(order.getVoucherUsedCode());
+		dto.setCouponCode(order.getCouponCode());
 		dto.setPaymentStatus(order.getPaymentStatus() != null && order.getPaymentStatus());
 		dto.setPaymentTime(order.getPaymentTime());
 		dto.setPaymentAmount(order.getPaymentAmount());

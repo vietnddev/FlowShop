@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.product.impl;
 
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.EntityNotFoundException;

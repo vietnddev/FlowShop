@@ -1,5 +1,6 @@
-package com.flowiee.pms.base.service;
+package com.flowiee.pms.base;
 
+import com.flowiee.pms.base.service.BaseImportExportService;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.ExcelUtils;
 import com.flowiee.pms.exception.AppException;

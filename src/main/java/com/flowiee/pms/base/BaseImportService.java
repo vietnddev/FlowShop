@@ -1,5 +1,6 @@
-package com.flowiee.pms.base.service;
+package com.flowiee.pms.base;
 
+import com.flowiee.pms.base.service.BaseImportExportService;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.entity.system.ImportHistory;
 import com.flowiee.pms.exception.AppException;
@@ -112,6 +113,10 @@ public abstract class BaseImportService extends BaseImportExportService implemen
 
     public void setData(Object pObj) {
         mvEximResult.setData(pObj);
+    }
+
+    public void setImportStatus(String pStatus) {
+        mvEximResult.setResultStatus(pStatus);
     }
 
     public Path getPath(TemplateExport templateExport, MultipartFile multipartFile) {

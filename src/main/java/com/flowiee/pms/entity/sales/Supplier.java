@@ -2,10 +2,10 @@ package com.flowiee.pms.entity.sales;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 
 import com.flowiee.pms.entity.product.Material;
-import com.flowiee.pms.entity.product.ProductDetail;
+import com.flowiee.pms.entity.product.Product;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -69,11 +69,11 @@ public class Supplier extends BaseEntity implements Serializable {
 
     @JsonIgnore
     @OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY)
-    List<ProductDetail> listProductDetail;
+    List<Material> listMaterial;
 
     @JsonIgnore
     @OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY)
-    List<Material> listMaterial;
+    List<Product> productList;
 
     public Supplier(long id, String name) {
         this.id = id;

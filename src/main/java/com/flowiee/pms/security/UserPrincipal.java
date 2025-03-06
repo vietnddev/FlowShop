@@ -27,6 +27,7 @@ public class UserPrincipal extends Account implements UserDetails {
     private boolean isCredentialsNonExpired;
     private boolean isEnabled;
     private Set<GrantedAuthority> grantedAuthorities;
+    private Account entity;
 
     public UserPrincipal(Account account) {
         this.id = account.getId();
@@ -39,6 +40,7 @@ public class UserPrincipal extends Account implements UserDetails {
         this.isCredentialsNonExpired = true;
         this.isEnabled = true;
         this.setEmail(account.getEmail());
+        this.entity = account;
     }
 
     public UserPrincipal(Long id, String username, String ip) {
@@ -84,13 +86,6 @@ public class UserPrincipal extends Account implements UserDetails {
     @Override
     public boolean isEnabled() {
         return this.isEnabled;
-    }
-
-    public Account toEntity() {
-        Account entity = new Account();
-        entity.setId(this.id);
-        entity.setUsername(this.username);
-        return entity;
     }
 
     public static UserPrincipal anonymousUser() {

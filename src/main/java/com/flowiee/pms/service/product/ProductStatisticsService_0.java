@@ -4,6 +4,4 @@ public interface ProductStatisticsService_0 {
     Integer countTotalProductsInStorage();
 
     Integer findProductVariantTotalQtySell(Long productId);
-
-    Integer findProductVariantQuantityBySizeOfEachColor(Long productId, Long colorId, Long sizeId);
 }

@@ -1,4 +1,4 @@
-package com.flowiee.pms.base.service;
+package com.flowiee.pms.base;
 
 import java.util.List;
 

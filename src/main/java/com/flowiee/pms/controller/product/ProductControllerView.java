@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.product;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.entity.product.ProductAttribute;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.model.EximResult;
@@ -72,7 +72,7 @@ public class ProductControllerView extends BaseController {
         modelAndView.addObject("bienTheSanPhamId", variantId);
         modelAndView.addObject("bienTheSanPham", productVariant);
         modelAndView.addObject("listImageOfSanPhamBienThe", mvProductImageService.getImageOfProductVariant(variantId));
-        FileStorage imageActive = productVariant.getImage();//mvProductImageService.findImageActiveOfProductVariant(variantId);
+        FileStorage imageActive = productVariant.getActiveImage();//mvProductImageService.findImageActiveOfProductVariant(variantId);
         if (imageActive == null) {
             imageActive = new FileStorage();
         }

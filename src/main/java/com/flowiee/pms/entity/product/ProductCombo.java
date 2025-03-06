@@ -2,7 +2,7 @@ package com.flowiee.pms.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import lombok.*;
@@ -11,6 +11,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import javax.validation.constraints.AssertTrue;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -39,9 +40,9 @@ public class ProductCombo extends BaseEntity implements Serializable {
     LocalDate endDate;
 
     @Column(name = "amount_discount", nullable = false)
-    BigDecimal amountDiscount;
+    BigDecimal amountDiscount = BigDecimal.ZERO;
 
-    @Column(name = "note")
+    @Column(name = "note", length = 500)
     String note;
 
     @JsonIgnore
@@ -61,6 +62,11 @@ public class ProductCombo extends BaseEntity implements Serializable {
 
     @Transient
     List<ProductVariantDTO> applicableProducts;
+
+    @AssertTrue(message = "Start date must be before end date")
+    public boolean isValidDateRange() {
+        return startDate == null || endDate == null || startDate.isBefore(endDate);
+    }
 
     public FileStorage getImage(Long pImageId) {
         if (getListImages() != null) {

@@ -2,7 +2,7 @@ package com.flowiee.pms.service.product.impl;
 
 import com.flowiee.pms.entity.product.ProductAttribute;
 import com.flowiee.pms.exception.EntityNotFoundException;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.ACTION;
 import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.repository.product.ProductAttributeRepository;
@@ -61,17 +61,19 @@ public class ProductAttributeServiceImpl extends BaseService implements ProductA
     public ProductAttribute update(ProductAttribute pAttribute, Long attributeId) {
         ProductAttribute attribute = this.findById(attributeId, true);
         //enhance later
-        ProductAttribute attributeBefore = ObjectUtils.clone(attribute);
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(attribute));
 
         attribute.setAttributeName(pAttribute.getAttributeName());
         attribute.setAttributeValue(pAttribute.getAttributeValue());
         attribute.setSort(pAttribute.getSort());
         attribute.setStatus(pAttribute.isStatus());
-
         ProductAttribute attributeUpdated = mvProductAttributeRepository.save(attribute);
 
+        changeLog.setNewObject(attributeUpdated);
+        changeLog.doAudit();
+
         String logTitle = "Cập nhật thuộc tính sản phẩm";
-        ChangeLog changeLog = new ChangeLog(attributeBefore, attributeUpdated);
+
         mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, attributeUpdated.getProductDetail().getProduct().getId(), attributeUpdated.getProductDetail().getId(), attributeUpdated.getId());
         systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Cập nhật thuộc tính sản phẩm", changeLog);
 

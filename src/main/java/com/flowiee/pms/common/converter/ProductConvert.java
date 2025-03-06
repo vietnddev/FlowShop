@@ -2,9 +2,10 @@ package com.flowiee.pms.common.converter;
 
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.product.Product;
+import com.flowiee.pms.entity.sales.GarmentFactory;
+import com.flowiee.pms.entity.sales.Supplier;
 import com.flowiee.pms.model.dto.ProductDTO;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,8 @@ public class ProductConvert {
             .productType(inputDTO.getProductType())
             .brand(inputDTO.getBrand())
             .unit(inputDTO.getUnit())
+            .garmentFactory(inputDTO.getGarmentFactory())
+            .supplier(inputDTO.getSupplier())
             .productVariantList(inputDTO.getProductVariantList())
             .listImages(inputDTO.getListImages())
             .listProductHistories(inputDTO.getListProductHistories())
@@ -36,6 +39,12 @@ public class ProductConvert {
         if (outputEntity.getUnit() == null && inputDTO.getUnitId() != null)
             outputEntity.setUnit(new Category(inputDTO.getUnitId(), null));
 
+        if (outputEntity.getGarmentFactory() == null && inputDTO.getGarmentFactoryId() != null)
+            outputEntity.setGarmentFactory(new GarmentFactory(inputDTO.getGarmentFactoryId()));
+
+        if (outputEntity.getSupplier() == null && inputDTO.getSupplierId() != null)
+            outputEntity.setSupplier(new Supplier(inputDTO.getSupplierId(), inputDTO.getSupplierName()));
+
         outputEntity.setId(inputDTO.getId());
         outputEntity.setCreatedAt(inputDTO.getCreatedAt());
         outputEntity.setCreatedBy(inputDTO.getCreatedBy());
@@ -44,7 +53,7 @@ public class ProductConvert {
         return outputEntity;
     }
 
-    public static ProductDTO convertToDTO(Product inputEntity, String description) {
+    public static ProductDTO convertToDTO(Product inputEntity) {
         ProductDTO dto = new ProductDTO();
         if (inputEntity != null) {
             dto.setId(inputEntity.getId());
@@ -64,16 +73,21 @@ public class ProductConvert {
                 dto.setUnitId(inputEntity.getUnit().getId());
                 dto.setUnitName(inputEntity.getUnit().getName());
             }
-            dto.setDescription(description);
-            //dto.setStatus(inputEntity.getStatus());
-            if (ObjectUtils.isNotEmpty(inputEntity.getProductVariantList())) {
-                dto.setProductVariantQty(inputEntity.getProductVariantList().size());
+            if (ObjectUtils.isNotEmpty(inputEntity.getGarmentFactory())) {
+                dto.setGarmentFactory(inputEntity.getGarmentFactory());
+                dto.setGarmentFactoryId(inputEntity.getGarmentFactory().getId());
+                dto.setGarmentFactoryName(inputEntity.getGarmentFactory().getName());
             }
+            if (ObjectUtils.isNotEmpty(inputEntity.getSupplier())) {
+                dto.setSupplier(inputEntity.getSupplier());
+                dto.setSupplierId(inputEntity.getSupplier().getId());
+                dto.setSupplierName(inputEntity.getSupplier().getName());
+            }
+            dto.setStatus("ACT");
             dto.setSoldQty(null);
             dto.setCreatedAt(inputEntity.getCreatedAt());
             dto.setCreatedBy(inputEntity.getCreatedBy());
 
-            dto.setListImages(inputEntity.getListImages());
             dto.setInternalNotes(inputEntity.getInternalNotes());
         }
         return dto;
@@ -83,17 +97,7 @@ public class ProductConvert {
         List<ProductDTO> outDTOs = new ArrayList<>();
         if (inputEntities != null) {
             for (Product p : inputEntities) {
-                outDTOs.add(convertToDTO(p, null));
-            }
-        }
-        return outDTOs;
-    }
-
-    public static List<ProductDTO> convertToDTOs(Page<Product> inputEntities) {
-        List<ProductDTO> outDTOs = new ArrayList<>();
-        if (inputEntities != null) {
-            for (Product p : inputEntities.getContent()) {
-                outDTOs.add(convertToDTO(p, null));
+                outDTOs.add(convertToDTO(p));
             }
         }
         return outDTOs;

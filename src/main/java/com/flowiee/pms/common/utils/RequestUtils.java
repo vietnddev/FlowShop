@@ -2,6 +2,7 @@ package com.flowiee.pms.common.utils;
 
 import com.flowiee.pms.common.enumeration.EndPoint;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -67,5 +68,15 @@ public class RequestUtils {
 
     public static boolean isLoginPage(ServletRequestAttributes attributes) {
         return getRequestUrl(attributes).contains(EndPoint.URL_LOGIN.getValue());
+    }
+
+    public static String getProcessClass(JoinPoint pJoinPoint) {
+        Signature lvSignature = pJoinPoint.getSignature();
+        return CoreUtils.trim(lvSignature.getDeclaringTypeName());
+    }
+
+    public static String getProcessMethod(JoinPoint pJoinPoint) {
+        Signature lvSignature = pJoinPoint.getSignature();
+        return CoreUtils.trim(lvSignature.getName());
     }
 }

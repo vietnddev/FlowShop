@@ -2,7 +2,7 @@ package com.flowiee.pms.entity.system;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 
 import com.flowiee.pms.entity.product.*;
 import com.flowiee.pms.entity.sales.Order;
@@ -22,7 +22,9 @@ import java.util.Arrays;
 
 @Builder
 @Entity
-@Table(name = "file_storage")
+@Table(name = "file_storage",
+       indexes = {@Index(name = "idx_FileStorage_productId", columnList = "product_id"),
+                  @Index(name = "idx_FileStorage_productVariantId", columnList = "product_variant_id")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

@@ -30,7 +30,27 @@ public interface FileStorageRepository extends JpaRepository<FileStorage, Long> 
            "and (:productVariantId is null or f.productDetail.id=:productVariantId) " +
            "and f.isActive is true " +
            "order by f.createdAt")
-    FileStorage findActiveImage(@Param("productId") Long productId, @Param("productVariantId") Long productVariantId);
+    FileStorage findProductImageActive(@Param("productId") Long productId, @Param("productVariantId") Long productVariantId);
+
+//    @Query("from FileStorage f " +
+//            "where 1=1 " +
+//            "and (:productId is null or (f.product.id in :productId and f.productDetail.id is null)) " +
+//            "and (:productVariantId is null or f.productDetail.id in :productVariantId) " +
+//            "and f.isActive is true " +
+//            "order by f.createdAt")
+//    List<FileStorage> findActiveImage(@Param("productId") List<Long> productId, @Param("productVariantId") List<Long> productVariantId);
+
+    @Query("from FileStorage f " +
+            "where f.isActive = true " +
+            "and (coalesce(:ids, -1) = -1 or f.product.id in :ids) " +
+            "order by f.createdAt")
+    List<FileStorage> findProductImageActive(@Param("ids") List<Long> ids);
+
+    @Query("from FileStorage f " +
+           "where f.isActive = true " +
+           "and (coalesce(:ids, -1) = -1 or f.productDetail.id in :ids) " +
+           "order by f.createdAt")
+    List<FileStorage> findProductVariantImageActive(@Param("ids") List<Long> ids);
 
     @Query("from FileStorage f where f.createdAt=:createdTime")
     FileStorage findByCreatedTime(@Param("createdTime") LocalDateTime createdTime);

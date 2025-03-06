@@ -3,12 +3,10 @@ package com.flowiee.pms.entity.product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 
 import com.flowiee.pms.entity.sales.Items;
 import com.flowiee.pms.entity.sales.OrderDetail;
-import com.flowiee.pms.entity.sales.Supplier;
-import com.flowiee.pms.entity.sales.GarmentFactory;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.common.enumeration.ProductStatus;
@@ -27,7 +25,10 @@ import java.util.List;
 
 @Builder
 @Entity
-@Table(name = "product_detail")
+@Table(name = "product_detail",
+       indexes = {@Index(name = "idx_ProductVariant_productId", columnList = "product_id"),
+                  @Index(name = "idx_ProductVariant_colorId", columnList = "color_id"),
+                  @Index(name = "idx_ProductVariant_sizeId", columnList = "size_id")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -50,29 +51,19 @@ public class ProductDetail extends BaseEntity implements Serializable {
     String variantName;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "color_id", nullable = false)
     Category color;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "size_id")
     Category size;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fabric_id")
     Category fabricType;
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "garment_factory_id")
-    GarmentFactory garmentFactory;
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supplier_id")
-    Supplier supplier;
 
     @Column(name = "quantity_stg", nullable = false)
     Integer storageQty;
@@ -89,8 +80,11 @@ public class ProductDetail extends BaseEntity implements Serializable {
     @Column(name = "dimensions")
     String dimensions;
 
-    @Column(name = "sku")
+    @Column(name = "sku", unique = true)
     String sku;
+
+    @Column(name = "supplier_sku", unique = true)
+    String supplierSku;
 
     @Column(name = "warranty_period")
     Integer warrantyPeriod;
@@ -116,17 +110,26 @@ public class ProductDetail extends BaseEntity implements Serializable {
     @Column(name = "out_of_stock_date")
     LocalDateTime outOfStockDate;
 
+    @Column(name = "manufacturing_country", length = 20)
+    String manufacturingCountry;
+
     @Column(name = "manufacturing_date")
     LocalDate manufacturingDate;
 
     @Column(name = "expiry_date")
     LocalDate expiryDate;
 
+    @Column(name = "storage_instructions")
+    String storageInstructions;
+
+    @Column(name = "uv_protection")
+    String uvProtection;
+
+    @Column(name = "is_machine_washable")
+    Boolean isMachineWashable;
+
     @Column(name = "note")
     String note;//will be remove
-
-    @OneToOne(mappedBy = "productVariant", cascade = CascadeType.ALL)
-    ProductDescription productDescription;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -162,7 +165,7 @@ public class ProductDetail extends BaseEntity implements Serializable {
     List<ProductVariantExim> listProductVariantTemp;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "productVariant", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
     List<ProductPrice> priceList;
 
     @JsonIgnore
@@ -202,9 +205,9 @@ public class ProductDetail extends BaseEntity implements Serializable {
                 if (ProductPrice.STATE_ACTIVE.equals(price.getState()))
                     return price;
             }
-            return null;
+            return new ProductPrice();
         }
-        return null;
+        return new ProductPrice();
     }
 
     public FileStorage getImage(Long pImageId) {
@@ -217,7 +220,7 @@ public class ProductDetail extends BaseEntity implements Serializable {
         return null;
     }
 
-    public FileStorage getImage() {
+    public FileStorage getActiveImage() {
         if (getListImages() != null) {
             for (FileStorage image : getListImages()) {
                 if (image.isActive())

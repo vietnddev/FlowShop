@@ -1,6 +1,6 @@
 package com.flowiee.pms.base.service;
 
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.entity.system.Account;

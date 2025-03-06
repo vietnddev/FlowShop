@@ -3,7 +3,7 @@ package com.flowiee.pms.service.sales.impl;
 import com.flowiee.pms.entity.sales.Supplier;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.repository.sales.SupplierRepository;
 import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.sales.SupplierService;
@@ -60,12 +60,14 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
     public Supplier update(Supplier entity, Long entityId) {
         Supplier supplier = this.findById(entityId, true);
 
-        Supplier supplierBefore =  ObjectUtils.clone(supplier);
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(supplier));
 
         entity.setId(entityId);
         Supplier supplierUpdated = mvSupplierRepository.save(entity);
 
-        ChangeLog changeLog = new ChangeLog(supplierBefore, supplierUpdated);
+        changeLog.setNewObject(supplierUpdated);
+        changeLog.doAudit();
+
         systemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_SUP_U, MasterObject.Supplier, "Cập nhật thông tin nhà cung cấp: " + supplierUpdated.getName(), changeLog);
 
         return supplierUpdated;

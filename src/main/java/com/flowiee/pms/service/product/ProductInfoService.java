@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.product;
 
 import com.flowiee.pms.model.ProductHeld;
-import com.flowiee.pms.base.service.BaseCurdService;
+import com.flowiee.pms.base.BaseCurdService;
 import com.flowiee.pms.model.dto.ProductDTO;
 import com.flowiee.pms.entity.product.Product;
 import com.flowiee.pms.common.enumeration.PID;

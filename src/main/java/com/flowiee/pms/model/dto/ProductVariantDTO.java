@@ -32,10 +32,6 @@ public class ProductVariantDTO extends ProductDetail implements Serializable {
     String sizeName;
     Long fabricTypeId;
     String fabricTypeName;
-    Long garmentFactoryId;
-    String garmentFactoryName;
-    Long supplierId;
-    String supplierName;
     BigDecimal originalPrice;
     BigDecimal discountPrice;
     String unitCurrency;
@@ -50,6 +46,6 @@ public class ProductVariantDTO extends ProductDetail implements Serializable {
 	public String toString() {
 		return "ProductVariantDTO [id=" + id + ", code=" + getVariantCode() + ", name=" + getVariantName()
                 + ", storageQty=" + getStorageQty() + ", soldQty=" + getSoldQty() + ", status=" + getStatus() + ", colorId=" + colorId + ", sizeId=" + sizeId
-                + ", fabricTypeId=" + fabricTypeId + ", garmentFactoryId=" + garmentFactoryId + ", supplierId=" + supplierId + "]";
+                + ", fabricTypeId=" + fabricTypeId + "]";
 	}
 }

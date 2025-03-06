@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.system.impl;
 
 import com.flowiee.pms.base.service.BaseService;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.common.utils.CoreUtils;
@@ -9,10 +9,9 @@ import com.flowiee.pms.common.utils.PasswordUtils;
 import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.exception.*;
 import com.flowiee.pms.repository.system.AccountRepository;
+import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.system.AccountService;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +20,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class AccountServiceImpl extends BaseService implements AccountService {
-    AccountRepository mvAccountRepository;
+    private final AccountRepository mvAccountRepository;
+    private final UserSession mvUserSession;
 
     @Override
     public Account findById(Long accountId, boolean pThrowException) {
@@ -67,7 +66,7 @@ public class AccountServiceImpl extends BaseService implements AccountService {
     public Account update(Account account, Long entityId) {
         Account accountOpt = this.findById(entityId, true);
 
-        Account accountBefore = ObjectUtils.clone(accountOpt);
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(accountOpt));
 
         accountOpt.setPhoneNumber(account.getPhoneNumber());
         accountOpt.setEmail(account.getEmail());
@@ -75,14 +74,25 @@ public class AccountServiceImpl extends BaseService implements AccountService {
         accountOpt.setGroupAccount(account.getGroupAccount());
         accountOpt.setBranch(account.getBranch());
         accountOpt.setRole(Constants.ADMINISTRATOR.equals(account.getRole()) ? "ADMIN" : "USER");
-
         Account accountUpdated = mvAccountRepository.save(accountOpt);
 
-        ChangeLog changeLog = new ChangeLog(accountBefore, accountUpdated);
+        changeLog.setNewObject(accountUpdated);
+        changeLog.doAudit();
+
         systemLogService.writeLogUpdate(MODULE.SYSTEM, ACTION.SYS_ACC_U, MasterObject.Account, "Cập nhật tài khoản " + accountUpdated.getUsername(), changeLog);
         logger.info("Update account success! username={}", accountUpdated.getUsername());
 
         return accountUpdated;
+    }
+
+    @Override
+    public Account updateProfile(Account pAccount) {
+        Account lvProfile = mvUserSession.getUserPrincipal().getEntity();
+        lvProfile.setPhoneNumber(pAccount.getPhoneNumber());
+        lvProfile.setEmail(pAccount.getEmail());
+        lvProfile.setAddress(pAccount.getAddress());
+        //... more field
+        return mvAccountRepository.save(lvProfile);
     }
 
     @Transactional

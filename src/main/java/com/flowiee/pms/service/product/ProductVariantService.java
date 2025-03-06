@@ -2,7 +2,7 @@ package com.flowiee.pms.service.product;
 
 import com.flowiee.pms.model.ProductVariantParameter;
 import com.flowiee.pms.model.dto.ProductVariantTempDTO;
-import com.flowiee.pms.base.service.BaseCurdService;
+import com.flowiee.pms.base.BaseCurdService;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import org.springframework.data.domain.Page;
 

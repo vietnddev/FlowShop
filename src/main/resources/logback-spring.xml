@@ -57,6 +57,7 @@
 
         <logger level="ERROR" name="com.flowiee" additivity="false">
             <appender-ref ref="ErrorRollingFile"/>
+            <appender-ref ref="flatConsoleAppender"/>
         </logger>
 
     </springProfile>

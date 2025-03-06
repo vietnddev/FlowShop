@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.system.impl;
 
-import com.flowiee.pms.base.system.Core;
+import com.flowiee.pms.base.Core;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.entity.system.SystemConfig;

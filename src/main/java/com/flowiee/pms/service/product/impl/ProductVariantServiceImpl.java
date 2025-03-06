@@ -5,6 +5,7 @@ import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.product.ProductPrice;
 import com.flowiee.pms.entity.product.ProductVariantExim;
+import com.flowiee.pms.entity.sales.Items;
 import com.flowiee.pms.entity.sales.OrderCart;
 import com.flowiee.pms.entity.sales.TicketExport;
 import com.flowiee.pms.entity.sales.TicketImport;
@@ -20,10 +21,10 @@ import com.flowiee.pms.repository.system.FileStorageRepository;
 import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.category.CategoryService;
 import com.flowiee.pms.base.service.GenerateBarcodeService;
-import com.flowiee.pms.service.product.ProductGenerateQRCodeService;
+import com.flowiee.pms.service.product.*;
 import com.flowiee.pms.service.sales.CartService;
 import com.flowiee.pms.service.storage.StorageService;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.enumeration.ACTION;
@@ -33,8 +34,6 @@ import com.flowiee.pms.model.dto.ProductVariantTempDTO;
 import com.flowiee.pms.repository.product.ProductDetailRepository;
 import com.flowiee.pms.repository.product.ProductDetailTempRepository;
 import com.flowiee.pms.base.service.BaseService;
-import com.flowiee.pms.service.product.ProductHistoryService;
-import com.flowiee.pms.service.product.ProductVariantService;
 import com.flowiee.pms.service.sales.TicketExportService;
 import com.flowiee.pms.service.sales.TicketImportService;
 import com.flowiee.pms.common.utils.CommonUtils;
@@ -58,10 +57,7 @@ import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,11 +75,15 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
     private final StorageService mvStorageService;
     private final StorageRepository mvStorageRepository;
     private final OrderCartRepository mvCartRepository;
+    private final GenerateBarcodeService mvGenerateBarcodeService;
+    private final ProductPriceService mvProductPriceService;
+    private final UserSession userSession;
     @Autowired
     @Lazy
     private CartService mvCartService;
-    private final GenerateBarcodeService mvGenerateBarcodeService;
-    private final UserSession userSession;
+    @Autowired
+    @Lazy
+    private ProductImageService mvProductImageService;
 
     @Override
     public List<ProductVariantDTO> findAll() {
@@ -104,6 +104,15 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
         CriteriaQuery<ProductDetail> lvCriteriaQuery = lvCriteriaBuilder.createQuery(ProductDetail.class);
         Root<ProductDetail> lvRoot = lvCriteriaQuery.from(ProductDetail.class);
 
+        lvRoot.fetch("product", JoinType.INNER);
+        lvRoot.fetch("product", JoinType.INNER).fetch("productType", JoinType.LEFT);
+        lvRoot.fetch("product", JoinType.INNER).fetch("unit", JoinType.LEFT);
+        lvRoot.fetch("product", JoinType.INNER).fetch("brand", JoinType.LEFT);
+        lvRoot.fetch("color", JoinType.LEFT);
+        lvRoot.fetch("size", JoinType.LEFT);
+        lvRoot.fetch("fabricType", JoinType.LEFT);
+        lvRoot.fetch("priceList", JoinType.LEFT);
+
         List<Predicate> lvPredicates = new ArrayList<>();
         addLikeCondition(lvCriteriaBuilder, lvPredicates, pTxtSearch,
                 lvRoot.get("variantCode"), lvRoot.get("variantName"));
@@ -122,31 +131,54 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
         }
 
         TypedQuery<ProductDetail> lvTypedQuery = initCriteriaQuery(lvCriteriaBuilder, lvCriteriaQuery, lvRoot, lvPredicates, lvPageable);
+        List<ProductDetail> lvProductVariants = lvTypedQuery.getResultList();
+
         TypedQuery<Long> lvCountQuery = initCriteriaCountQuery(lvCriteriaBuilder, lvPredicates, ProductDetail.class);
         long lvTotalRecords = lvCountQuery.getSingleResult();
 
-        List<ProductDetail> lvResultList = lvTypedQuery.getResultList();
-        List<ProductVariantDTO> lvResultListDto = lvResultList.stream()
-                .map(ProductVariantConvert::entityToDTO)
+        List<ProductVariantDTO> lvProductVariantDTOs = ProductVariantConvert.entitiesToDTOs(lvProductVariants);
+        List<Long> lvProductVariantIds = lvProductVariants.stream().map(ProductDetail::getId).toList();
+
+        Map<Long, FileStorage> lvImageActiveList = mvProductImageService.getImageActiveOfProductVariants(lvProductVariantIds);
+
+        OrderCart currentCart = checkInAnyCart ? getCurrentCart() : null;
+        List<Items> lvCartItems = currentCart != null ? mvCartService.getItems(currentCart.getId(), lvProductVariantIds) : List.of();
+        List<Long> lvCartItemIds = lvCartItems.isEmpty() ? List.of() : lvCartItems.stream().map(a -> a.getProductDetail().getId()).toList();
+
+        lvProductVariantDTOs.stream()
                 .peek(dto -> {
-                    setPriceInfo(dto, dto.getVariantPrice());
-                    setImageSrc(dto);
-                    OrderCart currentCart = getCurrentCart(checkInAnyCart);
-                    if (currentCart != null) {
-                        dto.setCurrentInCart(mvCartService.isItemExistsInCart(currentCart.getId(), dto.getId()));
-                    }
+                    assignPriceInfo(dto, dto.getVariantPrice());
+                    dto.setImageSrc(FileUtils.getImageUrl(lvImageActiveList.get(dto.getId()), true));
+                    dto.setCurrentInCart(lvCartItemIds.contains(dto.getId()));
                 })
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(lvResultListDto, lvPageable, lvTotalRecords);
+        return new PageImpl<>(lvProductVariantDTOs, lvPageable, lvTotalRecords);
     }
 
-    private OrderCart getCurrentCart(boolean checkInAnyCart) {
-        if (checkInAnyCart) {
-            List<OrderCart> cartList = mvCartRepository.findByAccountId(userSession.getUserPrincipal().getId());
-            if (ObjectUtils.isNotEmpty(cartList)) {
-                return cartList.get(0);
+    private ProductVariantDTO assignPriceInfo(ProductVariantDTO dto, ProductPrice productPrice) {
+        if (dto != null) {
+            if (productPrice != null) {
+                dto.setPrice(ProductPriceDTO.builder()
+                        .retailPrice(productPrice.getRetailPrice())
+                        .retailPriceDiscount(productPrice.getRetailPriceDiscount())
+                        .wholesalePrice(productPrice.getWholesalePrice())
+                        .wholesalePriceDiscount(productPrice.getWholesalePriceDiscount())
+                        .purchasePrice(productPrice.getPurchasePrice())
+                        .costPrice(productPrice.getCostPrice())
+                        .lastUpdated(productPrice.getLastUpdatedAt())
+                        .build());
+            } else {
+                dto.setPrice(new ProductPriceDTO());
             }
+        }
+        return dto;
+    }
+
+    private OrderCart getCurrentCart() {
+        List<OrderCart> cartList = mvCartRepository.findByAccountId(userSession.getUserPrincipal().getId());
+        if (ObjectUtils.isNotEmpty(cartList)) {
+            return cartList.get(0);
         }
         return null;
     }
@@ -157,7 +189,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
         if (productVariant.isPresent()) {
             ProductVariantDTO dto = ProductVariantConvert.entityToDTO(productVariant.get());
             //ProductPrice productPrice = mvProductPriceRepository.findPricePresent(null, dto.getId());
-            setPriceInfo(dto, dto.getVariantPrice());
+            assignPriceInfo(dto, dto.getVariantPrice());
             return dto;
         }
         if (pThrowException) {
@@ -201,7 +233,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
                 logger.error(String.format("Can't generate Barcode for Product %s", productDetailSaved.getVariantCode()), e);
             }
 
-            if (productDetailSaved.getStorageQty() > 0) {
+            if (productDetailSaved.getStorageQty() > 0 && inputDTO.getStorageIdInitStorageQty() != null) {
                 Storage lvStorage = mvStorageRepository.findById(inputDTO.getStorageIdInitStorageQty())
                         .orElseThrow(() -> new EntityNotFoundException(new Object[] {"storage"}, null, null));
                 String initMessage = "Initialize storage quantity when create new products";
@@ -222,7 +254,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
                         .note(initMessage)
                         .build());
             }
-            if (productDetailSaved.getSoldQty() > 0) {
+            if (productDetailSaved.getSoldQty() > 0 && inputDTO.getStorageIdInitStorageQty() != null) {
                 Storage lvStorage = mvStorageRepository.findById(inputDTO.getStorageIdInitStorageQty())
                         .orElseThrow(() -> new EntityNotFoundException(new Object[] {"storage"}, null, null));
                 String initMessage = "Initialize storage quantity when create new products";
@@ -258,8 +290,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
         ProductDetail productVariantOptional = this.findById(productVariantId, true);
         //VldModel vldModel = vldCategory(pProductDetail.getColorId(), pProductDetail.getSizeId(), pProductDetail.getFabricTypeId());
         try {
-            //Product variant info
-            ProductDetail productBeforeUpdate = ObjectUtils.clone(productVariantOptional);
+            ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(productVariantOptional));
 
             ProductDetail productToUpdate = productVariantOptional;
             productToUpdate.setVariantName(pProductDetail.getVariantName());
@@ -267,6 +298,9 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
             productToUpdate.setWeight(pProductDetail.getWeight());
             productToUpdate.setNote(pProductDetail.getNote());
             ProductDetail productVariantUpdated = mvProductVariantRepository.save(productToUpdate);
+
+            changeLog.setNewObject(productVariantUpdated);
+            changeLog.doAudit();
 
             //Update state of current Price to inactive
             ProductPrice productVariantPricePresent = mvProductPriceRepository.findPricePresent(null, productVariantUpdated.getId());
@@ -279,7 +313,6 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
 
             //Log
             String logTitle = "Cập nhật thông tin sản phẩm: " + productVariantUpdated.getVariantName();
-            ChangeLog changeLog = new ChangeLog(productBeforeUpdate, productVariantUpdated);
             mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, productVariantUpdated.getProduct().getId(), productVariantUpdated.getId(), null);
             systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
             logger.info("Update productVariant success! {}", productVariantUpdated);
@@ -366,40 +399,9 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
         Page<ProductDetail> productVariants = mvProductVariantRepository.findProductsOutOfStock(pageable);
         List<ProductVariantDTO> productVariantDTOs = ProductVariantConvert.entitiesToDTOs(productVariants.getContent());
         for (ProductVariantDTO dto : productVariantDTOs) {
-            setPriceInfo(dto, dto.getVariantPrice());
+            assignPriceInfo(dto, dto.getVariantPrice());
         }
         return new PageImpl<>(productVariantDTOs, pageable, productVariantDTOs.size());
-    }
-
-    private ProductVariantDTO setPriceInfo(ProductVariantDTO dto, ProductPrice productPrice) {
-        if (dto != null) {
-            if (productPrice != null) {
-                dto.setPrice(ProductPriceDTO.builder()
-                        .retailPrice(productPrice.getRetailPrice())
-                        .retailPriceDiscount(productPrice.getRetailPriceDiscount())
-                        .wholesalePrice(productPrice.getWholesalePrice())
-                        .wholesalePriceDiscount(productPrice.getWholesalePriceDiscount())
-                        .purchasePrice(productPrice.getPurchasePrice())
-                        .costPrice(productPrice.getCostPrice())
-                        .lastUpdated(productPrice.getLastUpdatedAt())
-                        .build());
-            } else {
-                dto.setPrice(new ProductPriceDTO());
-            }
-        }
-        return dto;
-    }
-
-    private ProductVariantDTO setImageSrc(ProductVariantDTO productVariantInfo) {
-        if (productVariantInfo == null) {
-            return null;
-        }
-        FileStorage imageModel = mvFileStorageRepository.findActiveImage(null, productVariantInfo.getId());
-        if (imageModel == null) {
-            return productVariantInfo;
-        }
-        productVariantInfo.setImageSrc(FileUtils.getImageUrl(imageModel, true));
-        return productVariantInfo;
     }
 
     private String genProductCode(String defaultCode) {

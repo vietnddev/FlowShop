@@ -18,7 +18,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("select distinct c from Customer c " +
            "left join CustomerContact cc on c.id = cc.customer.id " +
            "where (:name is null or c.customerName like %:name%) " +
-           "and (:sex is null or c.sex=:sex) " +
+           "and (:sex is null or c.gender=:sex) " +
            "and (:birthday is null or c.dateOfBirth=:birthday) " +
            "and (:phone is null or (cc.code = 'P' and cc.isDefault = 'Y' and cc.status = true and cc.value=:phone)) " +
            "and (:email is null or (cc.code = 'E' and cc.isDefault = 'Y' and cc.status = true and cc.value=:email)) " +

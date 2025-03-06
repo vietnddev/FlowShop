@@ -1,9 +1,9 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.entity.sales.Order;
+import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.system.AccountService;
-import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.enumeration.Pages;
 import com.flowiee.pms.entity.system.Account;
 
@@ -29,14 +29,13 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class ProfileControllerView extends BaseController {
 	AccountService accountService;
+	UserSession userSession;
 
 	@GetMapping("/sys/profile")
 	public ModelAndView showInformation(@ModelAttribute("message") String message) {
-		Account profile = accountService.findById(mvUserSession.getUserPrincipal().getId(), true);
-
 		ModelAndView modelAndView = new ModelAndView(Pages.SYS_PROFILE.getTemplate());
 		modelAndView.addObject("message", message);
-		modelAndView.addObject("profile", profile);
+		modelAndView.addObject("profile", userSession.getUserPrincipal().getEntity());
 		modelAndView.addObject("listDonHangDaBan", new ArrayList<Order>());
 
 		return baseView(modelAndView);
@@ -44,12 +43,7 @@ public class ProfileControllerView extends BaseController {
 
 	@PostMapping( "/sys/profile/update")
 	public ModelAndView updateProfile(@ModelAttribute("account") Account pAccount) {
-		Account account = accountService.findByUsername(pAccount.getUsername());
-		account.setPhoneNumber(pAccount.getPhoneNumber());
-		account.setEmail(pAccount.getEmail());
-		account.setAddress(pAccount.getAddress());
-		accountService.update(account, account.getId());
-
+		accountService.updateProfile(pAccount);
 		return new ModelAndView("redirect:/profile");
 	}
 

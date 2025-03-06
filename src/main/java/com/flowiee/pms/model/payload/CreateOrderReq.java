@@ -18,7 +18,7 @@ public class CreateOrderReq {
     private String orderStatus;
     private String note;
     private String orderTime;
-    private String voucherUsed;
+    private String couponCode;
     private String recipientName;
     private String recipientPhone;
     private String recipientEmail;
@@ -42,7 +42,7 @@ public class CreateOrderReq {
         dto.setOrderStatus(OrderStatus.valueOf(orderStatus));
         dto.setNote(note);
         dto.setOrderTime(LocalDateTime.parse(orderTime, formatter));
-        dto.setVoucherUsedCode(voucherUsed);
+        dto.setCouponCode(couponCode);
         dto.setReceiverName(recipientName);
         dto.setReceiverPhone(recipientPhone);
         dto.setReceiverEmail(recipientEmail);

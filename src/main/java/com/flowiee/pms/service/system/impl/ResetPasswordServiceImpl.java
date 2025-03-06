@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.system.impl;
 
-import com.flowiee.pms.base.system.Core;
+import com.flowiee.pms.base.Core;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.SystemConfig;
@@ -59,7 +59,7 @@ public class ResetPasswordServiceImpl extends BaseService implements ResetPasswo
     }
 
     private int getPasswordValidityPeriod() {
-        SystemConfig pwdValidityPeriodCnf = Core.mvSystemConfigList.get(ConfigCode.passwordValidityPeriod);
+        SystemConfig pwdValidityPeriodCnf = Core.getSystemConfigs().get(ConfigCode.passwordValidityPeriod);
         if (SysConfigUtils.isValid(pwdValidityPeriodCnf)) {
             return pwdValidityPeriodCnf.getIntValue();
         }

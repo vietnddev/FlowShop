@@ -1,6 +1,6 @@
 package com.flowiee.pms.exception;
 
-import com.flowiee.pms.base.exception.BaseException;
+import com.flowiee.pms.base.BaseException;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
@@ -52,6 +53,18 @@ public class ProductVariantTemp implements Serializable {
 
     @Column(name = "quantity_defective")
     private Integer defectiveQty;
+
+    @Column(name = "retail_price")
+    private BigDecimal retailPrice;
+
+    @Column(name = "wholesale_price")
+    private BigDecimal wholesalePrice;
+
+    @Column(name = "purchase_price")
+    private BigDecimal purchasePrice;
+
+    @Column(name = "cost_price")
+    private BigDecimal costPrice;
 
     @Column(name = "weight")
     private String weight;

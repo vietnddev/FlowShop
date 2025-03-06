@@ -1,4 +1,4 @@
-package com.flowiee.pms.base.auth;
+package com.flowiee.pms.base;
 
 import com.flowiee.pms.common.enumeration.ConfigCode;
 import com.flowiee.pms.common.utils.SysConfigUtils;

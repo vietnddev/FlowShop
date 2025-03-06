@@ -1,6 +1,6 @@
 package com.flowiee.pms.entity.storage;
 
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 import com.flowiee.pms.entity.product.Material;
 import com.flowiee.pms.entity.product.ProductDetail;
 import lombok.*;

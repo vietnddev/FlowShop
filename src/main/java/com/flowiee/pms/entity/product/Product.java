@@ -2,9 +2,11 @@ package com.flowiee.pms.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.base.entity.BaseEntity;
+import com.flowiee.pms.base.BaseEntity;
 
 import com.flowiee.pms.entity.category.Category;
+import com.flowiee.pms.entity.sales.GarmentFactory;
+import com.flowiee.pms.entity.sales.Supplier;
 import com.flowiee.pms.entity.system.FileStorage;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -19,7 +21,9 @@ import java.util.List;
 
 @Builder
 @Entity
-@Table(name = "product")
+@Table(name = "product",
+       indexes = {@Index(name = "idx_Product_productTypeId", columnList = "product_type_id"),
+                  @Index(name = "idx_Product_brandId", columnList = "brand_id")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -51,23 +55,11 @@ public class Product extends BaseEntity implements Serializable {
     @Column(name = "product_name", nullable = false)
     String productName;
 
-    @Column(name = "origin_country", length = 20)
-    String originCountry;
-
     @Column(name = "release_date")
     LocalDate releaseDate;
 
     @Column(name = "gender", length = 1)
     String gender;
-
-    @Column(name = "storage_instructions")
-    String storageInstructions;
-
-    @Column(name = "uv_protection")
-    String uvProtection;
-
-    @Column(name = "is_machine_washable")
-    Boolean isMachineWashable;
 
     @Column(name = "is_sale_off")
     Boolean isSaleOff;
@@ -75,11 +67,26 @@ public class Product extends BaseEntity implements Serializable {
     @Column(name = "is_hot_trend")
     Boolean isHotTrend;
 
-    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL)
-    ProductDescription productDescription;
+    @Column(name = "return_policy")
+    String returnPolicy;
+
+    @Column(name = "default_variant_id ")
+    Long variantDefault;
+
+//    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @LazyToOne(LazyToOneOption.PROXY)
+//    ProductDescription productDescription;
 
     @Column(name = "notes")
     String internalNotes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "garment_factory_id")
+    GarmentFactory garmentFactory;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supplier_id")
+    Supplier supplier;
 
 //    @Enumerated(EnumType.STRING)
 //    @Column(name = "status", nullable = false, length = 10)

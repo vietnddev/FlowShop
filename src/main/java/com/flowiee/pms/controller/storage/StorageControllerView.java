@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.storage;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.model.dto.StorageDTO;
 import com.flowiee.pms.service.storage.StorageService;
 import com.flowiee.pms.common.enumeration.Pages;

@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.product;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.entity.product.Product;
 import com.flowiee.pms.entity.product.ProductHistory;
@@ -53,6 +53,7 @@ public class ProductController extends BaseController {
     ProductInfoService mvProductInfoService;
     ProductHistoryService mvProductHistoryService;
     ProductRelatedService mvProductRelatedService;
+    ProductService        productService;
 
     @Operation(summary = "Find all products")
     @GetMapping("/all")
@@ -163,11 +164,17 @@ public class ProductController extends BaseController {
         return ResponseEntity.ok().headers(model.getHttpHeaders()).body(model.getContent());
     }
 
-    @GetMapping("/import")
+    @PostMapping("/import")
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
     public String importData(@RequestParam("file") MultipartFile file) {
         EximResult eximResult = mvImportService.importFromExcel(TemplateExport.IM_LIST_OF_PRODUCTS, file);
         return eximResult.getResultStatus();
+    }
+
+    @PostMapping("/import/approve")
+    @PreAuthorize("@vldModuleProduct.insertProduct(true)")
+    public String approveImportData() {
+        return mvImportService.approveData();
     }
 
     @GetMapping("/export")

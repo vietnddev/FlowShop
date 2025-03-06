@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.entity.system.Branch;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.AppResponse;

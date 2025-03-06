@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.system.impl;
 
-import com.flowiee.pms.base.system.Core;
+import com.flowiee.pms.base.Core;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.system.SystemConfig;
 import com.flowiee.pms.entity.system.SystemLog;
@@ -8,7 +8,7 @@ import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.model.ShopInfo;
 import com.flowiee.pms.repository.category.CategoryRepository;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.enumeration.*;
@@ -53,12 +53,15 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
         if (configOpt.isEmpty()) {
             throw new BadRequestException();
         }
-        SystemConfig configBefore = ObjectUtils.clone(configOpt.get());
+
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(configOpt.get()));
 
         systemConfig.setId(id);
         SystemConfig configUpdated = mvSysConfigRepository.save(systemConfig);
 
-        ChangeLog changeLog = new ChangeLog(configBefore, configUpdated);
+        changeLog.setNewObject(configUpdated);
+        changeLog.doAudit();
+
         systemLogService.writeLogUpdate(MODULE.SYSTEM, ACTION.SYS_CNF_U, MasterObject.SystemConfig, "Cập nhật cấu hình hệ thống", changeLog);
         logger.info("Update config success! {}", configUpdated.getName());
 
@@ -76,7 +79,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
             ShopInfo lvShopInfo = CommonUtils.mvShopInfo != null ? CommonUtils.mvShopInfo : new ShopInfo();
             //Reload system configs
             List<SystemConfig> systemConfigList = this.findAll();
-            Core.mvSystemConfigList.clear();
+            Core.getSystemConfigs().clear();
             for (SystemConfig systemConfig : systemConfigList) {
                 ConfigCode lvConfigCode = ConfigCode.get(systemConfig.getCode());
                 String lvConfigValue = systemConfig.getValue();
@@ -90,7 +93,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
                 if (ConfigCode.shopAddress.equals(lvConfigCode))        lvShopInfo.setAddress(lvConfigValue);
                 if (ConfigCode.shopLogoUrl.equals(lvConfigCode))        lvShopInfo.setLogoUrl(lvConfigValue);
 
-                Core.mvSystemConfigList.put(lvConfigCode, systemConfig);
+                Core.getSystemConfigs().put(lvConfigCode, systemConfig);
             }
             CommonUtils.mvShopInfo = lvShopInfo;
 

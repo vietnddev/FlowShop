@@ -107,7 +107,7 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
         customer.setCreatedBy(dto.getCreatedBy() != null ? dto.getCreatedBy() : userSession.getUserPrincipal().getId());
         customer.setBonusPoints(0);
         customer.setIsBlackList(false);
-        customer.setIsVIP(dto.getIsVIP() != null ? dto.getIsVIP() : false);
+        customer.setIsVIP(dto.getIsVIP());
         Customer customerInserted = mvCustomerRepository.save(customer);
 
         CustomerContact customerContact = CustomerContact.builder()

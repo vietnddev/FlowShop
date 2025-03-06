@@ -1,6 +1,6 @@
 package com.flowiee.pms.controller.system;
 
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.service.system.BranchService;
 import com.flowiee.pms.common.enumeration.Pages;
 import io.swagger.v3.oas.annotations.tags.Tag;

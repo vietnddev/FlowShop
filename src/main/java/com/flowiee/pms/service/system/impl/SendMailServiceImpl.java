@@ -1,5 +1,10 @@
 package com.flowiee.pms.service.system.impl;
 
+import com.flowiee.pms.base.Core;
+import com.flowiee.pms.common.enumeration.ConfigCode;
+import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.utils.SysConfigUtils;
+import com.flowiee.pms.entity.system.SystemConfig;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.system.SendMailService;
@@ -8,7 +13,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -17,13 +22,13 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
+import java.util.Properties;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class SendMailServiceImpl extends BaseService implements SendMailService {
-    JavaMailSender mvJavaMailSender;
-
     @Override
     public boolean sendMail(String subject, String to, String body) throws UnsupportedEncodingException, MessagingException {
         return sendMail(subject, to, body, null);
@@ -35,7 +40,26 @@ public class SendMailServiceImpl extends BaseService implements SendMailService 
         Assert.notNull(to, "Recipient cannot be null!");
         Assert.notNull(body, "Content cannot be null!");
 
-        MimeMessage mimeMessage = mvJavaMailSender.createMimeMessage();
+        Map<ConfigCode, SystemConfig> lvSystemConfig = Core.getSystemConfigs();
+        String lvHost = CoreUtils.trim(lvSystemConfig.get(ConfigCode.emailHost).getValue());
+        int lvPort = SysConfigUtils.getIntValue(lvSystemConfig.get(ConfigCode.emailPort));
+        String lvUsername = CoreUtils.trim(lvSystemConfig.get(ConfigCode.emailUser).getValue());
+        String lvPassword = CoreUtils.trim(lvSystemConfig.get(ConfigCode.emailPass).getValue());
+        Boolean lvSmtpAuth = Boolean.valueOf(CoreUtils.trim(lvSystemConfig.get(ConfigCode.emailSmtpAuth).getValue()));
+        Boolean lvSmtpStarttlsEnable = Boolean.valueOf(CoreUtils.trim(lvSystemConfig.get(ConfigCode.emailSmtpStarttlsEnable).getValue()));
+
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(lvHost);
+        mailSender.setPort(lvPort);
+        mailSender.setUsername(lvUsername);
+        mailSender.setPassword(lvPassword);
+
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.smtp.auth", lvSmtpAuth);
+        props.put("mail.smtp.starttls.enable", lvSmtpStarttlsEnable);
+
+        // Tạo email
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
 
         messageHelper.setSubject(subject);
@@ -56,7 +80,8 @@ public class SendMailServiceImpl extends BaseService implements SendMailService 
             messageHelper.addAttachment(attachmentFile.getName(), attachmentFile);
         }
 
-        mvJavaMailSender.send(mimeMessage);
+        // Gửi email
+        mailSender.send(mimeMessage);
 
         return true;
     }

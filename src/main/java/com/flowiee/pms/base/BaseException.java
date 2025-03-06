@@ -1,4 +1,4 @@
-package com.flowiee.pms.base.exception;
+package com.flowiee.pms.base;
 
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.enumeration.ErrorCode;

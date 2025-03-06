@@ -2,7 +2,7 @@ package com.flowiee.pms.controller.product;
 
 import com.flowiee.pms.entity.product.Material;
 import com.flowiee.pms.common.enumeration.Pages;
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.service.product.MaterialService;
 

@@ -10,7 +10,7 @@ import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.service.sales.*;
-import com.flowiee.pms.base.controller.BaseController;
+import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.service.category.CategoryService;
 
 import com.flowiee.pms.common.enumeration.CATEGORY;

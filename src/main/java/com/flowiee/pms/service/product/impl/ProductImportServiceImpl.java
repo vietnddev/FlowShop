@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.product.impl;
 
-import com.flowiee.pms.base.service.BaseImportService;
+import com.flowiee.pms.base.BaseImportService;
 import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.common.enumeration.PID;
 import com.flowiee.pms.common.enumeration.ProductEximKeyField;
@@ -12,6 +12,7 @@ import com.flowiee.pms.entity.product.ProductTemp;
 import com.flowiee.pms.entity.product.ProductVariantTemp;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.dto.ProductDTO;
+import com.flowiee.pms.model.dto.ProductPriceDTO;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.repository.product.ProductTempRepository;
@@ -112,6 +113,18 @@ public class ProductImportServiceImpl extends BaseImportService {
                     case defective_qty:
                         lvVariantTemp.setDefectiveQty(parseInt(cellValue));
                         break;
+                    case retail_price:
+                        lvVariantTemp.setRetailPrice(parseBigDecimal(cellValue));
+                        break;
+                    case wholesale_price:
+                        lvVariantTemp.setWholesalePrice(parseBigDecimal(cellValue));
+                        break;
+                    case purchase_price:
+                        lvVariantTemp.setPurchasePrice(parseBigDecimal(cellValue));
+                        break;
+                    case cost_price:
+                        lvVariantTemp.setCostPrice(parseBigDecimal(cellValue));
+                        break;
                     default:
                         break;
                 }
@@ -138,6 +151,7 @@ public class ProductImportServiceImpl extends BaseImportService {
             p.setCreatedAt(LocalDateTime.now());
             p.setCreatedBy(userSession.getUserPrincipal().getUsername());
             ProductTemp productTempSaved = productTempRepository.save(p);
+
             for (ProductVariantTemp pv : p.getProductVariantTempList()) {
                 pv.setCreatedAt(LocalDateTime.now());
                 pv.setCreatedBy(userSession.getUserPrincipal().getUsername());
@@ -152,13 +166,24 @@ public class ProductImportServiceImpl extends BaseImportService {
             mvEximResult.setResultStatus(lvMessageError.substring(0, 1));
             return;
         }
+
+        setImportStatus(String.format("OK, %s record (s) is pending for approval", lvData.size()));
     }
 
     private Integer parseInt(Object obj) {
         if (obj == null) return null;
         try {
+            return parseBigDecimal(obj).setScale(0).intValue();
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private BigDecimal parseBigDecimal(Object obj) {
+        if (obj == null) return null;
+        try {
             double doubleVal = Double.parseDouble(String.valueOf(obj));
-            return BigDecimal.valueOf(doubleVal).setScale(0).intValue();
+            return BigDecimal.valueOf(doubleVal);
         } catch (NumberFormatException e) {
             return null;
         }
@@ -178,23 +203,36 @@ public class ProductImportServiceImpl extends BaseImportService {
             Product productSaved = productService.save(lvPDto);
 
             p.getProductVariantTempList().forEach(pv -> {
+                ProductPriceDTO lvPriceDto = new ProductPriceDTO();
+                lvPriceDto.setRetailPrice(pv.getRetailPrice());
+                lvPriceDto.setWholesalePrice(pv.getWholesalePrice());
+                lvPriceDto.setPurchasePrice(pv.getPurchasePrice());
+                lvPriceDto.setCostPrice(pv.getCostPrice());
+
                 ProductVariantDTO lvPvDto = new ProductVariantDTO();
                 lvPvDto.setProduct(productSaved);
-                pv.setColorId(pv.getColorId());
-                pv.setSizeId(pv.getSizeId());
-                pv.setFabricTypeId(pv.getFabricTypeId());
-                pv.setStorageQty(pv.getStorageQty());
-                pv.setSoldQty(pv.getSoldQty());
-                pv.setDefectiveQty(pv.getDefectiveQty());
-                pv.setStatus(ProductStatus.ACT.name());
+                lvPvDto.setColorId(pv.getColorId());
+                lvPvDto.setSizeId(pv.getSizeId());
+                lvPvDto.setFabricTypeId(pv.getFabricTypeId());
+                lvPvDto.setStorageQty(pv.getStorageQty());
+                lvPvDto.setSoldQty(pv.getSoldQty());
+                lvPvDto.setDefectiveQty(pv.getDefectiveQty());
+                lvPvDto.setStatus(ProductStatus.ACT);
+                lvPvDto.setPrice(lvPriceDto);
                 productVariantService.save(lvPvDto);
             });
 
             totalRecordApproved.getAndIncrement();
         });
 
+        if (totalRecordApproved.get() == 0) {
+            return "No data is pending for approval";
+        }
+
+        productTempRepository.deleteAll();
+
         logger.info("Approved {} record (s)", totalRecordApproved.get());
 
-        return "Data is approved OK";
+        return String.format("%s record (s) is approved OK", totalRecordApproved.get());
     }
 }

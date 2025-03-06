@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.system.impl;
 
 import com.flowiee.pms.entity.system.SystemLog;
-import com.flowiee.pms.base.service.BaseExportService;
+import com.flowiee.pms.base.BaseExportService;
 import com.flowiee.pms.service.system.SystemLogService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

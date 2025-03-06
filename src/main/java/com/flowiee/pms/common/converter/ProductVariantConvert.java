@@ -65,14 +65,6 @@ public class ProductVariantConvert {
             outputDTO.setFabricTypeId(inputEntity.getFabricType().getId());
             outputDTO.setFabricTypeName(inputEntity.getFabricType().getName());
         }
-        if (ObjectUtils.isNotEmpty(inputEntity.getGarmentFactory())) {
-            outputDTO.setGarmentFactoryId(inputEntity.getGarmentFactory().getId());
-            outputDTO.setGarmentFactoryName(inputEntity.getGarmentFactory().getName());
-        }
-        if (ObjectUtils.isNotEmpty(inputEntity.getSupplier())) {
-            outputDTO.setSupplierId(inputEntity.getSupplier().getId());
-            outputDTO.setSupplierName(inputEntity.getSupplier().getName());
-        }
         outputDTO.setUnitCurrency(null);
 //        if (AppConstants.PRODUCT_STATUS.A.name().equals(inputEntity.getStatus())) {
 //            outputDTO.setStatus(AppConstants.PRODUCT_STATUS.A.getLabel());
@@ -86,7 +78,7 @@ public class ProductVariantConvert {
         outputDTO.setStatus(inputEntity.getStatus());
 
         //outputDTO.setListImages(inputEntity.getListImages());
-        outputDTO.setPriceList(inputEntity.getPriceList());
+        //outputDTO.setPriceList(inputEntity.getPriceList());
 
         return outputDTO;
     }
@@ -100,8 +92,6 @@ public class ProductVariantConvert {
             .color(inputDTO.getColor())
             .size(inputDTO.getSize())
             .fabricType(inputDTO.getFabricType())
-            .garmentFactory(inputDTO.getGarmentFactory())
-            .supplier(inputDTO.getSupplier())
             .variantCode(inputDTO.getVariantCode())
             .variantName(inputDTO.getVariantName())
             .storageQty(inputDTO.getStorageQty())
@@ -124,12 +114,6 @@ public class ProductVariantConvert {
 
         if (outputEntity.getFabricType() == null && inputDTO.getFabricTypeId() != null)
             outputEntity.setFabricType(new Category(inputDTO.getFabricTypeId(), inputDTO.getFabricTypeName()));
-
-        if (outputEntity.getGarmentFactory() == null && inputDTO.getGarmentFactoryId() != null)
-            outputEntity.setGarmentFactory(new GarmentFactory(inputDTO.getGarmentFactoryId()));
-
-        if (outputEntity.getSupplier() == null && inputDTO.getSupplierId() != null)
-            outputEntity.setSupplier(new Supplier(inputDTO.getSupplierId(), inputDTO.getSupplierName()));
 
         return outputEntity;
     }

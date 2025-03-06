@@ -8,16 +8,17 @@ import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.*;
 import com.flowiee.pms.model.ProductHeld;
 import com.flowiee.pms.model.ProductVariantParameter;
+import com.flowiee.pms.model.ProductSummaryInfoModel;
 import com.flowiee.pms.repository.product.ProductDescriptionRepository;
+import com.flowiee.pms.repository.product.ProductDetailRepository;
 import com.flowiee.pms.repository.sales.OrderRepository;
+import com.flowiee.pms.repository.system.FileStorageRepository;
 import com.flowiee.pms.service.category.CategoryService;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.dto.ProductDTO;
-import com.flowiee.pms.model.dto.VoucherApplyDTO;
-import com.flowiee.pms.model.dto.VoucherInfoDTO;
 import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.repository.product.ProductRepository;
 import com.flowiee.pms.base.service.BaseService;
@@ -26,6 +27,7 @@ import com.flowiee.pms.service.sales.VoucherApplyService;
 import com.flowiee.pms.service.sales.VoucherService;
 import com.flowiee.pms.common.converter.ProductConvert;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +51,9 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
     private final VoucherService mvVoucherInfoService;
     private final OrderRepository mvOrderRepository;
     private final CategoryService mvCategoryService;
+    private final ProductImageService mvProductImageService;
+    private final FileStorageRepository mvFileStorageRepository;
+    private final ProductDetailRepository mvProductDetailRepository;
 
     @Override
     public List<ProductDTO> findAll() {
@@ -75,7 +81,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
         addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("gender"), pGender);
         addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("isSaleOff"), pIsSaleOff);
         addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("isHotTrend"), pIsHotTrend);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("status"), pStatus);
+        //addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("status"), pStatus);
         addLikeCondition(lvCriteriaBuilder, lvPredicates, pTxtSearch, lvRoot.get("productName"));
 
         TypedQuery<Product> lvTypedQuery = initCriteriaQuery(lvCriteriaBuilder, lvCriteriaQuery, lvRoot, lvPredicates, lvPageable);
@@ -85,10 +91,56 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
         List<Product> lvResultList = lvTypedQuery.getResultList();
         List<ProductDTO> lvResultListDto = ProductConvert.convertToDTOs(lvResultList);
 
-        this.setImageActiveAndLoadVoucherApply(lvResultListDto);
-        this.setInfoVariantOfProduct(lvResultListDto);
+        assignActiveImages(lvResultListDto);
+        assignSummaryVariantInfo(lvResultListDto);
 
         return new PageImpl<>(lvResultListDto, lvPageable, lvTotalRecords);
+    }
+
+    private void assignActiveImages(List<ProductDTO> pProductDTOs) {
+        List<Long> lvProductIds = pProductDTOs.stream().map(ProductDTO::getId).toList();
+
+        List<FileStorage> lvImageList = new ArrayList<>();
+        int batchSize = 1000; // Số lượng tối đa trong một truy vấn
+        for (int i = 0; i < lvProductIds.size(); i += batchSize) {
+            List<Long> batch = lvProductIds.subList(i, Math.min(i + batchSize, lvProductIds.size()));
+            lvImageList.addAll(mvFileStorageRepository.findActiveImage(batch));
+        }
+
+        //Map<productId, imageUrl>
+        Map<Long, String> imageMap = lvImageList.stream()
+                .filter(img -> img.getProduct() != null)
+                .collect(Collectors.toMap(
+                        img -> img.getProduct().getId(),
+                        img -> FileUtils.getImageUrl(img, true),
+                        (existing, replacement) -> existing // Tránh lỗi nếu có trùng key
+                ));
+
+        // Gán ảnh từ map vào productDTOs
+        pProductDTOs.forEach(dto -> dto.setImageActive(imageMap.get(dto.getId())));
+    }
+
+    private void assignSummaryVariantInfo(List<ProductDTO> pProducts) {
+        if (CollectionUtils.isEmpty(pProducts)) {
+            return;
+        }
+
+        for (ProductDTO product : pProducts) {
+            List<ProductSummaryInfoModel> lvVariantInfoList = mvProductDetailRepository.findProductVariantInfo(product.getId());
+
+            // Nhóm thông tin theo màu sắc
+            LinkedHashMap<String, String> lvVariantInfoMap = lvVariantInfoList.stream()
+                    .collect(Collectors.groupingBy(
+                            ProductSummaryInfoModel::getColorName,
+                            LinkedHashMap::new,
+                            Collectors.mapping(
+                                    dto -> dto.getSizeName() + " (" + dto.getQuantity() + ")",
+                                    Collectors.joining(", ")
+                            )
+                    ));
+
+            product.setProductVariantInfo(lvVariantInfoMap);
+        }
     }
 
     @Override
@@ -194,7 +246,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
         Category lvUnit = vldModel.getUnit();
 
         Product lvProduct = productOpt.get();
-        Product productBefore = ObjectUtils.clone(productOpt.get());
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(productOpt.get()));
 
         //product.setId(productId);
         lvProduct.setProductName(productDTO.getProductName());
@@ -216,8 +268,11 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
         lvProduct.setProductDescription(productDescriptionUpdated);
         Product productUpdated = mvProductRepository.save(lvProduct);
 
+        changeLog.setNewObject(productUpdated);
+        changeLog.doAudit();
+
         String logTitle = "Cập nhật sản phẩm: " + productUpdated.getProductName();
-        ChangeLog changeLog = new ChangeLog(productBefore, productUpdated);
+
         mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, productUpdated.getId(), null, null);
         systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.Product, logTitle, changeLog);
         logger.info("Update product success! productId={}", productId);
@@ -286,59 +341,6 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
     @Override
     public List<ProductDTO> getDiscontinuedProducts() {
         return findAll(null, -1, -1, null, null, null, null, null, null, null, null, null, ProductStatus.INA.name()).getContent();
-    }
-
-    private void setImageActiveAndLoadVoucherApply(List<ProductDTO> products) {
-        if (products == null) {
-            return;
-        }
-        for (ProductDTO p : products) {
-            FileStorage imageActive = p.getImage();//mvProductImageService.findImageActiveOfProduct(p.getId());
-            if (imageActive != null) {
-                p.setImageActive(FileUtils.getImageUrl(imageActive, true));
-            }
-            List<Long> listVoucherInfoId = new ArrayList<>();
-            for (VoucherApplyDTO voucherApplyDTO : mvVoucherApplyService.findByProductId(p.getId())) {
-                listVoucherInfoId.add(voucherApplyDTO.getVoucherInfoId());
-            }
-            if (!listVoucherInfoId.isEmpty()) {
-                List<VoucherInfoDTO> voucherInfoDTOs = mvVoucherInfoService.findAll(-1, -1, listVoucherInfoId, null, null, null, VoucherStatus.A.name()).getContent();
-                p.setListVoucherInfoApply(voucherInfoDTOs);
-            }
-        }
-    }
-
-    private void setInfoVariantOfProduct(List<ProductDTO> products) {
-        if (products == null) {
-            return;
-        }
-        for (ProductDTO p : products) {
-            LinkedHashMap<String, String> variantInfo = new LinkedHashMap<>();
-            int totalQtyStorage = 0;
-            int totalDefective = 0;
-            int totalQtySell = mvProductStatisticsService.findProductVariantTotalQtySell(p.getId());
-
-            for (Category color : mvCategoryRepository.findColorOfProduct(p.getId())) {
-                StringBuilder sizeName = new StringBuilder();
-                List<Category> listSize = mvCategoryRepository.findSizeOfColorOfProduct(p.getId(), color.getId());
-                int sizeLength = listSize.size();
-                for (int i = 0; i < sizeLength; i++) {
-                    Category categorySize = listSize.get(i);
-                    int qtyStorage = mvProductStatisticsService.findProductVariantQuantityBySizeOfEachColor(p.getId(), color.getId(), categorySize.getId());
-                    if (i == sizeLength - 1) {
-                        sizeName.append(categorySize.getName()).append(" (").append(qtyStorage).append(")");
-                    } else {
-                        sizeName.append(categorySize.getName()).append(" (").append(qtyStorage).append(")").append(", ");
-                    }
-                    totalQtyStorage += qtyStorage;
-                }
-                variantInfo.put(color.getName(), sizeName.toString());//Đen: S (5)
-            }
-            p.setProductVariantInfo(variantInfo);
-            p.setTotalQtyStorage(totalQtyStorage);
-            p.setTotalQtySell(totalQtySell);
-            p.setTotalQtyAvailableSales(totalQtyStorage - totalDefective);
-        }
     }
 
     private VldModel vldCategory(Long pProductTypeId, Long pBrandId, Long pUnitId) {

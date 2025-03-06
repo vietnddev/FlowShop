@@ -67,7 +67,7 @@
                                 <div class="modal fade" id="import">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
-                                            <form th:action="@{/api/v1/product/import}" method="POST">
+                                            <form th:action="@{/api/v1/product/import}" enctype="multipart/form-data" method="POST">
                                                 <div class="modal-header">
                                                     <strong class="modal-title">Import data</strong>
                                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -81,7 +81,7 @@
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>Template</label>
-                                                                <a th:href="@{/san-pham/export?isTemplateOnly=true}" class="form-control link"><i class="fa-solid fa-cloud-arrow-down"></i>Download template</a>
+                                                                <a th:href="@{/api/v1/product/import/template}" class="form-control link"><i class="fa-solid fa-cloud-arrow-down"></i>Download template</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -126,7 +126,7 @@
                 createProduct();
             });
 
-            loadProducts(mvPageSizeDefault, 1);
+            loadProducts(getPageSize(), getPageNum());
             updateTableContentWhenOnClickPagination(loadProducts);
 
             $("#btnSearch").on("click", function () {

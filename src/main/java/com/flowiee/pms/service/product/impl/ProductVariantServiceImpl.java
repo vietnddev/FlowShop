@@ -23,7 +23,7 @@ import com.flowiee.pms.base.service.GenerateBarcodeService;
 import com.flowiee.pms.service.product.ProductGenerateQRCodeService;
 import com.flowiee.pms.service.sales.CartService;
 import com.flowiee.pms.service.storage.StorageService;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.enumeration.ACTION;
@@ -201,7 +201,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
                 logger.error(String.format("Can't generate Barcode for Product %s", productDetailSaved.getVariantCode()), e);
             }
 
-            if (productDetailSaved.getStorageQty() > 0) {
+            if (productDetailSaved.getStorageQty() > 0 && inputDTO.getStorageIdInitStorageQty() != null) {
                 Storage lvStorage = mvStorageRepository.findById(inputDTO.getStorageIdInitStorageQty())
                         .orElseThrow(() -> new EntityNotFoundException(new Object[] {"storage"}, null, null));
                 String initMessage = "Initialize storage quantity when create new products";
@@ -222,7 +222,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
                         .note(initMessage)
                         .build());
             }
-            if (productDetailSaved.getSoldQty() > 0) {
+            if (productDetailSaved.getSoldQty() > 0 && inputDTO.getStorageIdInitStorageQty() != null) {
                 Storage lvStorage = mvStorageRepository.findById(inputDTO.getStorageIdInitStorageQty())
                         .orElseThrow(() -> new EntityNotFoundException(new Object[] {"storage"}, null, null));
                 String initMessage = "Initialize storage quantity when create new products";
@@ -258,8 +258,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
         ProductDetail productVariantOptional = this.findById(productVariantId, true);
         //VldModel vldModel = vldCategory(pProductDetail.getColorId(), pProductDetail.getSizeId(), pProductDetail.getFabricTypeId());
         try {
-            //Product variant info
-            ProductDetail productBeforeUpdate = ObjectUtils.clone(productVariantOptional);
+            ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(productVariantOptional));
 
             ProductDetail productToUpdate = productVariantOptional;
             productToUpdate.setVariantName(pProductDetail.getVariantName());
@@ -267,6 +266,9 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
             productToUpdate.setWeight(pProductDetail.getWeight());
             productToUpdate.setNote(pProductDetail.getNote());
             ProductDetail productVariantUpdated = mvProductVariantRepository.save(productToUpdate);
+
+            changeLog.setNewObject(productVariantUpdated);
+            changeLog.doAudit();
 
             //Update state of current Price to inactive
             ProductPrice productVariantPricePresent = mvProductPriceRepository.findPricePresent(null, productVariantUpdated.getId());
@@ -279,7 +281,6 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
 
             //Log
             String logTitle = "Cập nhật thông tin sản phẩm: " + productVariantUpdated.getVariantName();
-            ChangeLog changeLog = new ChangeLog(productBeforeUpdate, productVariantUpdated);
             mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, productVariantUpdated.getProduct().getId(), productVariantUpdated.getId(), null);
             systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
             logger.info("Update productVariant success! {}", productVariantUpdated);

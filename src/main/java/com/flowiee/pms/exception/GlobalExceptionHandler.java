@@ -40,7 +40,7 @@ public class GlobalExceptionHandler extends BaseController {
             return;
         }
 
-        SystemConfig lvRecipientConfig = Core.mvSystemConfigList.get(ConfigCode.adminEmailRecipientExceptionNotification);
+        SystemConfig lvRecipientConfig = Core.getSystemConfigs().get(ConfigCode.adminEmailRecipientExceptionNotification);
         String lvRecipients = lvRecipientConfig.getValue();
         String lvMessage = CoreUtils.isNullStr(pEx.getFullStackTrace())
                 ? pEx.getMessage() : pEx.getFullStackTrace();
@@ -110,7 +110,7 @@ public class GlobalExceptionHandler extends BaseController {
 
     @ExceptionHandler
     public ResponseEntity<AppResponse<Object>> exceptionHandler(AppException ex) {
-        mvLogger.info(ex.getMessage(), ex);
+        mvLogger.error(ex.getMessage(), ex);
         notifyEmail(ex);
         return ResponseEntity.internalServerError ().body(fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
     }

@@ -71,7 +71,7 @@ public class Category extends BaseEntity implements Serializable {
 	List<TicketImport> listPaymentMethod;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "kenhBanHang", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "salesChannel", fetch = FetchType.LAZY)
 	List<Order> listKenhBanHang;
 
 	@JsonIgnore

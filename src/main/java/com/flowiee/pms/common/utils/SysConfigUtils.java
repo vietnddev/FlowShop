@@ -13,7 +13,7 @@ public class SysConfigUtils {
     }
 
     public static boolean isYesOption(ConfigCode pConfigCode) {
-        SystemConfig lvSystemConfig = Core.mvSystemConfigList.get(pConfigCode);
+        SystemConfig lvSystemConfig = Core.getSystemConfigs().get(pConfigCode);
         return isYesOption(lvSystemConfig);
     }
 
@@ -21,7 +21,7 @@ public class SysConfigUtils {
         return isValid(pSystemConfig) && "Y".equals(CoreUtils.trim(pSystemConfig.getValue()));
     }
 
-    public int getIntValue(SystemConfig pSystemConfig) {
+    public static int getIntValue(SystemConfig pSystemConfig) {
         if (isValid(pSystemConfig)) {
             String lvValue = CoreUtils.trim(pSystemConfig.getValue());
             if (CoreUtils.isNumeric(lvValue)) {

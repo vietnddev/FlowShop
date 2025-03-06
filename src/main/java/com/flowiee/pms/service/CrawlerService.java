@@ -88,7 +88,6 @@ public class CrawlerService extends BaseService {
                     .brand(brand)
                     .unit(unit)
                     .productName(CoreUtils.trim(p.getProductName()))
-                    .originCountry(CoreUtils.trim(p.getOriginCountry()))
                     .isSaleOff(discountPrice.doubleValue() < originalPrice.doubleValue())
                     //.status(ProductStatus.ACT)
                     .build());

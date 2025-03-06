@@ -114,6 +114,10 @@ public abstract class BaseImportService extends BaseImportExportService implemen
         mvEximResult.setData(pObj);
     }
 
+    public void setImportStatus(String pStatus) {
+        mvEximResult.setResultStatus(pStatus);
+    }
+
     public Path getPath(TemplateExport templateExport, MultipartFile multipartFile) {
         String lvPathStorage = CommonUtils.getPathDirectory(templateExport.getModule());
         long lvBeginTime = mvEximResult.getBeginTime().toNanoOfDay();

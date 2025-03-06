@@ -16,7 +16,7 @@ public class PasswordUtils {
     }
 
     public static int getPasswordLength() {
-        SystemConfig pwdLengthCnf = Core.mvSystemConfigList.get(ConfigCode.passwordLength);
+        SystemConfig pwdLengthCnf = Core.getSystemConfigs().get(ConfigCode.passwordLength);
         if (SysConfigUtils.isValid(pwdLengthCnf)) {
             return pwdLengthCnf.getIntValue();
         }

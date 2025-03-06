@@ -34,7 +34,7 @@ function createOrder() {
             recipientPhone : receivePhoneNumber,
             recipientEmail : receiveEmail,
             shippingAddress : receiveAddress,
-            voucherUsed : mvVoucherCode,
+            couponCode : mvVoucherCode,
             amountDiscount : mvAmountDiscount
         }
         $.ajax({

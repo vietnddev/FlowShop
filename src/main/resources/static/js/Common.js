@@ -34,6 +34,17 @@ mvStorageStatusInit["N"] = "Không sử dụng";
 
 //Pagination
 const mvPageSizeDefault = 10;
+let getPageSize = () => getPageParams().pageSize;
+let getPageNum = () => getPageParams().pageNum;
+
+function getPageParams() {
+    let params = new URLSearchParams(window.location.search);
+    return {
+        pageNum: params.get("page") ? parseInt(params.get("page")) : 1,
+        pageSize: params.get("size") ? parseInt(params.get("size")) : mvPageSizeDefault
+    };
+}
+
 function updatePaginationUI(pageNum, pageSize, totalPage, totalElements) {
     $('#paginationInfo').attr("pageNum", pageNum);
     $('#paginationInfo').attr("pageSize", pageSize);
@@ -102,47 +113,56 @@ function updatePaginationUI3(pageNum, pageSize, totalPage, totalElements) {
 
 function updateTableContentWhenOnClickPagination(loadNewDataMethod) {
     let lvPageSize = $('#selectPageSize').val();
+    let lvPageNum = 1;
+
     $('#selectPageSize').on('click', function() {
-        console.log($(this).val())
         if (lvPageSize === $(this).val()) {
             return;
         }
         lvPageSize = $(this).val();
-        loadNewDataMethod($(this).val(), 1);
+        lvPageNum = 1;
+        loadNewDataMethod($(this).val(), lvPageNum);
+        updateURLParameter(lvPageNum , lvPageSize);
     });
 
     $('#firstPage').on('click', function() {
         if (parseInt($('#paginationInfo').attr("pageNum")) === 1) {
             return;
         }
-        loadNewDataMethod(lvPageSize, 1);
+        lvPageNum = 1;
+        loadNewDataMethod(lvPageSize, lvPageNum);
         changePage();
+        updateURLParameter(lvPageNum , lvPageSize);
     });
 
     $('#previousPage').on('click', function() {
         if (parseInt($('#paginationInfo').attr("pageNum")) === 1) {
             return;
         }
-        loadNewDataMethod(lvPageSize, $('#paginationInfo').attr("pageNum") - 1);
+        lvPageNum = parseInt($('#paginationInfo').attr("pageNum")) - 1;
+        loadNewDataMethod(lvPageSize, lvPageNum);
         changePage();
+        updateURLParameter(lvPageNum , lvPageSize);
     });
 
     $('#nextPage').on('click', function() {
-        console.log("next")
         if ($('#paginationInfo').attr("pageNum") === $('#paginationInfo').attr("totalPage")) {
             return;
         }
-        loadNewDataMethod(lvPageSize, parseInt($('#paginationInfo').attr("pageNum")) + 1);
+        lvPageNum = parseInt($('#paginationInfo').attr("pageNum")) + 1;
+        loadNewDataMethod(lvPageSize, lvPageNum);
         changePage();
+        updateURLParameter(lvPageNum, lvPageSize);
     });
 
     $('#lastPage').on('click', function() {
-        console.log("last")
         if ($('#paginationInfo').attr("pageNum") === $('#paginationInfo').attr("totalPage")) {
             return;
         }
-        loadNewDataMethod(lvPageSize, $('#paginationInfo').attr("totalPage"));
+        lvPageNum = $('#paginationInfo').attr("totalPage");
+        loadNewDataMethod(lvPageSize, lvPageNum);
         changePage();
+        updateURLParameter(lvPageNum, lvPageSize);
     });
 }
 
@@ -237,6 +257,16 @@ function updateTableContentWhenOnClickPagination3(loadNewDataMethod) {
 function changePage() {
     mvProductSearchModalListSelected = [];
     $('#cbxChooseAllProduct').prop("checked", false);
+}
+
+function updateURLParameter(pageNum, pageSize) {
+    let url = new URL(window.location.href);
+    let params = new URLSearchParams(url.search);
+
+    params.set("page", pageNum);
+    params.set("size", pageSize);
+
+    window.history.pushState({}, "", `${url.pathname}?${params.toString()}`);
 }
 
 //Search tool

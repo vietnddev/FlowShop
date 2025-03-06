@@ -24,14 +24,4 @@ public class ProductStatisticsServiceImpl_0 extends BaseService implements Produ
         Integer totalSellQty = mvProductVariantRepository.findTotalQtySell(productId);
         return totalSellQty != null ? totalSellQty : 0;
     }
-
-    @Override
-    public Integer findProductVariantQuantityBySizeOfEachColor(Long productId, Long colorId, Long sizeId) {
-        try {
-            return mvProductVariantRepository.findQuantityBySizeOfEachColor(productId, colorId, sizeId);
-        } catch (RuntimeException ex) {
-            System.out.println("productId " + productId + ", colorId " + colorId + ", sizeId " + sizeId);
-            throw new RuntimeException("Error finding product variant quantity", ex);
-        }
-    }
 }

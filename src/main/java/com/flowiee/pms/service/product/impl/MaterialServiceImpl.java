@@ -2,7 +2,7 @@ package com.flowiee.pms.service.product.impl;
 
 import com.flowiee.pms.entity.product.Material;
 import com.flowiee.pms.exception.EntityNotFoundException;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.ACTION;
 import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.repository.product.MaterialRepository;
@@ -63,12 +63,15 @@ public class MaterialServiceImpl extends BaseService implements MaterialService 
     public Material update(Material entity, Long materialId) {
         Material materialOptional = this.findById(materialId, true);
 
-        Material materialBefore = ObjectUtils.clone(materialOptional);
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(materialOptional));
+
         entity.setId(materialId);
         Material materialUpdated = mvMaterialRepository.save(entity);
 
+        changeLog.setNewObject(materialUpdated);
+        changeLog.doAudit();
+
         String logTitle = "Cập nhật nguyên vật liệu: " + materialUpdated.getName();
-        ChangeLog changeLog = new ChangeLog(materialBefore, materialUpdated);
         mvMaterialHistoryService.save(changeLog.getLogChanges(), logTitle, materialId);
         systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.STG_MAT_U, MasterObject.Material, logTitle, changeLog);
         logger.info(logTitle);

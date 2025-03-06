@@ -168,7 +168,7 @@
                                                 <td th:text="${list.orderTime}"></td>
                                                 <td th:text="${list.receiverAddress}"></td>
                                                 <td th:text="${list.receiverName}"></td>
-                                                <td th:text="${list.kenhBanHang.name}"></td>
+                                                <td th:text="${list.salesChannel.name}"></td>
                                                 <td th:text="${list.trangThaiDonHang.name}"></td>
                                             </tr>
                                             </tbody>

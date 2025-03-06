@@ -4,7 +4,7 @@ import com.flowiee.pms.entity.sales.VoucherApply;
 import com.flowiee.pms.entity.sales.VoucherInfo;
 import com.flowiee.pms.entity.sales.VoucherTicket;
 import com.flowiee.pms.exception.*;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.dto.ProductDTO;
 import com.flowiee.pms.model.dto.VoucherInfoDTO;
@@ -137,14 +137,15 @@ public class VoucherInfoServiceImpl extends BaseService implements VoucherServic
 
     @Override
     public VoucherInfoDTO update(VoucherInfoDTO voucherInfo, Long voucherId) {
+        VoucherInfoDTO voucherOpt = this.findById(voucherId, true);
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(voucherOpt));
         try {
-            VoucherInfoDTO voucherOpt = this.findById(voucherId, true);
-
-            VoucherInfoDTO voucherInfoBefore = ObjectUtils.clone(voucherOpt);
             voucherInfo.setId(voucherId);
             VoucherInfo voucherInfoUpdated = mvVoucherInfoRepository.save(voucherInfo);
 
-            ChangeLog changeLog = new ChangeLog(voucherInfoBefore, voucherInfoUpdated);
+            changeLog.setNewObject(voucherInfoUpdated);
+            changeLog.doAudit();
+
             systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_VOU_U, MasterObject.VoucherInfo, "Cập nhật voucher " + voucherInfoUpdated.getTitle(), changeLog.getOldValues(), changeLog.getNewValues());
 
             return mvModelMapper.map(voucherInfoUpdated, VoucherInfoDTO.class);

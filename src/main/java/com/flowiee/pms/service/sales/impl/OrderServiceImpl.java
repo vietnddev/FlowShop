@@ -16,7 +16,7 @@ import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.category.CategoryService;
 import com.flowiee.pms.service.system.AccountService;
 import com.flowiee.pms.service.system.SendCustomerNotificationService;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.exception.DataInUseException;
@@ -96,7 +96,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("id"), pOrderId);
         addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("paymentMethod").get("id"), pPaymentMethodId);
         addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("orderStatus"), pOrderStatus);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("kenhBanHang").get("id"), pSalesChannelId);
+        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("salesChannel").get("id"), pSalesChannelId);
         addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("customer").get("id"), pCustomerId);
         addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("nhanVienBanHang").get("id"), pSellerId);
         addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("nhanVienBanHang").get("branch").get("id"), pBranchId);
@@ -185,11 +185,11 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a");
 
         BigDecimal lvAmountDiscount = request.getAmountDiscount();
-        String lvVoucherUsedCode = request.getVoucherUsed();
+        String lvCouponCode = request.getCouponCode();
         LocalDateTime lvOrderTime = LocalDateTime.parse(request.getOrderTime(), formatter);
         Long lvCartId = request.getCartId();
 
-        VldModel vldModel = vldBeforeCreateOrder(request, lvCartId, lvVoucherUsedCode, request.getPaymentMethodId(),
+        VldModel vldModel = vldBeforeCreateOrder(request, lvCartId, lvCouponCode, request.getPaymentMethodId(),
                 request.getSalesChannelId(), request.getCustomerId(), request.getSalesAssistantId());
         OrderCart lvCart = vldModel.getOrderCart();
         VoucherTicket lvVoucherTicket = vldModel.getVoucherTicket();
@@ -198,7 +198,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         Order order = Order.builder()
                 .code(getNextOrderCode())
                 .customer(lvCustomer)
-                .kenhBanHang(vldModel.getSalesChannel())
+                .salesChannel(vldModel.getSalesChannel())
                 .nhanVienBanHang(vldModel.getSalesAssistant())
                 .note(request.getNote())
                 .orderTime(lvOrderTime != null ? lvOrderTime : LocalDateTime.now())
@@ -208,7 +208,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
                 .receiverAddress(request.getShippingAddress())
                 .paymentMethod(vldModel.getPaymentMethod())
                 .paymentStatus(false)
-                .voucherUsedCode(ObjectUtils.isNotEmpty(lvVoucherUsedCode) ? lvVoucherUsedCode : null)
+                .couponCode(ObjectUtils.isNotEmpty(lvCouponCode) ? lvCouponCode : null)
                 .amountDiscount(CoreUtils.coalesce(lvAmountDiscount))
                 .packagingCost(CoreUtils.coalesce(request.getPackagingCost(), mvDefaultPackagingCost))
                 .shippingCost(CoreUtils.coalesce(request.getShippingCost(), mvDefaultShippingCost))
@@ -220,7 +220,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         order.setPriorityLevel(determinePriority(order));
 
         if (lvVoucherTicket != null) {
-            order.setVoucherUsedCode(lvVoucherTicket.getCode());
+            order.setCouponCode(lvVoucherTicket.getCode());
             //Update voucher ticket's status to used
             lvVoucherTicket.setCustomer(lvCustomer);
             lvVoucherTicket.setActiveTime(new Date());
@@ -271,80 +271,80 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         return new VldModel();
     }
 
-    private Order beforeUpdateOrder(Order pOrder) {
-        OrderStatus lvOrderStatus = pOrder.getOrderStatus();
-        LocalDateTime lvSuccessfulDeliveryTime = pOrder.getSuccessfulDeliveryTime();
-
-        switch (lvOrderStatus) {
-            case RTND:
-                SystemConfig lvReturnPeriodDaysMdl = mvConfigRepository.findByCode(ConfigCode.returnPeriodDays.name());
-                if (SysConfigUtils.isValid(lvReturnPeriodDaysMdl)) {
-                    throw new AppException("System has not configured the time allowed to return the order!");
-                }
-                int lvReturnPeriodDays = lvReturnPeriodDaysMdl.getIntValue();
-                if (!isWithinReturnPeriod(lvSuccessfulDeliveryTime, LocalDateTime.now(), lvReturnPeriodDays)) {
-                    throw new AppException("The return period has expired!");
-                }
-                break;
-        }
-
-        return ObjectUtils.clone(pOrder);
-    }
-
     @Transactional
     @Override
     public OrderDTO updateOrder(UpdateOrderReq request, Long pOrderId) {
-        Order orderToUpdate = mvOrderRepository.findById(pOrderId)
-                .orElseThrow(() -> new AppException("Order not found!"));
-        LocalDateTime lvSuccessfulDeliveryTime = request.getSuccessfulDeliveryTime();
+        Order lvCurrentOrder = mvOrderRepository.findById(pOrderId).orElseThrow(() -> new AppException("Order not found!"));
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(lvCurrentOrder));
 
-        //Validate request data
-        vldBeforeUpdateOrder(request);
-        //Validate business before update
-        Order orderBefore = beforeUpdateOrder(orderToUpdate);
+        OrderStatus lvCurrentOrderStatus = lvCurrentOrder.getOrderStatus();
+        OrderStatus lvRequestOrderStatus = OrderStatus.valueOf(request.getOrderStatus());
+        boolean isChangeStatus = !lvCurrentOrderStatus.equals(lvRequestOrderStatus);
 
-        //Update new info
-        orderToUpdate.setReceiverName(request.getRecipientName());
-        orderToUpdate.setReceiverPhone(request.getRecipientPhone());
-        orderToUpdate.setReceiverEmail(request.getRecipientEmail());
-        orderToUpdate.setReceiverAddress(request.getShippingAddress());
-        orderToUpdate.setNote(request.getNote());
-        Order orderUpdated = mvOrderRepository.save(orderToUpdate);
+        /*
+        * * * Validate something before update
+        */
+        if (isChangeStatus) {
+            switch (lvRequestOrderStatus) {
+                case RTND:
+                    LocalDateTime lvSuccessfulDeliveryTime = request.getSuccessfulDeliveryTime();
 
-        //Do something after updated
-        afterUpdatedOrder(orderUpdated, null);
+                    SystemConfig lvReturnPeriodDaysMdl = mvConfigRepository.findByCode(ConfigCode.returnPeriodDays.name());
+                    if (SysConfigUtils.isValid(lvReturnPeriodDaysMdl))
+                        throw new AppException("System has not configured the time allowed to return the order!");
 
-        //Log
-        ChangeLog changeLog = new ChangeLog(orderBefore, orderUpdated);
+                    int lvReturnPeriodDays = lvReturnPeriodDaysMdl.getIntValue();
+                    if (!isWithinReturnPeriod(lvSuccessfulDeliveryTime, LocalDateTime.now(), lvReturnPeriodDays))
+                        throw new AppException("The return period has expired!");
+            }
+        }
+
+        /*
+         * * * Update information
+         */
+        lvCurrentOrder.setReceiverName(request.getRecipientName());
+        lvCurrentOrder.setReceiverPhone(request.getRecipientPhone());
+        lvCurrentOrder.setReceiverEmail(request.getRecipientEmail());
+        lvCurrentOrder.setReceiverAddress(request.getShippingAddress());
+        lvCurrentOrder.setNote(request.getNote());
+        lvCurrentOrder.setOrderStatus(OrderStatus.valueOf(request.getOrderStatus()));
+        Order lvUpdatedOrder = mvOrderRepository.save(lvCurrentOrder);
+
+        /*
+        * * * Do something after updated
+        */
+        if (isChangeStatus) {
+            switch (lvUpdatedOrder.getOrderStatus()) {
+                case CONF:
+                    if (SysConfigUtils.isYesOption(ConfigCode.sendNotifyCustomerOnOrderConfirmation)) {
+                        mvSendCustomerNotificationService.notifyOrderConfirmation(lvUpdatedOrder, lvUpdatedOrder.getReceiverEmail());
+                    }
+                    break;
+                case RTND:
+                    Long lvStorageId = lvUpdatedOrder.getTicketExport().getStorage().getId();
+                    mvTicketImportService.restockReturnedItems(lvStorageId, lvUpdatedOrder.getCode());
+                    boolean isNeedRefund = false;
+                    if (isNeedRefund) {
+                        //create ledger transaction record for export
+                    }
+                    break;
+                case DLVD:
+                    mvLoyaltyProgramService.accumulatePoints(lvUpdatedOrder, null);
+                    break;
+            }
+        }
+
+        changeLog.setNewObject(lvUpdatedOrder);
+        changeLog.doAudit();
+
+        /*
+        * * * Log
+        */
         mvOrderHistoryService.save(changeLog.getLogChanges(), "Cập nhật đơn hàng", pOrderId, null);
         systemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_ORD_U, MasterObject.Order, "Cập nhật đơn hàng", changeLog);
-        logger.info("Cập nhật đơn hàng {}", orderUpdated.toString());
+        logger.info("Cập nhật đơn hàng {}", lvUpdatedOrder.toString());
 
-        return OrderDTO.fromOrder(orderToUpdate);
-    }
-
-    private void afterUpdatedOrder(Order pOrderUpdated, Long pLoyaltyProgramId) {
-        String lvOrderCode = pOrderUpdated.getCode();
-        OrderStatus lvOrderStatus = pOrderUpdated.getOrderStatus();
-        Long lvStorageId = pOrderUpdated.getTicketExport().getStorage().getId();
-        boolean isNeedRefund = false;
-
-        switch (lvOrderStatus) {
-            case CNCL:
-                if (SysConfigUtils.isYesOption(ConfigCode.sendNotifyCustomerOnOrderConfirmation)) {
-                    mvSendCustomerNotificationService.notifyOrderConfirmation(pOrderUpdated, pOrderUpdated.getReceiverEmail());
-                }
-                break;
-            case RTND:
-                mvTicketImportService.restockReturnedItems(lvStorageId, lvOrderCode);
-                if (isNeedRefund) {
-                    //create ledger transaction record for export
-                }
-                break;
-            case DLVD:
-                mvLoyaltyProgramService.accumulatePoints(pOrderUpdated, pLoyaltyProgramId);
-                break;
-        }
+        return OrderDTO.fromOrder(lvUpdatedOrder);
     }
 
     @Override
@@ -378,7 +378,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
 
         lvOrder.setOrderStatus(pOrderStatus);
         if (pOrderStatus.equals(OrderStatus.DLVD))
-            lvOrder.setSuccessfulDeliveryTime(pSuccessfulDeliveryTime != null ? pSuccessfulDeliveryTime : LocalDateTime.now());
+            lvOrder.setDeliverySuccessTime(pSuccessfulDeliveryTime != null ? pSuccessfulDeliveryTime : LocalDateTime.now());
         if (pOrderStatus.equals(OrderStatus.CNCL)) {
             lvOrder.setCancellationReason(cancellationReasonId);
             lvOrder.setCancellationDate(LocalDateTime.now());

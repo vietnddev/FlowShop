@@ -3,7 +3,7 @@ package com.flowiee.pms.service.system.impl;
 import com.flowiee.pms.entity.system.GroupAccount;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.repository.system.GroupAccountRepository;
 import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.system.GroupAccountService;
@@ -58,12 +58,14 @@ public class GroupAccountServiceImpl extends BaseService implements GroupAccount
     public GroupAccount update(GroupAccount groupAccount, Long groupId) {
         GroupAccount groupAccountOpt = this.findById(groupId, true);
 
-        GroupAccount groupAccountBefore = ObjectUtils.clone(groupAccountOpt);
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(groupAccountOpt));
 
         groupAccount.setId(groupId);
         GroupAccount groupAccountUpdated = mvGroupAccountRepository.save(groupAccount);
 
-        ChangeLog changeLog = new ChangeLog(groupAccountBefore, groupAccountUpdated);
+        changeLog.setOldObject(groupAccountUpdated);
+        changeLog.doAudit();
+
         systemLogService.writeLogUpdate(MODULE.SYSTEM, ACTION.SYS_GR_ACC_U, MasterObject.GroupAccount, "Cập nhật thông tin nhóm người dùng", changeLog.getOldValues(), changeLog.getNewValues());
 
         return groupAccountUpdated;

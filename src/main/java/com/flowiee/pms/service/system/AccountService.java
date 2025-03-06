@@ -15,5 +15,7 @@ public interface AccountService {
 
     Account update(Account pAccount, Long pAccountId);
 
+    Account updateProfile(Account pAccount);
+
     String delete(Long pAccountId);
 }

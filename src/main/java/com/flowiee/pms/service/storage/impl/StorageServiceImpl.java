@@ -4,7 +4,7 @@ import com.flowiee.pms.entity.storage.Storage;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.StorageItems;
 import com.flowiee.pms.model.dto.StorageDTO;
@@ -117,17 +117,18 @@ public class StorageServiceImpl extends BaseService implements StorageService {
         if (storageOpt.isEmpty()) {
             throw new BadRequestException("Storage not found");
         }
-        Storage storageBefore = ObjectUtils.clone(storageOpt.get());
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(storageOpt.get()));
 
         storageOpt.get().setName(inputStorageDTO.getName());
         storageOpt.get().setLocation(inputStorageDTO.getLocation());
         storageOpt.get().setDescription(inputStorageDTO.getDescription());
         storageOpt.get().setIsDefault(inputStorageDTO.getIsDefault());
         storageOpt.get().setStatus(inputStorageDTO.getStatus());
-
         Storage storageUpdated = mvStorageRepository.save(storageOpt.get());
 
-        ChangeLog changeLog = new ChangeLog(storageBefore, storageUpdated);
+        changeLog.setNewObject(storageUpdated);
+        changeLog.doAudit();
+
         systemLogService.writeLogUpdate(MODULE.STORAGE, ACTION.STG_STG_U, MasterObject.Storage, "Cập nhật Kho", changeLog);
 
         return StorageDTO.convertToDTO(storageUpdated);

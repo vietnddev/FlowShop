@@ -6,7 +6,7 @@ import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.repository.product.ProductComboApplyRepository;
 import com.flowiee.pms.service.product.ProductVariantService;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.repository.product.ProductComboRepository;
 import com.flowiee.pms.base.service.BaseService;
@@ -91,12 +91,14 @@ public class ProductComboServiceImpl extends BaseService implements ProductCombo
     public ProductCombo update(ProductCombo productCombo, Long comboId) {
         ProductCombo optional = this.findById(comboId, true);
 
-        ProductCombo comboBeforeChange = ObjectUtils.clone(optional);
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(optional));
 
         productCombo.setId(comboId);
         ProductCombo comboUpdated = mvProductComboRepository.save(productCombo);
 
-        ChangeLog changeLog = new ChangeLog(comboBeforeChange, comboUpdated);
+        changeLog.setNewObject(comboUpdated);
+        changeLog.doAudit();
+
         systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_CBO_C, MasterObject.ProductCombo, "Cập nhật combo sản phẩm", changeLog);
 
         return comboUpdated;

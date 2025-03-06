@@ -169,8 +169,8 @@
                                                             <td th:text="${orderDetail.totalProduct}"></td>
                                                         </tr>
                                                         <tr>
-                                                            <th>Voucher</th>
-                                                            <td th:text="${orderDetail.voucherUsedCode}"></td>
+                                                            <th>Coupon code</th>
+                                                            <td th:text="${orderDetail.couponCode}"></td>
                                                         </tr>
                                                         <tr>
                                                             <th>Giảm giá</th>
@@ -376,7 +376,7 @@
         }
 
         function loadOrderDetail() {
-            let apiURL = mvHostURLCallApi + "/order/" + [[${orderDetailId}]];
+            let apiURL = mvHostURLCallApi + "/sls/order/" + [[${orderDetailId}]];
             $.get(apiURL, function (response) {
                 if (response.status === "OK") {
                     mvOrderDetail = response.data;
@@ -418,7 +418,7 @@
                 let paymentMethod = $('#paymentMethodField_DoPay').val();
                 let paymentAmount= $('#paymentAmountField_DoPay').val();
                 let paymentNote = $('#paymentNoteField_doPay').val();
-                let apiURL = mvHostURLCallApi + "/order/do-pay/" + $(this).attr("orderId");
+                let apiURL = mvHostURLCallApi + "/sls/order/do-pay/" + $(this).attr("orderId");
                 let params = {paymentTime: paymentTime, paymentMethod: paymentMethod, paymentAmount:paymentAmount, paymentNote:paymentNote}
                 $.ajax({
                     url: apiURL,
@@ -450,7 +450,7 @@
             $("#yesButton").on("click", function () {
                 if ($(this).attr("actionType") === "update" && $(this).attr("entityName") === "order") {
                     $.ajax({
-                        url: mvHostURLCallApi + "/order/update/" + [[${orderDetailId}]],
+                        url: mvHostURLCallApi + "/sls/order/update/" + [[${orderDetailId}]],
                         type: "PUT",
                         contentType: "application/json",
                         data: JSON.stringify(
@@ -496,7 +496,7 @@
             $('#btnAddProduct').on('click', function () {
                 let productVariantSelect = $('#selectedProductField');
                 productVariantSelect.empty();
-                $.get(mvHostURL + '/order/cart/product/available-sales', function (response) {
+                $.get(mvHostURL + '/sls/order/cart/product/available-sales', function (response) {
                     if (response.status === "OK") {
                         $.each(response.data, function (index, d) {
                             productVariantSelect.append(`<option value="${d.itemId}">${d.itemName}</option>`);

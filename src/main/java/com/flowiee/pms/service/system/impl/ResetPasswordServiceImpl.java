@@ -59,7 +59,7 @@ public class ResetPasswordServiceImpl extends BaseService implements ResetPasswo
     }
 
     private int getPasswordValidityPeriod() {
-        SystemConfig pwdValidityPeriodCnf = Core.mvSystemConfigList.get(ConfigCode.passwordValidityPeriod);
+        SystemConfig pwdValidityPeriodCnf = Core.getSystemConfigs().get(ConfigCode.passwordValidityPeriod);
         if (SysConfigUtils.isValid(pwdValidityPeriodCnf)) {
             return pwdValidityPeriodCnf.getIntValue();
         }

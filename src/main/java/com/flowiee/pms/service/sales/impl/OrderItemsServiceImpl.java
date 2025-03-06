@@ -11,7 +11,7 @@ import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.repository.product.ProductPriceRepository;
 import com.flowiee.pms.repository.sales.CartItemsRepository;
 import com.flowiee.pms.service.product.ProductVariantService;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.repository.sales.OrderDetailRepository;
@@ -147,7 +147,7 @@ public class OrderItemsServiceImpl extends BaseService implements OrderItemsServ
         try {
             OrderDetail orderDetailOpt = this.findById(orderDetailId, true);
 
-            OrderDetail orderItemBefore = ObjectUtils.clone(orderDetailOpt);
+            ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(orderDetailOpt));
 
             int lvQuantity = orderDetail.getQuantity();
             BigDecimal lvExtraDiscount = orderDetail.getExtraDiscount();
@@ -158,9 +158,12 @@ public class OrderItemsServiceImpl extends BaseService implements OrderItemsServ
             orderDetailOpt.setNote(lvNote);
             OrderDetail orderItemUpdated = mvOrderDetailRepository.save(orderDetailOpt);
 
+            changeLog.setNewObject(orderItemUpdated);
+            changeLog.doAudit();
+
             String logTitle = "Cập nhật đơn hàng " + orderItemUpdated.getOrder().getCode();
-            ChangeLog changeLog = new ChangeLog(orderItemBefore, orderItemUpdated);
-            mvOrderHistoryService.save(changeLog.getLogChanges(), logTitle, orderItemBefore.getOrder().getId(), orderItemBefore.getId());
+
+            mvOrderHistoryService.save(changeLog.getLogChanges(), logTitle, orderDetailId, orderDetailId);
             mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_ORD_U, MasterObject.OrderDetail, logTitle, changeLog);
             logger.info("{}: Cập nhật item of đơn hàng {}", OrderServiceImpl.class.getName(), orderItemUpdated.toString());
 

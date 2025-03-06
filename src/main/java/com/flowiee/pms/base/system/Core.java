@@ -68,11 +68,11 @@ public class Core {
 	private final Environment            mvEnvironment;
 	private final ScheduleRepository 	 mvScheduleRepository;
 
-	public static LocalDateTime                                     START_APP_TIME;
-	public static String                                            mvResourceUploadPath      = null;
-	public static Map<NotificationType, TemplateSendEmail.Template> mvGeneralEmailTemplateMap = new HashMap<>();
-	public static Map<ConfigCode, SystemConfig>                     mvSystemConfigList        = new HashMap();
-	public static final ConfigCode                                  mvConfigInitData          = ConfigCode.initData;
+	public static LocalDateTime                                      START_APP_TIME;
+	public static String                                             mvResourceUploadPath      = null;
+	private static Map<NotificationType, TemplateSendEmail.Template> mvGeneralEmailTemplateMap = new HashMap<>();
+	private static Map<ConfigCode, SystemConfig>                     mvSystemConfigList        = new HashMap();
+	private static final ConfigCode                                  mvConfigInitData          = ConfigCode.initData;
 
 	private static final int CATEGORY_TYPE_COL_INDEX = 0;
 	private static final int CATEGORY_CODE_COL_INDEX = 1;
@@ -307,7 +307,7 @@ public class Core {
 								.code(getValue(lvRow, CUSTOMER_CODE_COL_INDEX))
 								.customerName(getValue(lvRow, CUSTOMER_NAME_COL_INDEX))
 								.dateOfBirth(LocalDate.now())
-								.sex(getValue(lvRow, CUSTOMER_SEX_COL_INDEX).equals("M"))
+								.gender(getValue(lvRow, CUSTOMER_SEX_COL_INDEX))
 								.build();
 						initAudit(lvCustomer);
 						try {
@@ -374,5 +374,13 @@ public class Core {
 
 	private String getValue(XSSFRow pRow, int pIndex) {
     	return CoreUtils.trim(pRow.getCell(pIndex).toString());
+	}
+
+	public static Map<NotificationType, TemplateSendEmail.Template> getEmailTemplateConfigs() {
+		return mvGeneralEmailTemplateMap;
+	}
+
+	public static Map<ConfigCode, SystemConfig> getSystemConfigs() {
+    	return mvSystemConfigList;
 	}
 }

@@ -22,7 +22,9 @@ import java.util.Arrays;
 
 @Builder
 @Entity
-@Table(name = "file_storage")
+@Table(name = "file_storage",
+       indexes = {@Index(name = "idx_FileStorage_productId", columnList = "product_id"),
+                  @Index(name = "idx_FileStorage_productVariantId", columnList = "product_variant_id")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

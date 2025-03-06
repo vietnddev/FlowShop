@@ -4,7 +4,7 @@ import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.exception.*;
 import com.flowiee.pms.repository.sales.OrderRepository;
-import com.flowiee.pms.common.ChangeLog;
+import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.repository.category.CategoryHistoryRepository;
 import com.flowiee.pms.repository.category.CategoryRepository;
@@ -60,7 +60,7 @@ public class CategoryServiceImpl extends BaseService implements CategoryService 
     public Category update(Category pCategory, Long categoryId) {
         Category categoryOpt = this.findById(categoryId, true);
 
-        Category categoryBefore = ObjectUtils.clone(categoryOpt);
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(categoryOpt));
 
         categoryOpt.setName(pCategory.getName());
         categoryOpt.setNote(pCategory.getNote());
@@ -68,9 +68,12 @@ public class CategoryServiceImpl extends BaseService implements CategoryService 
 
         Category categorySaved = mvCategoryRepository.save(categoryOpt);
 
+        changeLog.setNewObject(categorySaved);
+        changeLog.doAudit();
+
         String logTitle = "Cập nhật thông tin danh mục " + categorySaved.getType() + ": " + categorySaved.getName();
-        ChangeLog changeLog = new ChangeLog(categoryBefore, categorySaved);
         mvCategoryHistoryService.save(changeLog.getLogChanges(), logTitle, categoryId);
+
         systemLogService.writeLogUpdate(MODULE.CATEGORY, ACTION.CTG_U, MasterObject.Category, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
         logger.info("Update Category success! {}", categorySaved);
 

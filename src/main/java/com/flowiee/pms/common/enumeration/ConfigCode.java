@@ -3,17 +3,19 @@ package com.flowiee.pms.common.enumeration;
 import lombok.Getter;
 
 @Getter
-public enum ConfigCode {
+public enum ConfigCode {//props.put("mail.smtp.auth", mailConfig.getAuth());props.put("mail.smtp.starttls.enable", mailConfig.getStarttls());
     adminEmailRecipientExceptionNotification(MODULE.SYSTEM, "Email nhận thông báo khi có sự số hệ thống", "vietnd.stg008@gmail.com"),
     allowSellPriceLessThanCostPrice(MODULE.SALES, "Cho phép giá bán ra thấp hơn giá nhập", "Y"),
     allowDuplicateCustomerPhoneNumber(MODULE.SALES, "Cho phép trùng số điện thoại của khách hàng", "N"),
     daySendNotifyBeforeProductExpiry(MODULE.PRODUCT, "Thời gian gửi thông báo trước khi sản phẩm hết hạn sử dụng", "10"),
     dayDeleteSystemLog(MODULE.SYSTEM, "Thời gian xóa nhật ký hệ thống, các nhật ký có thời gian tạo từ >= ? ngày sẽ được xóa tự động", "100"),
     deleteSystemLog(MODULE.SYSTEM, "Xóa nhật ký hệ thống tự động", "N"),
-    emailHost(MODULE.SYSTEM, "Email host", "smtp"),
+    emailHost(MODULE.SYSTEM, "Email host", "smtp.gmail.com"),
     emailPort(MODULE.SYSTEM, "Email port", "587"),
     emailUser(MODULE.SYSTEM, "Email username", "vietnd.stg008@gmail.com"),
     emailPass(MODULE.SYSTEM, "Email password", "khpsawxcfkntzfbe"),
+    emailSmtpAuth(MODULE.SYSTEM, "Email smtp auth", "true"),
+    emailSmtpStarttlsEnable(MODULE.SYSTEM, "Email smtp starttls enable ", "true"),
     extensionAllowedFileUpload(MODULE.SYSTEM, "Định dạng file được phép upload", null),
     failLogonCount(MODULE.SYSTEM, "Khóa tài khoản khi đăng nhập sai số lần", "5"),
     forceApplyAccountRightsNoNeedReLogin(MODULE.SYSTEM, "Áp dụng phân quyền mới không cần đăng nhập lại", "N"),

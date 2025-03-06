@@ -24,6 +24,10 @@ public class ProductDTO extends Product implements Serializable {
     String brandName;
     Long unitId;
     String unitName;
+    Long garmentFactoryId;
+    String garmentFactoryName;
+    Long supplierId;
+    String supplierName;
     String imageActive;
     Integer totalQtySell;
     Integer totalQtyStorage;
@@ -32,6 +36,7 @@ public class ProductDTO extends Product implements Serializable {
     Integer productVariantQty;
     Integer soldQty;
     String description;
+    String status;
     List<VoucherInfoDTO> listVoucherInfoApply;
     LinkedHashMap<String, String> productVariantInfo;
 

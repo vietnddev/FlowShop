@@ -204,7 +204,7 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
         fileToChange.setExtension(FileUtils.getFileExtension(fileAttached.getOriginalFilename()));
         fileToChange.setContentType(fileAttached.getContentType());
         fileToChange.setDirectoryPath(CommonUtils.getPathDirectory(MODULE.PRODUCT).substring(CommonUtils.getPathDirectory(MODULE.PRODUCT).indexOf("uploads")));
-        fileToChange.setAccount(userSession.getUserPrincipal().toEntity());
+        fileToChange.setAccount(userSession.getUserPrincipal().getEntity());
         FileStorage imageSaved = mvFileStorageRepository.save(fileToChange);
 
         //Lưu file mới vào thư mục chứa file upload

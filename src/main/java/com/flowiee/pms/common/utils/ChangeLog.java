@@ -1,9 +1,7 @@
-package com.flowiee.pms.common;
+package com.flowiee.pms.common.utils;
 
 import com.flowiee.pms.entity.category.Category;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,15 +13,34 @@ import java.util.Map;
 import java.util.Objects;
 
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChangeLog {
-    final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    final Map<String, Object[]> logChanges;
-    final String oldValues;
-    final String newValues;
+    private Object oldObject;
+    private Object newObject;
 
-    public ChangeLog(Object oldObject, Object newObject) {
+    private Map<String, Object[]> logChanges = new HashMap<>();
+    private String oldValues;
+    private String newValues;
+
+    public ChangeLog() {}
+
+    public ChangeLog(Object pOldObject) {
+        this.oldObject = pOldObject;
+    }
+
+    public ChangeLog(Object pOldObject, Object pNewObject) {
+        this.oldObject = pOldObject;
+        this.newObject = pNewObject;
+    }
+
+    public Map<String, Object[]> doAudit() {
+        if (oldObject == null)
+            throw new NullPointerException("oldObject is null!");
+
+        if (newObject == null)
+            throw new NullPointerException("newObject is null!");
+
         Map<String, Object[]> changes = new HashMap<>();
         StringBuilder oldValueBuilder = new StringBuilder("Fields: ");
         StringBuilder newValueBuilder = new StringBuilder("Fields: ");
@@ -60,6 +77,8 @@ public class ChangeLog {
         this.oldValues = formatValueChange(oldValueBuilder.toString());
         this.newValues = formatValueChange(newValueBuilder.toString());
         this.logChanges = changes;
+
+        return logChanges;
     }
 
     private String formatValueChange(String valueChange) {
@@ -67,5 +86,13 @@ public class ChangeLog {
             valueChange = valueChange.substring(0, valueChange.length() - 2);
         }
         return valueChange;
+    }
+
+    public void setOldObject(Object oldObject) {
+        this.oldObject = oldObject;
+    }
+
+    public void setNewObject(Object newObject) {
+        this.newObject = newObject;
     }
 }

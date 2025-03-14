@@ -75,6 +75,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
             throw new AppException(ErrorCode.SYSTEM_BUSY, new Object[]{}, null, getClass(), null);
         }
         mvAppRefreshing = true;
+        logger.info("Begin refresh app data");
         try {
             ShopInfo lvShopInfo = CommonUtils.mvShopInfo != null ? CommonUtils.mvShopInfo : new ShopInfo();
             //Reload system configs
@@ -137,6 +138,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
             throw new AppException("An error occurred while refreshing app configuration", ex);
         } finally {
             mvAppRefreshing = false;
+            logger.info("Finish refresh app data");
         }
     }
 

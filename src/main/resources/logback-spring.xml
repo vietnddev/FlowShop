@@ -14,18 +14,18 @@
         <property name="FILE_LOG_PATTERN"
                   value="%d{HH:mm:ss.SSS} [%X{customKey:-${CUSTOM_KEY_DEFAULT}}] %p %C{1} [%t]: %m%n"/>
 
-        <appender name="flatConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
                 <pattern>${CONSOLE_LOG_PATTERN}</pattern>
                 <charset>utf8</charset>
             </encoder>
         </appender>
 
-        <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <appender name="infoFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
                 <Pattern>${FILE_LOG_PATTERN}</Pattern>
             </encoder>
-
+            <!--Hôm nay là ngày cuối cùng em làm việc tại công ty. Chiều nay em mời mọi người trà chiều để cảm ơn quãng thời gian đã đồng hành cùng nhau nha-->
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
                 <!-- rollover daily and when the file reaches 10 MegaBytes -->
                 <fileNamePattern>${LOGS}/${application_name}-%d{yyyy-MM-dd}.%i.log
@@ -37,28 +37,29 @@
         </appender>
 
         <!-- Appender riêng cho ERROR level -->
-        <appender name="ErrorRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-                <Pattern>${FILE_LOG_PATTERN}</Pattern>
-            </encoder>
+<!--        <appender name="errorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+<!--            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">-->
+<!--                <Pattern>${FILE_LOG_PATTERN}</Pattern>-->
+<!--            </encoder>-->
 
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOGS}/${application_name}-ERROR-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                    <maxFileSize>10MB</maxFileSize>
-                </timeBasedFileNamingAndTriggeringPolicy>
-            </rollingPolicy>
-        </appender>
+<!--            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+<!--                <fileNamePattern>${LOGS}/${application_name}-ERROR-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
+<!--                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
+<!--                    <maxFileSize>10MB</maxFileSize>-->
+<!--                </timeBasedFileNamingAndTriggeringPolicy>-->
+<!--            </rollingPolicy>-->
+<!--        </appender>-->
 
         <root level="INFO">
-            <appender-ref ref="RollingFile" />
-            <appender-ref ref="flatConsoleAppender"/>
+            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="infoFileAppender"/>
+<!--            <appender-ref ref="errorFile"/>-->
         </root>
 
-        <logger level="ERROR" name="com.flowiee" additivity="false">
-            <appender-ref ref="ErrorRollingFile"/>
-            <appender-ref ref="flatConsoleAppender"/>
-        </logger>
+<!--        <logger level="ERROR" name="com.flowiee" additivity="false">-->
+<!--            <appender-ref ref="errorFile"/>-->
+<!--            <appender-ref ref="consoleAppender"/>-->
+<!--        </logger>-->
 
     </springProfile>
 </configuration>

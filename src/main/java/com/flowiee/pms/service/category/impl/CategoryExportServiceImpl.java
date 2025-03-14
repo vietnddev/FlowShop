@@ -2,7 +2,7 @@ package com.flowiee.pms.service.category.impl;
 
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.base.BaseExportService;
-import com.flowiee.pms.service.category.CategoryService;
+import com.flowiee.pms.repository.category.CategoryRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +16,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class CategoryExportServiceImpl extends BaseExportService {
-    CategoryService mvCategoryService;
+    CategoryRepository mvCategoryRepository;
 
     @Override
     protected void prepareData(Object pCondition, boolean pTemplateOnly) {
@@ -26,7 +26,7 @@ public class CategoryExportServiceImpl extends BaseExportService {
     @Override
     protected void writeData(Object pCondition) {
         XSSFSheet sheet = mvWorkbook.getSheetAt(0);
-        List<Category> listData = mvCategoryService.findAll();
+        List<Category> listData = mvCategoryRepository.findAll();
         for (int i = 0; i < listData.size(); i++) {
             Category model = listData.get(i);
             

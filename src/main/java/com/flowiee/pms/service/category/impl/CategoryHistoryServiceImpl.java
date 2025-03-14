@@ -1,7 +1,9 @@
 package com.flowiee.pms.service.category.impl;
 
+import com.flowiee.pms.base.service.BaseFService;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.category.CategoryHistory;
+import com.flowiee.pms.model.dto.CategoryHistoryDTO;
 import com.flowiee.pms.repository.category.CategoryHistoryRepository;
 import com.flowiee.pms.service.category.CategoryHistoryService;
 import lombok.AccessLevel;
@@ -17,7 +19,7 @@ import java.util.Map;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class CategoryHistoryServiceImpl implements CategoryHistoryService {
+public class CategoryHistoryServiceImpl extends BaseFService<CategoryHistory, CategoryHistoryDTO, CategoryHistoryRepository> implements CategoryHistoryService {
     CategoryHistoryRepository mvCategoryHistoryRepository;
 
     @Override

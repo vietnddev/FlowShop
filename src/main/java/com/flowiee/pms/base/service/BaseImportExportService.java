@@ -3,7 +3,7 @@ package com.flowiee.pms.base.service;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
-public class BaseImportExportService extends BaseService {
+public class BaseImportExportService extends BaseFService {
     protected XSSFSheet mvDataSheet;
     protected String mvDataSheetName = "data";
     protected int mvHeadKeyLine = 1;

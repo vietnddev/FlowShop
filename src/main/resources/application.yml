@@ -41,3 +41,4 @@ logging:
   level:
     org.hibernate.SQL: DEBUG  #Log câu SQL
     #org.hibernate.type.descriptor.sql.BasicBinder: TRACE  #Log tham số truyền vào
+  config: classpath:logback-spring.xml

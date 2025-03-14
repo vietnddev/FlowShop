@@ -111,12 +111,6 @@ public class Core {
             mvConfigService.refreshApp();
 			logger.info("System configuration loading finished");
 
-			mvLanguageService.reloadMessage("en");
-			logger.info("Downloading of en messages finished");
-
-			mvLanguageService.reloadMessage("vi");
-			logger.info("Downloading of vi messages finished");
-
 			List<TemplateSendEmail.Template> lvGeneralMailTemplates = mvTemplateSendEmail.getGeneralMailTemplates();
 			lvGeneralMailTemplates.forEach(lvTemplate -> {
 				NotificationType lvNotificationType = NotificationType.valueOf(lvTemplate.getType());
@@ -187,9 +181,19 @@ public class Core {
 	private void initConfig() {
 		List<SystemConfig> cnfList = initConfigModels(ConfigCode.values());
 
-		SystemConfig flagConfigObj = mvConfigRepository.findByCode(mvConfigInitData.name());
+		List<SystemConfig> lvSystemConfigList = mvConfigRepository.findAll();
+		Map<ConfigCode, SystemConfig> lvSystemConfigMap = lvSystemConfigList.stream()
+				.collect(Collectors.toMap(
+						cnf -> ConfigCode.get(CoreUtils.trim(cnf.getCode())),
+						cnf -> cnf,
+						(existing, replacement) -> existing
+				));
+
+		SystemConfig flagConfigObj = lvSystemConfigMap.get(mvConfigInitData);
 		if (flagConfigObj == null) {
-			mvConfigRepository.saveAll(cnfList);
+			SystemConfig cnfModel = new SystemConfig(mvConfigInitData.name(), mvConfigInitData.getDescription(), "N");
+			initAudit(cnfModel);
+			cnfList.add(cnfModel);
 		}
 
 		initNewConfigIfDatabaseNotDefined(cnfList);
@@ -207,7 +211,7 @@ public class Core {
 
 	@Transactional
 	void initData() throws Exception {
-		SystemConfig systemConfigInitData = mvConfigRepository.findByCode(mvConfigInitData.name());
+		SystemConfig systemConfigInitData = mvSystemConfigList.get(mvConfigInitData);
 		if ("Y".equals(systemConfigInitData.getValue())) {
 			return;
 		}

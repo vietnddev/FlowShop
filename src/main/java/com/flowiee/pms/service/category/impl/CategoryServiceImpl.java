@@ -1,8 +1,10 @@
 package com.flowiee.pms.service.category.impl;
 
+import com.flowiee.pms.base.service.BaseFService;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.exception.*;
+import com.flowiee.pms.model.dto.CategoryDTO;
 import com.flowiee.pms.repository.sales.OrderRepository;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.*;
@@ -12,10 +14,15 @@ import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.category.CategoryHistoryService;
 import com.flowiee.pms.service.category.CategoryService;
 
+import com.flowiee.pms.service.storage.impl.TransactionGoodsServiceImpl;
+import com.flowiee.pms.service.system.SystemLogService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,48 +32,45 @@ import java.util.*;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class CategoryServiceImpl extends BaseService implements CategoryService {
+public class CategoryServiceImpl extends BaseFService<Category, CategoryDTO, CategoryRepository> implements CategoryService {
+    private static final Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
+
     CategoryRepository mvCategoryRepository;
     CategoryHistoryService mvCategoryHistoryService;
     CategoryHistoryRepository mvCategoryHistoryRepository;
     OrderRepository mvOrderRepository;
+    SystemLogService mvSystemLogService;
+    ModelMapper mvModelMapper;
 
     @Override
-    public List<Category> findAll() {
-        return mvCategoryRepository.findAll();
+    public CategoryDTO findById(Long entityId, boolean pThrowException) {
+        return super.findById(entityId, true);
     }
 
     @Override
-    public Category findById(Long entityId, boolean pThrowException) {
-        Optional<Category> entityOptional = mvCategoryRepository.findById(entityId);
-        if (entityOptional.isEmpty() && pThrowException) {
-            throw new EntityNotFoundException(new Object[] {"category"}, null, null);
-        }
-        return entityOptional.orElse(null);
-    }
-
-    @Override
-    public Category save(Category entity) {
-        if (entity == null) {
+    public CategoryDTO save(CategoryDTO pDto) {
+        if (pDto == null) {
             throw new BadRequestException();
         }
-        Category categorySaved = mvCategoryRepository.save(entity);
-        systemLogService.writeLogCreate(MODULE.CATEGORY, ACTION.CTG_I, MasterObject.Category, "Thêm mới danh mục " + categorySaved.getType(), categorySaved.getName());
+        CategoryDTO categorySaved = super.save(pDto);
+        mvSystemLogService.writeLogCreate(MODULE.CATEGORY, ACTION.CTG_I, MasterObject.Category, "Thêm mới danh mục " + categorySaved.getType(), categorySaved.getName());
         return categorySaved;
     }
 
     @Transactional
     @Override
-    public Category update(Category pCategory, Long categoryId) {
-        Category categoryOpt = this.findById(categoryId, true);
+    public CategoryDTO update(CategoryDTO pCategory, Long categoryId) {
+        Category lvCurrentCategory = super.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException(new Object[]{"category"}, null, null));
 
-        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(categoryOpt));
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(lvCurrentCategory));
 
-        categoryOpt.setName(pCategory.getName());
-        categoryOpt.setNote(pCategory.getNote());
-        if (pCategory.getSort() != null) categoryOpt.setSort(pCategory.getSort());
+        lvCurrentCategory.setName(pCategory.getName());
+        lvCurrentCategory.setNote(pCategory.getNote());
+        if (pCategory.getSort() != null)
+            lvCurrentCategory.setSort(pCategory.getSort());
 
-        Category categorySaved = mvCategoryRepository.save(categoryOpt);
+        Category categorySaved = entityRepository.save(lvCurrentCategory);
 
         changeLog.setNewObject(categorySaved);
         changeLog.doAudit();
@@ -74,23 +78,26 @@ public class CategoryServiceImpl extends BaseService implements CategoryService 
         String logTitle = "Cập nhật thông tin danh mục " + categorySaved.getType() + ": " + categorySaved.getName();
         mvCategoryHistoryService.save(changeLog.getLogChanges(), logTitle, categoryId);
 
-        systemLogService.writeLogUpdate(MODULE.CATEGORY, ACTION.CTG_U, MasterObject.Category, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
-        logger.info("Update Category success! {}", categorySaved);
+        mvSystemLogService.writeLogUpdate(MODULE.CATEGORY, ACTION.CTG_U, MasterObject.Category, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
+        LOG.info("Update Category success! {}", categorySaved);
 
-        return categorySaved;
+        return mvModelMapper.map(categorySaved, CategoryDTO.class);
     }
 
     @Transactional
     @Override
     public String delete(Long categoryId) {
-        Category categoryToDelete = this.findById(categoryId, true);
+        CategoryDTO lvCurrentCategory = this.findById(categoryId, true);
 
         if (categoryInUse(categoryId)) {
             throw new DataInUseException(ErrorCode.ERROR_DATA_LOCKED.getDescription());
         }
-        mvCategoryHistoryRepository.deleteAllByCategory(categoryId);
-        mvCategoryRepository.deleteById(categoryId);
-        systemLogService.writeLogDelete(MODULE.CATEGORY, ACTION.CTG_D, MasterObject.Category, "Xóa danh mục " + categoryToDelete.getType(), categoryToDelete.getName());
+
+        //mvCategoryHistoryRepository.deleteAllByCategory(categoryId);
+        entityRepository.deleteById(categoryId);
+
+        mvSystemLogService.writeLogDelete(MODULE.CATEGORY, ACTION.CTG_D, MasterObject.Category, "Xóa danh mục " + lvCurrentCategory.getType(), lvCurrentCategory.getName());
+
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
 
@@ -176,7 +183,7 @@ public class CategoryServiceImpl extends BaseService implements CategoryService 
 
     @Override
     public boolean categoryInUse(Long categoryId) {
-        Category lvCategoryMdl = this.findById(categoryId, true);
+        CategoryDTO lvCategoryMdl = this.findById(categoryId, true);
         CATEGORY lvCategoryType = CATEGORY.valueOf(lvCategoryMdl.getType().toUpperCase());
 
         switch (lvCategoryType) {
@@ -238,7 +245,7 @@ public class CategoryServiceImpl extends BaseService implements CategoryService 
                 break;
             default:
                 //throw new IllegalStateException("Unexpected value: " + category.get().getType());
-                logger.info("Unexpected value: " + lvCategoryMdl.getType());
+                LOG.info("Unexpected value: " + lvCategoryMdl.getType());
         }
         return false;
     }

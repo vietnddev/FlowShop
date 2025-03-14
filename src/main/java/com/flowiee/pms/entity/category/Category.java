@@ -115,7 +115,7 @@ public class Category extends BaseEntity implements Serializable {
 	List<Product> listProductByUnit;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	List<CategoryHistory> listCategoryHistory;
 
 	@JsonIgnore

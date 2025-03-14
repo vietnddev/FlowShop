@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.product.impl;
 
 import com.flowiee.pms.model.Filter;
-import com.flowiee.pms.base.service.BaseService2;
+import com.flowiee.pms.base.service.BaseFService;
 import com.flowiee.pms.common.converter.ProductConvert;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.common.utils.ChangeLog;
@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ProductService2Impl extends BaseService2<Product, ProductDTO, ProductRepository> implements ProductService {
+public class ProductFServiceImpl extends BaseFService<Product, ProductDTO, ProductRepository> implements ProductService {
     private final Logger LOG = LoggerFactory.getLogger(getClass());
 
     private final ProductDescriptionRepository mvProductDescriptionRepository;

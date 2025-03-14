@@ -5,8 +5,7 @@ import com.flowiee.pms.model.Filter;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public abstract class BaseService2<E, D, R extends BaseRepository<E, Long>> {
+public abstract class BaseFService<E, D, R extends BaseRepository<E, Long>> {
     @Autowired
     protected R entityRepository;
     @Autowired
@@ -58,6 +57,20 @@ public abstract class BaseService2<E, D, R extends BaseRepository<E, Long>> {
         }
         entityRepository.deleteById(pId);
         return "Entity with ID " + pId + " deleted successfully.";
+    }
+
+    protected Pageable getPageable(int pageNum, int pageSize) {
+        return getPageable(pageNum, pageSize, null);
+    }
+
+    protected Pageable getPageable(int pageNum, int pageSize, Sort sort) {
+        if (pageSize >= 0 && pageNum >= 0) {
+            if (sort == null) {
+                return PageRequest.of(pageNum, pageSize);
+            }
+            return PageRequest.of(pageNum, pageSize, sort);
+        }
+        return Pageable.unpaged();
     }
 
     protected <T> Specification<T> buildSpecification(List<Filter> filters) {

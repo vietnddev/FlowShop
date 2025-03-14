@@ -7,9 +7,18 @@ import java.util.Map;
 
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.common.enumeration.CATEGORY;
+import com.flowiee.pms.model.dto.CategoryDTO;
 import org.springframework.data.domain.Page;
 
-public interface CategoryService extends BaseCurdService<Category> {
+public interface CategoryService {
+    CategoryDTO findById(Long pId, boolean pThrowException);
+
+    CategoryDTO save(CategoryDTO pDto);
+
+    CategoryDTO update(CategoryDTO pEntity, Long pId);
+
+    String delete(Long pId);
+
     List<Category> findRootCategory();
 
     Page<Category> findSubCategory(CATEGORY categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum);

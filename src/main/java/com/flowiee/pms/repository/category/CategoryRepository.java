@@ -1,5 +1,6 @@
 package com.flowiee.pms.repository.category;
 
+import com.flowiee.pms.base.BaseRepository;
 import com.flowiee.pms.entity.category.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends BaseRepository<Category, Long> {
     @Query("from Category c where c.code = 'ROOT' order by c.sort")
     List<Category> findRootCategory();
 

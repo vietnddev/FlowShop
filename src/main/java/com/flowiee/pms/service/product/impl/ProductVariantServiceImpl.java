@@ -14,6 +14,7 @@ import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.*;
 import com.flowiee.pms.model.ProductVariantParameter;
 import com.flowiee.pms.model.dto.ProductPriceDTO;
+import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.repository.product.ProductPriceRepository;
 import com.flowiee.pms.repository.sales.OrderCartRepository;
 import com.flowiee.pms.repository.storage.StorageRepository;
@@ -72,6 +73,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
     private final TicketImportService mvTicketImportService;
     private final TicketExportService mvTicketExportService;
     private final CategoryService mvCategoryService;
+    private final CategoryRepository mvCategoryRepository;
     private final StorageService mvStorageService;
     private final StorageRepository mvStorageRepository;
     private final OrderCartRepository mvCartRepository;
@@ -413,15 +415,15 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
     }
 
     private VldModel vldCategory(Long pColorId, Long pSizeId, Long pFabricTypeId) {
-        Category lvColor = mvCategoryService.findById(pColorId, false);
+        Category lvColor = mvCategoryRepository.findById(pColorId).get();
         if (lvColor == null)
             throw new BadRequestException("Color invalid!");
 
-        Category lvSize = mvCategoryService.findById(pSizeId, false);
+        Category lvSize = mvCategoryRepository.findById(pSizeId).get();
         if (lvSize == null)
             throw new BadRequestException("Size invalid!");
 
-        Category lvFabricType = mvCategoryService.findById(pFabricTypeId, false);
+        Category lvFabricType = mvCategoryRepository.findById(pFabricTypeId).get();
         if (lvFabricType == null)
             throw new BadRequestException("Fabric type invalid!");
 

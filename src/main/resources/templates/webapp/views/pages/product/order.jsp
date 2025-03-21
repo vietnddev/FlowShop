@@ -99,7 +99,7 @@
             function printReport() {
                 $(document).on("click", ".btn-print-invoice", function (e) {
                     e.preventDefault();
-                    window.open(mvHostURL + "/order/print-invoice/" + parseInt($(this).attr("orderId")), "_blank");
+                    window.open(mvHostURL + "/sls/order/print-invoice/" + parseInt($(this).attr("orderId")), "_blank");
                 })
             }
 

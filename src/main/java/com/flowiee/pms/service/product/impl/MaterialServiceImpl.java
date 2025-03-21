@@ -1,72 +1,80 @@
 package com.flowiee.pms.service.product.impl;
 
 import com.flowiee.pms.entity.product.Material;
-import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.ACTION;
 import com.flowiee.pms.common.enumeration.MODULE;
+import com.flowiee.pms.model.dto.MaterialDTO;
 import com.flowiee.pms.repository.product.MaterialRepository;
-import com.flowiee.pms.base.service.BaseService;
+import com.flowiee.pms.base.service.BaseServiceNew;
 import com.flowiee.pms.service.product.MaterialHistoryService;
 import com.flowiee.pms.service.product.MaterialService;
 
 import com.flowiee.pms.common.enumeration.MasterObject;
 import com.flowiee.pms.common.enumeration.MessageCode;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import com.flowiee.pms.service.system.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
-public class MaterialServiceImpl extends BaseService implements MaterialService {
-    MaterialRepository     mvMaterialRepository;
-    MaterialHistoryService mvMaterialHistoryService;
+public class MaterialServiceImpl extends BaseServiceNew<Material, MaterialDTO, MaterialRepository> implements MaterialService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final MaterialHistoryService mvMaterialHistoryService;
+    private final SystemLogService systemLogService;
+    private final ModelMapper modelMapper;
+
+    public MaterialServiceImpl(MaterialRepository pMaterialRepository,
+                               MaterialHistoryService pMaterialHistoryService,
+                               SystemLogService pSystemLogService,
+                               ModelMapper pModelMapper) {
+        super(Material.class, MaterialDTO.class, pMaterialRepository);
+        this.mvMaterialHistoryService = pMaterialHistoryService;
+        this.systemLogService = pSystemLogService;
+        this.modelMapper = pModelMapper;
+    }
 
     @Override
-    public List<Material> findAll() {
+    public List<MaterialDTO> findAll() {
         return this.findAll(-1, -1, null, null, null, null, null, null).getContent();
     }
 
     @Override
-    public Page<Material> findAll(int pageSize, int pageNum, Long supplierId, Long unitId, String code, String name, String location, String status) {
+    public Page<MaterialDTO> findAll(int pageSize, int pageNum, Long supplierId, Long unitId, String code, String name, String location, String status) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("name").ascending());
-        return mvMaterialRepository.findAll(supplierId, unitId, code, name, location, status, pageable);
+        Page<Material> materialPage = mvEntityRepository.findAll(supplierId, unitId, code, name, location, status, pageable);
+        return new PageImpl<>(convertDTOs(materialPage.getContent()), pageable, materialPage.getTotalElements());
     }
 
     @Override
-    public Material findById(Long entityId, boolean pThrowException) {
-        Optional<Material> entityOptional = mvMaterialRepository.findById(entityId);
-        if (entityOptional.isEmpty() && pThrowException) {
-            throw new EntityNotFoundException(new Object[] {"material"}, null, null);
-        }
-        return entityOptional.orElse(null);
+    public MaterialDTO findById(Long entityId, boolean pThrowException) {
+        return super.findById(entityId, pThrowException);
     }
 
     @Override
-    public Material save(Material entity) {
-        Material materialSaved = mvMaterialRepository.save(entity);
+    public MaterialDTO save(MaterialDTO pDto) {
+        MaterialDTO materialSaved = super.save(pDto);
         systemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.STG_MAT_C, MasterObject.Material, "Thêm mới nguyên vật liệu", materialSaved.getName());
         return materialSaved;
     }
 
     @Override
-    public Material update(Material entity, Long materialId) {
-        Material materialOptional = this.findById(materialId, true);
+    public MaterialDTO update(MaterialDTO pDto, Long materialId) {
+        MaterialDTO materialDto = super.findById(materialId, true);
 
-        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(materialOptional));
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(materialDto));
 
-        entity.setId(materialId);
-        Material materialUpdated = mvMaterialRepository.save(entity);
+        pDto.setId(materialId);
+        Material materialUpdated = mvEntityRepository.save(modelMapper.map(pDto, Material.class));
 
         changeLog.setNewObject(materialUpdated);
         changeLog.doAudit();
@@ -76,14 +84,14 @@ public class MaterialServiceImpl extends BaseService implements MaterialService 
         systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.STG_MAT_U, MasterObject.Material, logTitle, changeLog);
         logger.info(logTitle);
 
-        return materialUpdated;
+        return modelMapper.map(materialUpdated, MaterialDTO.class);
     }
 
     @Override
     public String delete(Long entityId) {
-        Material materialToDelete = this.findById(entityId, true);
+        MaterialDTO materialToDelete = super.findById(entityId, true);
 
-        mvMaterialRepository.deleteById(materialToDelete.getId());
+        mvEntityRepository.deleteById(materialToDelete.getId());
 
         String logTitle = "Xóa nguyên vật liệu";
         systemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.STG_MAT_U, MasterObject.Material, "Xóa nguyên vật liệu", materialToDelete.getName());
@@ -97,10 +105,10 @@ public class MaterialServiceImpl extends BaseService implements MaterialService 
     public void updateQuantity(Integer quantity, long materialId, String type) {
         String logTitle = "Cập nhật số lượng nguyên vật liệu";
         if ("I".equals(type)) {
-            mvMaterialRepository.updateQuantityIncrease(quantity, materialId);
+            mvEntityRepository.updateQuantityIncrease(quantity, materialId);
             systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.STG_MAT_U, MasterObject.Material, logTitle, " + " + quantity);
         } else if ("D".equals(type)) {
-            mvMaterialRepository.updateQuantityDecrease(quantity, materialId);
+            mvEntityRepository.updateQuantityDecrease(quantity, materialId);
             systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.STG_MAT_U, MasterObject.Material, logTitle, " - " + quantity);
         }
     }

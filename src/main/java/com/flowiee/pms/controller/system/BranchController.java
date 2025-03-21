@@ -4,6 +4,7 @@ import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.entity.system.Branch;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.AppResponse;
+import com.flowiee.pms.model.dto.BranchDTO;
 import com.flowiee.pms.service.system.BranchService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +28,7 @@ public class BranchController extends BaseController {
     @Operation(summary = "Find all branches")
     @GetMapping("/all")
     @PreAuthorize("@vldModuleSystem.readBranch(true)")
-    public AppResponse<List<Branch>> findAllBranches() {
+    public AppResponse<List<BranchDTO>> findAllBranches() {
         try {
             return success(branchService.findAll());
         } catch (RuntimeException ex) {
@@ -37,7 +38,7 @@ public class BranchController extends BaseController {
 
     @PostMapping
     @PreAuthorize("@vldModuleSystem.insertBranch(true)")
-    public AppResponse<Branch> createBranch(@RequestBody Branch branch) {
+    public AppResponse<BranchDTO> createBranch(@RequestBody BranchDTO branch) {
         try {
             return success(branchService.save(branch));
         } catch (RuntimeException ex) {
@@ -47,7 +48,7 @@ public class BranchController extends BaseController {
 
     @PutMapping("/update/{id}")
     @PreAuthorize("@vldModuleSystem.updateBranch(true)")
-    public AppResponse<Branch> updateBranch(@RequestBody Branch branch, @PathVariable("id") Long branchId) {
+    public AppResponse<BranchDTO> updateBranch(@RequestBody BranchDTO branch, @PathVariable("id") Long branchId) {
         try {
             return success(branchService.update(branch, branchId));
         } catch (RuntimeException ex) {

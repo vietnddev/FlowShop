@@ -15,6 +15,7 @@ import com.flowiee.pms.entity.system.Notification;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.exception.ResourceNotFoundException;
+import com.flowiee.pms.repository.product.MaterialRepository;
 import com.flowiee.pms.repository.product.ProductDetailRepository;
 import com.flowiee.pms.repository.sales.OrderRepository;
 import com.flowiee.pms.repository.storage.StorageRepository;
@@ -53,6 +54,7 @@ public class TicketImportServiceImpl extends BaseService implements TicketImport
     RoleService                 mvRoleService;
     AccountService              mvAccountService;
     MaterialService             mvMaterialService;
+    MaterialRepository          mvMaterialRepository;
     OrderRepository             mvOrderRepository;
     StorageRepository           mvStorageRepository;
     NotificationService         mvNotificationService;
@@ -257,7 +259,7 @@ public class TicketImportServiceImpl extends BaseService implements TicketImport
     public List<MaterialTemp> addMaterialToTicket(Long ticketImportId, List<Long> materialIds) {
         List<MaterialTemp> listAdded = new ArrayList<>();
         for (Long materialId : materialIds) {
-            Material material = mvMaterialService.findById(materialId, false);
+            Material material = mvMaterialRepository.findById(materialId).orElse(null);
             if (material == null) {
                 continue;
             }

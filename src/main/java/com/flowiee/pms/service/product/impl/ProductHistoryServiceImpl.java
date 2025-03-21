@@ -4,13 +4,11 @@ import com.flowiee.pms.entity.product.Product;
 import com.flowiee.pms.entity.product.ProductAttribute;
 import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.product.ProductHistory;
-import com.flowiee.pms.exception.EntityNotFoundException;
+import com.flowiee.pms.model.dto.ProductHistoryDTO;
 import com.flowiee.pms.repository.product.ProductHistoryRepository;
-import com.flowiee.pms.base.service.BaseService;
+import com.flowiee.pms.base.service.BaseServiceNew;
 import com.flowiee.pms.service.product.ProductHistoryService;
-import com.flowiee.pms.common.enumeration.MessageCode;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
@@ -18,53 +16,48 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
-public class ProductHistoryServiceImpl extends BaseService implements ProductHistoryService {
-    ProductHistoryRepository mvProductHistoryRepository;
+public class ProductHistoryServiceImpl extends BaseServiceNew<ProductHistory, ProductHistoryDTO, ProductHistoryRepository> implements ProductHistoryService {
 
-    @Override
-    public List<ProductHistory> findAll() {
-        return mvProductHistoryRepository.findAll();
+    public ProductHistoryServiceImpl(ProductHistoryRepository pProductHistoryRepository) {
+        super(ProductHistory.class, ProductHistoryDTO.class, pProductHistoryRepository);
     }
 
     @Override
-    public ProductHistory findById(Long productHistoryId, boolean pThrowException) {
-        Optional<ProductHistory> entityOptional = mvProductHistoryRepository.findById(productHistoryId);
-        if (entityOptional.isEmpty() && pThrowException) {
-            throw new EntityNotFoundException(new Object[] {"product history"}, null, null);
-        }
-        return entityOptional.orElse(null);
+    public List<ProductHistoryDTO> findAll() {
+        return super.convertDTOs(mvEntityRepository.findAll());
     }
 
     @Override
-    public ProductHistory save(ProductHistory productHistory) {
-        return mvProductHistoryRepository.save(productHistory);
+    public ProductHistoryDTO findById(Long productHistoryId, boolean pThrowException) {
+        return super.findById(productHistoryId, pThrowException);
     }
 
     @Override
-    public ProductHistory update(ProductHistory productHistory, Long productHistoryId) {
-        productHistory.setId(productHistoryId);
-        return mvProductHistoryRepository.save(productHistory);
+    public ProductHistoryDTO save(ProductHistoryDTO productHistory) {
+        return super.save(productHistory);
+    }
+
+    @Override
+    public ProductHistoryDTO update(ProductHistoryDTO pProductHistory, Long pProductHistoryId) {
+        return super.update(pProductHistory, pProductHistoryId);
     }
 
     @Override
     public String delete(Long productHistoryId) {
-        mvProductHistoryRepository.deleteById(productHistoryId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return super.delete(productHistoryId);
     }
 
     @Override
     public List<ProductHistory> findByProduct(Long productId) {
-        return mvProductHistoryRepository.findByProductId(productId);
+        return mvEntityRepository.findByProductId(productId);
     }
 
     @Override
     public List<ProductHistory> findPriceChange(Long productDetailId) {
-        List<ProductHistory> prices =  mvProductHistoryRepository.findHistoryChangeOfProductDetail(productDetailId, "PRICE");
+        List<ProductHistory> prices =  mvEntityRepository.findHistoryChangeOfProductDetail(productDetailId, "PRICE");
         for (ProductHistory priceChange : prices) {
             if (priceChange.getProduct() != null) {
                 priceChange.setProductId(priceChange.getProduct().getId());
@@ -92,7 +85,7 @@ public class ProductHistoryServiceImpl extends BaseService implements ProductHis
                     .oldValue("null".equals(oldValue) || ObjectUtils.isEmpty(oldValue) ? "-" : oldValue)
                     .newValue("null".equals(newValue) || ObjectUtils.isEmpty(newValue) ? "-" : newValue)
                     .build();
-            logSaved.add(this.save(productHistory));
+            logSaved.add(mvEntityRepository.save(productHistory));
         }
         return logSaved;
     }

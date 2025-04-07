@@ -1,8 +1,8 @@
 package com.flowiee.pms.controller.sales;
 
-import com.flowiee.pms.entity.sales.Supplier;
 import com.flowiee.pms.entity.sales.TicketImport;
 import com.flowiee.pms.exception.ResourceNotFoundException;
+import com.flowiee.pms.model.dto.SupplierDTO;
 import com.flowiee.pms.service.product.MaterialService;
 import com.flowiee.pms.service.product.ProductVariantService;
 import com.flowiee.pms.service.sales.SupplierService;
@@ -45,11 +45,11 @@ public class TicketImportControllerView extends BaseController {
     public ModelAndView viewDetail(@PathVariable("id") Long ticketImportId) {
         TicketImport ticketImport = mvTicketImportService.findById(ticketImportId, true);
 
-        List<Supplier> suppliers = new ArrayList<>();
+        List<SupplierDTO> suppliers = new ArrayList<>();
         if (ticketImport.getSupplier() != null) {
-            suppliers.add(new Supplier(ticketImport.getSupplier().getId(), ticketImport.getSupplier().getName()));
+            suppliers.add(new SupplierDTO(ticketImport.getSupplier().getId(), ticketImport.getSupplier().getName()));
         } else {
-            suppliers.add(new Supplier(-1, "Chọn nhà cung cấp"));
+            suppliers.add(new SupplierDTO(-1l, "Chọn nhà cung cấp"));
         }
         suppliers.addAll(mvSupplierService.findAll(-1, -1, ticketImport.getSupplier() != null ? List.of(ticketImport.getSupplier().getId()) : null).getContent());
 

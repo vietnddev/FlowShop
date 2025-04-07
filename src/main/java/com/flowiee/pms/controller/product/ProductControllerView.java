@@ -2,6 +2,7 @@ package com.flowiee.pms.controller.product;
 
 import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.entity.product.ProductAttribute;
+import com.flowiee.pms.entity.product.ProductDescription;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.model.dto.ProductDTO;
@@ -9,10 +10,7 @@ import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.service.ExportService;
 
-import com.flowiee.pms.service.product.ProductAttributeService;
-import com.flowiee.pms.service.product.ProductImageService;
-import com.flowiee.pms.service.product.ProductInfoService;
-import com.flowiee.pms.service.product.ProductVariantService;
+import com.flowiee.pms.service.product.*;
 import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.common.enumeration.Pages;
 import com.flowiee.pms.common.enumeration.TemplateExport;
@@ -43,6 +41,7 @@ public class ProductControllerView extends BaseController {
     @Qualifier("productExportServiceImpl")
     @NonFinal
     ExportService exportService;
+    ProductDescriptionService mvProductDescriptionService;
 
     @GetMapping
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
@@ -55,6 +54,10 @@ public class ProductControllerView extends BaseController {
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public ModelAndView viewGeneralProduct(@PathVariable("id") Long productId) {
         ProductDTO product = mvProductInfoService.findById(productId, true);
+        ProductDescription lvProductDescription = mvProductDescriptionService.findByProductId(productId);
+        if (lvProductDescription != null) {
+            product.setDescription(lvProductDescription.getDescription());
+        }
 
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_PRODUCT_INFO.getTemplate());
         modelAndView.addObject("productId", productId);

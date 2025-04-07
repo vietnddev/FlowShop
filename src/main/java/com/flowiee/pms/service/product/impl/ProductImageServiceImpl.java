@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.product.impl;
 
-import com.flowiee.pms.base.Core;
+import com.flowiee.pms.base.CoreStartUp;
 import com.flowiee.pms.entity.product.ProductCombo;
 import com.flowiee.pms.entity.product.ProductDamaged;
 import com.flowiee.pms.entity.sales.TicketExport;
@@ -213,7 +213,7 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
         FileStorage fileToChange = fileOptional;
         //Delete file vật lý cũ
         try {
-            File file = new File(Core.getResourceUploadPath() + FileUtils.getImageUrl(fileToChange, true));
+            File file = new File(CoreStartUp.getResourceUploadPath() + FileUtils.getImageUrl(fileToChange, true));
             if (file.exists()) {
                 file.delete();
             }

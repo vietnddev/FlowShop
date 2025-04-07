@@ -1,13 +1,11 @@
 package com.flowiee.pms.base.service;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Builder
 @Data
 public class BaseDTO implements Serializable {
     private Long id;

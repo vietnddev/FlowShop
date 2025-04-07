@@ -7,6 +7,7 @@ import com.flowiee.pms.entity.system.LeaveApplication;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.model.payload.LeaveApplicationReq;
+import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.repository.system.LeaveApplicationRepository;
 import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.category.CategoryService;
@@ -31,6 +32,7 @@ public class LeaveApplicationServiceImpl extends BaseService implements LeaveApp
     private final MailMediaService mailMediaService;
     private final CategoryService categoryService;
     private final AccountService employeeService;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public LeaveApplication getApplicationById(Long leaveApplicationId) {
@@ -57,7 +59,8 @@ public class LeaveApplicationServiceImpl extends BaseService implements LeaveApp
             }
         }
 
-        Category leaveType = categoryService.findById(pLeaveRequest.getLeaveType(), true);
+        Category leaveType = categoryRepository.findById(pLeaveRequest.getLeaveType())
+                .orElseThrow(() -> new EntityNotFoundException(new Object[] {"leave type"}, null, null));
         LeaveApplication leaveApplicationSubmitted = leaveApplicationRepository.save(LeaveApplication.builder()
                 .employee(employee)
                 .leaveType(leaveType)

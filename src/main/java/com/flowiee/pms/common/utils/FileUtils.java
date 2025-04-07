@@ -1,6 +1,6 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.base.Core;
+import com.flowiee.pms.base.CoreStartUp;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.common.enumeration.ErrorCode;
@@ -27,7 +27,7 @@ import java.util.UUID;
 
 public class FileUtils {
     public static String resourceStaticPath = "src/main/resources/static";
-    public static String fileUploadPath = Core.getResourceUploadPath() + "/uploads/";
+    public static String fileUploadPath = CoreStartUp.getResourceUploadPath() + "/uploads/";
     public static String initCsvDataPath = resourceStaticPath + "/data/csv";
     public static String initXlsxDataPath = resourceStaticPath + "/data/excel";
     public static String reportTemplatePath = resourceStaticPath + "/report";
@@ -112,17 +112,17 @@ public class FileUtils {
     }
 
     public static String getFileUploadPath() {
-        if (Core.getResourceUploadPath() == null) {
+        if (CoreStartUp.getResourceUploadPath() == null) {
             throw new AppException("The uploaded file saving directory is not configured, please try again later!");
         }
-        return Core.getResourceUploadPath() + "/uploads/";
+        return CoreStartUp.getResourceUploadPath() + "/uploads/";
     }
 
     public static String getImageTempPath() {
-        if (Core.getResourceUploadPath() == null) {
+        if (CoreStartUp.getResourceUploadPath() == null) {
             throw new AppException("The uploaded file saving directory is not configured, please try again later!");
         }
-        return Core.getResourceUploadPath() + "/data-temp/";
+        return CoreStartUp.getResourceUploadPath() + "/data-temp/";
     }
 
     public static boolean isAllowUpload(String fileExtension, boolean throwException, String message) {

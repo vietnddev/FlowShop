@@ -10,6 +10,7 @@ import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.model.payload.CreateOrderReq;
 import com.flowiee.pms.model.payload.UpdateOrderReq;
+import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.repository.sales.CustomerRepository;
 import com.flowiee.pms.repository.system.ConfigRepository;
 import com.flowiee.pms.security.UserSession;
@@ -61,6 +62,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
     private final VoucherTicketService  mvVoucherTicketService;
     private final LoyaltyProgramService mvLoyaltyProgramService;
     private final CategoryService       mvCategoryService;
+    private final CategoryRepository    mvCategoryRepository;
     private final CustomerService       mvCustomerService;
     private final AccountService        mvAccountService;
     private final UserSession           mvUserSession;
@@ -138,10 +140,10 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         if (ObjectUtils.isEmpty(lvCart.getListItems()))
             throw new BadRequestException("At least one product in the order!");
 
-        Category lvPaymentMethod = mvCategoryService.findById(pPaymentMethodId, false);
+        Category lvPaymentMethod = mvCategoryRepository.findById(pPaymentMethodId).get();
         if (lvPaymentMethod == null || !lvPaymentMethod.getStatus())
             throw new BadRequestException("Payment method invalid!");
-        Category lvSalesChannel = mvCategoryService.findById(pSaleChannelId, false);
+        Category lvSalesChannel = mvCategoryRepository.findById(pSaleChannelId).get();
         if (lvSalesChannel == null || !lvSalesChannel.getStatus())
             throw new BadRequestException("Sales channel invalid!");
 

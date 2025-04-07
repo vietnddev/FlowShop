@@ -1,5 +1,6 @@
 package com.flowiee.pms.repository.product;
 
+import com.flowiee.pms.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.flowiee.pms.entity.product.Material;
 
 @Repository
-public interface MaterialRepository extends JpaRepository<Material, Long> {
+public interface MaterialRepository extends BaseRepository<Material, Long> {
     @Query("from Material m " +
            "where 1=1 " +
            "and (:supplierId is null or m.supplier.id=:supplierId) " +

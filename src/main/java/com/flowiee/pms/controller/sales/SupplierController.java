@@ -1,9 +1,9 @@
 package com.flowiee.pms.controller.sales;
 
 import com.flowiee.pms.base.BaseController;
-import com.flowiee.pms.entity.sales.Supplier;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.AppResponse;
+import com.flowiee.pms.model.dto.SupplierDTO;
 import com.flowiee.pms.service.sales.SupplierService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,14 +28,14 @@ public class SupplierController extends BaseController {
     @Operation(summary = "Find all nhà cung cấp")
     @GetMapping("/all")
     @PreAuthorize("@vldModuleSales.readSupplier(true)")
-    public AppResponse<List<Supplier>> findAll(@RequestParam(value = "pageSize", required = false) Integer pageSize,
-                                               @RequestParam(value = "pageNum", required = false) Integer pageNum) {
+    public AppResponse<List<SupplierDTO>> findAll(@RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                                  @RequestParam(value = "pageNum", required = false) Integer pageNum) {
         try {
             if (pageSize != null && pageNum != null) {
-                Page<Supplier> suppliers = mvSupplierService.findAll(pageSize, pageNum - 1, null);
+                Page<SupplierDTO> suppliers = mvSupplierService.findAll(pageSize, pageNum - 1, null);
                 return success(suppliers.getContent(), pageNum, pageSize, suppliers.getTotalPages(), suppliers.getTotalElements());
             } else {
-                Page<Supplier> suppliers = mvSupplierService.findAll(null, null, null);
+                Page<SupplierDTO> suppliers = mvSupplierService.findAll(null, null, null);
                 return success(suppliers.getContent(), 1, 0, suppliers.getTotalPages(), suppliers.getTotalElements());
             }
         } catch (RuntimeException ex) {
@@ -46,7 +46,7 @@ public class SupplierController extends BaseController {
     @Operation(summary = "Thêm mới nhà cung cấp")
     @PostMapping("/create")
     @PreAuthorize("@vldModuleSales.insertSupplier(true)")
-    public AppResponse<Supplier> createNewSupplier(@RequestBody Supplier supplier) {
+    public AppResponse<SupplierDTO> createNewSupplier(@RequestBody SupplierDTO supplier) {
         try {
             return success(mvSupplierService.save(supplier));
         } catch (RuntimeException ex) {
@@ -57,7 +57,7 @@ public class SupplierController extends BaseController {
     @Operation(summary = "Cập nhật nhà cung cấp")
     @PutMapping("/update/{id}")
     @PreAuthorize("@vldModuleSales.updateSupplier(true)")
-    public AppResponse<Supplier> updateSupplier(@RequestBody Supplier supplier, @PathVariable("id") Long supplierId) {
+    public AppResponse<SupplierDTO> updateSupplier(@RequestBody SupplierDTO supplier, @PathVariable("id") Long supplierId) {
         return success(mvSupplierService.update(supplier, supplierId));
     }
 

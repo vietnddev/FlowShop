@@ -5,6 +5,7 @@ import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.AppResponse;
+import com.flowiee.pms.model.dto.CategoryDTO;
 import com.flowiee.pms.service.category.CategoryService;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.enumeration.ErrorCode;
@@ -57,7 +58,7 @@ public class CategoryController extends BaseController {
     @Operation(summary = "Create category")
     @PostMapping("/create")
     @PreAuthorize("@vldModuleCategory.insertCategory(true)")
-    public AppResponse<Category> createCategory(@RequestBody Category category) {
+    public AppResponse<CategoryDTO> createCategory(@RequestBody CategoryDTO category) {
         try {
             category.setType(CommonUtils.getCategoryType(category.getType()));
             return success(mvCategoryService.save(category));
@@ -69,7 +70,7 @@ public class CategoryController extends BaseController {
     @Operation(summary = "Update category")
     @PutMapping("/update/{categoryId}")
     @PreAuthorize("@vldModuleCategory.updateCategory(true)")
-    public AppResponse<Category> updateCategory(@RequestBody Category category, @PathVariable("categoryId") Long categoryId) {
+    public AppResponse<CategoryDTO> updateCategory(@RequestBody CategoryDTO category, @PathVariable("categoryId") Long categoryId) {
         if (mvCategoryService.findById(categoryId, true) == null) {
             throw new ResourceNotFoundException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "category"));
         }

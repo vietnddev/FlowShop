@@ -1,5 +1,6 @@
 package com.flowiee.pms.model.dto;
 
+import com.flowiee.pms.base.service.BaseDTO;
 import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.Branch;
 import lombok.Getter;
@@ -12,8 +13,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class BranchDTO implements Serializable {
-    private Long id;
+public class BranchDTO extends BaseDTO implements Serializable {
     private String branchCode;
     private String branchName;
     private String phoneNumber;

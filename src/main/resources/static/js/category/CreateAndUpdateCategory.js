@@ -33,7 +33,16 @@ function preUpdateCategory() {
 function submitInsertOrUpdate() {
     $("#btn-insert-update-submit").on("click", function () {
         let actionType = $(this).attr("actionType");
-        let category = {id : mvId, type : mvType, code : mvCode.val(), name : mvName.val(), sort : mvSort.val(), isDefault : 0, note : mvNote.val(), status: mvStatus.val()};
+        let category = {
+            id : mvId,
+            type : mvType,
+            code : mvCode.val(),
+            name : mvName.val(),
+            sort : mvSort.val(),
+            isDefault : 0,
+            note : mvNote.val(),
+            status: mvStatus.val()
+        };
         console.log(category)
         if (actionType === "insert") {
             $.ajax({

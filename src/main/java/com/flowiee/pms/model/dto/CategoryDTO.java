@@ -10,14 +10,14 @@ import com.flowiee.pms.entity.sales.LedgerTransaction;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.entity.sales.TicketImport;
 import com.flowiee.pms.entity.system.LeaveApplication;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
 
-@Builder
 @Data
+@NoArgsConstructor
 public class CategoryDTO extends BaseDTO implements Serializable {
     private String type;
     private String code;

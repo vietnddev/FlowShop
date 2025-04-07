@@ -5,7 +5,6 @@ import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.DataExistsException;
 import com.flowiee.pms.model.dto.AccountDTO;
-import com.flowiee.pms.model.dto.BranchDTO;
 import com.flowiee.pms.model.dto.GroupAccountDTO;
 import com.flowiee.pms.service.system.*;
 import com.flowiee.pms.common.enumeration.AccountStatus;
@@ -59,7 +58,7 @@ public class AccountControllerView extends BaseController {
         modelAndView.addObject("listRole", roleOfAccount);
         modelAndView.addObject("accountInfo", AccountDTO.toDTO(account));
         modelAndView.addObject("groupAccount", GroupAccountDTO.toDTOs(groupAccountService.findAll()));
-        modelAndView.addObject("listBranch", BranchDTO.toDTOs(branchService.findAll()));
+        modelAndView.addObject("listBranch", branchService.findAll());
 
         return baseView(modelAndView);
     }

@@ -2,83 +2,81 @@ package com.flowiee.pms.service.sales.impl;
 
 import com.flowiee.pms.entity.sales.Supplier;
 import com.flowiee.pms.exception.BadRequestException;
-import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.common.utils.ChangeLog;
+import com.flowiee.pms.model.dto.SupplierDTO;
 import com.flowiee.pms.repository.sales.SupplierRepository;
-import com.flowiee.pms.base.service.BaseService;
+import com.flowiee.pms.base.service.BaseServiceNew;
 import com.flowiee.pms.service.sales.SupplierService;
 
 import com.flowiee.pms.common.enumeration.ACTION;
 import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.common.enumeration.MasterObject;
-import com.flowiee.pms.common.enumeration.MessageCode;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import com.flowiee.pms.service.system.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
-public class SupplierServiceImpl extends BaseService implements SupplierService {
-    SupplierRepository mvSupplierRepository;
+public class SupplierServiceImpl extends BaseServiceNew<Supplier, SupplierDTO, SupplierRepository> implements SupplierService {
+    private final SystemLogService mvSystemLogService;
+
+    public SupplierServiceImpl(SupplierRepository pSupplierRepository, SystemLogService pSystemLogService) {
+        super(Supplier.class, SupplierDTO.class, pSupplierRepository);
+        this.mvSystemLogService = pSystemLogService;
+    }
 
     @Override
-    public List<Supplier> findAll() {
+    public List<SupplierDTO> findAll() {
         return this.findAll(-1, -1, null).getContent();
     }
 
     @Override
-    public Page<Supplier> findAll(Integer pageSize, Integer pageNum, List<Long> ignoreIds) {
+    public Page<SupplierDTO> findAll(Integer pageSize, Integer pageNum, List<Long> ignoreIds) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("name").ascending());
-        return mvSupplierRepository.findAll(ignoreIds, pageable);
+        Page<Supplier> supplierPage = mvEntityRepository.findAll(ignoreIds, pageable);
+        return new PageImpl<>(convertDTOs(supplierPage.getContent()), pageable, supplierPage.getTotalElements());
     }
 
     @Override
-    public Supplier findById(Long entityId, boolean pThrowException) {
-        Optional<Supplier> entityOptional = mvSupplierRepository.findById(entityId);
-        if (entityOptional.isEmpty() && pThrowException) {
-            throw new EntityNotFoundException(new Object[] {"supplier"}, null, null);
-        }
-        return entityOptional.orElse(null);
+    public SupplierDTO findById(Long entityId, boolean pThrowException) {
+        return super.findById(entityId, pThrowException);
     }
 
     @Override
-    public Supplier save(Supplier supplier) {
-        supplier.setStatus("A");
-        return mvSupplierRepository.save(supplier);
+    public SupplierDTO save(SupplierDTO pSupplier) {
+        pSupplier.setStatus("A");
+        return super.save(pSupplier);
     }
 
     @Override
-    public Supplier update(Supplier entity, Long entityId) {
-        Supplier supplier = this.findById(entityId, true);
+    public SupplierDTO update(SupplierDTO pDto, Long entityId) {
+        Supplier lvCurrentSupplier = super.findById(entityId).orElseThrow(() -> new BadRequestException());
 
-        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(supplier));
+        ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(lvCurrentSupplier));
 
-        entity.setId(entityId);
-        Supplier supplierUpdated = mvSupplierRepository.save(entity);
+        lvCurrentSupplier.setName(pDto.getName());
+        lvCurrentSupplier.setPhone(pDto.getPhone());
+        lvCurrentSupplier.setAddress(pDto.getAddress());
+        Supplier lvSupplierUpdated = mvEntityRepository.save(lvCurrentSupplier);
 
-        changeLog.setNewObject(supplierUpdated);
+        changeLog.setNewObject(lvSupplierUpdated);
         changeLog.doAudit();
 
-        systemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_SUP_U, MasterObject.Supplier, "Cập nhật thông tin nhà cung cấp: " + supplierUpdated.getName(), changeLog);
+        mvSystemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_SUP_U, MasterObject.Supplier, "Cập nhật thông tin nhà cung cấp: " + lvSupplierUpdated.getName(), changeLog);
 
-        return supplierUpdated;
+        return super.convertDTO(lvSupplierUpdated);
     }
 
     @Override
-    public String delete(Long entityId) {
-        if (entityId == null || entityId <= 0) {
+    public String delete(Long pEntityId) {
+        if (pEntityId == null || pEntityId <= 0) {
             throw new BadRequestException();
         }
-        mvSupplierRepository.deleteById(entityId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return super.delete(pEntityId);
     }
 }

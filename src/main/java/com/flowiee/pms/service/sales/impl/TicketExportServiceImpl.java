@@ -10,6 +10,7 @@ import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.entity.product.ProductHistory;
 import com.flowiee.pms.entity.sales.TicketExport;
 import com.flowiee.pms.exception.BadRequestException;
+import com.flowiee.pms.model.dto.ProductHistoryDTO;
 import com.flowiee.pms.repository.product.ProductDetailTempRepository;
 import com.flowiee.pms.repository.sales.OrderRepository;
 import com.flowiee.pms.repository.sales.TicketExportRepository;
@@ -182,7 +183,7 @@ public class TicketExportServiceImpl extends BaseService implements TicketExport
                 //Save log
                 int storageQty = lvProductVariant.getStorageQty();
                 int soldQty = lvProductVariant.getSoldQty();
-                ProductHistory productHistory = ProductHistory.builder()
+                ProductHistoryDTO productHistory = ProductHistoryDTO.builder()
                     .product(lvProductVariant.getProduct())
                     .productDetail(lvProductVariant)
                     .title("Cập nhật số lượng cho [" + lvProductVariant.getVariantName() + "] - " + pTicket.getTitle())

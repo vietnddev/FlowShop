@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.sales.impl;
 
-import com.flowiee.pms.base.Core;
+import com.flowiee.pms.base.CoreStartUp;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.AppException;
@@ -60,7 +60,7 @@ public class OrderPrintInvoiceServiceImpl extends BaseService implements OrderPr
         parameterMap.put("nowDate", new Date());
         FileStorage f = mvOrderGenerateQRCodeService.findOrderQRCode(lvOrderDto.getId());
         if (f != null) {
-            Path barcodePath = Path.of(Core.getResourceUploadPath() + FileUtils.getImageUrl(f, true));
+            Path barcodePath = Path.of(CoreStartUp.getResourceUploadPath() + FileUtils.getImageUrl(f, true));
             if (barcodePath.toFile().exists()) {
                 parameterMap.put("barcode", barcodePath);
             }

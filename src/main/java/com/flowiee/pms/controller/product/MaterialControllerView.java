@@ -4,6 +4,7 @@ import com.flowiee.pms.entity.product.Material;
 import com.flowiee.pms.common.enumeration.Pages;
 import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.exception.ResourceNotFoundException;
+import com.flowiee.pms.model.dto.MaterialDTO;
 import com.flowiee.pms.service.product.MaterialService;
 
 import com.flowiee.pms.common.enumeration.EndPoint;
@@ -38,7 +39,7 @@ public class MaterialControllerView extends BaseController {
 
     @PostMapping("/insert")
     @PreAuthorize("@vldModuleProduct.insertMaterial(true)")
-    public ModelAndView insert(@ModelAttribute("material") Material material) {
+    public ModelAndView insert(@ModelAttribute("material") MaterialDTO material) {
         material.setStatus(true);
         mvMaterialService.save(material);
         return new ModelAndView("redirect:");
@@ -46,7 +47,7 @@ public class MaterialControllerView extends BaseController {
 
     @PostMapping("/update/{id}")
     @PreAuthorize("@vldModuleProduct.updateMaterial(true)")
-    public ModelAndView update(@ModelAttribute("material") Material material,
+    public ModelAndView update(@ModelAttribute("material") MaterialDTO material,
                                                @PathVariable("id") Long materialId,
                                                HttpServletRequest request) {
         if (mvMaterialService.findById(materialId, true) == null) {

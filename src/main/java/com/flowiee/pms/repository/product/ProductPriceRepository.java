@@ -1,7 +1,7 @@
 package com.flowiee.pms.repository.product;
 
+import com.flowiee.pms.base.BaseRepository;
 import com.flowiee.pms.entity.product.ProductPrice;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ProductPriceRepository extends JpaRepository<ProductPrice, Long> {
+public interface ProductPriceRepository extends BaseRepository<ProductPrice, Long> {
     @Query("from ProductPrice pp " +
            "where pp.state = 'A' " +
            "    and (:productBaseId is null or pp.productBase.id = :productBaseId) " +

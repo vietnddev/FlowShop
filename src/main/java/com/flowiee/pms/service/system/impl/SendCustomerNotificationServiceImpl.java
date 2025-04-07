@@ -34,7 +34,7 @@ public class SendCustomerNotificationServiceImpl extends BaseService implements 
         lvNotificationParameter.put("deliveryAddress", pOrderInfo.getReceiverAddress());
         lvNotificationParameter.put("deliveryPhoneNumber", pOrderInfo.getReceiverPhone());
         lvNotificationParameter.put("deliveryEmail", pOrderInfo.getReceiverEmail());
-        lvNotificationParameter.put("totalOrderValue", OrderUtils.calTotalAmount(pOrderInfo.getListOrderDetail(), pOrderInfo.getAmountDiscount()));
+        lvNotificationParameter.put("totalOrderValue", OrderUtils.calTotalAmount_(pOrderInfo.getListOrderDetail(), pOrderInfo.getAmountDiscount()));
 
         StringBuilder lvRowsBuilder = new StringBuilder("");
         StringBuilder lvRowBuilder = new StringBuilder();

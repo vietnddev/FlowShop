@@ -1,6 +1,5 @@
 package com.flowiee.pms.base;
 
-import com.flowiee.pms.base.BaseEntity;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.config.TemplateSendEmail;
 import com.flowiee.pms.entity.category.Category;
@@ -47,11 +46,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.transaction.annotation.Transactional;
 
 @Configuration
 @RequiredArgsConstructor
-public class Core {
+public class CoreStartUp {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final ConfigRepository       mvConfigRepository;
@@ -65,6 +66,7 @@ public class Core {
 	private final TemplateSendEmail      mvTemplateSendEmail;
 	private final Environment            mvEnvironment;
 	private final ScheduleRepository 	 mvScheduleRepository;
+	private final SessionRegistry 		 mvSessionRegistry;
 
 	public static LocalDateTime                                      START_APP_TIME;
 	public static String                                             mvResourceUploadPath      = null;
@@ -134,6 +136,8 @@ public class Core {
 				mvGeneralEmailTemplateMap.put(lvNotificationType, lvTemplate);
 			});
 			logger.info("Email template loading finished");
+
+			expireAllSessions();
 
 			START_APP_TIME = LocalDateTime.now();
         };
@@ -384,5 +388,14 @@ public class Core {
 
 	public static Map<ConfigCode, SystemConfig> getSystemConfigs() {
     	return mvSystemConfigList;
+	}
+
+	public void expireAllSessions() {
+		for (Object principal : mvSessionRegistry.getAllPrincipals()) {
+			List<SessionInformation> sessions = mvSessionRegistry.getAllSessions(principal, false);
+			for (SessionInformation session : sessions) {
+				session.expireNow();
+			}
+		}
 	}
 }

@@ -16,9 +16,9 @@ public interface OrderReadService {
                            OrderStatus pOrderStatus, Long pSalesChannelId, Long pSellerId, Long pCustomerId,
                            Long pBranchId, Long pGroupCustomerId, String pDateFilter, LocalDateTime pOrderTimeFrom, LocalDateTime pOrderTimeTo, String pSortBy);
 
-    Order findById(Long orderId, boolean throwException);
+    OrderDTO findById(Long orderId, boolean throwException);
 
-    Order findByTrackingCode(String pTrackingCode);
+    OrderDTO findByTrackingCode(String pTrackingCode);
 
     List<Order> findOrdersToday();
 

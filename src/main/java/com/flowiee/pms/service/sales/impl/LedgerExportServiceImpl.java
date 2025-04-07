@@ -1,8 +1,8 @@
 package com.flowiee.pms.service.sales.impl;
 
-import com.flowiee.pms.entity.sales.LedgerTransaction;
 import com.flowiee.pms.model.GeneralLedger;
 import com.flowiee.pms.base.BaseExportService;
+import com.flowiee.pms.model.dto.LedgerTransactionDTO;
 import com.flowiee.pms.service.sales.LedgerService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class LedgerExportServiceImpl extends BaseExportService {
         GeneralLedger lvData = mvLedgerService.findGeneralLedger(-1, -1, null, null);
         XSSFSheet lvSheet = mvWorkbook.getSheetAt(0);
         for (int i = 0; i < lvData.getListTransactions().size(); i++) {
-            LedgerTransaction t = lvData.getListTransactions().get(i);
+            LedgerTransactionDTO t = lvData.getListTransactions().get(i);
 
             XSSFRow row = lvSheet.createRow(i + 3);
             row.createCell(0).setCellValue(i + 1);

@@ -1,13 +1,14 @@
 package com.flowiee.pms.service.sales;
 
 import com.flowiee.pms.entity.sales.Order;
+import com.flowiee.pms.model.dto.OrderDTO;
 
 public interface OrderProcessService {
-    void cancelOrder(Order pOrder, String pReason);
+    void cancelOrder(OrderDTO pOrder, String pReason);
 
-    void completeOrder(Order pOrder);
+    void completeOrder(OrderDTO pOrder);
 
-    void returnOrder(Order pOrder);
+    void returnOrder(OrderDTO pOrder);
 
     void refundOrder(Long pOrderId);
 }

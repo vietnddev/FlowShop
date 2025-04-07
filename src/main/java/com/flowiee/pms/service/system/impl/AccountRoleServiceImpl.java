@@ -5,9 +5,9 @@ import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.AccountRole;
-import com.flowiee.pms.entity.system.GroupAccount;
 import com.flowiee.pms.entity.system.SystemLog;
 import com.flowiee.pms.exception.EntityNotFoundException;
+import com.flowiee.pms.model.dto.GroupAccountDTO;
 import com.flowiee.pms.repository.system.AccountRepository;
 import com.flowiee.pms.model.role.*;
 import com.flowiee.pms.repository.system.AccountRoleRepository;
@@ -47,8 +47,8 @@ public class AccountRoleServiceImpl extends BaseService implements RoleService {
 
     @Override
     public List<RoleModel> findAllRoleByGroupId(Long groupId) {
-        GroupAccount groupAcc = mvGroupAccountService.findById(groupId, false);
-        if (groupAcc == null) {
+        GroupAccountDTO lvGroupAcc = mvGroupAccountService.findById(groupId, false);
+        if (lvGroupAcc == null) {
             return List.of();
         }
         List<RoleModel> listReturn = new ArrayList<>();

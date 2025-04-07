@@ -1,9 +1,9 @@
 package com.flowiee.pms.controller.product;
 
 import com.flowiee.pms.base.BaseController;
-import com.flowiee.pms.entity.product.ProductAttribute;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.AppResponse;
+import com.flowiee.pms.model.dto.ProductAttributeDTO;
 import com.flowiee.pms.service.product.ProductAttributeService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +25,7 @@ public class ProductAttributeController extends BaseController {
     @Operation(summary = "Create product attribute")
     @PostMapping("/attribute/create")
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
-    public AppResponse<ProductAttribute> createProductAttribute(@RequestBody ProductAttribute productAttribute) {
+    public AppResponse<ProductAttributeDTO> createProductAttribute(@RequestBody ProductAttributeDTO productAttribute) {
         try {
             return success(mvProductAttributeService.save(productAttribute));
         } catch (RuntimeException ex) {
@@ -36,7 +36,7 @@ public class ProductAttributeController extends BaseController {
     @Operation(summary = "Update product attribute")
     @PutMapping("/attribute/update/{id}")
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
-    public AppResponse<ProductAttribute> updateProductAttribute(@RequestBody ProductAttribute productAttribute, @PathVariable("id") Long productAttributeId) {
+    public AppResponse<ProductAttributeDTO> updateProductAttribute(@RequestBody ProductAttributeDTO productAttribute, @PathVariable("id") Long productAttributeId) {
         try {
             return success(mvProductAttributeService.update(productAttribute, productAttributeId));
         } catch (RuntimeException ex) {

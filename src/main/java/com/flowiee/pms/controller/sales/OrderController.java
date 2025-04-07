@@ -91,8 +91,8 @@ public class OrderController extends BaseController {
     @GetMapping("/{orderId}")
     @PreAuthorize("@vldModuleSales.readOrder(true)")
     public AppResponse<OrderDTO> findOrderDetail(@PathVariable("orderId") Long pOrderId) {
-        Order lvOrder = mvOrderReadService.findById(pOrderId, true);
-        return success(OrderDTO.fromOrder(lvOrder));
+        OrderDTO lvOrder = mvOrderReadService.findById(pOrderId, true);
+        return success(lvOrder);
     }
 
     @Operation(summary = "Create new order")
@@ -153,7 +153,7 @@ public class OrderController extends BaseController {
     @PostMapping("/process/{type}/{orderId}")
     @PreAuthorize("@vldModuleSales.updateOrder(true)")
     public AppResponse<String> processOrder(@PathVariable("type") String pType, @PathVariable("orderId") Long pOrderId) {
-        Order lvOrder = mvOrderReadService.findById(pOrderId, true);
+        OrderDTO lvOrder = mvOrderReadService.findById(pOrderId, true);
         switch (CoreUtils.trim(pType).toLowerCase()) {
             case "cancel":
                 mvOrderProcessService.cancelOrder(lvOrder, "");

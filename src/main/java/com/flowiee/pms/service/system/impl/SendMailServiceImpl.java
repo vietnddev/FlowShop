@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.system.impl;
 
-import com.flowiee.pms.base.Core;
+import com.flowiee.pms.base.CoreStartUp;
 import com.flowiee.pms.common.enumeration.ConfigCode;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.SysConfigUtils;
@@ -40,7 +40,7 @@ public class SendMailServiceImpl extends BaseService implements SendMailService 
         Assert.notNull(to, "Recipient cannot be null!");
         Assert.notNull(body, "Content cannot be null!");
 
-        Map<ConfigCode, SystemConfig> lvSystemConfig = Core.getSystemConfigs();
+        Map<ConfigCode, SystemConfig> lvSystemConfig = CoreStartUp.getSystemConfigs();
         String lvHost = CoreUtils.trim(lvSystemConfig.get(ConfigCode.emailHost).getValue());
         int lvPort = SysConfigUtils.getIntValue(lvSystemConfig.get(ConfigCode.emailPort));
         String lvUsername = CoreUtils.trim(lvSystemConfig.get(ConfigCode.emailUser).getValue());

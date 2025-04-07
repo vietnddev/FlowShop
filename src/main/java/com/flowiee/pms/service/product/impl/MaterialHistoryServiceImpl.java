@@ -1,81 +1,72 @@
 package com.flowiee.pms.service.product.impl;
 
+import com.flowiee.pms.base.service.BaseGService;
 import com.flowiee.pms.entity.product.Material;
 import com.flowiee.pms.entity.product.MaterialHistory;
 import com.flowiee.pms.exception.BadRequestException;
-import com.flowiee.pms.exception.EntityNotFoundException;
+import com.flowiee.pms.model.dto.MaterialHistoryDTO;
 import com.flowiee.pms.repository.product.MaterialHistoryRepository;
 import com.flowiee.pms.service.product.MaterialHistoryService;
 
-import com.flowiee.pms.common.enumeration.MessageCode;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
-public class MaterialHistoryServiceImpl implements MaterialHistoryService {
-    MaterialHistoryRepository mvMaterialHistoryRepository;
-
-    @Override
-    public List<MaterialHistory> findAll() {
-        return mvMaterialHistoryRepository.findAll();
+public class MaterialHistoryServiceImpl extends BaseGService<MaterialHistory, MaterialHistoryDTO, MaterialHistoryRepository> implements MaterialHistoryService {
+    public MaterialHistoryServiceImpl(MaterialHistoryRepository pMaterialHistoryRepository) {
+        super(MaterialHistory.class, MaterialHistoryDTO.class, pMaterialHistoryRepository);
     }
 
     @Override
-    public MaterialHistory findById(Long entityId, boolean pThrowException) {
-        Optional<MaterialHistory> entityOptional = mvMaterialHistoryRepository.findById(entityId);
-        if (entityOptional.isEmpty() && pThrowException) {
-            throw new EntityNotFoundException(new Object[] {"material history"}, null, null);
-        }
-        return entityOptional.orElse(null);
+    public List<MaterialHistoryDTO> findAll() {
+        return super.findAll();
     }
 
     @Override
-    public MaterialHistory save(MaterialHistory entity) {
-        if (entity == null) {
+    public MaterialHistoryDTO findById(Long pEntityId, boolean pThrowException) {
+        return super.findById(pEntityId, pThrowException);
+    }
+
+    @Override
+    public MaterialHistoryDTO save(MaterialHistoryDTO pEntity) {
+        if (pEntity == null) {
             throw new BadRequestException();
         }
-        return mvMaterialHistoryRepository.save(entity);
+        return super.save(pEntity);
     }
 
     @Override
-    public MaterialHistory update(MaterialHistory entity, Long entityId) {
-        if (entity == null || entityId == null || entityId <= 0) {
+    public MaterialHistoryDTO update(MaterialHistoryDTO pEntity, Long pEntityId) {
+        if (pEntity == null || pEntityId == null || pEntityId <= 0) {
             throw new BadRequestException();
         }
-        entity.setId(entityId);
-        return mvMaterialHistoryRepository.save(entity);
+        pEntity.setId(pEntityId);
+        return super.update(pEntity, pEntityId);
     }
 
     @Override
-    public String delete(Long entityId) {
-        if (entityId == null || entityId <= 0) {
+    public String delete(Long pEntityId) {
+        if (pEntityId == null || pEntityId <= 0) {
             throw new BadRequestException();
         }
-        mvMaterialHistoryRepository.deleteById(entityId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return super.delete(pEntityId);
     }
 
     @Override
-    public List<MaterialHistory> findByMaterialId(Long materialId) {
-        return mvMaterialHistoryRepository.findByMaterialId(materialId);
+    public List<MaterialHistoryDTO> findByMaterialId(Long materialId) {
+        return super.convertDTOs(mvEntityRepository.findByMaterialId(materialId));
     }
 
     @Override
-    public List<MaterialHistory> findByFieldName(String fieldName) {
-        return mvMaterialHistoryRepository.findByFieldName(fieldName);
+    public List<MaterialHistoryDTO> findByFieldName(String fieldName) {
+        return super.convertDTOs(mvEntityRepository.findByFieldName(fieldName));
     }
 
     @Override
-    public List<MaterialHistory> save(Map<String, Object[]> logChanges, String title, Long materialId) {
+    public List<MaterialHistoryDTO> save(Map<String, Object[]> logChanges, String title, Long materialId) {
         List<MaterialHistory> materialHistories = new ArrayList<>();
         for (Map.Entry<String, Object[]> entry : logChanges.entrySet()) {
             String field = entry.getKey();
@@ -88,8 +79,8 @@ public class MaterialHistoryServiceImpl implements MaterialHistoryService {
                     .oldValue(oldValue)
                     .newValue(newValue)
                     .build();
-            materialHistories.add(this.save(materialHistory));
+            materialHistories.add(mvEntityRepository.save(materialHistory));
         }
-        return materialHistories;
+        return convertDTOs(materialHistories);
     }
 }

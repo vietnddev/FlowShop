@@ -1,6 +1,6 @@
 package com.flowiee.pms.repository.sales;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.flowiee.pms.base.BaseRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +11,7 @@ import com.flowiee.pms.entity.sales.Items;
 import java.util.List;
 
 @Repository
-public interface CartItemsRepository extends JpaRepository<Items, Long> {
+public interface CartItemsRepository extends BaseRepository<Items, Long> {
     @Query("from Items i where i.orderCart.id=:idCart")
     List<Items> findByCartId(@Param("idCart") Long idCart);
 

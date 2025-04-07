@@ -9,13 +9,12 @@ import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.StorageItems;
 import com.flowiee.pms.model.dto.StorageDTO;
 import com.flowiee.pms.repository.storage.StorageRepository;
-import com.flowiee.pms.base.service.BaseService;
+import com.flowiee.pms.base.service.BaseGService;
 import com.flowiee.pms.service.storage.StorageService;
-import com.flowiee.pms.common.converter.StorageConvert;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import com.flowiee.pms.service.system.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -29,10 +28,14 @@ import java.time.temporal.ChronoField;
 import java.util.*;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
-public class StorageServiceImpl extends BaseService implements StorageService {
-    StorageRepository mvStorageRepository;
+public class StorageImplService extends BaseGService<Storage, StorageDTO, StorageRepository> implements StorageService {
+    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private final SystemLogService systemLogService;
+
+    public StorageImplService(StorageRepository pEntityRepository, SystemLogService systemLogService) {
+        super(Storage.class, StorageDTO.class, pEntityRepository);
+        this.systemLogService = systemLogService;
+    }
 
     @Override
     public List<StorageDTO> findAll() {
@@ -42,17 +45,17 @@ public class StorageServiceImpl extends BaseService implements StorageService {
     @Override
     public Page<StorageDTO> findAll(int pageSize, int pageNum) {
         Pageable pageable = getPageable(pageNum, pageSize);
-        Page<Storage> storages = mvStorageRepository.findAll(pageable);
+        Page<Storage> storages = mvEntityRepository.findAll(pageable);
         return new PageImpl<>(StorageDTO.convertToDTOs(storages.getContent()), pageable, storages.getTotalElements());
     }
 
     @Override
     public Page<StorageItems> findStorageItems(int pageSize, int pageNum, Long storageId, String searchText) {
-        Optional<Storage> storage = mvStorageRepository.findById(storageId);
+        Optional<Storage> storage = super.findById(storageId);
         if (storage.isEmpty())
             throw new BadRequestException("Storage not found");
         Pageable pageable = getPageable(pageNum, pageSize);
-        Page<Object[]> storageItemsRawData = mvStorageRepository.findAllItems(searchText, storageId, pageable);
+        Page<Object[]> storageItemsRawData = mvEntityRepository.findAllItems(searchText, storageId, pageable);
         List<StorageItems> storageItems = new ArrayList<>();
         DateTimeFormatter formatter = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy-MM-dd HH:mm:ss")
@@ -81,7 +84,7 @@ public class StorageServiceImpl extends BaseService implements StorageService {
 
     @Override
     public StorageDTO findById(Long storageId, boolean pThrowException) {
-        Optional<Storage> storageOptional = mvStorageRepository.findById(storageId);
+        Optional<Storage> storageOptional = super.findById(storageId);
         if (storageOptional.isPresent()) {
             List<StorageItems> storageItemsList = this.findStorageItems(-1, -1, storageId, null).getContent();
             StorageDTO storage = StorageDTO.convertToDTO(storageOptional.get());
@@ -98,22 +101,20 @@ public class StorageServiceImpl extends BaseService implements StorageService {
     }
 
     @Override
-    public StorageDTO save(StorageDTO inputStorageDTO) {
-        Storage storage = StorageConvert.convertToEntity(inputStorageDTO);
-        String lvCode = storage.getCode();
+    public StorageDTO save(StorageDTO pStorageDTO) {
+        String lvCode = pStorageDTO.getCode();
 
-        if (mvStorageRepository.findByCode(lvCode) != null)
+        if (mvEntityRepository.findByCode(lvCode) != null)
             throw new BadRequestException(String.format("Storage code %s existed!", lvCode));
 
-        storage.setStatus("Y");
+        pStorageDTO.setStatus("Y");
 
-        Storage storageSaved = mvStorageRepository.save(storage);
-        return StorageDTO.convertToDTO(storageSaved);
+        return super.save(pStorageDTO);
     }
 
     @Override
     public StorageDTO update(StorageDTO inputStorageDTO, Long storageId) {
-        Optional<Storage> storageOpt = mvStorageRepository.findById(storageId);
+        Optional<Storage> storageOpt = super.findById(storageId);
         if (storageOpt.isEmpty()) {
             throw new BadRequestException("Storage not found");
         }
@@ -124,7 +125,7 @@ public class StorageServiceImpl extends BaseService implements StorageService {
         storageOpt.get().setDescription(inputStorageDTO.getDescription());
         storageOpt.get().setIsDefault(inputStorageDTO.getIsDefault());
         storageOpt.get().setStatus(inputStorageDTO.getStatus());
-        Storage storageUpdated = mvStorageRepository.save(storageOpt.get());
+        Storage storageUpdated = mvEntityRepository.save(storageOpt.get());
 
         changeLog.setNewObject(storageUpdated);
         changeLog.doAudit();
@@ -141,9 +142,9 @@ public class StorageServiceImpl extends BaseService implements StorageService {
             if ("Y".equals(storage.getStatus())) {
                 return "This storage is in use!";
             }
-            mvStorageRepository.deleteById(storageId);
+            mvEntityRepository.deleteById(storageId);
             systemLogService.writeLogDelete(MODULE.STORAGE, ACTION.STG_STORAGE, MasterObject.Storage, "Xóa kho", storage.getName());
-            logger.info("Delete storage success! storageId={}", storageId);
+            LOG.info("Delete storage success! storageId={}", storageId);
             return MessageCode.DELETE_SUCCESS.getDescription();
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.DELETE_ERROR_OCCURRED.getDescription(), "Storage storageId=" + storageId), ex);

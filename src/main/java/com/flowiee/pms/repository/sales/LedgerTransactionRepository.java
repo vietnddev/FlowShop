@@ -1,9 +1,9 @@
 package com.flowiee.pms.repository.sales;
 
+import com.flowiee.pms.base.BaseRepository;
 import com.flowiee.pms.entity.sales.LedgerTransaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface LedgerTransactionRepository extends JpaRepository<LedgerTransaction, Long> {
+public interface LedgerTransactionRepository extends BaseRepository<LedgerTransaction, Long> {
     @Query("from LedgerTransaction t " +
            "where 1=1 " +
            "and (:type is null or t.tranType=:type) " +

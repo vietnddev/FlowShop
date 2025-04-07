@@ -1,7 +1,6 @@
 package com.flowiee.pms.service.sales.impl;
 
-import com.flowiee.pms.base.Core;
-import com.flowiee.pms.entity.sales.Order;
+import com.flowiee.pms.base.CoreStartUp;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.OrderDetailRpt;
@@ -37,8 +36,8 @@ public class OrderPrintInvoiceServiceImpl extends BaseService implements OrderPr
     OrderGenerateQRCodeService mvOrderGenerateQRCodeService;
 
     @Override
-    public void printInvoicePDF(Order pOrder, List<Integer> pOrderIds, boolean isExportAll, HttpServletResponse response) {
-        OrderDTO lvOrderDto = OrderDTO.fromOrder(pOrder);
+    public void printInvoicePDF(OrderDTO pOrder, List<Integer> pOrderIds, boolean isExportAll, HttpServletResponse response) {
+        OrderDTO lvOrderDto = pOrder;
 
         boolean checkBatch = false;
 
@@ -60,7 +59,7 @@ public class OrderPrintInvoiceServiceImpl extends BaseService implements OrderPr
         parameterMap.put("nowDate", new Date());
         FileStorage f = mvOrderGenerateQRCodeService.findOrderQRCode(lvOrderDto.getId());
         if (f != null) {
-            Path barcodePath = Path.of(Core.getResourceUploadPath() + FileUtils.getImageUrl(f, true));
+            Path barcodePath = Path.of(CoreStartUp.getResourceUploadPath() + FileUtils.getImageUrl(f, true));
             if (barcodePath.toFile().exists()) {
                 parameterMap.put("barcode", barcodePath);
             }
@@ -71,7 +70,8 @@ public class OrderPrintInvoiceServiceImpl extends BaseService implements OrderPr
 
         // orderDetails
         List<OrderDetailRpt> listDetail = new ArrayList<>();
-        for (OrderDetailDTO detailDTO : lvOrderDto.getListOrderDetailDTO()) {
+        //for (OrderDetailDTO detailDTO : lvOrderDto.getListOrderDetailDTO()) {
+        for (OrderDetailDTO detailDTO : lvOrderDto.getListOrderDetail()) {
             BigDecimal lvUnitPrice = detailDTO.getPrice();
             int lvQuantity = detailDTO.getQuantity();
             listDetail.add(OrderDetailRpt.builder()

@@ -1,8 +1,8 @@
 package com.flowiee.pms.controller.sales;
 
 import com.flowiee.pms.base.BaseController;
-import com.flowiee.pms.entity.sales.LedgerTransaction;
 import com.flowiee.pms.model.AppResponse;
+import com.flowiee.pms.model.dto.LedgerTransactionDTO;
 import com.flowiee.pms.service.sales.LedgerPaymentService;
 import com.flowiee.pms.service.sales.LedgerReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,18 +31,18 @@ public class LedgerTransactionController extends BaseController {
     @Operation(summary = "Find all trans receipts")
     @GetMapping("/receipt/all")
     @PreAuthorize("@vldModuleSales.readLedgerTransaction(true)")
-    public AppResponse<List<LedgerTransaction>> findLedgerReceipts(@RequestParam(value = "pageSize", required = false) Integer pageSize,
-                                                                   @RequestParam(value = "pageNum", required = false) Integer pageNum) {
-        Page<LedgerTransaction> ledgerReceipts = mvLedgerReceiptService.findAll(pageSize, pageNum - 1, null, null);
+    public AppResponse<List<LedgerTransactionDTO>> findLedgerReceipts(@RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                                                      @RequestParam(value = "pageNum", required = false) Integer pageNum) {
+        Page<LedgerTransactionDTO> ledgerReceipts = mvLedgerReceiptService.findAll(pageSize, pageNum - 1, null, null);
         return success(ledgerReceipts.getContent(), pageNum, pageSize, ledgerReceipts.getTotalPages(), ledgerReceipts.getTotalElements());
     }
 
     @Operation(summary = "Find all trans payments")
     @GetMapping("/payment/all")
     @PreAuthorize("@vldModuleSales.readLedgerTransaction(true)")
-    public AppResponse<List<LedgerTransaction>> findLedgerPayments(@RequestParam(value = "pageSize", required = false) Integer pageSize,
+    public AppResponse<List<LedgerTransactionDTO>> findLedgerPayments(@RequestParam(value = "pageSize", required = false) Integer pageSize,
                                                                    @RequestParam(value = "pageNum", required = false) Integer pageNum) {
-        Page<LedgerTransaction> ledgerReceipts = mvLedgerPaymentService.findAll(pageSize, pageNum - 1, null, null);
+        Page<LedgerTransactionDTO> ledgerReceipts = mvLedgerPaymentService.findAll(pageSize, pageNum - 1, null, null);
         return success(ledgerReceipts.getContent(), pageNum, pageSize, ledgerReceipts.getTotalPages(), ledgerReceipts.getTotalElements());
     }
 }

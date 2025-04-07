@@ -1,9 +1,9 @@
 package com.flowiee.pms.controller.product;
 
 import com.flowiee.pms.base.BaseController;
-import com.flowiee.pms.entity.product.ProductCombo;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.model.AppResponse;
+import com.flowiee.pms.model.dto.ProductComboDTO;
 import com.flowiee.pms.service.product.ProductComboService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,24 +28,24 @@ public class ProductComboController extends BaseController {
     @Operation(summary = "Find all combos")
     @GetMapping("/all")
     @PreAuthorize("@vldModuleProduct.readCombo(true)")
-    public AppResponse<List<ProductCombo>> findProductCombos(@RequestParam(value = "pageSize", required = false) Integer pageSize,
-                                                             @RequestParam(value = "pageNum", required = false) Integer pageNum) {
-        Page<ProductCombo> productComboPage = mvProductComboService.findAll(pageSize, pageNum - 1);
+    public AppResponse<List<ProductComboDTO>> findProductCombos(@RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                                                @RequestParam(value = "pageNum", required = false) Integer pageNum) {
+        Page<ProductComboDTO> productComboPage = mvProductComboService.findAll(pageSize, pageNum - 1);
         return success(productComboPage.getContent(), pageNum, pageSize, productComboPage.getTotalPages(), productComboPage.getTotalElements());
     }
 
     @Operation(summary = "Find detail combo")
     @GetMapping("/{comboId}")
     @PreAuthorize("@vldModuleProduct.readCombo(true)")
-    public AppResponse<ProductCombo> findDetailCombo(@PathVariable("comboId") Long comboId) {
-        ProductCombo productCombo = mvProductComboService.findById(comboId, true);
+    public AppResponse<ProductComboDTO> findDetailCombo(@PathVariable("comboId") Long comboId) {
+        ProductComboDTO productCombo = mvProductComboService.findById(comboId, true);
         return success(productCombo);
     }
 
     @Operation(summary = "Create new combo")
     @PostMapping("/create")
     @PreAuthorize("@vldModuleProduct.insertCombo(true)")
-    public AppResponse<ProductCombo> createCombo(@RequestBody ProductCombo productCombo) {
+    public AppResponse<ProductComboDTO> createCombo(@RequestBody ProductComboDTO productCombo) {
         try {
             return success(mvProductComboService.save(productCombo));
         } catch (RuntimeException ex) {
@@ -56,7 +56,7 @@ public class ProductComboController extends BaseController {
     @Operation(summary = "Update combo")
     @PutMapping("/update/{comboId}")
     @PreAuthorize("@vldModuleProduct.updateCombo(true)")
-    public AppResponse<ProductCombo> updateProductCombo(@RequestBody ProductCombo productCombo, @PathVariable("comboId") Long comboId) {
+    public AppResponse<ProductComboDTO> updateProductCombo(@RequestBody ProductComboDTO productCombo, @PathVariable("comboId") Long comboId) {
         try {
             return success(mvProductComboService.update(productCombo, comboId));
         } catch (RuntimeException ex) {

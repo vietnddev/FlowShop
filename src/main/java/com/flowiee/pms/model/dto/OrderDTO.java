@@ -2,8 +2,10 @@ package com.flowiee.pms.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flowiee.pms.entity.sales.Order;
-import com.flowiee.pms.entity.sales.OrderDetail;
+import com.flowiee.pms.common.enumeration.PriorityLevel;
+import com.flowiee.pms.entity.category.Category;
+import com.flowiee.pms.entity.sales.*;
+import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.utils.OrderUtils;
@@ -47,6 +49,36 @@ public class OrderDTO implements Serializable {
 	private String paymentNote;
 	private String note;
 
+	private CustomerDTO customer;
+	private String customerType;
+	private String confirmedBy;
+	private LocalDateTime confirmedTime;
+	private String customerNote;
+	private Boolean isGiftWrapped;
+	private BigDecimal giftWrapCost;
+	private BigDecimal packagingCost;
+	private Account nhanVienBanHang;
+	private Category salesChannel;
+	private Category paymentMethod;
+	private TicketExport ticketExport;
+	private LocalDateTime cancellationDate;
+	private Long cancellationReason;
+	private LocalDateTime deliverySuccessTime;
+	private LocalDateTime deliveryExpectedTime;
+	private String deliveryMethod;
+	private String deliveredBy;
+	private String deliveredStatus;
+	private String deliveryPriority;
+	private PriorityLevel priorityLevel;
+	private String refundAmount;
+	private String refundStatus;
+	private String referrerCode;
+	private String trackingCode;
+	private BigDecimal totalWeight;
+	private List<OrderHistory> listOrderHistory;
+	private List<FileStorage> listImageQR;
+	private List<CustomerDebt> customerDebtList;
+
 	private Long customerId;
 	private String customerName;
 	private Long salesChannelId;
@@ -66,9 +98,9 @@ public class OrderDTO implements Serializable {
 	private Long cartId;
 	private Long ticketExportId;
 	private Boolean accumulateBonusPoints;
-	private List<OrderDetailDTO> listOrderDetailDTO;
-	@JsonIgnore
-	private List<OrderDetail> listOrderDetail;
+	private List<OrderDetailDTO> listOrderDetail;
+	//@JsonIgnore
+	//private List<OrderDetail> listOrderDetail;
 
 	public OrderDTO(Long id, String code, LocalDateTime orderTime, String receiptName, String receiptPhone, String receiptEmail, String receiptAddress, OrderStatus orderStatus) {
 		this.id = id;
@@ -112,9 +144,9 @@ public class OrderDTO implements Serializable {
 		dto.setShippingCost(order.getShippingCost());
 		dto.setCodFee(order.getCodFee());
 		dto.setAmountDiscount(order.getAmountDiscount() != null ? order.getAmountDiscount() : new BigDecimal(0));
-		dto.setTotalAmount(OrderUtils.calTotalAmount(order.getListOrderDetail(), BigDecimal.ZERO));
-		dto.setTotalAmountDiscount(OrderUtils.calTotalAmount(order.getListOrderDetail(), order.getAmountDiscount()));
-		dto.setTotalProduct(OrderUtils.countItemsEachOrder(order.getListOrderDetail()));
+		//dto.setTotalAmount(OrderUtils.calTotalAmount(order.getListOrderDetail(), BigDecimal.ZERO));
+		//dto.setTotalAmountDiscount(OrderUtils.calTotalAmount(order.getListOrderDetail(), order.getAmountDiscount()));
+		//dto.setTotalProduct(OrderUtils.countItemsEachOrder(order.getListOrderDetail()));
 		dto.setCouponCode(order.getCouponCode());
 		dto.setPaymentStatus(order.getPaymentStatus() != null && order.getPaymentStatus());
 		dto.setPaymentTime(order.getPaymentTime());
@@ -122,7 +154,8 @@ public class OrderDTO implements Serializable {
 		dto.setPaymentNote(order.getPaymentNote());
 		dto.setNote(order.getNote());
 
-		dto.setListOrderDetailDTO(OrderDetailDTO.fromOrderDetails(order.getListOrderDetail()));
+		//dto.setListOrderDetailDTO(OrderDetailDTO.fromOrderDetails(order.getListOrderDetail()));
+		dto.setListOrderDetail(OrderDetailDTO.fromOrderDetails(order.getListOrderDetail()));
 
 		return dto;
 	}

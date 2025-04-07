@@ -14,6 +14,7 @@ import com.flowiee.pms.service.statistics.SalesPerformanceStatisticsService;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.OrderUtils;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Query;
@@ -27,6 +28,7 @@ public class SalesPerformanceStatisticsServiceImpl extends BaseService implement
     private final AccountRepository accountRepository;
     private final OrderRepository orderRepository;
     private final OrderReadService orderReadService;
+    private final ModelMapper modelMapper;
 
     @Override
     public List<SalesPerformanceStatisticsModel> getPerformanceEmployee() {
@@ -93,7 +95,7 @@ public class SalesPerformanceStatisticsServiceImpl extends BaseService implement
             BigDecimal lvValueOfOrders = new BigDecimal(CoreUtils.trim(obj[3]));
             List<Order> lvOrderListBySalesChannel = orderRepository.countBySalesChannel(lvSalesChannelId);
             Integer lvNumberOfOrders = lvOrderListBySalesChannel.size();
-            Integer lvNumberOfProducts = OrderUtils.countItemsListOrder(lvOrderListBySalesChannel);
+            Integer lvNumberOfProducts = OrderUtils.countItemsListOrder_(lvOrderListBySalesChannel);
 
             lvReturnData.add(OrderSalesChannelStatisticsModel.builder()
                     .salesChannelName(lvSalesChannelName)

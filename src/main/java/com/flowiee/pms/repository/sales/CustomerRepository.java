@@ -1,8 +1,8 @@
 package com.flowiee.pms.repository.sales;
 
+import com.flowiee.pms.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
+public interface CustomerRepository extends BaseRepository<Customer, Long> {
     @Query("select distinct c from Customer c " +
            "left join CustomerContact cc on c.id = cc.customer.id " +
            "where (:name is null or c.customerName like %:name%) " +

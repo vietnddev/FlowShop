@@ -30,7 +30,7 @@ public class RevenueStatisticsServiceImpl extends BaseService implements Revenue
             lvDate = new LocalDateTime[] {pFromDate.atTime(LocalTime.MIN), pToDate.atTime(LocalTime.MAX)};
         }
         List<Order> lvOrderList = orderRepository.findBySuccessfulDeliveryTime(lvDate[0], lvDate[1]);
-        BigDecimal lvRevenue = OrderUtils.calTotalAmount(lvOrderList);
+        BigDecimal lvRevenue = OrderUtils.calTotalAmount_(lvOrderList);
         return lvRevenue;
     }
 
@@ -38,7 +38,7 @@ public class RevenueStatisticsServiceImpl extends BaseService implements Revenue
     public BigDecimal getWeekRevenue() {
         LocalDateTime[] lvDate = getFromDateToDate(FilterDate.getByCode("T-7"));
         List<Order> lvOrderList = orderRepository.findBySuccessfulDeliveryTime(lvDate[0], lvDate[1]);
-        BigDecimal lvRevenue = OrderUtils.calTotalAmount(lvOrderList);
+        BigDecimal lvRevenue = OrderUtils.calTotalAmount_(lvOrderList);
         return lvRevenue;
     }
 
@@ -54,7 +54,7 @@ public class RevenueStatisticsServiceImpl extends BaseService implements Revenue
             };
         }
         List<Order> lvOrderList = orderRepository.findBySuccessfulDeliveryTime(lvDate[0], lvDate[1]);
-        BigDecimal lvRevenue = OrderUtils.calTotalAmount(lvOrderList);
+        BigDecimal lvRevenue = OrderUtils.calTotalAmount_(lvOrderList);
         return lvRevenue;
     }
 

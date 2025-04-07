@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.system.impl;
 
-import com.flowiee.pms.base.Core;
+import com.flowiee.pms.base.CoreStartUp;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.entity.system.SystemConfig;
@@ -95,7 +95,7 @@ public class FileStorageServiceImpl extends BaseService implements FileStorageSe
             throw new BadRequestException("File not found!");
         }
         mvFileRepository.deleteById(fileId);
-        File file = new File(Core.getResourceUploadPath() + FileUtils.getImageUrl(fileStorage.get(), true));
+        File file = new File(CoreStartUp.getResourceUploadPath() + FileUtils.getImageUrl(fileStorage.get(), true));
         if (file.exists() && file.delete()) {
             return MessageCode.DELETE_SUCCESS.getDescription();
         }
@@ -103,10 +103,10 @@ public class FileStorageServiceImpl extends BaseService implements FileStorageSe
     }
 
     private boolean vldResourceUploadPath(boolean throwException) {
-        if (Core.getResourceUploadPath() == null) {
+        if (CoreStartUp.getResourceUploadPath() == null) {
             SystemConfig resourceUploadPathConfig = mvConfigRepository.findByCode(ConfigCode.resourceUploadPath.name());
             if (SysConfigUtils.isValid(resourceUploadPathConfig)) {
-                Core.mvResourceUploadPath = resourceUploadPathConfig.getValue();
+                CoreStartUp.mvResourceUploadPath = resourceUploadPathConfig.getValue();
                 return true;
             } else {
                 if (throwException) {

@@ -1,20 +1,20 @@
 package com.flowiee.pms.service.sales;
 
 import com.flowiee.pms.base.BaseCurdService;
-import com.flowiee.pms.entity.sales.CustomerContact;
+import com.flowiee.pms.model.dto.CustomerContactDTO;
 
 import java.util.List;
 
-public interface CustomerContactService extends BaseCurdService<CustomerContact> {
-    List<CustomerContact> findContacts(Long customerId);
+public interface CustomerContactService extends BaseCurdService<CustomerContactDTO> {
+    List<CustomerContactDTO> findContacts(Long customerId);
 
-    CustomerContact findContactPhoneUseDefault(Long customerId);
+    CustomerContactDTO findContactPhoneUseDefault(Long customerId);
 
-    CustomerContact findContactEmailUseDefault(Long customerId);
+    CustomerContactDTO findContactEmailUseDefault(Long customerId);
 
-    CustomerContact findContactAddressUseDefault(Long customerId);
+    CustomerContactDTO findContactAddressUseDefault(Long customerId);
 
-    CustomerContact enableContactUseDefault(Long customerId, String type, Long contactId);
+    CustomerContactDTO enableContactUseDefault(Long customerId, String type, Long contactId);
 
-    CustomerContact disableContactUnUseDefault(Long contactId);
+    CustomerContactDTO disableContactUnUseDefault(Long contactId);
 }

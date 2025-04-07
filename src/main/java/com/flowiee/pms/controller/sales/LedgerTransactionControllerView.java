@@ -1,8 +1,8 @@
 package com.flowiee.pms.controller.sales;
 
 import com.flowiee.pms.base.BaseController;
-import com.flowiee.pms.entity.sales.LedgerTransaction;
 import com.flowiee.pms.exception.ResourceNotFoundException;
+import com.flowiee.pms.model.dto.LedgerTransactionDTO;
 import com.flowiee.pms.service.category.CategoryService;
 import com.flowiee.pms.service.sales.LedgerPaymentService;
 import com.flowiee.pms.service.sales.LedgerReceiptService;
@@ -52,7 +52,7 @@ public class LedgerTransactionControllerView extends BaseController {
     @GetMapping("/{id}")
     @PreAuthorize("@vldModuleSales.readLedgerTransaction(true)")
     public ModelAndView findTransactionDetail(@PathVariable("id") Long tranId) {
-        LedgerTransaction transaction = mvLedgerReceiptService.findById(tranId, false);
+        LedgerTransactionDTO transaction = mvLedgerReceiptService.findById(tranId, false);
         if (transaction == null) {
             throw new ResourceNotFoundException("Ledger receipt not found!");
         }
@@ -64,14 +64,14 @@ public class LedgerTransactionControllerView extends BaseController {
 
     @PostMapping("/receipt/insert")
     @PreAuthorize("@vldModuleSales.insertLedgerTransaction(true)")
-    public ModelAndView insertLedgerReceipt(LedgerTransaction transaction) {
+    public ModelAndView insertLedgerReceipt(LedgerTransactionDTO transaction) {
         mvLedgerReceiptService.save(transaction);
         return new ModelAndView("redirect:/ledger/trans/receipt");
     }
 
     @PostMapping("/payment/insert")
     @PreAuthorize("@vldModuleSales.insertLedgerTransaction(true)")
-    public ModelAndView insertLedgerPayment(LedgerTransaction transaction) {
+    public ModelAndView insertLedgerPayment(LedgerTransactionDTO transaction) {
         mvLedgerPaymentService.save(transaction);
         return new ModelAndView("redirect:/ledger/trans/payment");
     }

@@ -1,6 +1,6 @@
 package com.flowiee.pms.repository.product;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.flowiee.pms.base.BaseRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -10,7 +10,7 @@ import com.flowiee.pms.entity.product.MaterialHistory;
 import java.util.List;
 
 @Repository
-public interface MaterialHistoryRepository extends JpaRepository<MaterialHistory, Long> {
+public interface MaterialHistoryRepository extends BaseRepository<MaterialHistory, Long> {
     @Query("from MaterialHistory m where m.material.id=:materialId")
     List<MaterialHistory> findByMaterialId(@Param("materialId") Long materialId);
 

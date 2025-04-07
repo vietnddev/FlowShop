@@ -1,6 +1,7 @@
 package com.flowiee.pms.service.system.impl;
 
 import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.SystemLog;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.repository.system.SystemLogRepository;
@@ -79,7 +80,7 @@ public class SystemLogServiceImpl extends BaseService implements SystemLogServic
                 .content(lvContent)
                 .contentChange(lvContentChange)
                 .ip(userSession.getUserPrincipal().getIp())
-                .account(userSession.getUserPrincipal().getEntity())
+                .account(new Account(userSession.getUserPrincipal().getId()))
                 .build());
     }
 }

@@ -116,7 +116,7 @@ public class LoyaltyProgramServiceImpl extends BaseService implements LoyaltyPro
         if (lvCustomerOpt.isEmpty())
             throw new ResourceNotFoundException("Customer not found!");
 
-        BigDecimal lvTotalAmount = OrderUtils.calTotalAmount(pOrder.getListOrderDetail(), pOrder.getAmountDiscount());
+        BigDecimal lvTotalAmount = OrderUtils.calTotalAmount_(pOrder.getListOrderDetail(), pOrder.getAmountDiscount());
         BigDecimal lvPoints = getPoints(lvTotalAmount, lvLoyaltyProgram);
         if (lvPoints.doubleValue() <= 0)
             throw new BadRequestException("Points must be greater than zero!");

@@ -1,7 +1,7 @@
 package com.flowiee.pms.repository.sales;
 
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.flowiee.pms.base.BaseRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,7 +11,7 @@ import com.flowiee.pms.entity.sales.CustomerContact;
 import java.util.List;
 
 @Repository
-public interface CustomerContactRepository extends JpaRepository<CustomerContact, Long> {
+public interface CustomerContactRepository extends BaseRepository<CustomerContact, Long> {
     @Query("from CustomerContact c where c.customer.id=:customerId order by c.code, c.isDefault, c.status")
     List<CustomerContact> findByCustomerId(@Param("customerId") Long customerId);
 

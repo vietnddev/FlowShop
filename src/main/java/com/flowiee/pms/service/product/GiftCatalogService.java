@@ -1,10 +1,10 @@
 package com.flowiee.pms.service.product;
 
-import com.flowiee.pms.entity.product.GiftCatalog;
 import com.flowiee.pms.base.BaseCurdService;
+import com.flowiee.pms.model.dto.GiftCatalogDTO;
 
 import java.util.List;
 
-public interface GiftCatalogService extends BaseCurdService<GiftCatalog> {
-    List<GiftCatalog> getActiveGifts();
+public interface GiftCatalogService extends BaseCurdService<GiftCatalogDTO> {
+    List<GiftCatalogDTO> getActiveGifts();
 }

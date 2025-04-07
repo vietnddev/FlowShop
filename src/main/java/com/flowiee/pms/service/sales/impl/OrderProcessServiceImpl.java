@@ -4,6 +4,8 @@ import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.common.enumeration.TransactionGoodsType;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.sales.Order;
+import com.flowiee.pms.exception.BadRequestException;
+import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.model.dto.TransactionGoodsDTO;
 import com.flowiee.pms.repository.sales.OrderRepository;
 import com.flowiee.pms.repository.system.ConfigRepository;
@@ -37,8 +39,8 @@ public class OrderProcessServiceImpl extends BaseService implements OrderProcess
     private final OrderRepository orderRepository;
 
     @Override
-    public void cancelOrder(Order pOrder, String pReason) {
-        Order lvOrder = pOrder;
+    public void cancelOrder(OrderDTO pOrder, String pReason) {
+        Order lvOrder = orderRepository.findById(pOrder.getId()).orElseThrow(() -> new BadRequestException());
         lvOrder.setCancellationReason(null);
         lvOrder.setCancellationDate(LocalDateTime.now());
         Order lvOrderUpdated = orderRepository.save(lvOrder);
@@ -51,8 +53,8 @@ public class OrderProcessServiceImpl extends BaseService implements OrderProcess
     }
 
     @Override
-    public void completeOrder(Order pOrder) {
-        Order lvOrder = pOrder;
+    public void completeOrder(OrderDTO pOrder) {
+        Order lvOrder = orderRepository.findById(pOrder.getId()).orElseThrow(() -> new BadRequestException());
         lvOrder.setOrderStatus(OrderStatus.DLVD);
         lvOrder.setDeliverySuccessTime(LocalDateTime.now());
         Order lvOrderUpdated = orderRepository.save(lvOrder);
@@ -65,9 +67,9 @@ public class OrderProcessServiceImpl extends BaseService implements OrderProcess
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void returnOrder(Order pOrder) {
+    public void returnOrder(OrderDTO pOrder) {
         try {
-            Order lvOrder = pOrder;
+            Order lvOrder = orderRepository.findById(pOrder.getId()).orElseThrow(() -> new BadRequestException());
             Long lvStorageId = null;
             String lvOrderCode = lvOrder.getCode();
             ticketImportService.restockReturnedItems(lvStorageId, lvOrderCode);
@@ -86,8 +88,7 @@ public class OrderProcessServiceImpl extends BaseService implements OrderProcess
 
     @Override
     public void refundOrder(Long pOrderId) {
-        Order lvOrder = orderReadService.findById(pOrderId, true);
-
+        Order lvOrder = orderRepository.findById(pOrderId).orElseThrow(() -> new BadRequestException());
         //...
     }
 }

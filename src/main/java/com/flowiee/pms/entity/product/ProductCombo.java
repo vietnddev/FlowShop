@@ -63,6 +63,10 @@ public class ProductCombo extends BaseEntity implements Serializable {
     @Transient
     List<ProductVariantDTO> applicableProducts;
 
+    public ProductCombo(Long pId) {
+        this.id = pId;
+    }
+
     @AssertTrue(message = "Start date must be before end date")
     public boolean isValidDateRange() {
         return startDate == null || endDate == null || startDate.isBefore(endDate);

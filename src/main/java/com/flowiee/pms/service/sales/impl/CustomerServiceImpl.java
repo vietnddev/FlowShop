@@ -1,5 +1,6 @@
 package com.flowiee.pms.service.sales.impl;
 
+import com.flowiee.pms.base.service.BaseGService;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.exception.BadRequestException;
@@ -17,15 +18,14 @@ import com.flowiee.pms.entity.sales.Customer;
 import com.flowiee.pms.repository.sales.CustomerContactRepository;
 import com.flowiee.pms.repository.sales.CustomerRepository;
 import com.flowiee.pms.repository.sales.OrderRepository;
-import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.sales.CustomerContactService;
 import com.flowiee.pms.service.sales.CustomerService;
 
-import com.flowiee.pms.common.utils.CommonUtils;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import com.flowiee.pms.service.system.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,15 +39,30 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
-public class CustomerServiceImpl extends BaseService implements CustomerService {
-    CustomerContactRepository mvCustomerContactRepository;
-    CustomerContactService mvCustomerContactService;
-    CustomerRepository mvCustomerRepository;
-    OrderRepository mvOrderRepository;
-    ConfigService mvConfigService;
-    UserSession userSession;
+public class CustomerServiceImpl extends BaseGService<Customer, CustomerDTO, CustomerRepository> implements CustomerService {
+    private Logger LOG = LoggerFactory.getLogger(getClass());
+
+    private final CustomerContactRepository mvCustomerContactRepository;
+    private final CustomerContactService mvCustomerContactService;
+    private final OrderRepository mvOrderRepository;
+    private final ConfigService mvConfigService;
+    private final UserSession userSession;
+    private final SystemLogService mvSystemLogService;
+    private final ModelMapper mvModelMapper;
+
+    public CustomerServiceImpl(CustomerRepository pEntityRepository, CustomerContactRepository pCustomerContactRepository,
+                               CustomerContactService pCustomerContactService, OrderRepository pOrderRepository,
+                               ConfigService pConfigService, UserSession pUserSession, SystemLogService pSystemLogService,
+                               ModelMapper pModelMapper) {
+        super(Customer.class, CustomerDTO.class, pEntityRepository);
+        this.mvCustomerContactRepository = pCustomerContactRepository;
+        this.mvCustomerContactService = pCustomerContactService;
+        this.mvOrderRepository = pOrderRepository;
+        this.mvConfigService = pConfigService;
+        this.userSession = pUserSession;
+        this.mvSystemLogService = pSystemLogService;
+        this.mvModelMapper = pModelMapper;
+    }
 
     @Override
     public List<CustomerDTO> findAll() {
@@ -57,7 +72,7 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
     @Override
     public Page<CustomerDTO> findAll(int pageSize, int pageNum, String name, String sex, Date birthday, String phone, String email, String address) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("customerName").ascending());
-        Page<Customer> customers = mvCustomerRepository.findAll(name, sex, birthday, phone, email, address, pageable);
+        Page<Customer> customers = mvEntityRepository.findAll(name, sex, birthday, phone, email, address, pageable);
         List<CustomerDTO> customerDTOs = CustomerDTO.fromCustomers(customers.getContent());
         this.setContactDefault(customerDTOs);
         return new PageImpl<>(customerDTOs, pageable, customerDTOs.size());
@@ -65,24 +80,16 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
 
     @Override
     public List<CustomerDTO> findCustomerNewInMonth() {
-        List<CustomerDTO> customerDTOs = CustomerDTO.fromCustomers(mvCustomerRepository.findCustomerNewInMonth());
+        List<CustomerDTO> customerDTOs = CustomerDTO.fromCustomers(mvEntityRepository.findCustomerNewInMonth());
         this.setContactDefault(customerDTOs);
         return customerDTOs;
     }
 
     @Override
-    public CustomerDTO findById(Long id, boolean pThrowException) {
-        Optional<Customer> customer = mvCustomerRepository.findById(id);
-        if (customer.isPresent()) {
-            CustomerDTO customerDTO = CustomerDTO.fromCustomer(customer.get());
-            this.setContactDefault(List.of(customerDTO));
-            return customerDTO;
-        }
-        if (pThrowException) {
-            throw new EntityNotFoundException(new Object[] {"customer"}, null, null);
-        } else {
-            return null;
-        }
+    public CustomerDTO findById(Long pId, boolean pThrowException) {
+        CustomerDTO lvCustomer = super.findById(pId, pThrowException);
+        this.setContactDefault(List.of(lvCustomer));
+        return lvCustomer;
     }
 
     @Transactional
@@ -108,7 +115,7 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
         customer.setBonusPoints(0);
         customer.setIsBlackList(false);
         customer.setIsVIP(dto.getIsVIP());
-        Customer customerInserted = mvCustomerRepository.save(customer);
+        Customer customerInserted = mvEntityRepository.save(customer);
 
         CustomerContact customerContact = CustomerContact.builder()
                 .customer(new Customer(customerInserted.getId()))
@@ -147,8 +154,8 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
             mvCustomerContactService.save(customerContact);
         }
 
-        systemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_CUS_C, MasterObject.Customer, "Thêm mới khách hàng", customer.toString());
-        logger.info("Create customer: {}", customer.toString());
+        mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_CUS_C, MasterObject.Customer, "Thêm mới khách hàng", customer.toString());
+        LOG.info("Create customer: {}", customer.toString());
 
         return CustomerDTO.fromCustomer(customerInserted);
     }
@@ -160,7 +167,7 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
         //lvCustomer.set
         //lvCustomer.set
         //lvCustomer.set
-        Customer customerUpdated = mvCustomerRepository.save(lvCustomer);
+        Customer customerUpdated = mvEntityRepository.save(lvCustomer);
 
         CustomerContact phoneDefault = null;
         CustomerContact emailDefault = null;
@@ -224,8 +231,8 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
                 mvCustomerContactService.save(addressDefault);
             }
         }
-        systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_CUS_U, MasterObject.Customer, "Cập nhật thông tin khách hàng", pCustomer.toString());
-        logger.info("Update customer info {}", pCustomer.toString());
+        mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_CUS_U, MasterObject.Customer, "Cập nhật thông tin khách hàng", pCustomer.toString());
+        LOG.info("Update customer info {}", pCustomer.toString());
         return CustomerDTO.fromCustomer(customerUpdated);
     }
 
@@ -236,10 +243,10 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
         if (ObjectUtils.isNotEmpty(orderOfCustomer)) {
             throw new DataInUseException(ErrorCode.ERROR_DATA_LOCKED.getDescription());
         }
-        mvCustomerRepository.deleteById(customer.getId());
+        mvEntityRepository.deleteById(customer.getId());
 
-        systemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_CUS_D, MasterObject.Customer, "Xóa khách hàng", customer.getCustomerName());
-        logger.info("Deleted customer id={}", customer.getId());
+        mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_CUS_D, MasterObject.Customer, "Xóa khách hàng", customer.getCustomerName());
+        LOG.info("Deleted customer id={}", customer.getId());
 
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
@@ -282,7 +289,7 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
     @Override
     public Page<CustomerDTO> getVIPCustomers(int pageSize, int pageNum) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Customer> customers = mvCustomerRepository.findVIPCustomers(pageable);
+        Page<Customer> customers = mvEntityRepository.findVIPCustomers(pageable);
         List<CustomerDTO> customerDTOs = CustomerDTO.fromCustomers(customers.getContent());
         this.setContactDefault(customerDTOs);
 
@@ -292,7 +299,7 @@ public class CustomerServiceImpl extends BaseService implements CustomerService 
     @Override
     public Page<CustomerDTO> getBlackListCustomers(int pageSize, int pageNum) {
         Pageable pageable = PageRequest.of(pageNum, pageSize);
-        Page<Customer> customers = mvCustomerRepository.findBlackListCustomers(pageable);
+        Page<Customer> customers = mvEntityRepository.findBlackListCustomers(pageable);
         List<CustomerDTO> customerDTOs = CustomerDTO.fromCustomers(customers.getContent());
         this.setContactDefault(customerDTOs);
 

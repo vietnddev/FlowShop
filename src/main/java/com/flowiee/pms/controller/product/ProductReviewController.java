@@ -1,9 +1,9 @@
 package com.flowiee.pms.controller.product;
 
 import com.flowiee.pms.base.BaseController;
-import com.flowiee.pms.entity.product.ProductReview;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.AppResponse;
+import com.flowiee.pms.model.dto.ProductReviewDTO;
 import com.flowiee.pms.service.product.ProductReviewService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,21 +27,21 @@ public class ProductReviewController extends BaseController {
 
     @Operation(summary = "Find all product reviews")
     @GetMapping
-    public AppResponse<List<ProductReview>> findByProduct(@PathVariable("productId") Long productId) {
-        Page<ProductReview> productReview = mvProductReviewService.findByProduct(productId);
+    public AppResponse<List<ProductReviewDTO>> findByProduct(@PathVariable("productId") Long productId) {
+        Page<ProductReviewDTO> productReview = mvProductReviewService.findByProduct(productId);
         return success(productReview.getContent(), 1, -1, productReview.getTotalPages(), productReview.getTotalElements());
     }
 
     @Operation(summary = "Create product review")
     @PostMapping("/create")
-    public AppResponse<ProductReview> createProductReview(@RequestBody ProductReview productReview) {
+    public AppResponse<ProductReviewDTO> createProductReview(@RequestBody ProductReviewDTO productReview) {
         return success(mvProductReviewService.save(productReview));
     }
 
     @Operation(summary = "Update product review")
     @PutMapping("/update/{reviewId}")
     @PreAuthorize("@vldModuleProduct.updateReview(true)")
-    public AppResponse<ProductReview> updateProductReview(@RequestBody ProductReview productReview, @PathVariable("reviewId") Long reviewId) {
+    public AppResponse<ProductReviewDTO> updateProductReview(@RequestBody ProductReviewDTO productReview, @PathVariable("reviewId") Long reviewId) {
         if (mvProductReviewService.findById(reviewId, true) == null) {
             throw new ResourceNotFoundException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "productReview"));
         }

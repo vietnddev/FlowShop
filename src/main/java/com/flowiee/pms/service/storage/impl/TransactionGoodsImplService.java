@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.storage.impl;
 
-import com.flowiee.pms.base.service.BaseService;
+import com.flowiee.pms.base.service.BaseGService;
 import com.flowiee.pms.entity.product.Material;
 import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.storage.TransactionGoods;
@@ -15,7 +15,6 @@ import com.flowiee.pms.repository.system.AccountRepository;
 import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.storage.TransactionGoodsService;
 import com.flowiee.pms.common.enumeration.TransactionGoodsType;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -28,21 +27,32 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
-public class TransactionGoodsServiceImpl extends BaseService implements TransactionGoodsService {
-    private static final Logger LOG = LoggerFactory.getLogger(TransactionGoodsServiceImpl.class);
+public class TransactionGoodsImplService extends BaseGService<TransactionGoods, TransactionGoodsDTO, TransactionGoodsRepository> implements TransactionGoodsService {
+    private final Logger LOG = LoggerFactory.getLogger(getClass());
 
-    private final TransactionGoodsRepository transactionGoodsRepository;
     private final ProductDetailRepository productVariantRepository;
     private final MaterialRepository materialRepository;
     private final AccountRepository accountRepository;
     private final UserSession userSession;
     private final ModelMapper modelMapper;
 
+    public TransactionGoodsImplService(TransactionGoodsRepository transactionGoodsRepository,
+                                       ProductDetailRepository productVariantRepository,
+                                       MaterialRepository materialRepository,
+                                       AccountRepository accountRepository,
+                                       UserSession userSession, ModelMapper modelMapper) {
+        super(TransactionGoods.class, TransactionGoodsDTO.class, transactionGoodsRepository);
+        this.productVariantRepository = productVariantRepository;
+        this.materialRepository = materialRepository;
+        this.accountRepository = accountRepository;
+        this.userSession = userSession;
+        this.modelMapper = modelMapper;
+    }
+
     @Override
     public Page<TransactionGoodsDTO> getTransactionGoods(int page, int size, String type, String transactionFromDate, String transactionToDate, String transactionDate, String transactionCode, String orderCode, String itemCode, String createBy, String[] sortColumn, String[] sortType) throws Exception {
         if (TransactionGoodsType.ISSUE.equals(TransactionGoodsType.get(type))) {} else {}
-        Page<TransactionGoods> transactionGoodsPage = transactionGoodsRepository.findAll(getPageable(page, size));
+        Page<TransactionGoods> transactionGoodsPage = mvEntityRepository.findAll(getPageable(page, size));
         return null;
     }
 

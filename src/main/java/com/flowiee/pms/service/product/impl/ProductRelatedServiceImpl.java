@@ -1,28 +1,31 @@
 package com.flowiee.pms.service.product.impl;
 
+import com.flowiee.pms.base.service.BaseGService;
 import com.flowiee.pms.entity.product.Product;
 import com.flowiee.pms.entity.product.ProductRelated;
 import com.flowiee.pms.exception.EntityNotFoundException;
+import com.flowiee.pms.model.dto.ProductRelatedDTO;
 import com.flowiee.pms.repository.product.ProductRelatedRepository;
 import com.flowiee.pms.repository.product.ProductRepository;
-import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.ProductRelatedService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-public class ProductRelatedServiceImpl extends BaseService implements ProductRelatedService {
-    private final ProductRelatedRepository mvProductRelatedRepository;
+public class ProductRelatedServiceImpl extends BaseGService<ProductRelated, ProductRelatedDTO, ProductRelatedRepository> implements ProductRelatedService {
     private final ProductRepository mvProductRepository;
 
+    public ProductRelatedServiceImpl(ProductRelatedRepository pEntityRepository, ProductRepository pProductRepository) {
+        super(ProductRelated.class, ProductRelatedDTO.class, pEntityRepository);
+        this.mvProductRepository = pProductRepository;
+    }
+
     @Override
-    public List<ProductRelated> get(Long productId) {
+    public List<ProductRelatedDTO> get(Long productId) {
         Product product = mvProductRepository.findById(productId)
                 .orElseThrow(()-> new EntityNotFoundException(new Object[] {"product"}, null, null));
-        return mvProductRelatedRepository.findByProductId(product.getId());
+        return convertDTOs(mvEntityRepository.findByProductId(product.getId()));
     }
 
     @Override
@@ -37,13 +40,11 @@ public class ProductRelatedServiceImpl extends BaseService implements ProductRel
         relation.setProduct(product);
         relation.setRelatedProduct(relatedProduct);
 
-        mvProductRelatedRepository.save(relation);
+        mvEntityRepository.save(relation);
     }
 
     @Override
-    public void remove(Long relationId) {
-        mvProductRelatedRepository.findById(relationId)
-                .orElseThrow(() -> new EntityNotFoundException(new Object[] {"relation product"}, null, null));
-        mvProductRelatedRepository.deleteById(relationId);
+    public void remove(Long pRelationId) {
+        super.delete(pRelationId);
     }
 }

@@ -10,14 +10,11 @@ import com.flowiee.pms.model.dto.ProductDTO;
 import com.flowiee.pms.model.dto.VoucherInfoDTO;
 import com.flowiee.pms.repository.sales.VoucherInfoRepository;
 
-import com.flowiee.pms.base.service.BaseService;
+import com.flowiee.pms.base.service.BaseGService;
 import com.flowiee.pms.service.sales.VoucherApplyService;
 import com.flowiee.pms.service.sales.VoucherService;
 import com.flowiee.pms.service.sales.VoucherTicketService;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
+import com.flowiee.pms.service.system.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -34,16 +31,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
-public class VoucherInfoServiceImpl extends BaseService implements VoucherService {
-    ModelMapper           mvModelMapper;
-    VoucherApplyService   mvVoucherApplyService;
-    VoucherInfoRepository mvVoucherInfoRepository;
+public class VoucherInfoImplService extends BaseGService<VoucherInfo, VoucherInfoDTO, VoucherInfoRepository> implements VoucherService {
     @Autowired
-    @NonFinal
     @Lazy
-    VoucherTicketService  mvVoucherTicketService;
+    private VoucherTicketService  mvVoucherTicketService;
+    private final VoucherApplyService   mvVoucherApplyService;
+    private final SystemLogService      mvSystemLogService;
+    private final ModelMapper           mvModelMapper;
+
+    public VoucherInfoImplService(VoucherInfoRepository pVoucherInfoRepository, VoucherApplyService pVoucherApplyService, SystemLogService pSystemLogService, ModelMapper pModelMapper) {
+        super(VoucherInfo.class, VoucherInfoDTO.class, pVoucherInfoRepository);
+        this.mvVoucherApplyService = pVoucherApplyService;
+        this.mvSystemLogService = pSystemLogService;
+        this.mvModelMapper = pModelMapper;
+    }
 
     @Override
     public List<VoucherInfoDTO> findAll() {
@@ -57,7 +58,7 @@ public class VoucherInfoServiceImpl extends BaseService implements VoucherServic
         LocalDateTime lvStartTime = getFilterStartTime(pStartTime);
         LocalDateTime lvEndTime = getFilterEndTime(pEndTime);
 
-        Page<VoucherInfo> pageVoucherInfoDTOs = mvVoucherInfoRepository.findAll(null, pTitle, lvStartTime, lvEndTime, pStatus, pageable);
+        Page<VoucherInfo> pageVoucherInfoDTOs = mvEntityRepository.findAll(null, pTitle, lvStartTime, lvEndTime, pStatus, pageable);
 
         Type listType = new TypeToken<List<VoucherInfoDTO>>() {}.getType();
         List<VoucherInfoDTO> voucherInfoDTOs = mvModelMapper.map(pageVoucherInfoDTOs.getContent(), listType);
@@ -71,7 +72,7 @@ public class VoucherInfoServiceImpl extends BaseService implements VoucherServic
 
     @Override
     public VoucherInfoDTO findById(Long entityId, boolean pThrowException) {
-        Optional<VoucherInfo> voucherInfo = mvVoucherInfoRepository.findById(entityId);
+        Optional<VoucherInfo> voucherInfo = super.findById(entityId);
         if (voucherInfo.isPresent()) {
             VoucherInfoDTO dto = mvModelMapper.map(voucherInfo.get(), VoucherInfoDTO.class);
             dto.setStatus(genVoucherStatus(dto.getStartTime(), dto.getEndTime()));
@@ -96,7 +97,7 @@ public class VoucherInfoServiceImpl extends BaseService implements VoucherServic
             voucherInfo.setStartTime(lvStartTime);
             voucherInfo.setEndTime(lvEndTime);
 
-            VoucherInfo voucherSaved = mvVoucherInfoRepository.save(VoucherInfo.fromVoucherDTO(voucherInfo));
+            VoucherInfo voucherSaved = mvEntityRepository.save(VoucherInfo.fromVoucherDTO(voucherInfo));
             //
             for (ProductDTO product : voucherInfo.getApplicableProducts()) {
                 mvVoucherApplyService.save(VoucherApply.builder()
@@ -128,7 +129,7 @@ public class VoucherInfoServiceImpl extends BaseService implements VoucherServic
             }
             VoucherInfoDTO dto = mvModelMapper.map(voucherSaved, VoucherInfoDTO.class);
             dto.setStatus(genVoucherStatus(dto.getStartTime(), dto.getEndTime()));
-            systemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_VOU_C, MasterObject.VoucherInfo, "Thêm mới voucher", dto.getTitle());
+            mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_VOU_C, MasterObject.VoucherInfo, "Thêm mới voucher", dto.getTitle());
             return dto;
         } catch (RuntimeException ex) {
             throw new AppException(ex);
@@ -141,12 +142,12 @@ public class VoucherInfoServiceImpl extends BaseService implements VoucherServic
         ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(voucherOpt));
         try {
             voucherInfo.setId(voucherId);
-            VoucherInfo voucherInfoUpdated = mvVoucherInfoRepository.save(voucherInfo);
+            VoucherInfo voucherInfoUpdated = mvEntityRepository.save(voucherInfo);
 
             changeLog.setNewObject(voucherInfoUpdated);
             changeLog.doAudit();
 
-            systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_VOU_U, MasterObject.VoucherInfo, "Cập nhật voucher " + voucherInfoUpdated.getTitle(), changeLog.getOldValues(), changeLog.getNewValues());
+            mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_VOU_U, MasterObject.VoucherInfo, "Cập nhật voucher " + voucherInfoUpdated.getTitle(), changeLog.getOldValues(), changeLog.getNewValues());
 
             return mvModelMapper.map(voucherInfoUpdated, VoucherInfoDTO.class);
         } catch (RuntimeException ex) {
@@ -161,8 +162,8 @@ public class VoucherInfoServiceImpl extends BaseService implements VoucherServic
         if (!mvVoucherApplyService.findByVoucherId(voucherId).isEmpty()) {
             throw new DataInUseException(ErrorCode.ERROR_DATA_LOCKED.getDescription());
         }
-        mvVoucherInfoRepository.deleteById(voucherId);
-        systemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_VOU_D, MasterObject.VoucherInfo, "Xóa voucher", voucherInfoBefore.getTitle());
+        mvEntityRepository.deleteById(voucherId);
+        mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_VOU_D, MasterObject.VoucherInfo, "Xóa voucher", voucherInfoBefore.getTitle());
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
 
@@ -207,6 +208,7 @@ public class VoucherInfoServiceImpl extends BaseService implements VoucherServic
     private boolean isTextType(String voucherType) {
         return VoucherType.TEXT.name().equals(voucherType);
     }
+
     private boolean isBothType(String voucherType) {
         return VoucherType.BOTH.name().equals(voucherType);
     }

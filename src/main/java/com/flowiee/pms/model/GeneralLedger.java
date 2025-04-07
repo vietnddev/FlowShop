@@ -1,7 +1,7 @@
 package com.flowiee.pms.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flowiee.pms.entity.sales.LedgerTransaction;
+import com.flowiee.pms.model.dto.LedgerTransactionDTO;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +20,7 @@ public class GeneralLedger {
     BigDecimal totalReceipt;
     BigDecimal totalPayment;
     BigDecimal endBalance;
-    List<LedgerTransaction> listTransactions;
+    List<LedgerTransactionDTO> listTransactions;
 
     @JsonIgnore
     int totalPages;

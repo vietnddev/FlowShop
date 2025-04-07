@@ -1,5 +1,6 @@
 package com.flowiee.pms.service.sales.impl;
 
+import com.flowiee.pms.base.service.BaseGService;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.sales.*;
 import com.flowiee.pms.entity.sales.Order;
@@ -7,9 +8,10 @@ import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.SystemConfig;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
-import com.flowiee.pms.exception.EntityNotFoundException;
+import com.flowiee.pms.model.dto.OrderDetailDTO;
 import com.flowiee.pms.model.payload.CreateOrderReq;
 import com.flowiee.pms.model.payload.UpdateOrderReq;
+import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.repository.sales.CustomerRepository;
 import com.flowiee.pms.repository.system.ConfigRepository;
 import com.flowiee.pms.security.UserSession;
@@ -20,7 +22,6 @@ import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.exception.DataInUseException;
-import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.sales.*;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.repository.sales.OrderRepository;
@@ -28,9 +29,12 @@ import com.flowiee.pms.repository.sales.OrderRepository;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.OrderUtils;
+import com.flowiee.pms.service.system.SystemLogService;
 import com.google.zxing.WriterException;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -43,14 +47,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
-public class OrderServiceImpl extends BaseService implements OrderReadService, OrderWriteService {
+public class OrderServiceImpl extends BaseGService<Order, OrderDTO, OrderRepository> implements OrderReadService, OrderWriteService {
+    private Logger LOG = LoggerFactory.getLogger(getClass());
+
     private final SendCustomerNotificationService mvSendCustomerNotificationService;
     private final CartService           mvCartService;
-    private final OrderRepository       mvOrderRepository;
+    //private final OrderRepository       mvOrderRepository;
     private final ConfigRepository      mvConfigRepository;
     private final CartItemsService      mvCartItemsService;
     private final OrderItemsService          mvOrderItemsService;
@@ -61,14 +67,41 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
     private final VoucherTicketService  mvVoucherTicketService;
     private final LoyaltyProgramService mvLoyaltyProgramService;
     private final CategoryService       mvCategoryService;
+    private final CategoryRepository    mvCategoryRepository;
     private final CustomerService       mvCustomerService;
     private final AccountService        mvAccountService;
     private final UserSession           mvUserSession;
+    private final ModelMapper           mvModelMapper;
+    private final SystemLogService      mvSystemLogService;
+
+    public OrderServiceImpl(OrderRepository pOrderRepository, SendCustomerNotificationService mvSendCustomerNotificationService, CartService mvCartService, ConfigRepository mvConfigRepository, CartItemsService mvCartItemsService, OrderItemsService mvOrderItemsService, OrderGenerateQRCodeService mvOrderGenerateQRCodeService, CustomerRepository mvCustomerRepository, OrderHistoryService mvOrderHistoryService, TicketImportService mvTicketImportService, VoucherTicketService mvVoucherTicketService, LoyaltyProgramService mvLoyaltyProgramService, CategoryService mvCategoryService, CategoryRepository mvCategoryRepository, CustomerService mvCustomerService, AccountService mvAccountService, UserSession mvUserSession, ModelMapper mvModelMapper, SystemLogService pSystemLogService) {
+        super(Order.class, OrderDTO.class, pOrderRepository);
+        this.mvSendCustomerNotificationService = mvSendCustomerNotificationService;
+        this.mvCartService = mvCartService;
+        this.mvConfigRepository = mvConfigRepository;
+        this.mvCartItemsService = mvCartItemsService;
+        this.mvOrderItemsService = mvOrderItemsService;
+        this.mvOrderGenerateQRCodeService = mvOrderGenerateQRCodeService;
+        this.mvCustomerRepository = mvCustomerRepository;
+        this.mvOrderHistoryService = mvOrderHistoryService;
+        this.mvTicketImportService = mvTicketImportService;
+        this.mvVoucherTicketService = mvVoucherTicketService;
+        this.mvLoyaltyProgramService = mvLoyaltyProgramService;
+        this.mvCategoryService = mvCategoryService;
+        this.mvCategoryRepository = mvCategoryRepository;
+        this.mvCustomerService = mvCustomerService;
+        this.mvAccountService = mvAccountService;
+        this.mvUserSession = mvUserSession;
+        this.mvModelMapper = mvModelMapper;
+        this.mvSystemLogService = pSystemLogService;
+    }
 
     private BigDecimal mvDefaultShippingCost = BigDecimal.ZERO;
     private BigDecimal mvDefaultPackagingCost = BigDecimal.ZERO;
     private BigDecimal mvDefaultGiftWrapCost = BigDecimal.ZERO;
     private BigDecimal mvDefaultCodFee = BigDecimal.ZERO;
+
+    private static final int GENERATE_TRACKING_CODE_MAX_RETRIES = 30;
 
     @Override
     public List<OrderDTO> findAll() {
@@ -117,20 +150,19 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
     }
 
     @Override
-    public Order findById(Long pOrderId, boolean throwException) {
-        Optional<Order> lvOrderOptional = mvOrderRepository.findById(pOrderId);
-        if (lvOrderOptional.isPresent()) {
-            return lvOrderOptional.get();
-        }
-        if (throwException) {
-            throw new EntityNotFoundException(new Object[] {"order"}, null, null);
-        }
-        return null;
+    public OrderDTO findById(Long pOrderId, boolean pThrowException) {
+        OrderDTO lvOrderDto = super.findById(pOrderId, pThrowException);
+
+        //Set ListOrderDetail -> Have to enhance in the next version
+        Order lvOrder = mvModelMapper.map(lvOrderDto, Order.class);
+        lvOrderDto.setListOrderDetail(OrderDetailDTO.fromOrderDetails(lvOrder.getListOrderDetail()));
+
+        return lvOrderDto;
     }
 
     @Override
-    public Order findByTrackingCode(String pTrackingCode) {
-        return mvOrderRepository.findByTrackingCode(pTrackingCode);
+    public OrderDTO findByTrackingCode(String pTrackingCode) {
+        return convertDTO(mvEntityRepository.findByTrackingCode(pTrackingCode));
     }
 
     private VldModel vldBeforeCreateOrder(CreateOrderReq pOrderRequest, Long pCartId, String pVoucherCode, Long pPaymentMethodId, Long pSaleChannelId, Long pCustomerId, Long pSalesAssistantId) {
@@ -138,22 +170,24 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         if (ObjectUtils.isEmpty(lvCart.getListItems()))
             throw new BadRequestException("At least one product in the order!");
 
-        Category lvPaymentMethod = mvCategoryService.findById(pPaymentMethodId, false);
+        Category lvPaymentMethod = mvCategoryRepository.findById(pPaymentMethodId).get();
         if (lvPaymentMethod == null || !lvPaymentMethod.getStatus())
             throw new BadRequestException("Payment method invalid!");
-        Category lvSalesChannel = mvCategoryService.findById(pSaleChannelId, false);
+        Category lvSalesChannel = mvCategoryRepository.findById(pSaleChannelId).get();
         if (lvSalesChannel == null || !lvSalesChannel.getStatus())
             throw new BadRequestException("Sales channel invalid!");
 
         Customer lvCustomer = mvCustomerService.findById(pCustomerId, true);
-        if (lvCustomer.getIsBlackList())
-            throw new BadRequestException("The customer is on the blacklist!");
-        if (!CoreUtils.validateEmail(pOrderRequest.getRecipientEmail()))
-            throw new BadRequestException("Email invalid!");
-        if (!CoreUtils.validatePhoneNumber(pOrderRequest.getRecipientPhone(), CommonUtils.defaultCountryCode))
-            throw new BadRequestException("Phone number invalid!");
-        if (CoreUtils.isNullStr(pOrderRequest.getShippingAddress()))
-            throw new BadRequestException("Address must not empty!");
+        if (!lvCustomer.isWalkInCustomer()) {
+            if (lvCustomer.getIsBlackList())
+                throw new BadRequestException("The customer is on the blacklist!");
+            if (!CoreUtils.validateEmail(pOrderRequest.getRecipientEmail()))
+                throw new BadRequestException("Email invalid!");
+            if (!CoreUtils.validatePhoneNumber(pOrderRequest.getRecipientPhone(), CommonUtils.defaultCountryCode))
+                throw new BadRequestException("Phone number invalid!");
+            if (CoreUtils.isNullStr(pOrderRequest.getShippingAddress()))
+                throw new BadRequestException("Address must not empty!");
+        }
 
         Account lvSalesAssistant = mvAccountService.findById(pSalesAssistantId, false);
         if (lvSalesAssistant == null || lvSalesAssistant.isClosed())
@@ -183,10 +217,22 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
     @Override
     public OrderDTO createOrder(CreateOrderReq request) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a");
+        DateTimeFormatter formatterUS = DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a", Locale.US);
 
         BigDecimal lvAmountDiscount = request.getAmountDiscount();
         String lvCouponCode = request.getCouponCode();
-        LocalDateTime lvOrderTime = LocalDateTime.parse(request.getOrderTime(), formatter);
+        LocalDateTime lvOrderTime = null;
+        try {
+            lvOrderTime = LocalDateTime.parse(request.getOrderTime(), formatter);
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            try {
+                TemporalAccessor temporalAccessor = formatterUS.parse(request.getOrderTime());
+                lvOrderTime = LocalDateTime.from(temporalAccessor);
+            } catch (Exception e) {
+                LOG.error(e.getMessage(), e);
+            }
+        }
         Long lvCartId = request.getCartId();
 
         VldModel vldModel = vldBeforeCreateOrder(request, lvCartId, lvCouponCode, request.getPaymentMethodId(),
@@ -216,6 +262,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
                 .codFee(CoreUtils.coalesce(request.getCodFee(), mvDefaultCodFee))
                 .isGiftWrapped(false)
                 .orderStatus(getDefaultOrderStatus())
+                .trackingCode(generateTrackingCode())
                 .build();
         order.setPriorityLevel(determinePriority(order));
 
@@ -229,17 +276,17 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         }
 
         //Create order
-        Order lvOrderSaved = mvOrderRepository.save(order);
+        Order lvOrderSaved = mvEntityRepository.save(order);
         //Create QRCode
         try {
             mvOrderGenerateQRCodeService.generateOrderQRCode(lvOrderSaved.getId());
         } catch (IOException | WriterException e ) {
             e.printStackTrace();
-            logger.error(String.format("Can't generate QR Code for Order %s", lvOrderSaved.getCode()), e);
+            LOG.error(String.format("Can't generate QR Code for Order %s", lvOrderSaved.getCode()), e);
         }
         //Create items detail
         List<OrderDetail> lvOrderItemsList = mvOrderItemsService.save(lvCart.getId(), lvOrderSaved.getId(), lvCart.getListItems());
-        BigDecimal totalAmountDiscount = OrderUtils.calTotalAmount(lvOrderItemsList, lvOrderSaved.getAmountDiscount());
+        BigDecimal totalAmountDiscount = OrderUtils.calTotalAmount_(lvOrderItemsList, lvOrderSaved.getAmountDiscount());
         if (totalAmountDiscount.doubleValue() <= 0) {
             throw new BadRequestException("The value of order must greater than zero!");
         }
@@ -254,8 +301,8 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         mvCartItemsService.deleteAllItems(lvCartId);
 
         //Log
-        systemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_ORD_C, MasterObject.Order, "Thêm mới đơn hàng", lvOrderSaved.getCode());
-        logger.info("Insert new order success! insertBy={}", mvUserSession.getUserPrincipal().getUsername());
+        mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_ORD_C, MasterObject.Order, "Thêm mới đơn hàng", lvOrderSaved.getCode());
+        LOG.info("Insert new order success! insertBy={}", mvUserSession.getUserPrincipal().getUsername());
 
         return OrderDTO.fromOrder(lvOrderSaved);
     }
@@ -274,7 +321,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
     @Transactional
     @Override
     public OrderDTO updateOrder(UpdateOrderReq request, Long pOrderId) {
-        Order lvCurrentOrder = mvOrderRepository.findById(pOrderId).orElseThrow(() -> new AppException("Order not found!"));
+        Order lvCurrentOrder = mvEntityRepository.findById(pOrderId).orElseThrow(() -> new AppException("Order not found!"));
         ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(lvCurrentOrder));
 
         OrderStatus lvCurrentOrderStatus = lvCurrentOrder.getOrderStatus();
@@ -308,7 +355,7 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         lvCurrentOrder.setReceiverAddress(request.getShippingAddress());
         lvCurrentOrder.setNote(request.getNote());
         lvCurrentOrder.setOrderStatus(OrderStatus.valueOf(request.getOrderStatus()));
-        Order lvUpdatedOrder = mvOrderRepository.save(lvCurrentOrder);
+        Order lvUpdatedOrder = mvEntityRepository.save(lvCurrentOrder);
 
         /*
         * * * Do something after updated
@@ -341,27 +388,36 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         * * * Log
         */
         mvOrderHistoryService.save(changeLog.getLogChanges(), "Cập nhật đơn hàng", pOrderId, null);
-        systemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_ORD_U, MasterObject.Order, "Cập nhật đơn hàng", changeLog);
-        logger.info("Cập nhật đơn hàng {}", lvUpdatedOrder.toString());
+        mvSystemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_ORD_U, MasterObject.Order, "Cập nhật đơn hàng", changeLog);
+        LOG.info("Cập nhật đơn hàng {}", lvUpdatedOrder.toString());
 
         return OrderDTO.fromOrder(lvUpdatedOrder);
     }
 
     @Override
     public String deleteOrder(Long id) {
-        Order lvOrder = this.findById(id, true);
-        if (lvOrder.getPaymentStatus()) {
+        OrderDTO lvOrder = this.findById(id, true);
+        if (Boolean.TRUE.equals(lvOrder.getPaymentStatus())) {
             throw new DataInUseException(ErrorCode.ERROR_DATA_LOCKED.getDescription());
         }
-        mvOrderRepository.deleteById(id);
-        systemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_ORD_D, MasterObject.Order, "Xóa đơn hàng", lvOrder.toString());
-        logger.info("Xóa đơn hàng orderId={}", id);
+
+        mvEntityRepository.deleteById(id);
+
+        mvSystemLogService.writeLogDelete(
+                MODULE.PRODUCT,
+                ACTION.PRO_ORD_D,
+                MasterObject.Order,
+                "Xóa đơn hàng",
+                lvOrder.toString()
+        );
+        LOG.info("Đã xóa đơn hàng với ID={}", id);
+
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
 
     @Override
     public List<Order> findOrdersToday() {
-        return mvOrderRepository.findOrdersToday();
+        return mvEntityRepository.findOrdersToday();
     }
 
     @Override
@@ -371,31 +427,39 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
 
     @Override
     public String updateOrderStatus(Long pOrderId, OrderStatus pOrderStatus, LocalDateTime pSuccessfulDeliveryTime, Long cancellationReasonId) {
-        Order lvOrder = this.findById(pOrderId, true);
+        Order lvOrder = super.findById(pOrderId).orElseThrow(() -> new BadRequestException("Order not found!"));
+
         if (lvOrder.getOrderStatus().equals(pOrderStatus)) {
             throw new BadRequestException(String.format("Order status is %s now!", pOrderStatus.getName()));
         }
 
         lvOrder.setOrderStatus(pOrderStatus);
-        if (pOrderStatus.equals(OrderStatus.DLVD))
-            lvOrder.setDeliverySuccessTime(pSuccessfulDeliveryTime != null ? pSuccessfulDeliveryTime : LocalDateTime.now());
-        if (pOrderStatus.equals(OrderStatus.CNCL)) {
-            lvOrder.setCancellationReason(cancellationReasonId);
-            lvOrder.setCancellationDate(LocalDateTime.now());
+
+        switch (pOrderStatus) {
+            case DLVD:
+                lvOrder.setDeliverySuccessTime(pSuccessfulDeliveryTime != null ? pSuccessfulDeliveryTime : LocalDateTime.now());
+                break;
+            case CNCL:
+                lvOrder.setCancellationReason(cancellationReasonId);
+                lvOrder.setCancellationDate(LocalDateTime.now());
+                break;
+            default:
+                // Do nothing or log if needed
+                break;
         }
 
-        mvOrderRepository.save(lvOrder);
+        mvEntityRepository.save(lvOrder);
         return "Updated successfully!";
     }
 
     @Override
     public Order getOrderByCode(String pOrderCode) {
-        return mvOrderRepository.findByOrderCode(pOrderCode);
+        return mvEntityRepository.findByOrderCode(pOrderCode);
     }
 
     private String getNextOrderCode() {
         int orderTodayQty = 0;
-        List<Order> ordersToday = mvOrderRepository.findOrdersToday();
+        List<Order> ordersToday = mvEntityRepository.findOrdersToday();
         if (ordersToday != null) {
             orderTodayQty = ordersToday.size();
         }
@@ -421,5 +485,15 @@ public class OrderServiceImpl extends BaseService implements OrderReadService, O
         }
         //Do more case here...
         return PriorityLevel.M;
+    }
+
+    private String generateTrackingCode() {
+        for (int i = 0; i < GENERATE_TRACKING_CODE_MAX_RETRIES; i++) {
+            String code = UUID.randomUUID().toString();
+            if (!mvEntityRepository.existsByTrackingCode(code)) {
+                return code;
+            }
+        }
+        throw new IllegalStateException("Unable to generate a unique tracking code after " + GENERATE_TRACKING_CODE_MAX_RETRIES + " attempts");
     }
 }

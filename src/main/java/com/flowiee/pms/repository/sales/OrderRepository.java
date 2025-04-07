@@ -1,5 +1,6 @@
 package com.flowiee.pms.repository.sales;
 
+import com.flowiee.pms.base.BaseRepository;
 import com.flowiee.pms.entity.sales.Order;
 
 import com.flowiee.pms.common.enumeration.OrderStatus;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends BaseRepository<Order, Long> {
     @Query(value = "select sum((select sum(d.price * d.quantity) from order_detail d where d.order_id = o.id) - o.amount_discount) from orders o where trunc(o.order_time) = trunc(current_date)", nativeQuery = true)
     Double findRevenueToday();
 
@@ -90,4 +91,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("from Order o where o.salesChannel.code = :salesChannelCode")
     List<Order> countBySalesChannel(@Param("salesChannelCode") String salesChannelCode);
+
+    boolean existsByTrackingCode(String trackingCode);
 }

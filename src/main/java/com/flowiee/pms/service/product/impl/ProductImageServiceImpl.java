@@ -1,12 +1,13 @@
 package com.flowiee.pms.service.product.impl;
 
-import com.flowiee.pms.base.Core;
+import com.flowiee.pms.base.CoreStartUp;
 import com.flowiee.pms.entity.product.ProductCombo;
 import com.flowiee.pms.entity.product.ProductDamaged;
 import com.flowiee.pms.entity.sales.TicketExport;
 import com.flowiee.pms.entity.sales.TicketImport;
 import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.BadRequestException;
+import com.flowiee.pms.model.dto.ProductComboDTO;
 import com.flowiee.pms.repository.product.ProductDamagedRepository;
 import com.flowiee.pms.security.UserSession;
 import com.flowiee.pms.service.product.ProductComboService;
@@ -88,10 +89,10 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
 
     @Override
     public FileStorage saveImageProductCombo(MultipartFile fileUpload, long productComboId) throws IOException {
-        ProductCombo productCombo = mvProductComboService.findById(productComboId, true);
+        ProductComboDTO productCombo = mvProductComboService.findById(productComboId, true);
 
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), null);
-        fileInfo.setProductCombo(productCombo);
+        fileInfo.setProductCombo(new ProductCombo(productCombo.getId()));
         FileStorage imageSaved = mvFileStorageService.save(fileInfo);
 
         Path path = Paths.get(CommonUtils.getPathDirectory(MODULE.PRODUCT) + "/" + imageSaved.getStorageName());
@@ -213,7 +214,7 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
         FileStorage fileToChange = fileOptional;
         //Delete file vật lý cũ
         try {
-            File file = new File(Core.getResourceUploadPath() + FileUtils.getImageUrl(fileToChange, true));
+            File file = new File(CoreStartUp.getResourceUploadPath() + FileUtils.getImageUrl(fileToChange, true));
             if (file.exists()) {
                 file.delete();
             }

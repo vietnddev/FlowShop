@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flowiee.pms.base.BaseEntity;
+import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.product.ProductReview;
 import com.flowiee.pms.model.dto.CustomerDTO;
@@ -146,6 +147,10 @@ public class Customer extends BaseEntity implements Serializable {
 	public String getContactAddress() {
 		CustomerContact contact = getContact(ContactType.A);
 		return contact != null ? contact.getValue() : null;
+	}
+
+	public boolean isWalkInCustomer() {
+		return "WIC".equals(CoreUtils.trim(code));
 	}
 
 	@Override

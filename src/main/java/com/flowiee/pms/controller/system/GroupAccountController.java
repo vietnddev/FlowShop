@@ -1,10 +1,10 @@
 package com.flowiee.pms.controller.system;
 
 import com.flowiee.pms.base.BaseController;
-import com.flowiee.pms.entity.system.GroupAccount;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.model.AppResponse;
+import com.flowiee.pms.model.dto.GroupAccountDTO;
 import com.flowiee.pms.model.role.RoleModel;
 import com.flowiee.pms.service.system.GroupAccountService;
 import com.flowiee.pms.service.system.RoleService;
@@ -32,9 +32,9 @@ public class GroupAccountController extends BaseController {
     @Operation(summary = "Find all group account")
     @GetMapping("/all")
     @PreAuthorize("@vldModuleSystem.readGroupAccount(true)")
-    public AppResponse<List<GroupAccount>> findAll(@RequestParam("pageSize") int pageSize, @RequestParam("pageNum") int pageNum) {
+    public AppResponse<List<GroupAccountDTO>> findAll(@RequestParam("pageSize") int pageSize, @RequestParam("pageNum") int pageNum) {
         try {
-            Page<GroupAccount> groupAccounts = groupAccountService.findAll(pageSize, pageNum - 1);
+            Page<GroupAccountDTO> groupAccounts = groupAccountService.findAll(pageSize, pageNum - 1);
             return success(groupAccounts.getContent(), pageNum, pageSize, groupAccounts.getTotalPages(), groupAccounts.getTotalElements());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "group account"), ex);
@@ -44,19 +44,19 @@ public class GroupAccountController extends BaseController {
     @Operation(summary = "Find detail group")
     @GetMapping("/{groupId}")
     @PreAuthorize("@vldModuleSystem.readGroupAccount(true)")
-    public AppResponse<GroupAccount> findDetailAccount(@PathVariable("groupId") Long groupId) {
+    public AppResponse<GroupAccountDTO> findDetailAccount(@PathVariable("groupId") Long groupId) {
         return success(groupAccountService.findById(groupId, true));
     }
 
     @Operation(summary = "Create group account")
     @PostMapping(value = "/create")
     @PreAuthorize("@vldModuleSystem.insertGroupAccount(true)")
-    public AppResponse<GroupAccount> save(@RequestBody GroupAccount groupAccount) {
+    public AppResponse<GroupAccountDTO> save(@RequestBody GroupAccountDTO pGroupAccount) {
         try {
-            if (groupAccount == null) {
+            if (pGroupAccount == null) {
                 throw new BadRequestException("Invalid group account");
             }
-            return success(groupAccountService.save(groupAccount));
+            return success(groupAccountService.save(pGroupAccount));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "group account"), ex);
         }
@@ -65,8 +65,8 @@ public class GroupAccountController extends BaseController {
     @Operation(summary = "Update group account")
     @PutMapping(value = "/update/{groupId}")
     @PreAuthorize("@vldModuleSystem.updateGroupAccount(true)")
-    public AppResponse<GroupAccount> update(@RequestBody GroupAccount groupAccount, @PathVariable("groupId") Long groupId) {
-        return success(groupAccountService.update(groupAccount, groupId));
+    public AppResponse<GroupAccountDTO> update(@RequestBody GroupAccountDTO pGroupAccount, @PathVariable("groupId") Long groupId) {
+        return success(groupAccountService.update(pGroupAccount, groupId));
     }
 
     @Operation(summary = "Delete group account")

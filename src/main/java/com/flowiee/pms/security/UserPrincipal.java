@@ -2,6 +2,7 @@ package com.flowiee.pms.security;
 
 import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.common.constants.Constants;
+import com.flowiee.pms.exception.AuthenticationException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -94,5 +95,12 @@ public class UserPrincipal extends Account implements UserDetails {
 
     public boolean isAdmin() {
         return Constants.ADMINISTRATOR.equals(this.username);
+    }
+
+    public Account getEntity() {
+        if (entity == null || entity.getId() == null || entity.getId() == 0) {
+            throw new AuthenticationException();
+        }
+        return entity;
     }
 }

@@ -1,7 +1,7 @@
 package com.flowiee.pms.controller.product;
 
 import com.flowiee.pms.base.BaseController;
-import com.flowiee.pms.entity.product.ProductCombo;
+import com.flowiee.pms.model.dto.ProductComboDTO;
 import com.flowiee.pms.service.product.ProductComboService;
 import com.flowiee.pms.common.enumeration.Pages;
 import lombok.AccessLevel;
@@ -30,7 +30,7 @@ public class ProductComboControllerView extends BaseController {
     @GetMapping("/{id}")
     @PreAuthorize("@vldModuleProduct.readCombo(true)")
     public ModelAndView findDetail(@PathVariable("id") Long productComboId) {
-        ProductCombo productCombo = mvProductComboService.findById(productComboId, true);
+        ProductComboDTO productCombo = mvProductComboService.findById(productComboId, true);
 
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_COMBO_DETAIL.getTemplate());
         modelAndView.addObject("productComboDetail", productCombo);

@@ -1,7 +1,7 @@
 package com.flowiee.pms.exception;
 
 import com.flowiee.pms.base.BaseException;
-import com.flowiee.pms.base.Core;
+import com.flowiee.pms.base.CoreStartUp;
 import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.entity.system.SystemConfig;
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler extends BaseController {
             return;
         }
 
-        SystemConfig lvRecipientConfig = Core.getSystemConfigs().get(ConfigCode.adminEmailRecipientExceptionNotification);
+        SystemConfig lvRecipientConfig = CoreStartUp.getSystemConfigs().get(ConfigCode.adminEmailRecipientExceptionNotification);
         String lvRecipients = lvRecipientConfig.getValue();
         String lvMessage = CoreUtils.isNullStr(pEx.getFullStackTrace())
                 ? pEx.getMessage() : pEx.getFullStackTrace();

@@ -2,6 +2,7 @@ package com.flowiee.pms.service.sales.impl;
 
 import com.flowiee.pms.entity.sales.LedgerTransaction;
 import com.flowiee.pms.model.GeneralLedger;
+import com.flowiee.pms.model.dto.LedgerTransactionDTO;
 import com.flowiee.pms.repository.sales.LedgerTransactionRepository;
 import com.flowiee.pms.service.sales.LedgerService;
 import com.flowiee.pms.service.sales.LedgerTransactionService;
@@ -41,7 +42,7 @@ public class LedgerServiceImpl implements LedgerService {
         }
         LocalDateTime fromDate = LocalDateTime.of(pFromDate, LocalTime.of(0, 0, 0, 0));
         LocalDateTime toDate = LocalDateTime.of(pToDate, LocalTime.of(23, 59, 59, 999999999));
-        Page<LedgerTransaction> ledgerTransactions = mvLedgerTransactionService.findAll(pageSize, pageNum, LocalDate.now(), LocalDate.now());
+        Page<LedgerTransactionDTO> ledgerTransactions = mvLedgerTransactionService.findAll(pageSize, pageNum, LocalDate.now(), LocalDate.now());
 
         LocalDateTime fromDateBeginBal = fromDate.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
         BigDecimal beginBal = mvLedgerTransactionRepository.calBeginBalance(fromDateBeginBal);

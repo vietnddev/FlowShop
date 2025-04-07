@@ -1,8 +1,8 @@
 package com.flowiee.pms.controller.sales;
 
 import com.flowiee.pms.base.BaseController;
-import com.flowiee.pms.entity.product.GiftCatalog;
 import com.flowiee.pms.model.AppResponse;
+import com.flowiee.pms.model.dto.GiftCatalogDTO;
 import com.flowiee.pms.service.product.GiftCatalogService;
 import com.flowiee.pms.service.sales.GiftRedemptionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +20,7 @@ public class LoyaltyController extends BaseController {
 
     @Operation(summary = "Get list of gifts")
     @GetMapping("/gifts")
-    public AppResponse<List<GiftCatalog>> getActiveGifts() {
+    public AppResponse<List<GiftCatalogDTO>> getActiveGifts() {
         return success(giftCatalogService.getActiveGifts());
     }
 

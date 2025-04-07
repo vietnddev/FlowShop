@@ -9,6 +9,7 @@ import com.flowiee.pms.exception.*;
 import com.flowiee.pms.model.ProductHeld;
 import com.flowiee.pms.model.ProductVariantParameter;
 import com.flowiee.pms.model.ProductSummaryInfoModel;
+import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.repository.product.ProductDescriptionRepository;
 import com.flowiee.pms.repository.product.ProductDetailRepository;
 import com.flowiee.pms.repository.sales.OrderRepository;
@@ -44,6 +45,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
     private final ProductRepository mvProductRepository;
     private final OrderRepository mvOrderRepository;
     private final CategoryService mvCategoryService;
+    private final CategoryRepository mvCategoryRepository;
     private final FileStorageRepository mvFileStorageRepository;
     private final ProductDetailRepository mvProductDetailRepository;
 
@@ -352,15 +354,15 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
     }
 
     private VldModel vldCategory(Long pProductTypeId, Long pBrandId, Long pUnitId) {
-        Category lvProductType = mvCategoryService.findById(pProductTypeId, false);
+        Category lvProductType = mvCategoryRepository.findById(pProductTypeId).get();
         if (lvProductType == null)
             throw new BadRequestException("Product type invalid!");
 
-        Category lvBrand = mvCategoryService.findById(pBrandId, false);
+        Category lvBrand = mvCategoryRepository.findById(pBrandId).get();
         if (lvBrand == null)
             throw new BadRequestException("Brand invalid!");
 
-        Category lvUnit = mvCategoryService.findById(pUnitId, false);
+        Category lvUnit = mvCategoryRepository.findById(pUnitId).get();
         if (lvUnit == null)
             throw new BadRequestException("Unit invalid!");
 

@@ -4,13 +4,13 @@ import com.flowiee.pms.base.BaseController;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.entity.product.Product;
 import com.flowiee.pms.entity.product.ProductHistory;
-import com.flowiee.pms.entity.product.ProductRelated;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.ResourceNotFoundException;
 import com.flowiee.pms.model.AppResponse;
 import com.flowiee.pms.model.EximResult;
 import com.flowiee.pms.model.dto.ProductDTO;
 import com.flowiee.pms.exception.AppException;
+import com.flowiee.pms.model.dto.ProductRelatedDTO;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.service.ExportService;
 import com.flowiee.pms.service.ImportService;
@@ -141,7 +141,7 @@ public class ProductController extends BaseController {
 
     @Operation(summary = "Get related product")
     @GetMapping("/{productId}/related")
-    public AppResponse<List<ProductRelated>> getRelatedProducts(@PathVariable Long productId) {
+    public AppResponse<List<ProductRelatedDTO>> getRelatedProducts(@PathVariable Long productId) {
         return success(mvProductRelatedService.get(productId));
     }
 

@@ -10,11 +10,12 @@ import com.flowiee.pms.entity.sales.TicketImport;
 import com.flowiee.pms.entity.storage.Storage;
 import com.flowiee.pms.entity.system.Account;
 import com.flowiee.pms.entity.system.AccountRole;
-import com.flowiee.pms.entity.system.GroupAccount;
 import com.flowiee.pms.entity.system.Notification;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
 import com.flowiee.pms.exception.ResourceNotFoundException;
+import com.flowiee.pms.model.dto.GroupAccountDTO;
+import com.flowiee.pms.repository.product.MaterialRepository;
 import com.flowiee.pms.repository.product.ProductDetailRepository;
 import com.flowiee.pms.repository.sales.OrderRepository;
 import com.flowiee.pms.repository.storage.StorageRepository;
@@ -29,7 +30,6 @@ import com.flowiee.pms.service.system.AccountService;
 import com.flowiee.pms.service.system.GroupAccountService;
 import com.flowiee.pms.service.system.NotificationService;
 import com.flowiee.pms.service.system.RoleService;
-import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.repository.sales.TicketImportRepository;
 import com.flowiee.pms.service.sales.TicketImportService;
 
@@ -53,6 +53,7 @@ public class TicketImportServiceImpl extends BaseService implements TicketImport
     RoleService                 mvRoleService;
     AccountService              mvAccountService;
     MaterialService             mvMaterialService;
+    MaterialRepository          mvMaterialRepository;
     OrderRepository             mvOrderRepository;
     StorageRepository           mvStorageRepository;
     NotificationService         mvNotificationService;
@@ -122,7 +123,7 @@ public class TicketImportServiceImpl extends BaseService implements TicketImport
                     if (ObjectUtils.isNotEmpty(listOfStorageManagersRight)){
                         Set<Account> stgManagersReceiveNtfs = new HashSet<>();
                         for (AccountRole storageManagerRight : listOfStorageManagersRight) {
-                            GroupAccount groupAccount = mvGroupAccountService.findById(storageManagerRight.getGroupId(), false);
+                            GroupAccountDTO groupAccount = mvGroupAccountService.findById(storageManagerRight.getGroupId(), false);
                             if (groupAccount != null) {
                                 stgManagersReceiveNtfs.addAll(groupAccount.getListAccount());
                             }
@@ -257,7 +258,7 @@ public class TicketImportServiceImpl extends BaseService implements TicketImport
     public List<MaterialTemp> addMaterialToTicket(Long ticketImportId, List<Long> materialIds) {
         List<MaterialTemp> listAdded = new ArrayList<>();
         for (Long materialId : materialIds) {
-            Material material = mvMaterialService.findById(materialId, false);
+            Material material = mvMaterialRepository.findById(materialId).orElse(null);
             if (material == null) {
                 continue;
             }

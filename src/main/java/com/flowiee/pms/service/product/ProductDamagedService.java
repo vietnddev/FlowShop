@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.product;
 
-import com.flowiee.pms.entity.product.ProductDamaged;
 import com.flowiee.pms.base.BaseCurdService;
+import com.flowiee.pms.model.dto.ProductDamagedDTO;
 
-public interface ProductDamagedService extends BaseCurdService<ProductDamaged> {
+public interface ProductDamagedService extends BaseCurdService<ProductDamagedDTO> {
 }

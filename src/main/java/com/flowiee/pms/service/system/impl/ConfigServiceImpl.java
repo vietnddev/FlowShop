@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.system.impl;
 
-import com.flowiee.pms.base.Core;
+import com.flowiee.pms.base.CoreStartUp;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.system.SystemConfig;
 import com.flowiee.pms.entity.system.SystemLog;
@@ -80,21 +80,21 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
             ShopInfo lvShopInfo = CommonUtils.mvShopInfo != null ? CommonUtils.mvShopInfo : new ShopInfo();
             //Reload system configs
             List<SystemConfig> systemConfigList = this.findAll();
-            Core.getSystemConfigs().clear();
+            CoreStartUp.getSystemConfigs().clear();
             for (SystemConfig systemConfig : systemConfigList) {
                 ConfigCode lvConfigCode = ConfigCode.get(systemConfig.getCode());
                 String lvConfigValue = systemConfig.getValue();
 
                 if (lvConfigCode == null) continue;
 
-                if (ConfigCode.resourceUploadPath.equals(lvConfigCode)) Core.mvResourceUploadPath = lvConfigValue;
+                if (ConfigCode.resourceUploadPath.equals(lvConfigCode)) CoreStartUp.mvResourceUploadPath = lvConfigValue;
                 if (ConfigCode.shopName.equals(lvConfigCode))           lvShopInfo.setName(lvConfigValue);
                 if (ConfigCode.shopPhoneNumber.equals(lvConfigCode))    lvShopInfo.setPhoneNumber(lvConfigValue);
                 if (ConfigCode.shopEmail.equals(lvConfigCode))          lvShopInfo.setEmail(lvConfigValue);
                 if (ConfigCode.shopAddress.equals(lvConfigCode))        lvShopInfo.setAddress(lvConfigValue);
                 if (ConfigCode.shopLogoUrl.equals(lvConfigCode))        lvShopInfo.setLogoUrl(lvConfigValue);
 
-                Core.getSystemConfigs().put(lvConfigCode, systemConfig);
+                CoreStartUp.getSystemConfigs().put(lvConfigCode, systemConfig);
             }
             CommonUtils.mvShopInfo = lvShopInfo;
 
@@ -123,7 +123,7 @@ public class ConfigServiceImpl extends BaseService implements ConfigService {
             mvLanguageService.reloadMessage("vi");
             mvLanguageService.reloadMessage("en");
 
-            if (Core.START_APP_TIME != null) {
+            if (CoreStartUp.START_APP_TIME != null) {
                 systemLogService.writeLog(MODULE.SYSTEM, ACTION.SYS_REFRESH_APP, MasterObject.Master, LogType.U, "Refresh application", SystemLog.EMPTY, SystemLog.EMPTY);
             }
 

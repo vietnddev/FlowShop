@@ -34,16 +34,16 @@ public class OrderGenerateQRCodeServiceImpl extends GenerateQRCodeService implem
     public void generateOrderQRCode(long orderId) throws IOException, WriterException {
         Order lvOrder = mvOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException(new Object[] {"order"}, null, null));
-        String lvTrackingCode = UUID.randomUUID().toString();
-        lvOrder.setTrackingCode(lvTrackingCode);
+        //String lvTrackingCode = UUID.randomUUID().toString();
+        //lvOrder.setTrackingCode(lvTrackingCode);
 
         FileStorage lvQRCodeModel = getFileModel(lvOrder, MODULE.SALES, orderId, null);
         mvFileStorageRepository.save(lvQRCodeModel);
 
         Path lvGenPath = Paths.get(super.getGenPath(MODULE.SALES) + "/" + lvQRCodeModel.getStorageName());
-        generateQRCode(getGenContent(lvTrackingCode), mvQRCodeFormat, lvGenPath);
+        generateQRCode(getGenContent(lvOrder.getTrackingCode()), mvQRCodeFormat, lvGenPath);
 
-        mvOrderRepository.save(lvOrder);
+        //mvOrderRepository.save(lvOrder);
     }
 
     @Override

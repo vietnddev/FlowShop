@@ -5,10 +5,10 @@ import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.product.ProductPrice;
 import com.flowiee.pms.entity.sales.Items;
 import com.flowiee.pms.entity.sales.OrderCart;
-import com.flowiee.pms.entity.system.FileStorage;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
+import com.flowiee.pms.model.dto.ItemsDTO;
 import com.flowiee.pms.model.payload.CartItemsReq;
 import com.flowiee.pms.model.payload.CartReq;
 import com.flowiee.pms.common.enumeration.*;
@@ -26,12 +26,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -42,6 +42,7 @@ public class CartServiceImpl extends BaseService implements CartService {
     CartItemsRepository mvCartItemsRepository;
     ProductVariantService mvProductVariantService;
     ProductPriceRepository mvProductPriceRepository;
+    ModelMapper mvModelMapper;
 
     @Override
     public List<OrderCart> findCartByAccountId(Long accountId) {
@@ -168,17 +169,18 @@ public class CartServiceImpl extends BaseService implements CartService {
                 }
                 BigDecimal lvRetailPrice = productVariantPrice.getRetailPrice();
                 BigDecimal lvRetailPriceDiscount = productVariantPrice.getRetailPriceDiscount();
-                Items items = Items.builder()
-                    .orderCart(new OrderCart(cartId))
-                    .productDetail(new ProductDetail(Integer.parseInt(productVariantId)))
-                    .priceType(PriceType.L.name())
-                    .price(lvRetailPriceDiscount != null ? lvRetailPriceDiscount : lvRetailPrice)
-                    .priceOriginal(lvRetailPrice)
-                    .extraDiscount(BigDecimal.ZERO)
-                    .quantity(1)
-                    .note("")
-                    .build();
-                mvCartItemsService.save(items);
+                ItemsDTO itemsDto = mvModelMapper.map(Items.builder()
+                        .orderCart(new OrderCart(cartId))
+                        .productDetail(new ProductDetail(Integer.parseInt(productVariantId)))
+                        .priceType(PriceType.L.name())
+                        .price(lvRetailPriceDiscount != null ? lvRetailPriceDiscount : lvRetailPrice)
+                        .priceOriginal(lvRetailPrice)
+                        .extraDiscount(BigDecimal.ZERO)
+                        .quantity(1)
+                        .note("")
+                        .build(),
+                        ItemsDTO.class);
+                mvCartItemsService.save(itemsDto);
             }
         }
     }
@@ -216,7 +218,7 @@ public class CartServiceImpl extends BaseService implements CartService {
                 }
                 BigDecimal lvRetailPrice = productVariantPrice.getRetailPrice();
                 BigDecimal lvRetailPriceDiscount = productVariantPrice.getRetailPriceDiscount();
-                Items items = Items.builder()
+                ItemsDTO itemsDto = mvModelMapper.map(Items.builder()
                         .orderCart(orderCart)
                         .productDetail(new ProductDetail(lvProductVariant.getId()))
                         .priceType(PriceType.L.name())
@@ -225,15 +227,16 @@ public class CartServiceImpl extends BaseService implements CartService {
                         .extraDiscount(BigDecimal.ZERO)
                         .quantity(lvItemQty)
                         .note("")
-                        .build();
-                mvCartItemsService.save(items);
+                        .build(),
+                        ItemsDTO.class);
+                mvCartItemsService.save(itemsDto);
             }
         }
     }
 
     @Override
     public void updateItemsOfCart(Items pItemToUpdate, Long itemId) {
-        Items lvItem = mvCartItemsService.findById(itemId, true);
+        ItemsDTO lvItem = mvCartItemsService.findById(itemId, true);
         if (pItemToUpdate.getQuantity() <= 0) {
             mvCartItemsService.delete(lvItem.getId());
         } else {

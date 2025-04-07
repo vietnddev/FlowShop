@@ -1,5 +1,7 @@
 package com.flowiee.pms.model.dto;
 
+import com.flowiee.pms.entity.product.Product;
+import com.flowiee.pms.entity.product.ProductDetail;
 import com.flowiee.pms.entity.product.ProductPrice;
 import lombok.*;
 
@@ -12,6 +14,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ProductPriceDTO implements Serializable {
+    Product productBase;
+    ProductDetail productVariant;
     BigDecimal retailPrice;
     BigDecimal retailPriceDiscount;
     BigDecimal wholesalePrice;
@@ -19,6 +23,8 @@ public class ProductPriceDTO implements Serializable {
     BigDecimal purchasePrice;
     BigDecimal costPrice;
     LocalDateTime lastUpdated;
+    String note;
+    String state;
 
     public ProductPriceDTO() {
         this.retailPrice = BigDecimal.ZERO;

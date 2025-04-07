@@ -26,7 +26,8 @@ import java.util.*;
                   @Index(name = "idx_Order_receiverPhone", columnList = "receiver_phone"),
                   @Index(name = "idx_Order_salesAssistantId", columnList = "sales"),
                   @Index(name = "idx_Order_channelId", columnList = "channel"),
-                  @Index(name = "idx_Order_customerId", columnList = "customer_id")})
+                  @Index(name = "idx_Order_customerId", columnList = "customer_id"),
+				  @Index(name = "idx_Order_trackingCode", columnList = "tracking_code")})
 @Getter
 @Setter
 @NoArgsConstructor

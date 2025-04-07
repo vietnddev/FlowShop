@@ -7,6 +7,7 @@ import com.flowiee.pms.entity.sales.OrderDetail;
 import com.flowiee.pms.exception.AppException;
 import com.flowiee.pms.exception.BadRequestException;
 import com.flowiee.pms.exception.EntityNotFoundException;
+import com.flowiee.pms.model.dto.OrderDTO;
 import com.flowiee.pms.model.dto.ProductVariantDTO;
 import com.flowiee.pms.repository.product.ProductPriceRepository;
 import com.flowiee.pms.repository.sales.CartItemsRepository;
@@ -67,7 +68,7 @@ public class OrderItemsServiceImpl extends BaseService implements OrderItemsServ
     }
 
     @Override
-    public List<OrderDetail> save(Order pOrder, List<String> productVariantIds) {
+    public List<OrderDetail> save(OrderDTO pOrder, List<String> productVariantIds) {
         List<OrderDetail> itemAdded = new ArrayList<>();
         for (String productVariantId : productVariantIds) {
             ProductVariantDTO productDetail = mvProductVariantService.findById(Long.parseLong(productVariantId), false);

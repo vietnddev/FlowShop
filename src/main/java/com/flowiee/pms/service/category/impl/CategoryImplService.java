@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.category.impl;
 
-import com.flowiee.pms.base.service.BaseFService;
+import com.flowiee.pms.base.service.BaseGService;
 import com.flowiee.pms.entity.category.Category;
 import com.flowiee.pms.entity.sales.Order;
 import com.flowiee.pms.exception.*;
@@ -10,15 +10,10 @@ import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.repository.category.CategoryHistoryRepository;
 import com.flowiee.pms.repository.category.CategoryRepository;
-import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.category.CategoryHistoryService;
 import com.flowiee.pms.service.category.CategoryService;
 
-import com.flowiee.pms.service.storage.impl.TransactionGoodsServiceImpl;
 import com.flowiee.pms.service.system.SystemLogService;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -30,23 +25,32 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
-public class CategoryServiceImpl extends BaseFService<Category, CategoryDTO, CategoryRepository> implements CategoryService {
-    private static final Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
+public class CategoryImplService extends BaseGService<Category, CategoryDTO, CategoryRepository> implements CategoryService {
+    private Logger LOG = LoggerFactory.getLogger(CategoryImplService.class);
 
-    CategoryRepository mvCategoryRepository;
-    CategoryHistoryService mvCategoryHistoryService;
-    CategoryHistoryRepository mvCategoryHistoryRepository;
-    OrderRepository mvOrderRepository;
-    SystemLogService mvSystemLogService;
-    ModelMapper mvModelMapper;
+    private final CategoryRepository mvCategoryRepository;
+    private final CategoryHistoryService mvCategoryHistoryService;
+    private final CategoryHistoryRepository mvCategoryHistoryRepository;
+    private final OrderRepository mvOrderRepository;
+    private final SystemLogService mvSystemLogService;
+    private final ModelMapper mvModelMapper;
+
+    public CategoryImplService(CategoryRepository pEntityRepository, CategoryRepository mvCategoryRepository, CategoryHistoryService mvCategoryHistoryService, CategoryHistoryRepository mvCategoryHistoryRepository, OrderRepository mvOrderRepository, SystemLogService mvSystemLogService, ModelMapper mvModelMapper) {
+        super(Category.class, CategoryDTO.class, pEntityRepository);
+        this.mvCategoryRepository = mvCategoryRepository;
+        this.mvCategoryHistoryService = mvCategoryHistoryService;
+        this.mvCategoryHistoryRepository = mvCategoryHistoryRepository;
+        this.mvOrderRepository = mvOrderRepository;
+        this.mvSystemLogService = mvSystemLogService;
+        this.mvModelMapper = mvModelMapper;
+    }
 
     @Override
     public CategoryDTO findById(Long entityId, boolean pThrowException) {
         return super.findById(entityId, true);
     }
 
+    @Transactional
     @Override
     public CategoryDTO save(CategoryDTO pDto) {
         if (pDto == null) {
@@ -70,7 +74,7 @@ public class CategoryServiceImpl extends BaseFService<Category, CategoryDTO, Cat
         if (pCategory.getSort() != null)
             lvCurrentCategory.setSort(pCategory.getSort());
 
-        Category categorySaved = entityRepository.save(lvCurrentCategory);
+        Category categorySaved = mvEntityRepository.save(lvCurrentCategory);
 
         changeLog.setNewObject(categorySaved);
         changeLog.doAudit();
@@ -94,7 +98,7 @@ public class CategoryServiceImpl extends BaseFService<Category, CategoryDTO, Cat
         }
 
         //mvCategoryHistoryRepository.deleteAllByCategory(categoryId);
-        entityRepository.deleteById(categoryId);
+        mvEntityRepository.deleteById(categoryId);
 
         mvSystemLogService.writeLogDelete(MODULE.CATEGORY, ACTION.CTG_D, MasterObject.Category, "Xóa danh mục " + lvCurrentCategory.getType(), lvCurrentCategory.getName());
 

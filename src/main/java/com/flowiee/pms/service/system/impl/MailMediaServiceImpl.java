@@ -1,6 +1,6 @@
 package com.flowiee.pms.service.system.impl;
 
-import com.flowiee.pms.base.Core;
+import com.flowiee.pms.base.CoreStartUp;
 import com.flowiee.pms.config.TemplateSendEmail;
 import com.flowiee.pms.entity.system.MailMedia;
 import com.flowiee.pms.repository.system.MailMediaRepository;
@@ -52,7 +52,7 @@ public class MailMediaServiceImpl extends BaseService implements MailMediaServic
 
     @Override
     public void send(NotificationType pNotificationType, Map<String, Object> pNotificationParameter) {
-        TemplateSendEmail.Template lvTemplate = Core.getEmailTemplateConfigs().get(pNotificationType);
+        TemplateSendEmail.Template lvTemplate = CoreStartUp.getEmailTemplateConfigs().get(pNotificationType);
         String lvDestination = pNotificationParameter.get(pNotificationType.name()).toString();
         String lvDefaultSubject = SendMailUtils.replaceTemplateParameter(lvTemplate.getSubject(), pNotificationParameter);
         Object lvCustomSubject = pNotificationParameter.get(MailMedia.SUBJECT);

@@ -1,7 +1,7 @@
 package com.flowiee.pms.service.product.impl;
 
 import com.flowiee.pms.model.Filter;
-import com.flowiee.pms.base.service.BaseFService;
+import com.flowiee.pms.base.service.BaseGService;
 import com.flowiee.pms.common.converter.ProductConvert;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.common.utils.ChangeLog;
@@ -21,6 +21,7 @@ import com.flowiee.pms.model.ProductHeld;
 import com.flowiee.pms.model.ProductSummaryInfoModel;
 import com.flowiee.pms.model.ProductVariantParameter;
 import com.flowiee.pms.model.dto.ProductDTO;
+import com.flowiee.pms.repository.category.CategoryRepository;
 import com.flowiee.pms.repository.product.ProductDescriptionRepository;
 import com.flowiee.pms.repository.product.ProductDetailRepository;
 import com.flowiee.pms.repository.product.ProductRepository;
@@ -31,7 +32,6 @@ import com.flowiee.pms.service.product.ProductHistoryService;
 import com.flowiee.pms.service.product.ProductService;
 import com.flowiee.pms.service.product.ProductVariantService;
 import com.flowiee.pms.service.system.SystemLogService;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
@@ -46,10 +46,8 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @Service
-@RequiredArgsConstructor
-public class ProductFServiceImpl extends BaseFService<Product, ProductDTO, ProductRepository> implements ProductService {
+public class ProductFImplService extends BaseGService<Product, ProductDTO, ProductRepository> implements ProductService {
     private final Logger LOG = LoggerFactory.getLogger(getClass());
 
     private final ProductDescriptionRepository mvProductDescriptionRepository;
@@ -61,6 +59,21 @@ public class ProductFServiceImpl extends BaseFService<Product, ProductDTO, Produ
     private final ProductDetailRepository      mvProductDetailRepository;
     private final ModelMapper                  mvModelMapper;
     private final SystemLogService             mvSystemLogService;
+    private final CategoryRepository           mvCategoryRepository;
+
+    public ProductFImplService(ProductRepository pEntityRepository, ProductDescriptionRepository mvProductDescriptionRepository, ProductVariantService mvProductVariantService, ProductHistoryService mvProductHistoryService, OrderRepository mvOrderRepository, CategoryService mvCategoryService, FileStorageRepository mvFileStorageRepository, ProductDetailRepository mvProductDetailRepository, ModelMapper mvModelMapper, SystemLogService mvSystemLogService, CategoryRepository mvCategoryRepository) {
+        super(Product.class, ProductDTO.class, pEntityRepository);
+        this.mvProductDescriptionRepository = mvProductDescriptionRepository;
+        this.mvProductVariantService = mvProductVariantService;
+        this.mvProductHistoryService = mvProductHistoryService;
+        this.mvOrderRepository = mvOrderRepository;
+        this.mvCategoryService = mvCategoryService;
+        this.mvFileStorageRepository = mvFileStorageRepository;
+        this.mvProductDetailRepository = mvProductDetailRepository;
+        this.mvModelMapper = mvModelMapper;
+        this.mvSystemLogService = mvSystemLogService;
+        this.mvCategoryRepository = mvCategoryRepository;
+    }
 
     @Override
     public Page<ProductDTO> findAll(PID pPID, int pageSize, int pageNum, String pTxtSearch, Long pBrand, Long pProductType, Long pColor, Long pSize, Long pUnit, String pGender, Boolean pIsSaleOff, Boolean pIsHotTrend, String pStatus) {
@@ -72,7 +85,7 @@ public class ProductFServiceImpl extends BaseFService<Product, ProductDTO, Produ
         Pageable lvPageable = Pageable.unpaged();
 
         Specification<Product> specification = Specification.where(buildSpecification(filters));
-        Page<Product> productPage = entityRepository.findAll(specification, lvPageable);
+        Page<Product> productPage = mvEntityRepository.findAll(specification, lvPageable);
 
         return mapEntityPageToDtoPage(productPage, ProductDTO.class);
     }
@@ -138,7 +151,7 @@ public class ProductFServiceImpl extends BaseFService<Product, ProductDTO, Produ
     @Override
     public List<Product> findProductsIdAndProductName() {
         List<Product> products = new ArrayList<>();
-        for (Object[] objects : entityRepository.findIdAndName()) {
+        for (Object[] objects : mvEntityRepository.findIdAndName()) {
             products.add(new Product(Integer.parseInt(String.valueOf(objects[0])), String.valueOf(objects[1])));
         }
         return products;
@@ -148,15 +161,15 @@ public class ProductFServiceImpl extends BaseFService<Product, ProductDTO, Produ
     public ProductDTO saveProduct(ProductDTO dto) {
         Product productToSave = mvModelMapper.map(dto, Product.class);
 
-        Category lvProductType = mvCategoryService.findById(productToSave.getProductType().getId(), false);
+        Category lvProductType = mvCategoryRepository.findById(productToSave.getProductType().getId()).get();
         if (lvProductType == null)
             throw new BadRequestException("Product type invalid!");
 
-        Category lvBrand = mvCategoryService.findById(productToSave.getBrand().getId(), false);
+        Category lvBrand = mvCategoryRepository.findById(productToSave.getBrand().getId()).get();
         if (lvBrand == null)
             throw new BadRequestException("Brand invalid!");
 
-        Category lvUnit = mvCategoryService.findById(productToSave.getUnit().getId(), false);
+        Category lvUnit = mvCategoryRepository.findById(productToSave.getUnit().getId()).get();
         if (lvUnit == null)
             throw new BadRequestException("Unit invalid!");
 
@@ -166,7 +179,7 @@ public class ProductFServiceImpl extends BaseFService<Product, ProductDTO, Produ
         try {
             //productToSave.setCreatedBy(CommonUtils.getUserPrincipal().getId());
             //productToSave.setStatus(ProductStatus.ACT);
-            Product productSaved = entityRepository.save(productToSave);
+            Product productSaved = mvEntityRepository.save(productToSave);
 
             if (ObjectUtils.isNotEmpty(dto.getDescription())) {
                 mvProductDescriptionRepository.save(ProductDescription.builder()
@@ -194,15 +207,15 @@ public class ProductFServiceImpl extends BaseFService<Product, ProductDTO, Produ
 
         //BaseService.VldModel vldModel = vldCategory(lvProductTypeId, lvBrandId, lvUnitId);
 
-        Category lvProductType = mvCategoryService.findById(lvProductTypeId, false);
+        Category lvProductType = mvCategoryRepository.findById(lvProductTypeId).get();
         if (lvProductType == null)
             throw new BadRequestException("Product type invalid!");
 
-        Category lvBrand = mvCategoryService.findById(lvBrandId, false);
+        Category lvBrand = mvCategoryRepository.findById(lvBrandId).get();
         if (lvBrand == null)
             throw new BadRequestException("Brand invalid!");
 
-        Category lvUnit = mvCategoryService.findById(lvUnitId, false);
+        Category lvUnit = mvCategoryRepository.findById(lvUnitId).get();
         if (lvUnit == null)
             throw new BadRequestException("Unit invalid!");
 
@@ -225,7 +238,7 @@ public class ProductFServiceImpl extends BaseFService<Product, ProductDTO, Produ
         ProductDescription productDescriptionUpdated = mvProductDescriptionRepository.save(productDescription);
 
         //lvProduct.setProductDescription(productDescriptionUpdated);
-        Product productUpdated = entityRepository.save(product);
+        Product productUpdated = mvEntityRepository.save(product);
 
         changeLog.setNewObject(productUpdated);
         changeLog.doAudit();
@@ -246,7 +259,7 @@ public class ProductFServiceImpl extends BaseFService<Product, ProductDTO, Produ
             throw new DataInUseException(ErrorCode.ERROR_DATA_LOCKED.getDescription());
         }
 
-        entityRepository.deleteById(pId);
+        mvEntityRepository.deleteById(pId);
         mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_D, MasterObject.Product, "Xóa sản phẩm", product.getProductName());
         LOG.info("Delete product success! productId={}", pId);
 

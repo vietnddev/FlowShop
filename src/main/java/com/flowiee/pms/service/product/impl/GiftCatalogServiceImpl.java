@@ -1,63 +1,55 @@
 package com.flowiee.pms.service.product.impl;
 
+import com.flowiee.pms.base.service.BaseGService;
 import com.flowiee.pms.entity.product.GiftCatalog;
-import com.flowiee.pms.exception.EntityNotFoundException;
+import com.flowiee.pms.model.dto.GiftCatalogDTO;
 import com.flowiee.pms.repository.product.GiftCatalogRepository;
-import com.flowiee.pms.base.service.BaseService;
 import com.flowiee.pms.service.product.GiftCatalogService;
-import com.flowiee.pms.common.enumeration.MessageCode;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-public class GiftCatalogServiceImpl extends BaseService implements GiftCatalogService {
-    private final GiftCatalogRepository giftCatalogRepository;
-
-    @Override
-    public List<GiftCatalog> findAll() {
-        return giftCatalogRepository.findAll();
+public class GiftCatalogServiceImpl extends BaseGService<GiftCatalog, GiftCatalogDTO, GiftCatalogRepository> implements GiftCatalogService {
+    public GiftCatalogServiceImpl(GiftCatalogRepository pEntityRepository) {
+        super(GiftCatalog.class, GiftCatalogDTO.class, pEntityRepository);
     }
 
     @Override
-    public GiftCatalog findById(Long entityId, boolean pThrowException) {
-        Optional<GiftCatalog> entityOptional = giftCatalogRepository.findById(entityId);
-        if (entityOptional.isEmpty() && pThrowException) {
-            throw new EntityNotFoundException(new Object[] {"gift catalog"}, null, null);
-        }
-        return entityOptional.orElse(null);
+    public List<GiftCatalogDTO> findAll() {
+        return super.findAll();
     }
 
     @Override
-    public GiftCatalog save(GiftCatalog entity) {
-        return giftCatalogRepository.save(entity);
+    public GiftCatalogDTO findById(Long pEntityId, boolean pThrowException) {
+        return super.findById(pEntityId, pThrowException);
     }
 
     @Override
-    public GiftCatalog update(GiftCatalog updatedGift, Long id) {
-        GiftCatalog existingGift = giftCatalogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Quà tặng không tồn tại"));
-
-        existingGift.setName(updatedGift.getName());
-        existingGift.setDescription(updatedGift.getDescription());
-        existingGift.setRequiredPoints(updatedGift.getRequiredPoints());
-        existingGift.setStock(updatedGift.getStock());
-        existingGift.setIsActive(updatedGift.getIsActive());
-
-        return giftCatalogRepository.save(existingGift);
+    public GiftCatalogDTO save(GiftCatalogDTO pEntity) {
+        return super.save(pEntity);
     }
 
     @Override
-    public String delete(Long entityId) {
-        giftCatalogRepository.deleteById(entityId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+    public GiftCatalogDTO update(GiftCatalogDTO pGift, Long pId) {
+        GiftCatalog existingGift = super.findById(pId).orElseThrow(() -> new RuntimeException("Quà tặng không tồn tại"));
+
+        existingGift.setName(pGift.getName());
+        existingGift.setDescription(pGift.getDescription());
+        existingGift.setRequiredPoints(pGift.getRequiredPoints());
+        existingGift.setStock(pGift.getStock());
+        existingGift.setIsActive(pGift.getIsActive());
+
+        return super.convertDTO(mvEntityRepository.save(existingGift));
     }
 
     @Override
-    public List<GiftCatalog> getActiveGifts() {
-        return giftCatalogRepository.findByIsActiveTrue();
+    public String delete(Long pEntityId) {
+        return super.delete(pEntityId);
+    }
+
+    @Override
+    public List<GiftCatalogDTO> getActiveGifts() {
+        return convertDTOs(mvEntityRepository.findByIsActiveTrue());
     }
 }

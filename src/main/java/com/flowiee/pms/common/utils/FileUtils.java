@@ -1,8 +1,8 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.base.CoreStartUp;
-import com.flowiee.pms.entity.system.FileStorage;
-import com.flowiee.pms.exception.AppException;
+import com.flowiee.pms.common.base.CoreStartUp;
+import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import com.flowiee.pms.common.enumeration.FileExtension;
 import org.apache.commons.lang3.ObjectUtils;

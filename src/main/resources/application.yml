@@ -17,7 +17,8 @@ spring:
   # Config package chứa file view JSP
   thymeleaf:
     prefix: classpath:/templates/webapp/views/
-    suffix: .jsp
+    suffix: .html
+    mode: HTML
     cache: false
     encoding: UTF-8
   #banner
@@ -35,10 +36,10 @@ spring:
     properties:
       hibernate:
         session_factory:
-          statement_inspector: com.flowiee.pms.config.CustomHibernateInterceptor
+          statement_inspector: com.flowiee.pms.common.config.CustomHibernateInterceptor
 #Log
 logging:
   level:
-    org.hibernate.SQL: DEBUG  #Log câu SQL
+    org.hibernate.SQL: off  #Log câu SQL
     #org.hibernate.type.descriptor.sql.BasicBinder: TRACE  #Log tham số truyền vào
   config: classpath:logback-spring.xml

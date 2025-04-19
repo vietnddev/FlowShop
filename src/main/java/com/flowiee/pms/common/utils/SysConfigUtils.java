@@ -1,8 +1,8 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.base.CoreStartUp;
+import com.flowiee.pms.common.base.CoreStartUp;
 import com.flowiee.pms.common.enumeration.ConfigCode;
-import com.flowiee.pms.entity.system.SystemConfig;
+import com.flowiee.pms.modules.system.entity.SystemConfig;
 
 public class SysConfigUtils {
     public static boolean isValid(SystemConfig pSystemConfig) {

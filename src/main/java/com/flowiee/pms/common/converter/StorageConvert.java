@@ -1,7 +1,7 @@
 package com.flowiee.pms.common.converter;
 
-import com.flowiee.pms.entity.storage.Storage;
-import com.flowiee.pms.model.dto.StorageDTO;
+import com.flowiee.pms.modules.inventory.entity.Storage;
+import com.flowiee.pms.modules.inventory.dto.StorageDTO;
 
 public class StorageConvert {
     public static Storage convertToEntity(StorageDTO inputDTO) {

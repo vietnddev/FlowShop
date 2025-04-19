@@ -1,11 +1,9 @@
 package com.flowiee.pms.common.converter;
 
-import com.flowiee.pms.entity.category.Category;
-import com.flowiee.pms.entity.product.Product;
-import com.flowiee.pms.entity.product.ProductDetail;
-import com.flowiee.pms.entity.sales.GarmentFactory;
-import com.flowiee.pms.entity.sales.Supplier;
-import com.flowiee.pms.model.dto.ProductVariantDTO;
+import com.flowiee.pms.modules.category.entity.Category;
+import com.flowiee.pms.modules.product.entity.Product;
+import com.flowiee.pms.modules.product.entity.ProductDetail;
+import com.flowiee.pms.modules.product.dto.ProductVariantDTO;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.ArrayList;

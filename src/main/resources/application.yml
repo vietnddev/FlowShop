@@ -1,3 +1,9 @@
+#Port
+server:
+  port: 8085
+  servlet:
+    session:
+      timeout: 3600
 #API prefix
 app:
   api:
@@ -10,15 +16,16 @@ spring:
     name: sms
   main:
     allow-circular-references: true
-    resources:
-      static-locations:
-        - classpath:/static/**
-        - file:/static/uploads/**
+    lazy-initialization: true
+  resources:
+    static-locations:
+      - classpath:/static/**
+      - file:/static/uploads/**
   # Config package chứa file view JSP
   thymeleaf:
     prefix: classpath:/templates/webapp/views/
-    suffix: .jsp
-    cache: false
+    suffix: .html
+    mode: HTML
     encoding: UTF-8
   #banner
   banner:
@@ -26,7 +33,7 @@ spring:
   # Database
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
 #    naming:
 #      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 #    properties:
@@ -35,10 +42,24 @@ spring:
     properties:
       hibernate:
         session_factory:
-          statement_inspector: com.flowiee.pms.config.CustomHibernateInterceptor
+          statement_inspector: com.flowiee.pms.common.config.CustomHibernateInterceptor
+        enhancer:
+          enableLazyInitialization: true
+        default_batch_fetch_size: 20
+        transaction:
+          coordinator_class: jdbc
+    #open-in-view: false
+  # File's size request
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
+  security:
+    filter:
+      dispatcher-types: REQUEST
 #Log
 logging:
   level:
-    org.hibernate.SQL: DEBUG  #Log câu SQL
+    org.hibernate.SQL: off  #Log câu SQL
     #org.hibernate.type.descriptor.sql.BasicBinder: TRACE  #Log tham số truyền vào
   config: classpath:logback-spring.xml

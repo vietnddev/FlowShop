@@ -1,8 +1,8 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.base.CoreStartUp;
-import com.flowiee.pms.entity.system.FileStorage;
-import com.flowiee.pms.exception.AppException;
+import com.flowiee.pms.common.base.StartUp;
+import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import com.flowiee.pms.common.enumeration.FileExtension;
 import org.apache.commons.lang3.ObjectUtils;
@@ -27,7 +27,7 @@ import java.util.UUID;
 
 public class FileUtils {
     public static String resourceStaticPath = "src/main/resources/static";
-    public static String fileUploadPath = CoreStartUp.getResourceUploadPath() + "/uploads/";
+    public static String fileUploadPath = StartUp.getResourceUploadPath() + "/uploads/";
     public static String initCsvDataPath = resourceStaticPath + "/data/csv";
     public static String initXlsxDataPath = resourceStaticPath + "/data/excel";
     public static String reportTemplatePath = resourceStaticPath + "/report";
@@ -112,17 +112,17 @@ public class FileUtils {
     }
 
     public static String getFileUploadPath() {
-        if (CoreStartUp.getResourceUploadPath() == null) {
+        if (StartUp.getResourceUploadPath() == null) {
             throw new AppException("The uploaded file saving directory is not configured, please try again later!");
         }
-        return CoreStartUp.getResourceUploadPath() + "/uploads/";
+        return StartUp.getResourceUploadPath() + "/uploads/";
     }
 
     public static String getImageTempPath() {
-        if (CoreStartUp.getResourceUploadPath() == null) {
+        if (StartUp.getResourceUploadPath() == null) {
             throw new AppException("The uploaded file saving directory is not configured, please try again later!");
         }
-        return CoreStartUp.getResourceUploadPath() + "/data-temp/";
+        return StartUp.getResourceUploadPath() + "/data-temp/";
     }
 
     public static boolean isAllowUpload(String fileExtension, boolean throwException, String message) {

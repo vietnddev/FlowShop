@@ -1,9 +1,9 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.entity.sales.Order;
-import com.flowiee.pms.entity.sales.OrderDetail;
-import com.flowiee.pms.model.dto.OrderDTO;
-import com.flowiee.pms.model.dto.OrderDetailDTO;
+import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.modules.sales.entity.OrderDetail;
+import com.flowiee.pms.modules.sales.dto.OrderDTO;
+import com.flowiee.pms.modules.sales.dto.OrderDetailDTO;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -60,7 +60,7 @@ function loadImageInfoOnForm(subImage) {
         $("#imageNameField").val(subImage.name);
         $("#imageSizeField").val(subImage.size);
         $("#imageOriginalNameField").val(subImage.originalName);
-        $("#imageUploadByField").val(subImage.uploadBy);
+        $("#imageUploadByField").val(subImage.uploadByStr);
         $("#imageUploadAtField").val(subImage.uploadAt);
         $("#imageStatusField").val(subImage.isActive);
     })
@@ -68,7 +68,7 @@ function loadImageInfoOnForm(subImage) {
         $("#imageNameField").val(subImage.name);
         $("#imageSizeField").val(subImage.size);
         $("#imageOriginalNameField").val(subImage.originalName);
-        $("#imageUploadByField").val(subImage.uploadBy);
+        $("#imageUploadByField").val(subImage.uploadByStr);
         $("#imageUploadAtField").val(subImage.uploadAt);
         $("#imageStatusField").val(subImage.isActive);
     }

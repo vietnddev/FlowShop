@@ -1,6 +1,6 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.entity.category.Category;
+import com.flowiee.pms.modules.system.entity.Category;
 import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;

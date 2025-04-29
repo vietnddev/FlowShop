@@ -1,6 +1,6 @@
 //Host
-const mvHostURLCallApi = 'http://localhost:8085/api/v1';
-const mvHostURL = 'http://localhost:8085';
+const mvHostURL = window.location.origin;
+const mvHostURLCallApi = mvHostURL + '/api/v1';
 
 //Language to use
 let mvLang = "vi";

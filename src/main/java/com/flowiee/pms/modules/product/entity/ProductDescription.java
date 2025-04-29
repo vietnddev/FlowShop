@@ -5,7 +5,7 @@ import com.flowiee.pms.common.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Builder
@@ -22,6 +22,6 @@ public class ProductDescription extends BaseEntity implements Serializable {
     Long productId;
 
     @Lob
-    @Column(name = "description", length = 30000, columnDefinition = "CLOB")
+    @Column(name = "description", columnDefinition = "TEXT")
     String description;
 }

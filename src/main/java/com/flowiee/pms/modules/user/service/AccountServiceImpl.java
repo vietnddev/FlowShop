@@ -5,16 +5,20 @@ import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.utils.PasswordUtils;
+import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.modules.user.dto.AccountDTO;
 import com.flowiee.pms.modules.user.entity.Account;
 import com.flowiee.pms.common.exception.*;
 import com.flowiee.pms.modules.user.repository.AccountRepository;
 import com.flowiee.pms.common.security.UserSession;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,6 +112,35 @@ public class AccountServiceImpl extends BaseService implements AccountService {
         } catch (Exception ex) {
             throw new AppException("Delete account fail! id=" + accountId, ex);
         }
+    }
+
+    @Override
+    public AccountDTO getMyProfile() {
+        Account lvEntity = mvAccountRepository.findById(mvUserSession.getUserPrincipal().getId())
+                .orElseThrow(() -> new BadRequestException("Invalid information!"));
+        String lvAvt = "/media/default/user";
+        List<FileStorage> lvAvatars = lvEntity.getListAvatar();
+        if (CollectionUtils.isNotEmpty(lvAvatars)) {
+            Optional<FileStorage> lvAvatar = lvAvatars.stream()
+                    .filter(i -> i.isActive())
+                    .findFirst();
+            if (lvAvatar.isPresent()) {
+                lvAvt = FileUtils.getImageUrl(lvAvatar.get(), true);
+            }
+        }
+
+        AccountDTO lvDto = new AccountDTO();
+        lvDto.setId(lvEntity.getId());
+        lvDto.setUsername(lvEntity.getUsername());
+        lvDto.setFullName(lvEntity.getFullName());
+        lvDto.setEmail(lvEntity.getEmail());
+        lvDto.setPhoneNumber(lvEntity.getPhoneNumber());
+        lvDto.setSex(lvEntity.isSex());
+        lvDto.setStatus(lvEntity.getStatus());
+        lvDto.setAvatar(lvAvt);
+        //more fields
+
+        return lvDto;
     }
 
     @Override

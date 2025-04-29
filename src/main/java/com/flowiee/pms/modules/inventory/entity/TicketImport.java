@@ -15,7 +15,7 @@ import com.flowiee.pms.common.enumeration.TicketImportStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -36,7 +36,7 @@ public class TicketImport extends BaseEntity implements Serializable {
 	static final long serialVersionUID = 1L;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "storage_id", nullable = false)
     Storage storage;
 
@@ -44,7 +44,7 @@ public class TicketImport extends BaseEntity implements Serializable {
     String title;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "supplier_id")
     Supplier supplier;
 
@@ -52,7 +52,7 @@ public class TicketImport extends BaseEntity implements Serializable {
     Float discount;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "payment_method")
     Category paymentMethod;
 

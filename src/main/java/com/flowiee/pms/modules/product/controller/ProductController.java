@@ -3,7 +3,6 @@ package com.flowiee.pms.modules.product.controller;
 import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.constants.Constants;
-import com.flowiee.pms.modules.product.entity.Product;
 import com.flowiee.pms.modules.product.entity.ProductHistory;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
@@ -16,7 +15,6 @@ import com.flowiee.pms.modules.product.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.product.service.ProductHistoryService;
 import com.flowiee.pms.modules.product.service.ProductInfoService;
 import com.flowiee.pms.modules.product.service.ProductRelatedService;
-import com.flowiee.pms.modules.product.service.ProductService;
 import com.flowiee.pms.modules.system.service.ExportService;
 import com.flowiee.pms.modules.system.service.ImportService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
@@ -57,7 +55,6 @@ public class ProductController extends BaseController {
     ProductInfoService mvProductInfoService;
     ProductHistoryService mvProductHistoryService;
     ProductRelatedService mvProductRelatedService;
-    ProductService productService;
     ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all products")
@@ -82,7 +79,7 @@ public class ProductController extends BaseController {
             Page<ProductDTO> productPage = mvProductInfoService.findAll(PID.CLOTHES, pageSize, pageNum - 1, txtSearch, pBrand, pProductType, pColor, pSize, pUnit, pGender, pIsSalesOff, pIsHotTrend, null);
             return mvCHelper.success(productPage.getContent(), pageNum, pageSize, productPage.getTotalPages(), productPage.getTotalElements());
         } catch (RuntimeException ex) {
-            throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product"), ex);
+            throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product") + ": " + ex.getMessage(), ex);
         }
     }
 
@@ -100,7 +97,7 @@ public class ProductController extends BaseController {
     @Operation(summary = "Create clothes product")
     @PostMapping("/create")
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
-    public AppResponse<Product> createProduct(@RequestBody ProductDTO product, @RequestParam("PID_") String pPID) {
+    public AppResponse<ProductDTO> createProduct(@RequestBody ProductDTO product, @RequestParam("PID_") String pPID) {
         PID lvPID = PID.get(pPID);
         return switch (lvPID) {
             case CLOTHES -> mvCHelper.success(mvProductInfoService.saveClothes(product));

@@ -16,7 +16,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.util.Assert;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -27,13 +27,7 @@ import java.util.Objects;
 @Builder
 @Entity
 @Table(name = "account")
-@NamedEntityGraph(
-	name = "Account.withBranchAndGroupAccount",
-	attributeNodes = {
-		@NamedAttributeNode("branch"),
-		@NamedAttributeNode("groupAccount")
-	}
-)
+@NamedEntityGraph(name = "Account.withImages", attributeNodes = {@NamedAttributeNode("listAvatar")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -85,12 +79,12 @@ public class Account extends BaseEntity implements Serializable {
 	Long lineManagerId;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "group_account")
 	GroupAccount groupAccount;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "branch_id", nullable = false)
 	Branch branch;
 
@@ -110,7 +104,7 @@ public class Account extends BaseEntity implements Serializable {
 	String status;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "uploadBy", fetch = FetchType.LAZY)
 	List<FileStorage> listImages;
 
 	@JsonIgnore
@@ -133,6 +127,10 @@ public class Account extends BaseEntity implements Serializable {
 	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
 	List<LeaveApplication> listLeaveApplication;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+	List<FileStorage> listAvatar;
+
 	@Transient
 	String ip;
 
@@ -144,27 +142,6 @@ public class Account extends BaseEntity implements Serializable {
 		super.id = id;
 		this.username = username;
 		this.fullName = fullName;
-	}
-
-	public FileStorage getAvatar(Long pImageId) {
-		if (getListImages() != null) {
-			return getListImages().stream()
-					.filter(avatar -> avatar.getId().equals(pImageId))
-					.findAny()
-					.orElse(null);
-		}
-		return null;
-	}
-
-	public FileStorage getAvatar() {
-		if (getListImages() != null) {
-			for (FileStorage avatar : getListImages()) {
-				if (avatar.isActive())
-					return avatar;
-			}
-			return null;
-		}
-		return null;
 	}
 
 	public boolean isPasswordExpired() {

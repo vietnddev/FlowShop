@@ -1,11 +1,11 @@
 package com.flowiee.pms.modules.product.repository;
 
+import com.flowiee.pms.common.base.repository.BaseRepository;
 import com.flowiee.pms.modules.product.entity.Product;
 import com.flowiee.pms.modules.product.entity.ProductDetail;
 import com.flowiee.pms.modules.product.model.ProductSummaryInfoModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,11 +15,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface ProductDetailRepository extends JpaRepository <ProductDetail, Long>{
+public interface ProductDetailRepository extends BaseRepository<ProductDetail, Long> {
     @Query("from ProductDetail b where b.product.id=:productId and b.color.id=:colorId and b.size.id=:sizeId and b.fabricType.id=:fabricTypeId")
     ProductDetail findByColorAndSize(@Param("productId") Long productId, @Param("colorId") Long colorId, @Param("sizeId")  Long sizeId, @Param("fabricTypeId")  Long fabricTypeId);
 
-    @Query("select sum(nvl(p.soldQty, 0)) as totalQtySell from ProductDetail p where p.product.id=:productId")
+    @Query("select sum(coalesce(p.soldQty, 0)) as totalQtySell from ProductDetail p where p.product.id=:productId")
     Integer findTotalQtySell(@Param("productId") Long productId);
 
     @Modifying

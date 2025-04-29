@@ -6,7 +6,7 @@ import com.flowiee.pms.common.enumeration.LoyaltyTransactionType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -20,11 +20,11 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LoyaltyTransaction extends BaseEntity implements Serializable {
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "customer_Id", nullable = false)
     Customer customer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "loyalty_program_Id", nullable = false)
     LoyaltyProgram loyaltyProgram;
 

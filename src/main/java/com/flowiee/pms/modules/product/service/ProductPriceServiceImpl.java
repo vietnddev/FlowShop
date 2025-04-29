@@ -33,10 +33,16 @@ public class ProductPriceServiceImpl extends BaseGService<ProductPrice, ProductP
         List<ProductPrice> lvPriceList = new ArrayList<>();
         int batchSize = 1000; // Số lượng tối đa trong một truy vấn
         for (int i = 0; i < pProductVariantIds.size(); i += batchSize) {
-            List<Long> batch = pProductVariantIds.subList(i, Math.min(i + batchSize, pProductVariantIds.size()));
+            List<Long> batch = new ArrayList<>(pProductVariantIds.subList(i, Math.min(i + batchSize, pProductVariantIds.size())));
             lvPriceList.addAll(mvEntityRepository.findPresentPrices(batch));
         }
 
         return convertDTOs(lvPriceList);
+    }
+
+    @Override
+    public ProductPriceDTO findPresentPrice(Long productVariantId) {
+        ProductPrice lvPrice = mvEntityRepository.findPricePresent(null, productVariantId);
+        return lvPrice != null ? ProductPriceDTO.toDTO(lvPrice) : new ProductPriceDTO();
     }
 }

@@ -5,7 +5,7 @@ import com.flowiee.pms.modules.product.entity.Material;
 import com.flowiee.pms.modules.product.entity.ProductDetail;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class TransactionGoodsItem extends BaseEntity implements Serializable {
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "transaction_goods_id", nullable = false)
     private TransactionGoods transactionGoods;
 

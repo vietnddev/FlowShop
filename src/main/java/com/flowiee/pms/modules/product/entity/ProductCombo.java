@@ -10,8 +10,8 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.*;
-import javax.validation.constraints.AssertTrue;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.AssertTrue;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flowiee | Quản lý sản phẩm - Báo cáo thống kê</title>
-    <div th:replace="header :: stylesheets">
+    <div th:replace="~{header :: stylesheets}">
         <!--Nhúng các file css, icon,...-->
     </div>
     <!--Chart JS-->
@@ -12,9 +12,9 @@
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
-    <div th:replace="header :: header"></div>
+    <div th:replace="~{header :: header}"></div>
 
-    <div th:replace="sidebar :: sidebar"></div>
+    <div th:replace="~{sidebar :: sidebar}"></div>
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper" style="padding-top: 15px; padding-bottom: 1px;">
@@ -71,7 +71,7 @@
 </div>
 <!-- /.content-wrapper -->
 
-<div th:replace="footer :: footer">
+<div th:replace="~{footer :: footer}">
     <!-- Nhúng các file JavaScript vào -->
 </div>
 
@@ -80,7 +80,7 @@
     <!-- Control sidebar content goes here -->
 </aside>
 
-<div th:replace="header :: scripts">
+<div th:replace="~{header :: scripts}">
     <!-- Nhúng các file JavaScript vào -->
 </div>
 

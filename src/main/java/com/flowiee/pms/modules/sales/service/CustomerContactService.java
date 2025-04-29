@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.sales.service;
 
 import com.flowiee.pms.common.base.service.BaseCurdService;
+import com.flowiee.pms.common.enumeration.ContactType;
 import com.flowiee.pms.modules.sales.dto.CustomerContactDTO;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public interface CustomerContactService extends BaseCurdService<CustomerContactD
     CustomerContactDTO findContactEmailUseDefault(Long customerId);
 
     CustomerContactDTO findContactAddressUseDefault(Long customerId);
+
+    CustomerContactDTO findContact(Long customerId, ContactType contactType);
 
     CustomerContactDTO enableContactUseDefault(Long customerId, String type, Long contactId);
 

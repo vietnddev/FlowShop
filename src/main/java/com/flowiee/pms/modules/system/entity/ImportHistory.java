@@ -7,7 +7,7 @@ import com.flowiee.pms.modules.user.entity.Account;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -35,7 +35,7 @@ public class ImportHistory extends BaseEntity implements Serializable {
     @Column(name = "entity")
     String entity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "account", nullable = false)
     Account account;
 

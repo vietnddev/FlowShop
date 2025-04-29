@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kho tài liệu</title>
-    <th:block th:replace="header :: stylesheets"></th:block>
+    <th:block th:replace="~{header :: stylesheets}"></th:block>
     <style rel="stylesheet">
         .table td, th {
             vertical-align: middle;
@@ -16,23 +16,23 @@
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         <!-- Navbar (header) -->
-        <div th:replace="header :: header"></div>
+        <div th:replace="~{header :: header}"></div>
         <!-- /.navbar (header)-->
 
         <!-- Folder tree -->
-        <div th:replace="fragments :: folderTree"></div>
+        <div th:replace="~{fragments :: folderTree}"></div>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
             <section class="content">
                 <div class="container-fluid">
                     <!--Breadcrumb-->
-                    <div th:replace="fragments :: breadcrumb"></div>
+                    <div th:replace="~{fragments :: breadcrumb}"></div>
 
                     <div class="row">
                         <div class="col-12">
                             <!--Search tool-->
-                            <div th:replace="fragments :: searchTool(${configSearchTool})" id="searchTool"></div>
+                            <div th:replace="~{fragments :: searchTool(${configSearchTool})}" id="searchTool"></div>
 
                             <div class="card">
                                 <div class="card-header">
@@ -63,7 +63,7 @@
                                     </table>
                                 </div>
                                 <div class="card-footer">
-                                    <div th:replace="fragments :: pagination"></div>
+                                    <div th:replace="~{fragments :: pagination}"></div>
                                 </div>
 
                                 <!-- Modal insert and update -->
@@ -114,13 +114,13 @@
             </section>
         </div>
 
-        <div th:replace="modal_fragments :: confirm_modal"></div>
+        <div th:replace="~{modal_fragments :: confirm_modal}"></div>
 
-        <div th:replace="footer :: footer"></div>
+        <div th:replace="~{footer :: footer}"></div>
 
         <aside class="control-sidebar control-sidebar-dark"></aside>
 
-        <div th:replace="header :: scripts"></div>
+        <div th:replace="~{header :: scripts}"></div>
     </div>
 
     <script type="text/javascript">

@@ -5,7 +5,7 @@ import com.flowiee.pms.common.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -22,7 +22,7 @@ public class CategoryHistory extends BaseEntity implements Serializable {
     @Serial
     static final long serialVersionUID = 1L;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "category_id")
     Category category;
 
@@ -33,11 +33,11 @@ public class CategoryHistory extends BaseEntity implements Serializable {
     String field;
 
     @Lob
-    @Column(name = "old_value", nullable = false, length = 9999, columnDefinition = "CLOB")
+    @Column(name = "old_value", nullable = false, columnDefinition = "TEXT")
     String oldValue;
 
     @Lob
-    @Column(name = "new_value", nullable = false, length = 9999, columnDefinition = "CLOB")
+    @Column(name = "new_value", nullable = false, columnDefinition = "TEXT")
     String newValue;
 
 	@Override

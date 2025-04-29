@@ -13,7 +13,7 @@ import com.flowiee.pms.common.enumeration.PriorityLevel;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -55,7 +55,7 @@ public class Order extends BaseEntity implements Serializable {
 	String receiverAddress;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "customer_id", nullable = false)
 	Customer customer;
 
@@ -97,12 +97,12 @@ public class Order extends BaseEntity implements Serializable {
 	BigDecimal packagingCost;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "sales")
 	Account nhanVienBanHang;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "channel", nullable = false)
 	Category salesChannel;
 
@@ -111,7 +111,7 @@ public class Order extends BaseEntity implements Serializable {
 	LocalDateTime paymentTime;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "payment_method")
 	Category paymentMethod;
 
@@ -128,12 +128,12 @@ public class Order extends BaseEntity implements Serializable {
 	BigDecimal codFee;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ticket_export_id")
 	TicketExport ticketExport;
 
 //	@JsonIgnore
-//	@ManyToOne(fetch = FetchType.LAZY)
+//	@ManyToOne
 //	@JoinColumn(name = "status", nullable = false)
 //	Category trangThaiDonHang;
 

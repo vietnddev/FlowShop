@@ -22,7 +22,7 @@ public class ProductPriceDTO implements Serializable {
     BigDecimal wholesalePriceDiscount;
     BigDecimal purchasePrice;
     BigDecimal costPrice;
-    LocalDateTime lastUpdated;
+    LocalDateTime lastUpdatedAt;
     String note;
     String state;
 
@@ -41,7 +41,7 @@ public class ProductPriceDTO implements Serializable {
                 .retailPriceDiscount(productPrice.getRetailPriceDiscount())
                 .wholesalePrice(productPrice.getWholesalePrice())
                 .wholesalePriceDiscount(productPrice.getWholesalePriceDiscount())
-                .lastUpdated(productPrice.getLastUpdatedAt())
+                .lastUpdatedAt(productPrice.getLastUpdatedAt())
                 .build();
     }
 }

@@ -1,23 +1,52 @@
 package com.flowiee.pms.modules.product.dto;
 
-import com.flowiee.pms.modules.product.entity.Product;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flowiee.pms.common.base.dto.BaseDTO;
+import com.flowiee.pms.modules.category.dto.CategoryDTO;
+import com.flowiee.pms.modules.category.entity.Category;
+import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.modules.product.entity.*;
 import com.flowiee.pms.modules.promotion.dto.VoucherInfoDTO;
+import com.flowiee.pms.modules.sales.dto.GarmentFactoryDTO;
+import com.flowiee.pms.modules.sales.dto.SupplierDTO;
+import com.flowiee.pms.modules.sales.entity.GarmentFactory;
+import com.flowiee.pms.modules.sales.entity.Supplier;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+@NoArgsConstructor
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductDTO extends Product implements Serializable {
+public class ProductDTO extends BaseDTO implements Serializable {
     @Serial
     static final long serialVersionUID = 1L;
+
+    String PID;
+    CategoryDTO productType;
+    CategoryDTO brand;
+    CategoryDTO unit;
+    String productName;
+    LocalDate releaseDate;
+    String gender;
+    Boolean isSaleOff;
+    Boolean isHotTrend;
+    String returnPolicy;
+    Long variantDefault;
+    String internalNotes;
+    GarmentFactoryDTO garmentFactory;
+    SupplierDTO supplier;
 
     Long productTypeId;
     String productTypeName;
@@ -40,6 +69,10 @@ public class ProductDTO extends Product implements Serializable {
     String status;
     List<VoucherInfoDTO> listVoucherInfoApply;
     LinkedHashMap<String, String> productVariantInfo;
+
+    public ProductDTO(Long id) {
+        this.id = id;
+    }
 
 	@Override
 	public String toString() {

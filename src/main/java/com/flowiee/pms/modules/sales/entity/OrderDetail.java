@@ -7,7 +7,7 @@ import com.flowiee.pms.modules.product.entity.ProductDetail;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -25,13 +25,13 @@ public class OrderDetail extends BaseEntity implements java.io.Serializable {
 
 	@JsonIgnore
 	@JsonIgnoreProperties("listDonHangChiTiet")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "order_id", nullable = false)
 	Order order;
 
 	@JsonIgnore
 	@JsonIgnoreProperties("listDonHangChiTiet")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "product_variant_id", nullable = false)
 	ProductDetail productDetail;
 

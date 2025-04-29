@@ -24,6 +24,9 @@ public interface CustomerContactRepository extends BaseRepository<CustomerContac
     @Query("from CustomerContact c where c.customer.id=:customerId and c.code='A' and c.isDefault='Y'  and c.status=true")
     CustomerContact findAddressUseDefault(@Param("customerId") Long customerId);
 
+    @Query("from CustomerContact c where c.customer.id=:customerId and c.code=:contactType and c.isDefault='Y' and c.status=true")
+    CustomerContact findContactDefault(@Param("customerId") Long customerId, @Param("contactType") String contactType);
+
     @Query("from CustomerContact c where c.code = :contactType and c.value = :value")
     CustomerContact findByContactTypeAndValue(@Param("contactType") String contactType, @Param("value") String value);
 }

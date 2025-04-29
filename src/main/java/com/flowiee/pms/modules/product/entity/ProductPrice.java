@@ -6,7 +6,7 @@ import com.flowiee.pms.common.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -23,13 +23,13 @@ public class ProductPrice extends BaseEntity implements Serializable {
     public static final String STATE_ACTIVE = "A";
     public static final String STATE_INACTIVE = "I";
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_base_id")
-    Product productBase;
+//    @JsonIgnore
+//    @ManyToOne
+//    @JoinColumn(name = "product_base_id")
+//    Product productBase;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "product_variant_id")
     ProductDetail productVariant;
 

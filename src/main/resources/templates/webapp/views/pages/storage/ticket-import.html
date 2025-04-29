@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Quản lý phiếu nhập hàng</title>
-    <th:block th:replace="header :: stylesheets"></th:block>
+    <th:block th:replace="~{header :: stylesheets}"></th:block>
     <style>
         .table td.vertical-center {
             vertical-align: middle;
@@ -15,9 +15,9 @@
 
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
-    <div th:replace="header :: header"></div>
+    <div th:replace="~{header :: header}"></div>
 
-    <div th:replace="sidebar :: sidebar"></div>
+    <div th:replace="~{sidebar :: sidebar}"></div>
 
     <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
         <section class="content">
@@ -25,7 +25,7 @@
                 <div class="row">
                     <div class="col-12">
                         <!--Search tool-->
-                        <div th:replace="fragments :: searchTool(${configSearchTool})" id="searchTool"></div>
+                        <div th:replace="~{fragments :: searchTool(${configSearchTool})}" id="searchTool"></div>
 
                         <div class="card">
                             <div class="card-header">
@@ -56,7 +56,7 @@
                                 </table>
                             </div>
                             <div class="card-footer">
-                                <div th:replace="fragments :: pagination"></div>
+                                <div th:replace="~{fragments :: pagination}"></div>
                             </div>
                         </div>
                     </div>
@@ -65,11 +65,11 @@
         </section>
     </div>
 
-    <div th:replace="footer :: footer"></div>
+    <div th:replace="~{footer :: footer}"></div>
 
     <aside class="control-sidebar control-sidebar-dark"></aside>
 
-    <div th:replace="header :: scripts"></div>
+    <div th:replace="~{header :: scripts}"></div>
 
 </div>
 <script>

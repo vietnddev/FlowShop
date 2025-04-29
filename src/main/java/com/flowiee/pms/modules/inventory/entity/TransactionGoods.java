@@ -4,7 +4,7 @@ import com.flowiee.pms.common.base.entity.BaseEntity;
 import com.flowiee.pms.modules.sales.entity.Order;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,11 +65,11 @@ public class TransactionGoods extends BaseEntity implements Serializable {
     @Column(name = "source_type")
     private String sourceType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "warehouse_id")
     private Storage warehouse;
 

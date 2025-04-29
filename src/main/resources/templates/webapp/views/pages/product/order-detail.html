@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flowiee | Đơn hàng chi tiết</title>
-    <th:block th:replace="header :: stylesheets"></th:block>
+    <th:block th:replace="~{header :: stylesheets}"></th:block>
     <style rel="stylesheet">
         .table td,
         th {
@@ -14,9 +14,9 @@
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
-    <div th:replace="header :: header"></div>
+    <div th:replace="~{header :: header}"></div>
 
-    <div th:replace="sidebar :: sidebar"></div>
+    <div th:replace="~{sidebar :: sidebar}"></div>
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
@@ -92,9 +92,9 @@
                                                                 <button th:if="${allowEditItem}" type="button" class="btn btn-sm btn-success" data-toggle="modal" th:data-target="'#modalUpdateItems_' + ${list.id}">Cập nhật</button>
                                                                 <button th:if="${allowEditItem}" type="button" class="btn btn-sm btn-danger" data-toggle="modal" th:data-target="'#modalDeleteItems_' + ${list.id}">Xóa</button>
                                                                 <!--Modal update item-->
-                                                                <div th:replace="pages/sales/order/fragments/order-detail-fragments :: modalUpdateItem"></div>
+                                                                <div th:replace="~{pages/sales/order/fragments/order-detail-fragments :: modalUpdateItem}"></div>
                                                                 <!--Modal delete item-->
-                                                                <div th:replace="pages/sales/order/fragments/order-detail-fragments :: modalDeleteItem"></div>
+                                                                <div th:replace="~{pages/sales/order/fragments/order-detail-fragments :: modalDeleteItem}"></div>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -334,15 +334,15 @@
     </div>
     <!-- /.content-wrapper -->
 
-    <div th:replace="modal_fragments :: dialog_modal"></div>
-    <div th:replace="modal_fragments :: confirm_modal"></div>
+    <div th:replace="~{modal_fragments :: dialog_modal}"></div>
+    <div th:replace="~{modal_fragments :: confirm_modal}"></div>
 
-    <div th:replace="footer :: footer"></div>
+    <div th:replace="~{footer :: footer}"></div>
 
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark"></aside>
 
-    <div th:replace="header :: scripts"></div>
+    <div th:replace="~{header :: scripts}"></div>
 
     <script>
         $(function () {

@@ -7,7 +7,7 @@ import com.flowiee.pms.modules.inventory.entity.TicketImport;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -25,11 +25,11 @@ public class MaterialTemp extends BaseEntity implements Serializable {
     @Serial
 	static final long serialVersionUID = 1L;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "goods_import_id", nullable = false)
     TicketImport ticketImport;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
 	@JoinColumn(name = "material_id", nullable = false)
 	Material material;
 

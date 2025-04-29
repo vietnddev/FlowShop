@@ -50,7 +50,7 @@ public interface CategoryRepository extends BaseRepository<Category, Long> {
     @Query("from Category c where c.id in (select p.size.id from ProductDetail p where p.product.id=:productId and p.color.id=:colorId)")
     List<Category> findSizeOfColorOfProduct(@Param("productId") Long productId, @Param("colorId") Long colorId);
 
-    @Query("select c.type, nvl((select count(*) from Category where code <> 'ROOT' and type = c.type), 0) as total_records " +
+    @Query("select c.type, coalesce((select count(*) from Category where code <> 'ROOT' and type = c.type), 0) as total_records " +
            "from Category c " +
            "where c.code = 'ROOT'")
     List<Object[]> totalRecordsOfEachType();

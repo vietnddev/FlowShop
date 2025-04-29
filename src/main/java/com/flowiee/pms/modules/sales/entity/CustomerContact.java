@@ -7,7 +7,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.util.Assert;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Builder
@@ -22,7 +22,7 @@ import java.io.Serializable;
 public class CustomerContact extends BaseEntity implements Serializable {
 	static final long serialVersionUID = 1L;
 	
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     Customer customer;
 

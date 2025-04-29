@@ -1,7 +1,9 @@
 package com.flowiee.pms.modules.product.dto;
 
-import com.flowiee.pms.modules.product.entity.ProductDetail;
-import com.flowiee.pms.modules.product.entity.ProductHistory;
+import com.flowiee.pms.common.base.dto.BaseDTO;
+import com.flowiee.pms.common.enumeration.ProductStatus;
+import com.flowiee.pms.modules.category.dto.CategoryDTO;
+import com.flowiee.pms.modules.product.entity.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,15 +13,47 @@ import lombok.experimental.FieldDefaults;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductVariantDTO extends ProductDetail implements Serializable {
+public class ProductVariantDTO extends BaseDTO implements Serializable {
     @Serial
     static final long serialVersionUID = 1L;
+
+    ProductDTO product;
+    String variantCode;
+    String variantName;
+    CategoryDTO color;
+    CategoryDTO size;
+    CategoryDTO fabricType;
+    Integer storageQty;
+    Integer soldQty;
+    Integer defectiveQty;
+    String weight;
+    String dimensions;
+    String sku;
+    String supplierSku;
+    Integer warrantyPeriod;
+    String soleMaterial;
+    String heelHeight;
+    LocalDate discontinuedDate;
+    Boolean isLimitedEdition;
+    String pattern;
+    Integer lowStockThreshold;
+    LocalDateTime outOfStockDate;
+    String manufacturingCountry;
+    LocalDate manufacturingDate;
+    LocalDate expiryDate;
+    String storageInstructions;
+    String uvProtection;
+    Boolean isMachineWashable;
+    String note;//will be remove
+    ProductStatus status;
+    Integer availableSalesQty;
 
     Long productId;
     Long productTypeId;
@@ -37,7 +71,7 @@ public class ProductVariantDTO extends ProductDetail implements Serializable {
     BigDecimal originalPrice;
     BigDecimal discountPrice;
     String unitCurrency;
-    List<ProductHistory> listPrices;
+    //List<ProductHistory> listPrices;
     Long storageIdInitStorageQty;
     Long storageIdInitSoldQty;
     ProductPriceDTO price;

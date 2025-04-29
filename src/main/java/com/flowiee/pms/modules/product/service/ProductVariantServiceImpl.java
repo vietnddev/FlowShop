@@ -1,10 +1,16 @@
 package com.flowiee.pms.modules.product.service;
 
+import com.flowiee.pms.common.base.service.BaseGService;
+import com.flowiee.pms.common.constants.JpaHints;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.modules.category.entity.Category;
+import com.flowiee.pms.modules.log.service.SystemLogService;
+import com.flowiee.pms.modules.product.dto.ProductDTO;
+import com.flowiee.pms.modules.product.entity.Product;
 import com.flowiee.pms.modules.product.entity.ProductDetail;
 import com.flowiee.pms.modules.product.entity.ProductPrice;
 import com.flowiee.pms.modules.product.entity.ProductVariantExim;
+import com.flowiee.pms.modules.product.repository.ProductRepository;
 import com.flowiee.pms.modules.sales.entity.Items;
 import com.flowiee.pms.modules.sales.entity.OrderCart;
 import com.flowiee.pms.modules.inventory.entity.TicketExport;
@@ -33,15 +39,16 @@ import com.flowiee.pms.modules.product.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.product.dto.ProductVariantTempDTO;
 import com.flowiee.pms.modules.product.repository.ProductDetailRepository;
 import com.flowiee.pms.modules.product.repository.ProductDetailTempRepository;
-import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.modules.inventory.service.TicketExportService;
 import com.flowiee.pms.modules.inventory.service.TicketImportService;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.common.converter.ProductVariantConvert;
 import com.google.zxing.WriterException;
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityGraph;
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -51,9 +58,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-import javax.validation.ConstraintViolationException;
+import jakarta.persistence.criteria.*;
+import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -61,10 +67,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-public class ProductVariantServiceImpl extends BaseService implements ProductVariantService {
+public class ProductVariantServiceImpl extends BaseGService<ProductDetail, ProductVariantDTO, ProductDetailRepository> implements ProductVariantService {
     private final ProductDetailTempRepository mvProductVariantTempRepository;
-    private final ProductDetailRepository mvProductVariantRepository;
     private final ProductPriceRepository mvProductPriceRepository;
     private final FileStorageRepository mvFileStorageRepository;
     private final ProductGenerateQRCodeService mvProductGenerateQRCodeService;
@@ -78,13 +82,46 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
     private final OrderCartRepository mvCartRepository;
     private final GenerateBarcodeService mvGenerateBarcodeService;
     private final ProductPriceService mvProductPriceService;
-    private final UserSession userSession;
+    private final UserSession mvUserSession;
+    private final SystemLogService mvSystemLogService;
+    private final ProductRepository mvProductRepository;
     @Autowired
     @Lazy
     private CartService mvCartService;
     @Autowired
     @Lazy
     private ProductImageService mvProductImageService;
+
+    private final Logger LOG = LoggerFactory.getLogger(getClass());
+
+    public ProductVariantServiceImpl(ProductDetailRepository pEntityRepository, ProductDetailTempRepository pProductVariantTempRepository,
+                                     ProductPriceRepository pProductPriceRepository, FileStorageRepository pFileStorageRepository,
+                                     ProductGenerateQRCodeService pProductGenerateQRCodeService, ProductHistoryService pProductHistoryService,
+                                     TicketImportService pTicketImportService, TicketExportService pTicketExportService,
+                                     CategoryService pCategoryService, CategoryRepository pCategoryRepository,
+                                     StorageService pStorageService, StorageRepository pStorageRepository,
+                                     OrderCartRepository pCartRepository, GenerateBarcodeService pGenerateBarcodeService,
+                                     ProductPriceService pProductPriceService, UserSession pUserSession,
+                                     SystemLogService pSystemLogService, ProductRepository pProductRepository) {
+        super(ProductDetail.class, ProductVariantDTO.class, pEntityRepository);
+        this.mvProductVariantTempRepository = pProductVariantTempRepository;
+        this.mvProductPriceRepository = pProductPriceRepository;
+        this.mvFileStorageRepository = pFileStorageRepository;
+        this.mvProductGenerateQRCodeService = pProductGenerateQRCodeService;
+        this.mvProductHistoryService = pProductHistoryService;
+        this.mvTicketImportService = pTicketImportService;
+        this.mvTicketExportService = pTicketExportService;
+        this.mvCategoryService = pCategoryService;
+        this.mvCategoryRepository = pCategoryRepository;
+        this.mvStorageService = pStorageService;
+        this.mvStorageRepository = pStorageRepository;
+        this.mvCartRepository = pCartRepository;
+        this.mvGenerateBarcodeService = pGenerateBarcodeService;
+        this.mvProductPriceService = pProductPriceService;
+        this.mvUserSession = pUserSession;
+        this.mvSystemLogService = pSystemLogService;
+        this.mvProductRepository = pProductRepository;
+    }
 
     @Override
     public List<ProductVariantDTO> findAll() {
@@ -101,43 +138,42 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
     @Override
     public Page<ProductVariantDTO> findAll(int pageSize, int pageNum, String pTxtSearch, Long pProductId, Long pTicketImport, Long pBrandId, Long pColorId, Long pSizeId, Long pFabricTypeId, Boolean pAvailableForSales, boolean checkInAnyCart) {
         Pageable lvPageable = getPageable(pageNum, pageSize, Sort.by("variantName").ascending());
-        CriteriaBuilder lvCriteriaBuilder = mvEntityManager.getCriteriaBuilder();
-        CriteriaQuery<ProductDetail> lvCriteriaQuery = lvCriteriaBuilder.createQuery(ProductDetail.class);
-        Root<ProductDetail> lvRoot = lvCriteriaQuery.from(ProductDetail.class);
 
-        lvRoot.fetch("product", JoinType.INNER);
-        lvRoot.fetch("product", JoinType.INNER).fetch("productType", JoinType.LEFT);
-        lvRoot.fetch("product", JoinType.INNER).fetch("unit", JoinType.LEFT);
-        lvRoot.fetch("product", JoinType.INNER).fetch("brand", JoinType.LEFT);
-        lvRoot.fetch("color", JoinType.LEFT);
-        lvRoot.fetch("size", JoinType.LEFT);
-        lvRoot.fetch("fabricType", JoinType.LEFT);
-        lvRoot.fetch("priceList", JoinType.LEFT);
-
-        List<Predicate> lvPredicates = new ArrayList<>();
-        addLikeCondition(lvCriteriaBuilder, lvPredicates, pTxtSearch,
-                lvRoot.get("variantCode"), lvRoot.get("variantName"));
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("product").get("id"), pProductId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("product").get("brand").get("id"), pBrandId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("color").get("id"), pColorId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("size").get("id"), pSizeId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("fabricType").get("id"), pFabricTypeId);
+        QueryBuilder<ProductDetail> lvQueryBuilder = createQueryBuilder(ProductDetail.class)
+                .addLike("variantCode", pTxtSearch)
+                .addLike("variantName", pTxtSearch)
+                .addEqual("product.id", pProductId)
+                .addEqual("product.brand.id", pBrandId)
+                .addEqual("color.id", pColorId)
+                .addEqual("size.id", pSizeId)
+                .addEqual("fabricType.id", pFabricTypeId);
         if (pAvailableForSales != null) {
-            if (Boolean.TRUE.equals(pAvailableForSales)) {
-                lvPredicates.add(lvCriteriaBuilder.greaterThan(
-                        lvCriteriaBuilder.diff(lvRoot.get("storageQty"), lvRoot.get("defectiveQty")), 0));
-            } else
-                lvPredicates.add(lvCriteriaBuilder.lessThan(
-                        lvCriteriaBuilder.diff(lvRoot.get("storageQty"), lvRoot.get("defectiveQty")), 1));
+            lvQueryBuilder.addPredicate(cb -> {
+                //storageQty - defectiveQty
+                Expression<Integer> availableQty = cb.diff(
+                        lvQueryBuilder.getRoot().get("storageQty"),
+                        lvQueryBuilder.getRoot().get("defectiveQty")
+                );
+                return Boolean.TRUE.equals(pAvailableForSales)
+                        ? cb.greaterThan(availableQty, 0)
+                        : cb.lessThan(availableQty, 1);
+            });
         }
 
-        TypedQuery<ProductDetail> lvTypedQuery = initCriteriaQuery(lvCriteriaBuilder, lvCriteriaQuery, lvRoot, lvPredicates, lvPageable);
-        List<ProductDetail> lvProductVariants = lvTypedQuery.getResultList();
+        EntityGraph<ProductDetail> lvEntityGraph = mvEntityManager.createEntityGraph(ProductDetail.class);
+        lvEntityGraph.addSubgraph("product").addAttributeNodes("productType", "unit", "brand");
+        lvEntityGraph.addSubgraph("color");
+        lvEntityGraph.addSubgraph("size");
+        lvEntityGraph.addSubgraph("fabricType");
+        lvEntityGraph.addSubgraph("priceList");
 
-        TypedQuery<Long> lvCountQuery = initCriteriaCountQuery(lvCriteriaBuilder, lvPredicates, ProductDetail.class);
-        long lvTotalRecords = lvCountQuery.getSingleResult();
+        List<ProductDetail> lvProductVariants = lvQueryBuilder.build(lvPageable)
+                .setHint(JpaHints.FETCH_GRAPH, lvEntityGraph)
+                .getResultList();
+        long lvTotalRecords = lvQueryBuilder.buildCount();
 
-        List<ProductVariantDTO> lvProductVariantDTOs = ProductVariantConvert.entitiesToDTOs(lvProductVariants);
+        //List<ProductVariantDTO> lvProductVariantDTOs = ProductVariantConvert.entitiesToDTOs(lvProductVariants);
+        List<ProductVariantDTO> lvProductVariantDTOs = convertDTOs(lvProductVariants);
         List<Long> lvProductVariantIds = lvProductVariants.stream().map(ProductDetail::getId).toList();
 
         Map<Long, FileStorage> lvImageActiveList = mvProductImageService.getImageActiveOfProductVariants(lvProductVariantIds);
@@ -148,8 +184,9 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
 
         lvProductVariantDTOs.stream()
                 .peek(dto -> {
-                    assignPriceInfo(dto, dto.getVariantPrice());
-                    dto.setImageSrc(FileUtils.getImageUrl(lvImageActiveList.get(dto.getId()), true));
+                    assignPriceInfo(dto, mvProductPriceService.findPresentPrice(dto.getId()));
+                    String lvImageUrl = FileUtils.getImageUrl(lvImageActiveList.get(dto.getId()), true);
+                    dto.setImageSrc(lvImageUrl != null ? lvImageUrl : EndPoint.URL_MEDIA_DEFAULT_PRODUCT.getValue());
                     dto.setCurrentInCart(lvCartItemIds.contains(dto.getId()));
                 })
                 .collect(Collectors.toList());
@@ -157,7 +194,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
         return new PageImpl<>(lvProductVariantDTOs, lvPageable, lvTotalRecords);
     }
 
-    private ProductVariantDTO assignPriceInfo(ProductVariantDTO dto, ProductPrice productPrice) {
+    private ProductVariantDTO assignPriceInfo(ProductVariantDTO dto, ProductPriceDTO productPrice) {
         if (dto != null) {
             if (productPrice != null) {
                 dto.setPrice(ProductPriceDTO.builder()
@@ -167,7 +204,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
                         .wholesalePriceDiscount(productPrice.getWholesalePriceDiscount())
                         .purchasePrice(productPrice.getPurchasePrice())
                         .costPrice(productPrice.getCostPrice())
-                        .lastUpdated(productPrice.getLastUpdatedAt())
+                        .lastUpdatedAt(productPrice.getLastUpdatedAt())
                         .build());
             } else {
                 dto.setPrice(new ProductPriceDTO());
@@ -177,7 +214,7 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
     }
 
     private OrderCart getCurrentCart() {
-        List<OrderCart> cartList = mvCartRepository.findByAccountId(userSession.getUserPrincipal().getId());
+        List<OrderCart> cartList = mvCartRepository.findByAccountId(mvUserSession.getUserPrincipal().getId());
         if (ObjectUtils.isNotEmpty(cartList)) {
             return cartList.get(0);
         }
@@ -186,11 +223,18 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
 
     @Override
     public ProductVariantDTO findById(Long pProductVariantId, boolean pThrowException) {
-        Optional<ProductDetail> productVariant = mvProductVariantRepository.findById(pProductVariantId);
+        Optional<ProductDetail> productVariant = mvEntityRepository.findById(pProductVariantId);
         if (productVariant.isPresent()) {
-            ProductVariantDTO dto = ProductVariantConvert.entityToDTO(productVariant.get());
+            ProductVariantDTO dto = ProductVariantConvert.toDto(productVariant.get());
             //ProductPrice productPrice = mvProductPriceRepository.findPricePresent(null, dto.getId());
-            assignPriceInfo(dto, dto.getVariantPrice());
+            ProductPrice lvProductPrice = new ProductPrice();
+            if (productVariant.get().getPriceList() != null) {
+                for (ProductPrice price : productVariant.get().getPriceList()) {
+                    if (ProductPrice.STATE_ACTIVE.equals(price.getState()))
+                        lvProductPrice = price;
+                }
+            }
+            assignPriceInfo(dto, ProductPriceDTO.toDTO(lvProductPrice));
             return dto;
         }
         if (pThrowException) {
@@ -200,48 +244,57 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
         }
     }
 
+    @Transactional
     @Override
-    public ProductVariantDTO save(ProductVariantDTO inputDTO) {
+    public ProductVariantDTO save(ProductVariantDTO pDto) {
         try {
-            VldModel vldModel = vldCategory(inputDTO.getColorId(), inputDTO.getSizeId(), inputDTO.getFabricTypeId());
+            Product lvProduct = mvProductRepository.findById(pDto.getProductId())
+                    .orElseThrow(() -> new BadRequestException("Product invalid!"));
 
-            ProductDetail pVariant = ProductVariantConvert.dtoToEntity(inputDTO);
-            pVariant.setColor(vldModel.getColor());
-            pVariant.setSize(vldModel.getSize());
-            pVariant.setFabricType(vldModel.getFabricType());
-            pVariant.setSoldQty(CoreUtils.coalesce(pVariant.getSoldQty()));
-            pVariant.setStorageQty(CoreUtils.coalesce(pVariant.getStorageQty()));
-            pVariant.setDefectiveQty(CoreUtils.coalesce(pVariant.getDefectiveQty()));
-            pVariant.setStatus(ProductStatus.ACT);
-            pVariant.setVariantCode(genProductCode(inputDTO.getVariantCode()));
-            pVariant.setSku(generateSKUCode());
-            ProductDetail productDetailSaved = mvProductVariantRepository.save(pVariant);
+            VldModel vldModel = vldCategory(pDto.getColorId(), pDto.getSizeId(), pDto.getFabricTypeId());
 
-            ProductPriceDTO priceDTO = inputDTO.getPrice();
-            savePrice(productDetailSaved, priceDTO);
+            ProductDetail lvEntity = ProductDetail.builder()
+                    .product(new Product(lvProduct.getId()))
+                    .color(vldModel.getColor())
+                    .size(vldModel.getSize())
+                    .fabricType(vldModel.getFabricType())
+                    .variantCode(genProductCode(pDto.getVariantCode()))
+                    .variantName(pDto.getVariantName())
+                    .soldQty(CoreUtils.coalesce(pDto.getSoldQty()))
+                    .storageQty(CoreUtils.coalesce(pDto.getStorageQty()))
+                    .defectiveQty(CoreUtils.coalesce(pDto.getDefectiveQty()))
+                    .weight(pDto.getWeight())
+                    .note(pDto.getNote())
+                    .status(ProductStatus.ACT)
+                    .sku(generateSKUCode())
+                    .build();
+            ProductDetail lvProductVariantSaved = mvEntityRepository.save(lvEntity);
+
+            ProductPriceDTO priceDTO = pDto.getPrice();
+            savePrice(lvProductVariantSaved, priceDTO);
 
             try {
-                mvProductGenerateQRCodeService.generateProductVariantQRCode(productDetailSaved.getId());
+                mvProductGenerateQRCodeService.generateProductVariantQRCode(lvProductVariantSaved.getId());
             } catch (IOException | WriterException e ) {
                 e.printStackTrace();
-                logger.error(String.format("Can't generate QR Code for Product %s", productDetailSaved.getVariantCode()), e);
+                LOG.error(String.format("Can't generate QR Code for Product %s", lvProductVariantSaved.getVariantCode()), e);
             }
 
             try {
-                mvGenerateBarcodeService.generateBarcode(productDetailSaved.getId());
+                mvGenerateBarcodeService.generateBarcode(lvProductVariantSaved.getId());
             } catch (IOException | WriterException e ) {
                 e.printStackTrace();
-                logger.error(String.format("Can't generate Barcode for Product %s", productDetailSaved.getVariantCode()), e);
+                LOG.error(String.format("Can't generate Barcode for Product %s", lvProductVariantSaved.getVariantCode()), e);
             }
 
-            if (productDetailSaved.getStorageQty() > 0 && inputDTO.getStorageIdInitStorageQty() != null) {
-                Storage lvStorage = mvStorageRepository.findById(inputDTO.getStorageIdInitStorageQty())
+            if (lvProductVariantSaved.getStorageQty() > 0 && pDto.getStorageIdInitStorageQty() != null) {
+                Storage lvStorage = mvStorageRepository.findById(pDto.getStorageIdInitStorageQty())
                         .orElseThrow(() -> new EntityNotFoundException(new Object[] {"storage"}, null, null));
                 String initMessage = "Initialize storage quantity when create new products";
 
                 TicketImport ticketImportSaved = mvTicketImportService.save(TicketImport.builder()
                         .title("Initialize storage")
-                        .importer(userSession.getUserPrincipal().getUsername())
+                        .importer(mvUserSession.getUserPrincipal().getUsername())
                         .importTime(LocalDateTime.now())
                         .note(initMessage)
                         .status(TicketImportStatus.COMPLETED.name())
@@ -250,19 +303,20 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
 
                 mvProductVariantTempRepository.save(ProductVariantExim.builder()
                         .ticketImport(ticketImportSaved)
-                        .productVariant(productDetailSaved)
-                        .quantity(productDetailSaved.getStorageQty())
+                        .productVariant(lvProductVariantSaved)
+                        .quantity(lvProductVariantSaved.getStorageQty())
                         .note(initMessage)
                         .build());
             }
-            if (productDetailSaved.getSoldQty() > 0 && inputDTO.getStorageIdInitStorageQty() != null) {
-                Storage lvStorage = mvStorageRepository.findById(inputDTO.getStorageIdInitStorageQty())
+
+            if (lvProductVariantSaved.getSoldQty() > 0 && pDto.getStorageIdInitStorageQty() != null) {
+                Storage lvStorage = mvStorageRepository.findById(pDto.getStorageIdInitStorageQty())
                         .orElseThrow(() -> new EntityNotFoundException(new Object[] {"storage"}, null, null));
                 String initMessage = "Initialize storage quantity when create new products";
 
                 TicketExport ticketExportSaved = mvTicketExportService.save(TicketExport.builder()
                         .title("Initialize storage")
-                        .exporter(userSession.getUserPrincipal().getUsername())
+                        .exporter(mvUserSession.getUserPrincipal().getUsername())
                         .exportTime(LocalDateTime.now())
                         .note(initMessage)
                         .status(TicketExportStatus.COMPLETED.name())
@@ -271,15 +325,15 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
 
                 mvProductVariantTempRepository.save(ProductVariantExim.builder()
                         .ticketExport(ticketExportSaved)
-                        .productVariant(productDetailSaved)
-                        .quantity(productDetailSaved.getStorageQty())
+                        .productVariant(lvProductVariantSaved)
+                        .quantity(lvProductVariantSaved.getStorageQty())
                         .note(initMessage)
                         .build());
             }
 
-            systemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Thêm mới biến thể sản phẩm", pVariant.toStringInsert());
-            logger.info("Insert productVariant success! {}", pVariant);
-            return ProductVariantConvert.entityToDTO(productDetailSaved);
+            mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Thêm mới biến thể sản phẩm", lvEntity.toStringInsert());
+            LOG.info("Insert productVariant success! {}", lvEntity);
+            return ProductVariantConvert.toDto(lvProductVariantSaved);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "product variant"), ex);
         }
@@ -288,17 +342,17 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
     @Transactional
     @Override
     public ProductVariantDTO update(ProductVariantDTO pProductDetail, Long productVariantId) {
-        ProductDetail productVariantOptional = this.findById(productVariantId, true);
+        ProductDetail productVariant = this.findById(productVariantId).orElseThrow(() -> new BadRequestException());
         //VldModel vldModel = vldCategory(pProductDetail.getColorId(), pProductDetail.getSizeId(), pProductDetail.getFabricTypeId());
         try {
-            ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(productVariantOptional));
+            ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(productVariant));
 
-            ProductDetail productToUpdate = productVariantOptional;
+            ProductDetail productToUpdate = productVariant;
             productToUpdate.setVariantName(pProductDetail.getVariantName());
             productToUpdate.setDefectiveQty(pProductDetail.getDefectiveQty());
             productToUpdate.setWeight(pProductDetail.getWeight());
             productToUpdate.setNote(pProductDetail.getNote());
-            ProductDetail productVariantUpdated = mvProductVariantRepository.save(productToUpdate);
+            ProductDetail productVariantUpdated = mvEntityRepository.save(productToUpdate);
 
             changeLog.setNewObject(productVariantUpdated);
             changeLog.doAudit();
@@ -315,10 +369,10 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
             //Log
             String logTitle = "Cập nhật thông tin sản phẩm: " + productVariantUpdated.getVariantName();
             mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, productVariantUpdated.getProduct().getId(), productVariantUpdated.getId(), null);
-            systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
-            logger.info("Update productVariant success! {}", productVariantUpdated);
+            mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
+            LOG.info("Update productVariant success! {}", productVariantUpdated);
 
-            return ProductVariantConvert.entityToDTO(productVariantUpdated);
+            return ProductVariantConvert.toDto(productVariantUpdated);
         } catch (Exception e) {
             throw new AppException("Update productVariant fail! " + pProductDetail.toString(), e);
         }
@@ -328,18 +382,18 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
     public String delete(Long productVariantId) {
         ProductVariantDTO productDetailToDelete = this.findById(productVariantId, true);
         try {
-            mvProductVariantRepository.deleteById(productVariantId);
+            mvEntityRepository.deleteById(productVariantId);
         } catch (ConstraintViolationException ex) {
             throw new DataInUseException("Không thể xóa sản phẩm đã được sử dụng!", ex);
         }
-        systemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Xóa biến thể sản phẩm", productDetailToDelete.getVariantName());
-        logger.info("Delete productVariant success! {}", productDetailToDelete);
+        mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Xóa biến thể sản phẩm", productDetailToDelete.getVariantName());
+        LOG.info("Delete productVariant success! {}", productDetailToDelete);
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
 
     @Override
     public boolean isProductVariantExists(long productId, long colorId, long sizeId, long fabricTypeId) {
-        ProductDetail productDetail = mvProductVariantRepository.findByColorAndSize(productId, colorId, sizeId, fabricTypeId);
+        ProductDetail productDetail = mvEntityRepository.findByColorAndSize(productId, colorId, sizeId, fabricTypeId);
         return ObjectUtils.isNotEmpty(productDetail);
     }
 
@@ -387,20 +441,20 @@ public class ProductVariantServiceImpl extends BaseService implements ProductVar
 
     @Override
     public void updateLowStockThreshold(Long pProductId, int pThreshold) {
-        ProductDetail lvProduct = mvProductVariantRepository.findById(pProductId)
+        ProductDetail lvProduct = mvEntityRepository.findById(pProductId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         lvProduct.setLowStockThreshold(pThreshold);
-        mvProductVariantRepository.save(lvProduct);
+        mvEntityRepository.save(lvProduct);
     }
 
     @Override
     public Page<ProductVariantDTO> getProductsOutOfStock(int pageSize, int pageNum) {
         Pageable pageable = getPageable(pageNum, pageSize);
-        Page<ProductDetail> productVariants = mvProductVariantRepository.findProductsOutOfStock(pageable);
+        Page<ProductDetail> productVariants = mvEntityRepository.findProductsOutOfStock(pageable);
         List<ProductVariantDTO> productVariantDTOs = ProductVariantConvert.entitiesToDTOs(productVariants.getContent());
         for (ProductVariantDTO dto : productVariantDTOs) {
-            assignPriceInfo(dto, dto.getVariantPrice());
+            assignPriceInfo(dto, mvProductPriceService.findPresentPrice(dto.getId()));
         }
         return new PageImpl<>(productVariantDTOs, pageable, productVariantDTOs.size());
     }

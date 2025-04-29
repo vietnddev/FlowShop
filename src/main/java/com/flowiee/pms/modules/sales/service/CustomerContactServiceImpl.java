@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.sales.service;
 
 import com.flowiee.pms.common.base.service.BaseGService;
+import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.modules.sales.entity.CustomerContact;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.DataInUseException;
@@ -8,10 +9,6 @@ import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.modules.sales.dto.CustomerContactDTO;
 import com.flowiee.pms.modules.sales.repository.CustomerContactRepository;
 import com.flowiee.pms.modules.sales.repository.CustomerRepository;
-import com.flowiee.pms.common.enumeration.ACTION;
-import com.flowiee.pms.common.enumeration.MODULE;
-import com.flowiee.pms.common.enumeration.MasterObject;
-import com.flowiee.pms.common.enumeration.MessageCode;
 import com.flowiee.pms.modules.log.service.SystemLogService;
 import org.springframework.stereotype.Service;
 
@@ -106,6 +103,11 @@ public class CustomerContactServiceImpl extends BaseGService<CustomerContact, Cu
     @Override
     public CustomerContactDTO findContactAddressUseDefault(Long customerId) {
         return convertDTO(mvEntityRepository.findAddressUseDefault(customerId));
+    }
+
+    @Override
+    public CustomerContactDTO findContact(Long customerId, ContactType contactType) {
+        return super.convertDTO(mvEntityRepository.findContactDefault(customerId, contactType.name()));
     }
 
     @Override

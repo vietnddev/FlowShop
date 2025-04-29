@@ -1,7 +1,5 @@
 package com.flowiee.pms.common.converter;
 
-import com.flowiee.pms.modules.category.entity.Category;
-import com.flowiee.pms.modules.product.entity.Product;
 import com.flowiee.pms.modules.product.entity.ProductDetail;
 import com.flowiee.pms.modules.product.dto.ProductVariantDTO;
 import org.apache.commons.lang3.ObjectUtils;
@@ -14,105 +12,87 @@ public class ProductVariantConvert {
         List<ProductVariantDTO> outputDTOs = new ArrayList<>();
         if (ObjectUtils.isNotEmpty(inputEntities)) {
             for (ProductDetail p : inputEntities) {
-                outputDTOs.add(entityToDTO(p));
+                outputDTOs.add(toDto(p));
             }
         }
         return outputDTOs;
     }
 
-    public static List<ProductDetail> dTOsToEntities(List<ProductVariantDTO> inputDTOs) {
-        List<ProductDetail> outputEntities = new ArrayList<>();
-        if (ObjectUtils.isNotEmpty(inputDTOs)) {
-            for (ProductVariantDTO p : inputDTOs) {
-                outputEntities.add(dtoToEntity(p));
-            }
-        }
-        return outputEntities;
-    }
+    public static ProductVariantDTO toDto(ProductDetail pInput) {
+        ProductVariantDTO dto = new ProductVariantDTO();
+        if (pInput != null) {
+            dto.setId(pInput.getId());
+            //dto.setProduct();
+            dto.setVariantCode(pInput.getVariantCode());
+            dto.setVariantName(pInput.getVariantName());
+            //dto.setColor();
+            //dto.setSize();
+            //dto.setFabricType();
+//            dto.setStorageQty();
+//            dto.setSoldQty();
+//            dto.setDefectiveQty();
+//            dto.setWeight();
+//            dto.setDimensions();
+//            dto.setSku();
+//            dto.setSupplierSku();
+//            dto.setWarrantyPeriod();
+//            dto.setSoleMaterial();
+//            dto.setHeelHeight();
+//            dto.setDiscontinuedDate();
+//            dto.setIsLimitedEdition();
+//            dto.setPattern();
+//            dto.setLowStockThreshold();
+//            dto.setOutOfStockDate();
+//            dto.setManufacturingCountry();
+//            dto.setManufacturingDate();
+//            dto.setExpiryDate();
+//            dto.setStorageInstructions();
+//            dto.setUvProtection();
+//            dto.setIsMachineWashable();
+//            dto.setNote();//will be remove
+//            dto.setStatus();
+//            dto.setAvailableSalesQty();
 
-    public static ProductVariantDTO entityToDTO(ProductDetail inputEntity) {
-        if (ObjectUtils.isEmpty(inputEntity)) {
-            return null;
-        }
-        ProductVariantDTO outputDTO = new ProductVariantDTO();
-        outputDTO.setId(inputEntity.getId());
-        outputDTO.setProductId(inputEntity.getProduct().getId());
-        outputDTO.setVariantCode(inputEntity.getVariantCode());
-        outputDTO.setVariantName(inputEntity.getVariantName());
-        outputDTO.setStorageQty(inputEntity.getStorageQty());
-        outputDTO.setSoldQty(inputEntity.getSoldQty());
-        outputDTO.setStatus(inputEntity.getStatus());
-        if (ObjectUtils.isNotEmpty(inputEntity.getProduct().getProductType())) {
-            outputDTO.setProductTypeId(inputEntity.getProduct().getProductType().getId());
-            outputDTO.setProductTypeName(inputEntity.getProduct().getProductType().getName());
-        }
-        if (ObjectUtils.isNotEmpty(inputEntity.getProduct().getBrand())) {
-            outputDTO.setBrandId(inputEntity.getProduct().getBrand().getId());
-            outputDTO.setBrandName(inputEntity.getProduct().getBrand().getName());
-        }
-        if (ObjectUtils.isNotEmpty(inputEntity.getProduct().getUnit())) {
-            outputDTO.setUnitId(inputEntity.getProduct().getUnit().getId());
-            outputDTO.setUnitName(inputEntity.getProduct().getUnit().getName());
-        }
-        outputDTO.setColorId(inputEntity.getColor().getId());
-        outputDTO.setColorName(inputEntity.getColor().getName());
-        outputDTO.setSizeId(inputEntity.getSize().getId());
-        outputDTO.setSizeName(inputEntity.getSize().getName());
-        if (inputEntity.getFabricType() != null) {
-            outputDTO.setFabricType(inputEntity.getFabricType());
-            outputDTO.setFabricTypeId(inputEntity.getFabricType().getId());
-            outputDTO.setFabricTypeName(inputEntity.getFabricType().getName());
-        }
-        outputDTO.setUnitCurrency(null);
+            dto.setProductId(pInput.getProduct().getId());
+            dto.setStorageQty(pInput.getStorageQty());
+            dto.setSoldQty(pInput.getSoldQty());
+            dto.setStatus(pInput.getStatus());
+            if (ObjectUtils.isNotEmpty(pInput.getProduct().getProductType())) {
+                dto.setProductTypeId(pInput.getProduct().getProductType().getId());
+                dto.setProductTypeName(pInput.getProduct().getProductType().getName());
+            }
+            if (ObjectUtils.isNotEmpty(pInput.getProduct().getBrand())) {
+                dto.setBrandId(pInput.getProduct().getBrand().getId());
+                dto.setBrandName(pInput.getProduct().getBrand().getName());
+            }
+            if (ObjectUtils.isNotEmpty(pInput.getProduct().getUnit())) {
+                dto.setUnitId(pInput.getProduct().getUnit().getId());
+                dto.setUnitName(pInput.getProduct().getUnit().getName());
+            }
+            dto.setColorId(pInput.getColor().getId());
+            dto.setColorName(pInput.getColor().getName());
+            dto.setSizeId(pInput.getSize().getId());
+            dto.setSizeName(pInput.getSize().getName());
+            if (pInput.getFabricType() != null) {
+                //outputDTO.setFabricType(inputEntity.getFabricType());
+                dto.setFabricTypeId(pInput.getFabricType().getId());
+                dto.setFabricTypeName(pInput.getFabricType().getName());
+            }
+            dto.setUnitCurrency(null);
 //        if (AppConstants.PRODUCT_STATUS.A.name().equals(inputEntity.getStatus())) {
 //            outputDTO.setStatus(AppConstants.PRODUCT_STATUS.A.getLabel());
 //        } else if (AppConstants.PRODUCT_STATUS.I.name().equals(inputEntity.getStatus())) {
 //            outputDTO.setStatus(AppConstants.PRODUCT_STATUS.I.getLabel());
 //        }
-        outputDTO.setDefectiveQty(inputEntity.getDefectiveQty());
-        outputDTO.setAvailableSalesQty(outputDTO.getStorageQty() - outputDTO.getDefectiveQty());
-        outputDTO.setWeight(inputEntity.getWeight());
-        outputDTO.setNote(inputEntity.getNote());
-        outputDTO.setStatus(inputEntity.getStatus());
+            dto.setDefectiveQty(pInput.getDefectiveQty());
+            dto.setAvailableSalesQty(dto.getStorageQty() - dto.getDefectiveQty());
+            dto.setWeight(pInput.getWeight());
+            dto.setNote(pInput.getNote());
+            dto.setStatus(pInput.getStatus());
 
-        //outputDTO.setListImages(inputEntity.getListImages());
-        //outputDTO.setPriceList(inputEntity.getPriceList());
-
-        return outputDTO;
-    }
-
-    public static ProductDetail dtoToEntity(ProductVariantDTO inputDTO) {
-        if (inputDTO == null) {
-            return null;
+            //outputDTO.setListImages(inputEntity.getListImages());
+            //outputDTO.setPriceList(inputEntity.getPriceList());
         }
-        ProductDetail outputEntity = ProductDetail.builder()
-            .product(inputDTO.getProduct())
-            .color(inputDTO.getColor())
-            .size(inputDTO.getSize())
-            .fabricType(inputDTO.getFabricType())
-            .variantCode(inputDTO.getVariantCode())
-            .variantName(inputDTO.getVariantName())
-            .storageQty(inputDTO.getStorageQty())
-            .soldQty(inputDTO.getSoldQty())
-            .defectiveQty(inputDTO.getDefectiveQty())
-            .weight(inputDTO.getWeight())
-            .note(inputDTO.getNote())
-            .status(inputDTO.getStatus())
-            .build();
-        outputEntity.setId(inputDTO.getId());
-
-        if (outputEntity.getProduct() == null && inputDTO.getProductId() != null)
-            outputEntity.setProduct(new Product(inputDTO.getProductId()));
-
-        if (outputEntity.getColor() == null && inputDTO.getColorId() != null)
-            outputEntity.setColor(new Category(inputDTO.getColorId(), inputDTO.getColorName()));
-
-        if (outputEntity.getSize() == null && inputDTO.getSizeId() != null)
-            outputEntity.setSize(new Category(inputDTO.getSizeId(), inputDTO.getSizeName()));
-
-        if (outputEntity.getFabricType() == null && inputDTO.getFabricTypeId() != null)
-            outputEntity.setFabricType(new Category(inputDTO.getFabricTypeId(), inputDTO.getFabricTypeName()));
-
-        return outputEntity;
+        return dto;
     }
 }

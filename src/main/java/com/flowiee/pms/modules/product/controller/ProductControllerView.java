@@ -25,7 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -75,7 +75,8 @@ public class ProductControllerView extends BaseController {
         modelAndView.addObject("bienTheSanPhamId", variantId);
         modelAndView.addObject("bienTheSanPham", productVariant);
         modelAndView.addObject("listImageOfSanPhamBienThe", mvProductImageService.getImageOfProductVariant(variantId));
-        FileStorage imageActive = productVariant.getActiveImage();//mvProductImageService.findImageActiveOfProductVariant(variantId);
+        //FileStorage imageActive = productVariant.getActiveImage();
+        FileStorage imageActive = mvProductImageService.findImageActiveOfProductVariant(variantId);
         if (imageActive == null) {
             imageActive = new FileStorage();
         }

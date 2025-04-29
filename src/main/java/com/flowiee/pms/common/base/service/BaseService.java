@@ -18,15 +18,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 public class BaseService {
@@ -142,87 +138,6 @@ public class BaseService {
             return pTime;
         }
         return DateTimeUtil.MAX_TIME;
-    }
-
-    protected <T> void addEqualCondition(
-            CriteriaBuilder cb,
-            List<Predicate> predicates,
-            Path<T> path,
-            T value) {
-        if (value != null) {
-            predicates.add(cb.equal(path, value));
-        }
-    }
-
-    protected void addLikeCondition(
-            CriteriaBuilder cb,
-            List<Predicate> predicates,
-            String value,
-            Path<String>... fields) {
-        if (value != null) {
-            List<Predicate> likePredicates = Arrays.stream(fields)
-                    .map(field -> cb.like(cb.lower(field), "%" + value.toLowerCase() + "%"))
-                    .toList();
-            predicates.add(cb.or(likePredicates.toArray(new Predicate[0])));
-        }
-    }
-
-    protected <T extends Comparable<? super T>> void addBetweenCondition(
-            CriteriaBuilder cb,
-            List<Predicate> predicates,
-            Expression<?> field,
-            String functionName, // Tên hàm SQL
-            Class<T> functionResultType, // Kiểu kết quả trả về từ hàm SQL
-            T from,
-            T to) {
-        if (from != null && to != null) {
-            Expression<T> functionExpression = cb.function(functionName, functionResultType, field);
-            predicates.add(cb.between(functionExpression, from, to));
-        }
-    }
-
-    protected <T> TypedQuery<Long> initCriteriaCountQuery(CriteriaBuilder lvCriteriaBuilder,
-                                                          List<Predicate> predicates,
-                                                          Class<T> entityClass) {
-        CriteriaQuery<Long> countQuery = lvCriteriaBuilder.createQuery(Long.class);
-        Root<T> countRoot = countQuery.from(entityClass);
-        // Copy các điều kiện từ danh sách ban đầu
-        if (predicates != null && !predicates.isEmpty()) {
-            countQuery.where(predicates.toArray(new Predicate[0]));
-        }
-        // Chọn count distinct
-        countQuery.select(lvCriteriaBuilder.countDistinct(countRoot));
-        return mvEntityManager.createQuery(countQuery);
-    }
-
-    protected <T> TypedQuery<T> initCriteriaQuery(CriteriaBuilder pCriteriaBuilder,
-                                                  CriteriaQuery<T> pCriteriaQuery,
-                                                  Root<T> pRoot,
-                                                  List<Predicate> pPredicates,
-                                                  Pageable pPageable) {
-        pCriteriaQuery.where(pPredicates.toArray(new Predicate[0]));
-        pCriteriaQuery.distinct(true);
-
-        if (pPageable.getSort().isSorted()) {
-            List<javax.persistence.criteria.Order> orders = pPageable.getSort().stream()
-                    .map(sortOrder  -> {
-                        if (sortOrder.isAscending()) {
-                            return pCriteriaBuilder.asc(pRoot.get(sortOrder.getProperty()));
-                        } else {
-                            return pCriteriaBuilder.desc(pRoot.get(sortOrder.getProperty()));
-                        }
-                    })
-                    .toList();
-            pCriteriaQuery.orderBy(orders);
-        }
-
-        TypedQuery<T> lvTypedQuery = mvEntityManager.createQuery(pCriteriaQuery);
-        if (pPageable.isPaged()) {
-            lvTypedQuery.setFirstResult((int) pPageable.getOffset());
-            lvTypedQuery.setMaxResults(pPageable.getPageSize());
-        }
-
-        return lvTypedQuery;
     }
 
     @Data

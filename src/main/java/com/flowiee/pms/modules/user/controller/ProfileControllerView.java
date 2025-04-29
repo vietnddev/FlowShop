@@ -20,7 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 @RestController
@@ -33,9 +33,10 @@ public class ProfileControllerView extends BaseController {
 
 	@GetMapping("/sys/profile")
 	public ModelAndView showInformation(@ModelAttribute("message") String message) {
+		Account lvAccount = userSession.getUserPrincipal().getEntity();
 		ModelAndView modelAndView = new ModelAndView(Pages.SYS_PROFILE.getTemplate());
 		modelAndView.addObject("message", message);
-		modelAndView.addObject("profile", userSession.getUserPrincipal().getEntity());
+		modelAndView.addObject("profile", accountService.getMyProfile());
 		modelAndView.addObject("listDonHangDaBan", new ArrayList<Order>());
 
 		return baseView(modelAndView);
@@ -44,7 +45,7 @@ public class ProfileControllerView extends BaseController {
 	@PostMapping( "/sys/profile/update")
 	public ModelAndView updateProfile(@ModelAttribute("account") Account pAccount) {
 		accountService.updateProfile(pAccount);
-		return new ModelAndView("redirect:/profile");
+		return new ModelAndView("redirect:/sys/profile");
 	}
 
 	@PostMapping("/sys/profile/change-password")
@@ -72,6 +73,6 @@ public class ProfileControllerView extends BaseController {
 		}
 		redirectAttributes.addAttribute("message", "Sai mật khẩu hiện tại!");
 
-		return new ModelAndView("redirect:/profile");
+		return new ModelAndView("redirect:/sys/profile");
 	}
 }

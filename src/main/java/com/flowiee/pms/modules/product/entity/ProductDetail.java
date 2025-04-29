@@ -16,7 +16,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.util.Assert;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -185,50 +185,6 @@ public class ProductDetail extends BaseEntity implements Serializable {
 
     public int getAvailableSalesQty() {
         return storageQty - defectiveQty;
-    }
-
-    public ProductPrice getVariantPrice(Long pPriceId) {
-        if (getPriceList() != null) {
-            for (ProductPrice price : getPriceList()) {
-                Long lvPriceId = price.getId();
-                if (lvPriceId.equals(pPriceId))
-                    return price;
-            }
-            return null;
-        }
-        return null;
-    }
-
-    public ProductPrice getVariantPrice() {
-        if (getPriceList() != null) {
-            for (ProductPrice price : getPriceList()) {
-                if (ProductPrice.STATE_ACTIVE.equals(price.getState()))
-                    return price;
-            }
-            return new ProductPrice();
-        }
-        return new ProductPrice();
-    }
-
-    public FileStorage getImage(Long pImageId) {
-        if (getListImages() != null) {
-            return getListImages().stream()
-                    .filter(image -> image.getId().equals(pImageId))
-                    .findAny()
-                    .orElse(null);
-        }
-        return null;
-    }
-
-    public FileStorage getActiveImage() {
-        if (getListImages() != null) {
-            for (FileStorage image : getListImages()) {
-                if (image.isActive())
-                    return image;
-            }
-            return null;
-        }
-        return null;
     }
 
     public boolean isExpiredDate() {

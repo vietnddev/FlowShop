@@ -6,7 +6,7 @@ import com.flowiee.pms.modules.product.entity.ProductDetail;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ public class Items extends BaseEntity implements Serializable {
     @Serial
     static final long serialVersionUID = 1L;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
     @JoinColumn(name = "product_detail_id", nullable = false)
     ProductDetail productDetail;
 
@@ -34,7 +34,7 @@ public class Items extends BaseEntity implements Serializable {
     @Column(name = "note")
     String note;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "cart_id", nullable = false)
     OrderCart orderCart;
 

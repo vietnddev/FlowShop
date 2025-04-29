@@ -9,4 +9,6 @@ public interface ProductPriceService {
     String updateProductPrice(Long variantId, BigDecimal originalPrice, BigDecimal discountPrice);
 
     List<ProductPriceDTO> findPresentPrices(List<Long> productVariantIds);
+
+    ProductPriceDTO findPresentPrice(Long productVariantId);
 }

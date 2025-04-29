@@ -1,12 +1,16 @@
 package com.flowiee.pms.common.converter;
 
+import com.flowiee.pms.modules.category.dto.CategoryDTO;
 import com.flowiee.pms.modules.category.entity.Category;
 import com.flowiee.pms.modules.product.entity.Product;
+import com.flowiee.pms.modules.sales.dto.GarmentFactoryDTO;
+import com.flowiee.pms.modules.sales.dto.SupplierDTO;
 import com.flowiee.pms.modules.sales.entity.GarmentFactory;
 import com.flowiee.pms.modules.sales.entity.Supplier;
 import com.flowiee.pms.modules.product.dto.ProductDTO;
 import org.apache.commons.lang3.ObjectUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,14 +24,14 @@ public class ProductConvert {
             .productName(inputDTO.getProductName())
             //.description(inputDTO.getDescription())
             //.status(inputDTO.getStatus())
-            .productType(inputDTO.getProductType())
-            .brand(inputDTO.getBrand())
-            .unit(inputDTO.getUnit())
-            .garmentFactory(inputDTO.getGarmentFactory())
-            .supplier(inputDTO.getSupplier())
-            .productVariantList(inputDTO.getProductVariantList())
-            .listImages(inputDTO.getListImages())
-            .listProductHistories(inputDTO.getListProductHistories())
+            .productType(new Category(inputDTO.getProductType().getId()))
+            .brand(new Category(inputDTO.getBrand().getId()))
+            .unit(new Category(inputDTO.getUnit().getId()))
+            .garmentFactory(new GarmentFactory(inputDTO.getGarmentFactory().getId()))
+            .supplier(new Supplier(inputDTO.getSupplier().getId(), null))
+            //.productVariantList(inputDTO.getProductVariantList())
+            //.listImages(inputDTO.getListImages())
+            //.listProductHistories(inputDTO.getListProductHistories())
             .build();
 
         if (outputEntity.getProductType() == null && inputDTO.getProductTypeId() != null)
@@ -53,42 +57,54 @@ public class ProductConvert {
         return outputEntity;
     }
 
-    public static ProductDTO convertToDTO(Product inputEntity) {
+    public static ProductDTO toDto(Product pInput) {
         ProductDTO dto = new ProductDTO();
-        if (inputEntity != null) {
-            dto.setId(inputEntity.getId());
-            dto.setProductName(inputEntity.getProductName());
-            if (ObjectUtils.isNotEmpty(inputEntity.getProductType())) {
-                dto.setProductType(inputEntity.getProductType());
-                dto.setProductTypeId(inputEntity.getProductType().getId());
-                dto.setProductTypeName(inputEntity.getProductType().getName());
-            }
-            if (ObjectUtils.isNotEmpty(inputEntity.getBrand())) {
-                dto.setBrand(inputEntity.getBrand());
-                dto.setBrandId(inputEntity.getBrand().getId());
-                dto.setBrandName(inputEntity.getBrand().getName());
-            }
-            if (ObjectUtils.isNotEmpty(inputEntity.getUnit())) {
-                dto.setUnit(inputEntity.getUnit());
-                dto.setUnitId(inputEntity.getUnit().getId());
-                dto.setUnitName(inputEntity.getUnit().getName());
-            }
-            if (ObjectUtils.isNotEmpty(inputEntity.getGarmentFactory())) {
-                dto.setGarmentFactory(inputEntity.getGarmentFactory());
-                dto.setGarmentFactoryId(inputEntity.getGarmentFactory().getId());
-                dto.setGarmentFactoryName(inputEntity.getGarmentFactory().getName());
-            }
-            if (ObjectUtils.isNotEmpty(inputEntity.getSupplier())) {
-                dto.setSupplier(inputEntity.getSupplier());
-                dto.setSupplierId(inputEntity.getSupplier().getId());
-                dto.setSupplierName(inputEntity.getSupplier().getName());
-            }
+        if (pInput != null) {
+            dto.setId(pInput.getId());
+            dto.setPID(pInput.getPID());
+            //dto.setProductType();
+            //dto.setBrand();
+            //dto.setUnit();
+            dto.setProductName(pInput.getProductName());
+            dto.setReleaseDate(pInput.getReleaseDate());
+            dto.setGender(pInput.getGender());
+            dto.setIsSaleOff(pInput.getIsSaleOff());
+            dto.setIsHotTrend(pInput.getIsHotTrend());
+            dto.setReturnPolicy(pInput.getReturnPolicy());
+            dto.setVariantDefault(pInput.getVariantDefault());
+            dto.setInternalNotes(pInput.getInternalNotes());
+            //dto.setGarmentFactory();
+            //dto.setSupplier();
             dto.setStatus("ACT");
             dto.setSoldQty(null);
-            dto.setCreatedAt(inputEntity.getCreatedAt());
-            dto.setCreatedBy(inputEntity.getCreatedBy());
+            dto.setCreatedAt(pInput.getCreatedAt());
+            dto.setCreatedBy(pInput.getCreatedBy());
 
-            dto.setInternalNotes(inputEntity.getInternalNotes());
+            if (ObjectUtils.isNotEmpty(pInput.getProductType())) {
+                //dto.setProductType(inputEntity.getProductType());
+                dto.setProductTypeId(pInput.getProductType().getId());
+                dto.setProductTypeName(pInput.getProductType().getName());
+            }
+            if (ObjectUtils.isNotEmpty(pInput.getBrand())) {
+                //dto.setBrand(inputEntity.getBrand());
+                dto.setBrandId(pInput.getBrand().getId());
+                dto.setBrandName(pInput.getBrand().getName());
+            }
+            if (ObjectUtils.isNotEmpty(pInput.getUnit())) {
+                //dto.setUnit(inputEntity.getUnit());
+                dto.setUnitId(pInput.getUnit().getId());
+                dto.setUnitName(pInput.getUnit().getName());
+            }
+            if (ObjectUtils.isNotEmpty(pInput.getGarmentFactory())) {
+                //dto.setGarmentFactory(inputEntity.getGarmentFactory());
+                dto.setGarmentFactoryId(pInput.getGarmentFactory().getId());
+                dto.setGarmentFactoryName(pInput.getGarmentFactory().getName());
+            }
+            if (ObjectUtils.isNotEmpty(pInput.getSupplier())) {
+                //dto.setSupplier(inputEntity.getSupplier());
+                dto.setSupplierId(pInput.getSupplier().getId());
+                dto.setSupplierName(pInput.getSupplier().getName());
+            }
         }
         return dto;
     }
@@ -97,7 +113,7 @@ public class ProductConvert {
         List<ProductDTO> outDTOs = new ArrayList<>();
         if (inputEntities != null) {
             for (Product p : inputEntities) {
-                outDTOs.add(convertToDTO(p));
+                outDTOs.add(toDto(p));
             }
         }
         return outDTOs;

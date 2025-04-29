@@ -12,13 +12,13 @@ import java.util.List;
 public interface ProductPriceRepository extends BaseRepository<ProductPrice, Long> {
     @Query("from ProductPrice pp " +
            "where pp.state = 'A' " +
-           "    and (:productBaseId is null or pp.productBase.id = :productBaseId) " +
+           "    and (:productBaseId is null or pp.productVariant.id = :productBaseId) " +
            "    and (:productVariantId is null or pp.productVariant.id = :productVariantId) ")
     ProductPrice findPricePresent(@Param("productBaseId") Long productBaseId, @Param("productVariantId") Long productVariantId);
 
     @Query("from ProductPrice pp " +
            "where 1=1 " +
-           "    and (:productBaseId is null or pp.productBase.id = :productBaseId) " +
+           "    and (:productBaseId is null or pp.productVariant.id = :productBaseId) " +
            "    and (:productVariantId is null or pp.productVariant.id = :productVariantId) ")
     List<ProductPrice> findPrices(@Param("productBaseId") Long productBaseId, @Param("productVariantId") Long productVariantId);
 

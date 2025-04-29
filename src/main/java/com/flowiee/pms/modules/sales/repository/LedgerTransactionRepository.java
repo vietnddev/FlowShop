@@ -23,14 +23,14 @@ public interface LedgerTransactionRepository extends BaseRepository<LedgerTransa
     @Query(value = "select tran_index from ledger_transaction where tran_type = :type order by id desc fetch first 1 rows only", nativeQuery = true)
     Long findLastIndex(@Param("type") String type);
 
-    @Query("select nvl(sum((case when t.tranType = 'PT' then t.amount else 0 end) - (case when t.tranType = 'PC' then t.amount else 0 end)), 0) as beginBal " +
+    @Query("select coalesce(sum((case when t.tranType = 'PT' then t.amount else 0 end) - (case when t.tranType = 'PC' then t.amount else 0 end)), 0) as beginBal " +
            "from LedgerTransaction t " +
            "where t.createdAt <= :fromDate")
     BigDecimal calBeginBalance(@Param("fromDate") LocalDateTime fromDate);
 
     @Query("select " +
-           "    nvl(sum(case when t.tranType = 'PT' then t.amount else 0 end), 0) as total_receipt, " +
-           "    nvl(sum(case when t.tranType = 'PC' then t.amount else 0 end), 0) as total_payment " +
+           "    coalesce(sum(case when t.tranType = 'PT' then t.amount else 0 end), 0) as total_receipt, " +
+           "    coalesce(sum(case when t.tranType = 'PC' then t.amount else 0 end), 0) as total_payment " +
            "from LedgerTransaction t " +
            "where t.createdAt >= :fromDate and t.createdAt <= :toDate")
     List<BigDecimal[]> calTotalReceiptAndTotalPayment(@Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate);

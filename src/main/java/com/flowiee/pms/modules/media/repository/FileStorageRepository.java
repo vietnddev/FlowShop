@@ -28,7 +28,7 @@ public interface FileStorageRepository extends JpaRepository<FileStorage, Long> 
            "where 1=1 " +
            "and (:productId is null or (f.product.id=:productId and f.productDetail.id is null)) " +
            "and (:productVariantId is null or f.productDetail.id=:productVariantId) " +
-           "and f.isActive is true " +
+           "and f.isActive " +
            "order by f.createdAt")
     FileStorage findProductImageActive(@Param("productId") Long productId, @Param("productVariantId") Long productVariantId);
 

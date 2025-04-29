@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flowiee Official | Thư viện ảnh</title>
-    <th:block th:replace="header :: stylesheets"></th:block>
+    <th:block th:replace="~{header :: stylesheets}"></th:block>
     <style>
         .row {
             margin-left: 0px;
@@ -26,9 +26,9 @@
 
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
-    <div th:replace="header :: header"></div>
+    <div th:replace="~{header :: header}"></div>
 
-    <div th:replace="sidebar :: sidebar"></div>
+    <div th:replace="~{sidebar :: sidebar}"></div>
 
     <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
 
@@ -75,11 +75,11 @@
         </section>
     </div>
 
-    <div th:replace="footer :: footer"></div>
+    <div th:replace="~{footer :: footer}"></div>
 
     <aside class="control-sidebar control-sidebar-dark"></aside>
 
-    <div th:replace="header :: scripts"></div>
+    <div th:replace="~{header :: scripts}"></div>
 </div>
 <!-- ./wrapper -->
 <script>

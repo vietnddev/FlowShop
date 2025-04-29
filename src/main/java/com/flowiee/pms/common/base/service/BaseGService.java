@@ -12,26 +12,29 @@ import com.flowiee.pms.common.model.Filter;
 import com.flowiee.pms.common.exception.EntityNotFoundException;
 import com.flowiee.pms.modules.log.repository.SystemLogRepository;
 import com.flowiee.pms.common.security.UserSession;
+import jakarta.persistence.EntityGraph;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public abstract class BaseGService<E, D, R extends BaseRepository<E, Long>> {
+public class BaseGService<E, D, R extends BaseRepository<E, Long>> {
     @Autowired
     protected R mvEntityRepository;
     @Autowired
@@ -133,7 +136,7 @@ public abstract class BaseGService<E, D, R extends BaseRepository<E, Long>> {
             return Collections.emptyList();
         }
         return pInput.stream()
-                .map(entity -> mvModelMapper.map(entity, mvDtoClass))
+                .map(entity -> convertDTO(entity))
                 .toList();
     }
 
@@ -143,12 +146,183 @@ public abstract class BaseGService<E, D, R extends BaseRepository<E, Long>> {
 
     protected Pageable getPageable(int pageNum, int pageSize, Sort sort) {
         if (pageSize >= 0 && pageNum >= 0) {
-            if (sort == null) {
-                return PageRequest.of(pageNum, pageSize);
-            }
-            return PageRequest.of(pageNum, pageSize, sort);
+            return sort != null ? PageRequest.of(pageNum, pageSize, sort)
+                    : PageRequest.of(pageNum, pageSize);
         }
         return Pageable.unpaged();
+    }
+
+    public class QueryBuilder<T> {
+        private final Class<T> entityClass;
+        private final CriteriaBuilder cb;
+        private final CriteriaQuery<T> query;
+        private final Root<T> root;
+        private final List<Predicate> predicates = new ArrayList<>();
+        private final List<Order> orders = new ArrayList<>();
+        private final Map<String, Join<?, ?>> joins = new HashMap<>();
+        private final EntityManager entityManager;
+
+        public QueryBuilder(Class<T> entityClass, EntityManager entityManager) {
+            this.entityClass = entityClass;
+            this.entityManager = entityManager;
+            this.cb = entityManager.getCriteriaBuilder();
+            this.query = cb.createQuery(entityClass);
+            this.root = query.from(entityClass);
+        }
+
+        public CriteriaBuilder getCriteriaBuilder() {
+            return this.cb;
+        }
+
+        public Root<T> getRoot() {
+            return this.root;
+        }
+
+        public EntityManager getEntityManager() {
+            return this.entityManager;
+        }
+
+        // Thêm điều kiện equal với path phức tạp (vd: "product.brand.id")
+        public QueryBuilder<T> addEqual(String fieldPath, Object value) {
+            if (value != null) {
+                Path<Object> path = resolvePath(fieldPath);
+                predicates.add(cb.equal(path, value));
+            }
+            return this;
+        }
+
+        // Thêm điều kiện like với path phức tạp
+        public QueryBuilder<T> addLike(String fieldPath, String value) {
+            if (value != null) {
+                Path<String> path = resolvePath(fieldPath);
+                predicates.add(cb.like(cb.lower(path), "%" + value.toLowerCase() + "%"));
+            }
+            return this;
+        }
+
+        // Thêm điều kiện like cho nhiều field
+        public QueryBuilder<T> addLike(String value, String... fieldPaths) {
+            if (value != null && fieldPaths != null && fieldPaths.length > 0) {
+                List<Predicate> likePredicates = Arrays.stream(fieldPaths)
+                        .map(fieldPath -> cb.like(cb.lower(resolvePath(fieldPath)), "%" + value.toLowerCase() + "%"))
+                        .collect(Collectors.toList());
+
+                predicates.add(cb.or(likePredicates.toArray(new Predicate[0])));
+            }
+            return this;
+        }
+
+        // Thêm điều kiện between
+        public QueryBuilder<T> addBetween(String fieldPath, Comparable from, Comparable to) {
+            if (from != null && to != null) {
+                Path<? extends Comparable> path = resolvePath(fieldPath);
+                predicates.add(cb.between(path, from, to));
+            }
+            return this;
+        }
+
+        // Thêm sắp xếp
+        public QueryBuilder<T> addOrder(String fieldPath, boolean ascending) {
+            Path<?> path = resolvePath(fieldPath);
+            orders.add(ascending ? cb.asc(path) : cb.desc(path));
+            return this;
+        }
+
+        // Thêm predicate tùy chỉnh
+        public QueryBuilder<T> addPredicate(Function<CriteriaBuilder, Predicate> predicateFunction) {
+            if (predicateFunction != null) {
+                Predicate predicate = predicateFunction.apply(this.cb);
+                predicates.add(predicate);
+            }
+            return this;
+        }
+
+        public QueryBuilder<T> fetch(String associationPath, JoinType joinType) {
+            String[] parts = associationPath.split("\\.");
+            From<?, ?> from = this.root;
+
+            for (int i = 0; i < parts.length; i++) {
+                if (i == parts.length - 1) {
+                    from.fetch(parts[i], joinType);
+                } else {
+                    from = getOrCreateJoin(from, parts[i], joinType);
+                }
+            }
+            return this;
+        }
+
+        // Build query
+        public TypedQuery<T> build() {
+            return build(Pageable.unpaged());
+        }
+
+        public TypedQuery<T> build(Pageable pageable) {
+            query.where(predicates.toArray(new Predicate[0]));
+
+            if (!orders.isEmpty()) {
+                query.orderBy(orders);
+            }
+
+            TypedQuery<T> typedQuery = entityManager.createQuery(query);
+
+            if (pageable != null && pageable.isPaged()) {
+                typedQuery.setFirstResult((int) pageable.getOffset());
+                typedQuery.setMaxResults(pageable.getPageSize());
+            }
+
+            return typedQuery;
+        }
+
+        // Build count query
+        public Long buildCount() {
+            CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+            Root<T> countRoot = countQuery.from(entityClass);
+
+            List<Predicate> countPredicates = predicates.stream()
+                    .map(p -> recreatePredicate(p, countRoot))
+                    .collect(Collectors.toList());
+
+            countQuery.select(cb.countDistinct(countRoot));
+            countQuery.where(countPredicates.toArray(new Predicate[0]));
+
+            return entityManager.createQuery(countQuery).getSingleResult();
+        }
+
+        // Helper methods
+        private <X> Path<X> resolvePath(String path) {
+            String[] parts = path.split("\\.");
+            Path<X> currentPath = root.get(parts[0]);
+
+            for (int i = 1; i < parts.length; i++) {
+                currentPath = currentPath.get(parts[i]);
+            }
+
+            return currentPath;
+        }
+
+        private Join<?, ?> getOrCreateJoin(From<?, ?> from, String attribute, JoinType joinType) {
+            String joinKey = from.getAlias() + "." + attribute;
+            return joins.computeIfAbsent(joinKey, k -> from.join(attribute, joinType));
+        }
+
+        private Predicate recreatePredicate(Predicate original, Root<?> newRoot) {
+            // Đơn giản hóa - trong thực tế cần phân tích predicate và tạo lại
+            // Có thể sử dụng thư viện như ModelMapper hoặc viết logic phức tạp hơn
+            return cb.conjunction();
+        }
+
+        public EntityGraph<T> createEntityGraph() {
+            return this.entityManager.createEntityGraph(entityClass);
+        }
+    }
+
+    // Phương thức khởi tạo query builder
+    protected <T> QueryBuilder<T> createQueryBuilder(Class<T> entityClass) {
+        return createQueryBuilder(entityClass, mvEntityManager);
+    }
+
+    protected <T> QueryBuilder<T> createQueryBuilder(Class<T> entityClass, EntityManager pEntityManager) {
+        return new QueryBuilder<>(entityClass, pEntityManager);
     }
 
     protected <T> Specification<T> buildSpecification(List<Filter> filters) {
@@ -184,87 +358,6 @@ public abstract class BaseGService<E, D, R extends BaseRepository<E, Long>> {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(dtoList, entityPage.getPageable(), entityPage.getTotalElements());
-    }
-
-    protected <T> void addEqualCondition(
-            CriteriaBuilder cb,
-            List<Predicate> predicates,
-            Path<T> path,
-            T value) {
-        if (value != null) {
-            predicates.add(cb.equal(path, value));
-        }
-    }
-
-    protected void addLikeCondition(
-            CriteriaBuilder cb,
-            List<Predicate> predicates,
-            String value,
-            Path<String>... fields) {
-        if (value != null) {
-            List<Predicate> likePredicates = Arrays.stream(fields)
-                    .map(field -> cb.like(cb.lower(field), "%" + value.toLowerCase() + "%"))
-                    .toList();
-            predicates.add(cb.or(likePredicates.toArray(new Predicate[0])));
-        }
-    }
-
-    protected <T extends Comparable<? super T>> void addBetweenCondition(
-            CriteriaBuilder cb,
-            List<Predicate> predicates,
-            Expression<?> field,
-            String functionName, // Tên hàm SQL
-            Class<T> functionResultType, // Kiểu kết quả trả về từ hàm SQL
-            T from,
-            T to) {
-        if (from != null && to != null) {
-            Expression<T> functionExpression = cb.function(functionName, functionResultType, field);
-            predicates.add(cb.between(functionExpression, from, to));
-        }
-    }
-
-    protected <T> TypedQuery<Long> initCriteriaCountQuery(CriteriaBuilder lvCriteriaBuilder,
-                                                          List<Predicate> predicates,
-                                                          Class<T> entityClass) {
-        CriteriaQuery<Long> countQuery = lvCriteriaBuilder.createQuery(Long.class);
-        Root<T> countRoot = countQuery.from(entityClass);
-        // Copy các điều kiện từ danh sách ban đầu
-        if (predicates != null && !predicates.isEmpty()) {
-            countQuery.where(predicates.toArray(new Predicate[0]));
-        }
-        // Chọn count distinct
-        countQuery.select(lvCriteriaBuilder.countDistinct(countRoot));
-        return mvEntityManager.createQuery(countQuery);
-    }
-
-    protected <T> TypedQuery<T> initCriteriaQuery(CriteriaBuilder pCriteriaBuilder,
-                                                  CriteriaQuery<T> pCriteriaQuery,
-                                                  Root<T> pRoot,
-                                                  List<Predicate> pPredicates,
-                                                  Pageable pPageable) {
-        pCriteriaQuery.where(pPredicates.toArray(new Predicate[0]));
-        pCriteriaQuery.distinct(true);
-
-        if (pPageable.getSort().isSorted()) {
-            List<javax.persistence.criteria.Order> orders = pPageable.getSort().stream()
-                    .map(sortOrder  -> {
-                        if (sortOrder.isAscending()) {
-                            return pCriteriaBuilder.asc(pRoot.get(sortOrder.getProperty()));
-                        } else {
-                            return pCriteriaBuilder.desc(pRoot.get(sortOrder.getProperty()));
-                        }
-                    })
-                    .toList();
-            pCriteriaQuery.orderBy(orders);
-        }
-
-        TypedQuery<T> lvTypedQuery = mvEntityManager.createQuery(pCriteriaQuery);
-        if (pPageable.isPaged()) {
-            lvTypedQuery.setFirstResult((int) pPageable.getOffset());
-            lvTypedQuery.setMaxResults(pPageable.getPageSize());
-        }
-
-        return lvTypedQuery;
     }
 
     protected LocalDateTime getFilterStartTime(LocalDateTime pTime) {

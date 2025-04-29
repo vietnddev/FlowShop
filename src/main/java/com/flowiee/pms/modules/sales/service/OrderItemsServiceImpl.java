@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.sales.service;
 
+import com.flowiee.pms.modules.product.entity.ProductDetail;
 import com.flowiee.pms.modules.product.entity.ProductPrice;
 import com.flowiee.pms.modules.sales.entity.Items;
 import com.flowiee.pms.modules.sales.entity.Order;
@@ -82,7 +83,7 @@ public class OrderItemsServiceImpl extends BaseService implements OrderItemsServ
                     }
                     itemAdded.add(this.save(OrderDetail.builder()
                             .order(new Order(pOrder.getId()))
-                            .productDetail(productDetail)
+                            .productDetail(new ProductDetail(productDetail.getId()))
                             .quantity(1)
                             .status(true)
                             .price(itemPrice.getRetailPriceDiscount())
@@ -115,7 +116,7 @@ public class OrderItemsServiceImpl extends BaseService implements OrderItemsServ
             }
             lvOrderDetailList.add(save(OrderDetail.builder()
                     .order(new Order(pOrderId))
-                    .productDetail(productDetail)
+                    .productDetail(new ProductDetail(productDetail.getId()))
                     .quantity(lvItemQuantity)
                     .status(true)
                     .note(items.getNote())

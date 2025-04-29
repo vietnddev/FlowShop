@@ -5,25 +5,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kho tài liệu</title>
-    <th:block th:replace="header :: stylesheets"></th:block>
-    <link rel="stylesheet" type="text/css" th:href="@{/plugins/pdf-js/web/viewer.css}">
+    <th:block th:replace="~{header :: stylesheets}"></th:block>
+    <!--<link rel="stylesheet" type="text/css" th:href="@{/plugins/pdf-js/web/viewer.css}">-->
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         <!-- Navbar (header) -->
-        <div th:replace="header :: header"></div>
+        <div th:replace="~{header :: header}"></div>
         <!-- /.navbar (header)-->
 
         <!-- Folder tree -->
-        <div th:replace="fragments :: folderTree"></div>
+        <div th:replace="~{fragments :: folderTree}"></div>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
             <!-- Main content -->
             <div class="content" style="padding-left: 20px; padding-right: 20px">
                 <!--Breadcrumb-->
-                <div th:replace="fragments :: breadcrumb"></div>
+                <div th:replace="~{fragments :: breadcrumb}"></div>
 
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
@@ -172,11 +172,11 @@
             </div>
         </div>
 
-        <div th:replace="footer :: footer"></div>
+        <div th:replace="~{footer :: footer}"></div>
 
         <aside class="control-sidebar control-sidebar-dark"></aside>
 
-        <div th:replace="header :: scripts"></div>
+        <div th:replace="~{header :: scripts}"></div>
     </div>
 
     <script type="text/javascript">

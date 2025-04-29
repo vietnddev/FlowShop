@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.log.service;
 
+import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.RequestUtils;
 import com.flowiee.pms.modules.log.entity.EventLog;
 import com.flowiee.pms.common.utils.CommonUtils;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -48,31 +49,19 @@ public class LoggingAspect {
 
     @Around("execution(* com.flowiee.pms.modules..controller..*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        //Before process
         long startTime = System.currentTimeMillis();
-        Object[] args = joinPoint.getArgs();
-
-        //Save request info into db
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        String lvProcessMethod = RequestUtils.getProcessMethod(joinPoint);
+        String lvUri = attributes.getRequest().getRequestURI();
+        if (!lvUri.contains("/api/v1") || "handleFileRequest".equals(lvProcessMethod)) {
+            return joinPoint.proceed();
+        }
         LocalDateTime lvRequestTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime), ZoneId.systemDefault());
 
-        String lvProcessMethod = RequestUtils.getProcessMethod(joinPoint);
-        String lvClassName = joinPoint.getTarget().getClass().getSimpleName();
-
-        long lvRequestId = -1l;
-        String lvUsername = RequestUtils.isLoginPage(attributes) ? null : mvUserSession.getUserPrincipal().getUsername();
-        String lvIpAddress = RequestUtils.isLoginPage(attributes) ? null : mvUserSession.getUserPrincipal().getIp();
-
         EventLog eventLog = mvEventLogService.writeLog(attributes, joinPoint, lvRequestTime, CommonUtils.productID);
-        if ("handleFileRequest".equals(lvProcessMethod)) {
-            String lvLogMsg = String.format("[%s] %s", RequestUtils.getHttpMethod(attributes), RequestUtils.getRequestUrl(attributes));
-            mvLogger.info(lvLogMsg);
-        } else {
-            //eventLog = mvEventLogService.writeLog(attributes, joinPoint, lvRequestTime, CommonUtils.productID);
-            lvRequestId = eventLog.getRequestId();
-            lvUsername = eventLog.getCreatedBy();
-            lvIpAddress = eventLog.getIpAddress();
-        }
+        long lvRequestId = eventLog.getRequestId();
+        String lvUsername = eventLog.getCreatedBy();
+        String lvIpAddress = eventLog.getIpAddress();
 
         RequestContext lvRequestContext = mvRequestContext.get();
         lvRequestContext.setRequestId(lvRequestId);
@@ -81,24 +70,10 @@ public class LoggingAspect {
         lvRequestContext.setIp(lvIpAddress);
         mvRequestContext.set(lvRequestContext);
 
-        //---------------------------------------
-
-        // Lấy request URL và method nếu có context
-        String requestUrl = null;
-        String httpMethod = null;
-
-        if (attributes != null) {
-            HttpServletRequest request = attributes.getRequest();
-            requestUrl = request.getRequestURI();
-            httpMethod = request.getMethod();
-        }
-
-        // Log input
         mvLogger.info("[REQUEST {}] {}",
                 lvRequestContext.getRequestId(),
                 formatRequestInfo(attributes.getRequest(), joinPoint, attributes));
 
-        // Xử lý và lấy kết quả
         Object result;
         try {
             result = joinPoint.proceed();
@@ -115,7 +90,6 @@ public class LoggingAspect {
         mvEventLogService.updateDuration(lvRequestContext.requestId, duration);
         mvRequestContext.remove();
 
-        // Log output
         mvLogger.info("[RESPONSE {}] {} ({} ms)",
                 lvRequestContext.getRequestId(),
                 formatResponse(result),

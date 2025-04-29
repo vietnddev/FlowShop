@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.system.dto;
 
 import com.flowiee.pms.common.base.dto.BaseDTO;
+import com.flowiee.pms.modules.user.dto.AccountDTO;
 import com.flowiee.pms.modules.user.entity.Account;
 import com.flowiee.pms.modules.system.entity.Branch;
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class BranchDTO extends BaseDTO implements Serializable {
     private String email;
     private String address;
     private String contactPoint;
-    private List<Account> listAccount;
+    //private List<AccountDTO> listAccount;
 
     public static BranchDTO toDTO(Branch pBranch) {
         BranchDTO dto = new BranchDTO();
@@ -34,7 +35,7 @@ public class BranchDTO extends BaseDTO implements Serializable {
         dto.setEmail(pBranch.getEmail());
         dto.setAddress(pBranch.getAddress());
         dto.setContactPoint(pBranch.getContactPoint());
-        dto.setListAccount(pBranch.getListAccount());
+        //dto.setListAccount(pBranch.getListAccount());
 
         return dto;
     }

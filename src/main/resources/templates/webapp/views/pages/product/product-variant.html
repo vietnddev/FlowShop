@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flowiee Official | Quản lý sản phẩm</title>
-    <th:block th:replace="header :: stylesheets"></th:block>
+    <th:block th:replace="~{header :: stylesheets}"></th:block>
     <style>
         .row {
             margin-left: 0px;
@@ -46,11 +46,11 @@
 <!-- Site wrapper -->
 <div class="wrapper">
     <!-- Navbar (header) -->
-    <div th:replace="header :: header"></div>
+    <div th:replace="~{header :: header}"></div>
     <!-- /.navbar (header)-->
 
     <!-- Main Sidebar Container -->
-    <div th:replace="sidebar :: sidebar"></div>
+    <div th:replace="~{sidebar :: sidebar}"></div>
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
@@ -410,9 +410,9 @@
     </div>
     <!-- /.content-wrapper -->
 
-    <div th:replace="modal_fragments :: confirm_modal"></div>
+    <div th:replace="~{modal_fragments :: confirm_modal}"></div>
 
-    <div th:replace="footer :: footer">
+    <div th:replace="~{footer :: footer}">
         <!-- Nhúng các file JavaScript vào -->
     </div>
 
@@ -421,7 +421,7 @@
         <!-- Control sidebar content goes here -->
     </aside>
 
-    <div th:replace="header :: scripts">
+    <div th:replace="~{header :: scripts}">
         <!-- Nhúng các file JavaScript vào -->
     </div>
 </div>

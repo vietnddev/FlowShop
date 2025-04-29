@@ -7,7 +7,7 @@ import com.flowiee.pms.modules.category.entity.Category;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -31,17 +31,17 @@ public class LedgerPayment extends BaseEntity implements Serializable {
     String paymentCode;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "payer_group_id", nullable = false)
     Category payerGroup;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "payment_type_id", nullable = false)
     Category paymentType;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "payment_method_id", nullable = false)
     Category paymentMethod;
 

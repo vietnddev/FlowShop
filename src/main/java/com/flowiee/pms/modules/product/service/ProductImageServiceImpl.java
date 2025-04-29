@@ -8,6 +8,7 @@ import com.flowiee.pms.modules.inventory.entity.TicketImport;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.modules.product.dto.ProductComboDTO;
+import com.flowiee.pms.modules.product.entity.ProductDetail;
 import com.flowiee.pms.modules.product.repository.ProductDamagedRepository;
 import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.modules.media.service.FileStorageService;
@@ -75,7 +76,7 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
         ProductVariantDTO productDetail = mvProductVariantService.findById(pProductVariantId, true);
 
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), productDetail.getProductId());
-        fileInfo.setProductDetail(productDetail);
+        fileInfo.setProductDetail(new ProductDetail(productDetail.getId()));
         FileStorage imageSaved = mvFileStorageService.save(fileInfo);
 
         Path path = Paths.get(CommonUtils.getPathDirectory(MODULE.PRODUCT) + "/" + imageSaved.getStorageName());
@@ -179,6 +180,11 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
     }
 
     @Override
+    public FileStorage findImageActiveOfProductVariant(long pProductVariantId) {
+        return mvFileStorageRepository.findProductImageActive(null, pProductVariantId);
+    }
+
+    @Override
     public Map<Long, FileStorage> getImageActiveOfProductVariants(List<Long> pProductVariantIds) {
         if (CollectionUtils.isEmpty(pProductVariantIds)) {
             return Map.of();
@@ -187,7 +193,7 @@ public class ProductImageServiceImpl extends BaseService implements ProductImage
         List<FileStorage> lvImageList = new ArrayList<>();
         int batchSize = 1000; // Số lượng tối đa trong một truy vấn
         for (int i = 0; i < pProductVariantIds.size(); i += batchSize) {
-            List<Long> batch = pProductVariantIds.subList(i, Math.min(i + batchSize, pProductVariantIds.size()));
+            List<Long> batch = new ArrayList<>(pProductVariantIds.subList(i, Math.min(i + batchSize, pProductVariantIds.size())));
             lvImageList.addAll(mvFileStorageRepository.findProductVariantImageActive(batch));
         }
 

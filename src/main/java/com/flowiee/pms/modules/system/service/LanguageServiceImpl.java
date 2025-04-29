@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.system.service;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -63,7 +64,15 @@ public class LanguageServiceImpl extends BaseGService<Language, LanguageDTO, Lan
 		try {
 			Map<String, String> enMessages = this.findAllLanguageMessages(langCode);
 			Properties properties = new Properties();
-			OutputStream outputStream = new FileOutputStream(String.format("src/main/resources/language/messages_%s.properties", langCode));
+			//Begin hot fix (temp)
+			String outputFolder = System.getProperty("user.dir") + "/language";
+			File folder = new File(outputFolder);
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
+			//OutputStream outputStream = new FileOutputStream(String.format("src/main/resources/language/messages_%s.properties", langCode));
+			OutputStream outputStream = new FileOutputStream(String.format("%s/messages_%s.properties", outputFolder, langCode));
+			//End hot fix
 			for (Map.Entry<String, String> entry : enMessages.entrySet()) {
 				properties.setProperty(entry.getKey(), entry.getValue());
 			}

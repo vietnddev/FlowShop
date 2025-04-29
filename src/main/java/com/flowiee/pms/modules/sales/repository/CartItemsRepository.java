@@ -24,7 +24,7 @@ public interface CartItemsRepository extends BaseRepository<Items, Long> {
     @Query("from Items i where i.orderCart.id=:cartId and (coalesce(:productVariantIds, -1) = -1 or i.productDetail.id in :productVariantIds)")
     List<Items> findItems(@Param("cartId") Long cartId, @Param("productVariantIds") List<Long> productVariantIds);
 
-    @Query("select nvl(sum(nvl((case when i.price is not null then i.price else i.priceOriginal end), 0) * i.quantity), 0) " +
+    @Query("select coalesce(sum(coalesce((case when i.price is not null then i.price else i.priceOriginal end), 0) * i.quantity), 0) " +
            "from Items i " +
            "where i.orderCart.id=:cartId")
     Double calTotalAmountWithoutDiscount(@Param("cartId") long cartId);

@@ -127,7 +127,7 @@ public class TicketImportServiceImpl extends BaseService implements TicketImport
                         for (AccountRole storageManagerRight : listOfStorageManagersRight) {
                             GroupAccountDTO groupAccount = mvGroupAccountService.findById(storageManagerRight.getGroupId(), false);
                             if (groupAccount != null) {
-                                stgManagersReceiveNtfs.addAll(groupAccount.getListAccount());
+                                //stgManagersReceiveNtfs.addAll(groupAccount.getListAccount());
                             }
                             Account account = mvAccountService.findById(storageManagerRight.getAccountId(), false);
                             if (account != null) {

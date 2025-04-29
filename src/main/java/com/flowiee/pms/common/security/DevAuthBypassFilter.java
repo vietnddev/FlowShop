@@ -4,13 +4,15 @@ import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.CoreUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @Component
+@ConditionalOnProperty(name = "system.login.bypass", havingValue = "true")
 public class DevAuthBypassFilter implements Filter {
     @Value("${system.login.bypass}")
     private boolean mvSystemByPass;

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Tạo đơn</title>
-    <th:block th:replace="header :: stylesheets"></th:block>
+    <th:block th:replace="~{header :: stylesheets}"></th:block>
     <style rel="stylesheet">
         .table td, th {
             vertical-align: middle;
@@ -25,9 +25,9 @@
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        <div th:replace="header :: header"></div>
+        <div th:replace="~{header :: header}"></div>
 
-        <div th:replace="sidebar :: sidebar"></div>
+        <div th:replace="~{sidebar :: sidebar}"></div>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px">
@@ -77,9 +77,9 @@
                                                         <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" th:data-target="'#modalUpdateItems_' + ${item.id}">Cập nhật</button>
                                                         <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" th:data-target="'#modalDeleteItems_' + ${item.id}">Xóa</button>
                                                         <!--Modal update item-->
-                                                        <div th:replace="pages/sales/order/fragments/create-order-fragments :: modalUpdateItem"></div>
+                                                        <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalUpdateItem}"></div>
                                                         <!--Modal delete item-->
-                                                        <div th:replace="pages/sales/order/fragments/create-order-fragments :: modalDeleteItem"></div>
+                                                        <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalDeleteItem}"></div>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -223,7 +223,7 @@
                                             <button type="button" class="btn btn-danger w-100" style="padding-left: 3px;" data-toggle="modal" id="preDeleteDonHang" th:data-target="'#modalDeleteCart_' + ${cart.id}">Clear</button>
                                         </div>
                                         <!--Modal clear cart-->
-                                        <div th:replace="pages/sales/order/fragments/create-order-fragments :: modalClearCart"></div>
+                                        <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalClearCart}"></div>
                                     </div>
                                 </div>
                             </div>
@@ -232,14 +232,14 @@
                 </div>
             </section>
         </div>
-        <div th:replace="modal_fragments :: confirm_modal"></div>
-        <div th:replace="pages/product/fragments/product-fragments :: searchProductModal"></div>
+        <div th:replace="~{modal_fragments :: confirm_modal}"></div>
+        <div th:replace="~{pages/product/fragments/product-fragments :: searchProductModal}"></div>
 
-        <div th:replace="footer :: footer"><!-- Nhúng các file JavaScript vào --></div>
+        <div th:replace="~{footer :: footer}"><!-- Nhúng các file JavaScript vào --></div>
 
         <aside class="control-sidebar control-sidebar-dark"><!-- Control sidebar content goes here --></aside>
 
-        <div th:replace="header :: scripts"><!-- Nhúng các file JavaScript vào --></div>
+        <div th:replace="~{header :: scripts}"><!-- Nhúng các file JavaScript vào --></div>
 
         <script th:src="@{/js/order/CreateNewOrder.js}"></script>
         <script th:src="@{/js/product/SearchProductModal.js}"></script>

@@ -45,7 +45,7 @@ public class CategoryImplService extends BaseGService<Category, CategoryDTO, Cat
 
     @Override
     public CategoryDTO findById(Long entityId, boolean pThrowException) {
-        return super.findById(entityId, true);
+        return super.findById(entityId, pThrowException);
     }
 
     @Transactional
@@ -185,70 +185,71 @@ public class CategoryImplService extends BaseGService<Category, CategoryDTO, Cat
 
     @Override
     public boolean categoryInUse(Long categoryId) {
-        CategoryDTO lvCategoryMdl = this.findById(categoryId, true);
+        Category lvCategoryMdl = super.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException("category with id " + categoryId));
         CATEGORY lvCategoryType = CATEGORY.valueOf(lvCategoryMdl.getType().toUpperCase());
 
-        switch (lvCategoryType) {
-            case UNIT:
-                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListUnit())) {
-                    return true;
-                }
-                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListProductByUnit())) {
-                    return true;
-                }
-                break;
-            case FABRIC_TYPE:
-                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListFabricType()))
-                    return true;
-                break;
-            case PAYMENT_METHOD:
-//                if (ObjectUtils.isNotEmpty(category.get().getListTrangThaiDonHang())) {
+//        switch (lvCategoryType) {
+//            case UNIT:
+//                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListUnit())) {
 //                    return true;
 //                }
-                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListPaymentMethod())) {
-                    return true;
-                }
-                break;
-            case SALES_CHANNEL:
-                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListKenhBanHang())) {
-                    return true;
-                }
-                break;
-            case SIZE:
-                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListLoaiKichCo())) {
-                    return true;
-                }
-                break;
-            case COLOR:
-                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListLoaiMauSac())) {
-                    return true;
-                }
-                break;
-            case PRODUCT_TYPE:
-                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListProductByProductType())) {
-                    return true;
-                }
-                break;
-            case ORDER_STATUS:
-//                if (ObjectUtils.isNotEmpty(category.get().getListTrangThaiDonHang())) {
+//                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListProductByUnit())) {
 //                    return true;
 //                }
-                break;
-            case ORDER_CANCEL_REASON:
-                List<Order> orderList = mvOrderRepository.findByCancellationReason(categoryId);
-                if (orderList != null && !orderList.isEmpty()) {
-                    return true;
-                }
-                break;
-            case GROUP_CUSTOMER:
-                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListCustomerByGroupCustomer())) {
-                    return true;
-                }
-                break;
-            default:
-                //throw new IllegalStateException("Unexpected value: " + category.get().getType());
-                LOG.info("Unexpected value: " + lvCategoryMdl.getType());
-        }
+//                break;
+//            case FABRIC_TYPE:
+//                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListFabricType()))
+//                    return true;
+//                break;
+//            case PAYMENT_METHOD:
+////                if (ObjectUtils.isNotEmpty(category.get().getListTrangThaiDonHang())) {
+////                    return true;
+////                }
+//                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListPaymentMethod())) {
+//                    return true;
+//                }
+//                break;
+//            case SALES_CHANNEL:
+//                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListKenhBanHang())) {
+//                    return true;
+//                }
+//                break;
+//            case SIZE:
+//                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListLoaiKichCo())) {
+//                    return true;
+//                }
+//                break;
+//            case COLOR:
+//                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListLoaiMauSac())) {
+//                    return true;
+//                }
+//                break;
+//            case PRODUCT_TYPE:
+//                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListProductByProductType())) {
+//                    return true;
+//                }
+//                break;
+//            case ORDER_STATUS:
+////                if (ObjectUtils.isNotEmpty(category.get().getListTrangThaiDonHang())) {
+////                    return true;
+////                }
+//                break;
+//            case ORDER_CANCEL_REASON:
+//                List<Order> orderList = mvOrderRepository.findByCancellationReason(categoryId);
+//                if (orderList != null && !orderList.isEmpty()) {
+//                    return true;
+//                }
+//                break;
+//            case GROUP_CUSTOMER:
+////                if (ObjectUtils.isNotEmpty(lvCategoryMdl.getListCustomerByGroupCustomer())) {
+////                    return true;
+////                }
+//                break;
+//            default:
+//                //throw new IllegalStateException("Unexpected value: " + category.get().getType());
+//                LOG.info("Unexpected value: " + lvCategoryMdl.getType());
+//        }
         return false;
     }
 

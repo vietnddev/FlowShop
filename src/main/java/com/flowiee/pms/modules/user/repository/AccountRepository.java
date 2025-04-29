@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    @EntityGraph(value = "Account.withBranchAndGroupAccount", type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(value = "Account.withImages", type = EntityGraph.EntityGraphType.FETCH)
     Optional<Account> findById(Long id);
 
     @Query("from Account a where a.username=:username")

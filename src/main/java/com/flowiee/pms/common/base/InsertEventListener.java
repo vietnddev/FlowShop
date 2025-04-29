@@ -13,7 +13,7 @@ public class InsertEventListener implements PostInsertEventListener {
     }
 
     @Override
-    public boolean requiresPostCommitHanding(EntityPersister persister) {
+    public boolean requiresPostCommitHandling(EntityPersister entityPersister) {
         return false;
     }
 }

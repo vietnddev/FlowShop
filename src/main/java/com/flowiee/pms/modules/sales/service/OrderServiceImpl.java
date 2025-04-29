@@ -43,15 +43,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-import javax.transaction.Transactional;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
@@ -126,29 +126,44 @@ public class OrderServiceImpl extends BaseGService<Order, OrderDTO, OrderReposit
             lvOrderTimeTo = lvFromDateToDate[1];
         }
 
-        CriteriaBuilder lvCriteriaBuilder = mvEntityManager.getCriteriaBuilder();
-        CriteriaQuery<Order> lvCriteriaQuery = lvCriteriaBuilder.createQuery(Order.class);
-        Root<Order> lvRoot = lvCriteriaQuery.from(Order.class);
+//        CriteriaBuilder lvCriteriaBuilder = mvEntityManager.getCriteriaBuilder();
+//        CriteriaQuery<Order> lvCriteriaQuery = lvCriteriaBuilder.createQuery(Order.class);
+//        Root<Order> lvRoot = lvCriteriaQuery.from(Order.class);
+//
+//        List<Predicate> lvPredicates = new ArrayList<>();
+//        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("id"), pOrderId);
+//        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("paymentMethod").get("id"), pPaymentMethodId);
+//        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("orderStatus"), pOrderStatus);
+//        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("salesChannel").get("id"), pSalesChannelId);
+//        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("customer").get("id"), pCustomerId);
+//        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("nhanVienBanHang").get("id"), pSellerId);
+//        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("nhanVienBanHang").get("branch").get("id"), pBranchId);
+//        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("customer").get("groupCustomer").get("id"), pGroupCustomerId);
+//        addLikeCondition(lvCriteriaBuilder, lvPredicates, pTxtSearch,
+//                lvRoot.get("receiverName"), lvRoot.get("receiverPhone"), lvRoot.get("code"));
+//        addBetweenCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("orderTime"), "trunc", LocalDateTime.class,
+//                lvOrderTimeFrom, lvOrderTimeTo);
+//
+//        TypedQuery<Order> lvTypedQuery = initCriteriaQuery(lvCriteriaBuilder, lvCriteriaQuery, lvRoot, lvPredicates, lvPageable);
+//        TypedQuery<Long> lvCountQuery = initCriteriaCountQuery(lvCriteriaBuilder, lvPredicates, Order.class);
+//        long total = lvCountQuery.getSingleResult();
 
-        List<Predicate> lvPredicates = new ArrayList<>();
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("id"), pOrderId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("paymentMethod").get("id"), pPaymentMethodId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("orderStatus"), pOrderStatus);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("salesChannel").get("id"), pSalesChannelId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("customer").get("id"), pCustomerId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("nhanVienBanHang").get("id"), pSellerId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("nhanVienBanHang").get("branch").get("id"), pBranchId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("customer").get("groupCustomer").get("id"), pGroupCustomerId);
-        addLikeCondition(lvCriteriaBuilder, lvPredicates, pTxtSearch,
-                lvRoot.get("receiverName"), lvRoot.get("receiverPhone"), lvRoot.get("code"));
-        addBetweenCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("orderTime"), "trunc", LocalDateTime.class,
-                lvOrderTimeFrom, lvOrderTimeTo);
+//        List<Order> lvResultList = lvTypedQuery.getResultList();
 
-        TypedQuery<Order> lvTypedQuery = initCriteriaQuery(lvCriteriaBuilder, lvCriteriaQuery, lvRoot, lvPredicates, lvPageable);
-        TypedQuery<Long> lvCountQuery = initCriteriaCountQuery(lvCriteriaBuilder, lvPredicates, Order.class);
-        long total = lvCountQuery.getSingleResult();
+        QueryBuilder<Order> lvQueryBuilder = createQueryBuilder(Order.class)
+                .addEqual("id", pOrderId)
+                .addEqual("paymentMethod.id", pPaymentMethodId)
+                .addEqual("orderStatus", pOrderStatus)
+                .addEqual("salesChannel.id", pSalesChannelId)
+                .addEqual("customer.id", pCustomerId)
+                .addEqual("nhanVienBanHang.id", pSellerId)
+                .addEqual("nhanVienBanHang.branch.id", pBranchId)
+                .addEqual("customer.groupCustomer.id", pGroupCustomerId)
+                .addLike(pTxtSearch, "receiverName", "receiverPhone", "code")
+                .addBetween("orderTime", lvOrderTimeFrom, lvOrderTimeTo);
+        List<Order> lvResultList = lvQueryBuilder.build(lvPageable).getResultList();
+        long total = lvQueryBuilder.buildCount();
 
-        List<Order> lvResultList = lvTypedQuery.getResultList();
         List<OrderDTO> lvResultListDto = OrderDTO.fromOrders(lvResultList);
 
         return new PageImpl<>(lvResultListDto, lvPageable, total);
@@ -480,7 +495,7 @@ public class OrderServiceImpl extends BaseGService<Order, OrderDTO, OrderReposit
     }
 
     public boolean isWithinReturnPeriod(LocalDateTime successfulDeliveryTime, LocalDateTime currentDay, int periodDays) {
-        long daysBetween = ChronoUnit.DAYS.between(successfulDeliveryTime, currentDay);
+        long daysBetween = Duration.between(successfulDeliveryTime, currentDay).toDays();
         return daysBetween < periodDays;
     }
 

@@ -11,6 +11,7 @@ import com.flowiee.pms.modules.product.entity.ProductPrice;
 import com.flowiee.pms.common.base.service.BaseExportService;
 import com.flowiee.pms.modules.product.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.category.service.CategoryService;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -18,8 +19,8 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -27,6 +28,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ProductExportServiceImpl extends BaseExportService {
     private final CategoryService mvCategoryService;
+    private final EntityManager mvEntityManager;
 
     private final List<CATEGORY> mvProductCategories = List.of(CATEGORY.PRODUCT_TYPE, CATEGORY.BRAND, CATEGORY.UNIT, CATEGORY.COLOR, CATEGORY.SIZE, CATEGORY.FABRIC_TYPE);
     private Map<CATEGORY, List<Category>> mvCategoryMap;
@@ -68,13 +70,35 @@ public class ProductExportServiceImpl extends BaseExportService {
             lvRoot.fetch("priceList", JoinType.LEFT);
 
             List<Predicate> lvPredicates = new ArrayList<>();
-            addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("product").get("productType").get("id"), lvCondition.getProductTypeId());
-            addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("product").get("brand").get("id"), lvCondition.getBrandId());
-            addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("color").get("id"), lvCondition.getColorId());
-            addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("size").get("id"), lvCondition.getSizeId());
-            addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("fabricType").get("id"), lvCondition.getFabricTypeId());
+            lvPredicates.add(lvCriteriaBuilder.equal(lvRoot.get("product").get("productType").get("id"), lvCondition.getProductTypeId()));
+            lvPredicates.add(lvCriteriaBuilder.equal(lvRoot.get("product").get("brand").get("id"), lvCondition.getBrandId()));
+            lvPredicates.add(lvCriteriaBuilder.equal(lvRoot.get("color").get("id"), lvCondition.getColorId()));
+            lvPredicates.add(lvCriteriaBuilder.equal(lvRoot.get("size").get("id"), lvCondition.getSizeId()));
+            lvPredicates.add(lvCriteriaBuilder.equal(lvRoot.get("fabricType").get("id"), lvCondition.getFabricTypeId()));
 
-            TypedQuery<ProductDetail> lvTypedQuery = initCriteriaQuery(lvCriteriaBuilder, lvCriteriaQuery, lvRoot, lvPredicates, Pageable.unpaged());
+            Pageable lvPageable = Pageable.unpaged();
+
+            lvCriteriaQuery.where(lvPredicates.toArray(new Predicate[0]));
+            lvCriteriaQuery.distinct(true);
+
+            if (lvPageable.getSort().isSorted()) {
+                List<jakarta.persistence.criteria.Order> orders = lvPageable.getSort().stream()
+                        .map(sortOrder  -> {
+                            if (sortOrder.isAscending()) {
+                                return lvCriteriaBuilder.asc(lvRoot.get(sortOrder.getProperty()));
+                            } else {
+                                return lvCriteriaBuilder.desc(lvRoot.get(sortOrder.getProperty()));
+                            }
+                        })
+                        .toList();
+                lvCriteriaQuery.orderBy(orders);
+            }
+
+            TypedQuery<ProductDetail> lvTypedQuery = mvEntityManager.createQuery(lvCriteriaQuery);
+            if (lvPageable.isPaged()) {
+                lvTypedQuery.setFirstResult((int) lvPageable.getOffset());
+                lvTypedQuery.setMaxResults(lvPageable.getPageSize());
+            }
 
             mvDataExport = lvTypedQuery.getResultList();
         }
@@ -94,7 +118,13 @@ public class ProductExportServiceImpl extends BaseExportService {
         for (int i = 0; i < mvDataExportSize; i++) {
             ProductDetail lvProductVariant = lvDataExportList.get(i);
             Product lvProduct = lvProductVariant.getProduct();
-            ProductPrice lvProductPrice = lvProductVariant.getVariantPrice();
+            ProductPrice lvProductPrice = new ProductPrice();
+            if (lvProductVariant.getPriceList() != null) {
+                for (ProductPrice price : lvProductVariant.getPriceList()) {
+                    if (ProductPrice.STATE_ACTIVE.equals(price.getState()))
+                        lvProductPrice = price;
+                }
+            }
 
             XSSFRow lvRow = mvDataSheet.createRow(i + mvDataBeginLine);
 

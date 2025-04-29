@@ -5,15 +5,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flowiee Official | Quản lý sản phẩm</title>
-    <th:block th:replace="header :: stylesheets"></th:block>
+    <th:block th:replace="~{header :: stylesheets}"></th:block>
     <link rel="stylesheet" th:href="@{/css/product/Product.css}">
 </head>
 
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
-        <div th:replace="header :: header"></div>
+        <div th:replace="~{header :: header}"></div>
 
-        <div th:replace="sidebar :: sidebar"></div>
+        <div th:replace="~{sidebar :: sidebar}"></div>
 
         <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
 
@@ -246,13 +246,13 @@
             </section>
         </div>
 
-        <div th:replace="modal_fragments :: confirm_modal"></div>
+        <div th:replace="~{modal_fragments :: confirm_modal}"></div>
 
-        <div th:replace="footer :: footer"></div>
+        <div th:replace="~{footer :: footer}"></div>
 
         <aside class="control-sidebar control-sidebar-dark"></aside>
 
-        <div th:replace="header :: scripts"></div>
+        <div th:replace="~{header :: scripts}"></div>
 
         <script th:src="@{/js/product/CreateProductVariant.js}"></script>
         <script th:src="@{/js/product/DeleteProduct.js}"></script>

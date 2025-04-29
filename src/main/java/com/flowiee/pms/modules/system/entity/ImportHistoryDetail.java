@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.system.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Builder
 @Entity
@@ -17,7 +17,7 @@ public class ImportHistoryDetail {
     @Column(name = "id", nullable = false)
     public Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "import_history_id", nullable = false)
     private ImportHistory importHistory;
 

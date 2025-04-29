@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.schedule.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -18,7 +18,7 @@ public class ScheduleStatus {
     @Column(name = "id", nullable = false)
     public Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "schedule_id", nullable = false)
     Schedule schedule;
 

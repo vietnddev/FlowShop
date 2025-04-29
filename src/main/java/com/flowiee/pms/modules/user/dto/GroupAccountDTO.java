@@ -1,6 +1,5 @@
 package com.flowiee.pms.modules.user.dto;
 
-import com.flowiee.pms.modules.user.entity.Account;
 import com.flowiee.pms.modules.user.entity.GroupAccount;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +16,7 @@ public class GroupAccountDTO implements Serializable {
     private String groupCode;
     private String groupName;
     private String note;
-    private List<Account> listAccount;
+    private List<AccountDTO> listAccount;
 
     public static GroupAccountDTO toDTO(GroupAccount pGroupAccount) {
         GroupAccountDTO dto = new GroupAccountDTO();
@@ -28,7 +27,7 @@ public class GroupAccountDTO implements Serializable {
         dto.setGroupCode(pGroupAccount.getGroupCode());
         dto.setGroupName(pGroupAccount.getGroupName());
         dto.setNote(pGroupAccount.getNote());
-        dto.setListAccount(pGroupAccount.getListAccount());
+        //dto.setListAccount(pGroupAccount.getListAccount());
 
         return dto;
     }

@@ -10,13 +10,12 @@ import com.flowiee.pms.modules.product.entity.ProductReview;
 import com.flowiee.pms.modules.product.entity.GiftRedemption;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;
 
-import com.flowiee.pms.common.enumeration.ContactType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -74,7 +73,7 @@ public class Customer extends BaseEntity implements Serializable {
 	Boolean isVIP = false;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "group_customer_id")
 	Category groupCustomer;
 
@@ -122,32 +121,6 @@ public class Customer extends BaseEntity implements Serializable {
 			.build();
 		customer.setId(dto.getId());
 		return customer;
-	}
-
-	public CustomerContact getContact(ContactType contactType) {
-		if (getListCustomerContact() != null) {
-			for (CustomerContact contact : getListCustomerContact()) {
-				if (contactType.name().equals(contact.getCode()))
-					return contact;
-			}
-			return null;
-		}
-		return null;
-	}
-
-	public String getContactPhone() {
-		CustomerContact contact = getContact(ContactType.P);
-		return contact != null ? contact.getValue() : null;
-	}
-
-	public String getContactEmail() {
-		CustomerContact contact = getContact(ContactType.E);
-		return contact != null ? contact.getValue() : null;
-	}
-
-	public String getContactAddress() {
-		CustomerContact contact = getContact(ContactType.A);
-		return contact != null ? contact.getValue() : null;
 	}
 
 	public boolean isWalkInCustomer() {

@@ -53,7 +53,8 @@ public class CartServiceImpl extends BaseService implements CartService {
                 continue;
             }
             for (Items item : cart.getListItems()) {
-                ProductPrice itemPrice = item.getProductDetail().getVariantPrice();//mvProductPriceRepository.findPricePresent(null, item.getProductDetail().getId());
+                //ProductPrice itemPrice = item.getProductDetail().getVariantPrice();
+                ProductPrice itemPrice = mvProductPriceRepository.findPricePresent(null, item.getProductDetail().getId());
                 if (itemPrice != null) {
                     PriceType priceType = PriceType.valueOf(item.getPriceType());
                     if (priceType.equals(PriceType.L)) {
@@ -132,7 +133,7 @@ public class CartServiceImpl extends BaseService implements CartService {
         List<Items> lvItemList = new ArrayList<>();
         int batchSize = 1000; // Số lượng tối đa trong một truy vấn
         for (int i = 0; i < productVariantIds.size(); i += batchSize) {
-            List<Long> batch = productVariantIds.subList(i, Math.min(i + batchSize, productVariantIds.size()));
+            List<Long> batch = new ArrayList<>(productVariantIds.subList(i, Math.min(i + batchSize, productVariantIds.size())));
             lvItemList.addAll(mvCartItemsRepository.findItems(cartId, batch));
         }
 
@@ -161,7 +162,8 @@ public class CartServiceImpl extends BaseService implements CartService {
                 Items items = mvCartItemsService.findItemByCartAndProductVariant(cartId, productVariant.getId());
                 mvCartItemsService.increaseItemQtyInCart(items.getId(), items.getQuantity() + 1);
             } else {
-                ProductPrice productVariantPrice = productVariant.getVariantPrice();//mvProductPriceRepository.findPricePresent(null, Long.parseLong(productVariantId));
+                //ProductPrice productVariantPrice = productVariant.getVariantPrice();//mvProductPriceRepository.findPricePresent(null, Long.parseLong(productVariantId));
+                ProductPrice productVariantPrice = mvProductPriceRepository.findPricePresent(null, Long.parseLong(productVariantId));
                 if (productVariantPrice == null) {
                     throw new AppException(String.format("Sản phẩm %s chưa được thiết lập giá bán!", productVariant.getVariantName()));
                 }
@@ -242,7 +244,8 @@ public class CartServiceImpl extends BaseService implements CartService {
             if (pItemToUpdate.getQuantity() > productVariant.getAvailableSalesQty()) {
                 throw new AppException(ErrorCode.ProductOutOfStock, new Object[]{productVariant.getVariantName()}, null, getClass(), null);
             }
-            ProductPrice productVariantPrice = productVariant.getVariantPrice();//mvProductPriceRepository.findPricePresent(null, productVariant.getId());
+            //ProductPrice productVariantPrice = productVariant.getVariantPrice();
+            ProductPrice productVariantPrice = mvProductPriceRepository.findPricePresent(null, productVariant.getId());
             String lvPriceType = pItemToUpdate.getPriceType();
             BigDecimal lvRetailPrice = productVariantPrice.getRetailPrice();
             BigDecimal lvRetailPriceDiscount = productVariantPrice.getRetailPriceDiscount();

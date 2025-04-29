@@ -26,7 +26,7 @@ public class FileDTO extends FileStorage implements Serializable{
     Long productVariantId;
     Long orderId;
     String name;
-    String uploadBy;
+    String uploadByStr;
     String src;
     Boolean status;
     long size;
@@ -54,7 +54,7 @@ public class FileDTO extends FileStorage implements Serializable{
             dto.setContentType(fileStorage.getContentType());
             dto.setModule(fileStorage.getModule());
             dto.setNote(fileStorage.getNote());
-            dto.setUploadBy(fileStorage.getAccount().getUsername());
+            dto.setUploadByStr(fileStorage.getUploadBy().getUsername());
             dto.setSrc(FileUtils.getImageUrl(fileStorage, false));
             //dto.setIsActive(fileStorage.isActive());
             dto.setStatus(fileStorage.isStatus());

@@ -11,7 +11,7 @@ import com.flowiee.pms.common.enumeration.TicketExportStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -32,7 +32,7 @@ public class TicketExport extends BaseEntity implements Serializable {
     static final long serialVersionUID = 1L;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "storage_id", nullable = false)
     Storage storage;
 

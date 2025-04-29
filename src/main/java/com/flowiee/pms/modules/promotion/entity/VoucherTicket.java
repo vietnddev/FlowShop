@@ -7,7 +7,7 @@ import com.flowiee.pms.modules.sales.entity.Customer;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
@@ -25,7 +25,7 @@ public class VoucherTicket extends BaseEntity implements Serializable {
     @Serial
 	static final long serialVersionUID = 1L;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
     @JoinColumn(name = "voucher_info_id", nullable = false)
     VoucherInfo voucherInfo;
 
@@ -39,7 +39,7 @@ public class VoucherTicket extends BaseEntity implements Serializable {
     @Column(name = "active_time")
     Date activeTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "customer")
     Customer customer;
 

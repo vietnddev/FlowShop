@@ -1,5 +1,8 @@
 package com.flowiee.pms.modules.product.service;
 
+import com.flowiee.pms.common.base.service.BaseGService;
+import com.flowiee.pms.common.constants.JpaHints;
+import com.flowiee.pms.modules.log.service.SystemLogService;
 import com.flowiee.pms.modules.product.entity.Product;
 import com.flowiee.pms.modules.product.entity.ProductDescription;
 import com.flowiee.pms.modules.product.entity.ProductDetail;
@@ -23,32 +26,49 @@ import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.modules.product.dto.ProductDTO;
 import com.flowiee.pms.modules.product.repository.ProductRepository;
-import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.converter.ProductConvert;
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.EntityGraph;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-public class ProductInfoServiceImpl extends BaseService implements ProductInfoService {
+public class ProductInfoServiceImpl extends BaseGService<Product, ProductDTO, ProductRepository> implements ProductInfoService {
     private final ProductDescriptionRepository mvProductDescriptionRepository;
     private final ProductVariantService mvProductVariantService;
     private final ProductHistoryService mvProductHistoryService;
-    private final ProductRepository mvProductRepository;
     private final OrderRepository mvOrderRepository;
     private final CategoryService mvCategoryService;
     private final CategoryRepository mvCategoryRepository;
     private final FileStorageRepository mvFileStorageRepository;
     private final ProductDetailRepository mvProductDetailRepository;
+    private final SystemLogService mvSystemLogService;
+
+    private final Logger mvLogger = LoggerFactory.getLogger(getClass());
+
+    public ProductInfoServiceImpl(ProductRepository pProductRepository, ProductDescriptionRepository pProductDescriptionRepository,
+                                  ProductVariantService pProductVariantService, ProductHistoryService pProductHistoryService,
+                                  OrderRepository pOrderRepository, CategoryService pCategoryService,
+                                  CategoryRepository pCategoryRepository, FileStorageRepository pFileStorageRepository,
+                                  ProductDetailRepository pProductDetailRepository, SystemLogService pSystemLogService) {
+        super(Product.class, ProductDTO.class, pProductRepository);
+        this.mvProductDescriptionRepository = pProductDescriptionRepository;
+        this.mvProductVariantService = pProductVariantService;
+        this.mvProductHistoryService = pProductHistoryService;
+        this.mvOrderRepository = pOrderRepository;
+        this.mvCategoryService = pCategoryService;
+        this.mvCategoryRepository = pCategoryRepository;
+        this.mvFileStorageRepository = pFileStorageRepository;
+        this.mvProductDetailRepository = pProductDetailRepository;
+        this.mvSystemLogService = pSystemLogService;
+    }
 
     @Override
     public List<ProductDTO> findAll() {
@@ -60,37 +80,23 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
                                     Long pColorId, Long pSizeId, Long pUnitId, String pGender, Boolean pIsSaleOff, Boolean pIsHotTrend, String pStatus) {
         Pageable lvPageable = getPageable(pageNum, pageSize, Sort.by("createdAt").descending());
 
-        CriteriaBuilder lvCriteriaBuilder = mvEntityManager.getCriteriaBuilder();
-        CriteriaQuery<Product> lvCriteriaQuery = lvCriteriaBuilder.createQuery(Product.class);
-        Root<Product> lvRoot = lvCriteriaQuery.from(Product.class);
+        QueryBuilder<Product> lvQueryBuilder = createQueryBuilder(Product.class)
+                .addLike("productName", pTxtSearch)
+                .addEqual("brand.id", pBrandId)
+                .addEqual("productType.id", pProductTypeId)
+                .addOrder("createdAt", false);
 
-        Join<Product, ProductDetail> lvJoinProductVariant = lvRoot.join("productVariantList", JoinType.LEFT);
+        EntityGraph<Product> lvEntityGraph = lvQueryBuilder.createEntityGraph();
+        lvEntityGraph.addSubgraph("brand");
+        lvEntityGraph.addSubgraph("productType");
+        lvEntityGraph.addSubgraph("unit");
+        lvEntityGraph.addSubgraph("productVariantList");
 
-        lvRoot.fetch("brand", JoinType.LEFT);
-        lvRoot.fetch("productType", JoinType.LEFT);
-        lvRoot.fetch("unit", JoinType.LEFT);
-        lvRoot.fetch("productVariantList", JoinType.LEFT);
+        List<Product> lvResultList = lvQueryBuilder.build(lvPageable)
+                .setHint(JpaHints.FETCH_GRAPH, lvEntityGraph).getResultList();
+        Long lvTotalRecords = lvQueryBuilder.buildCount();
 
-        List<Predicate> lvPredicates = new ArrayList<>();
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("PID"), pPID.getId());
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("brand").get("id"), pBrandId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("productType").get("id"), pProductTypeId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("unit").get("id"), pUnitId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvJoinProductVariant.get("color").get("id"), pColorId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvJoinProductVariant.get("size").get("id"), pSizeId);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("gender"), pGender);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("isSaleOff"), pIsSaleOff);
-        addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("isHotTrend"), pIsHotTrend);
-        //addEqualCondition(lvCriteriaBuilder, lvPredicates, lvRoot.get("status"), pStatus);
-        addLikeCondition(lvCriteriaBuilder, lvPredicates, pTxtSearch, lvRoot.get("productName"));
-
-        TypedQuery<Product> lvTypedQuery = initCriteriaQuery(lvCriteriaBuilder, lvCriteriaQuery, lvRoot, lvPredicates, lvPageable);
-        List<Product> lvResultList = lvTypedQuery.getResultList();
-
-        TypedQuery<Long> lvCountQuery = initCriteriaCountQuery(lvCriteriaBuilder, lvPredicates, Product.class);
-        long lvTotalRecords = lvCountQuery.getSingleResult();
-
-        List<ProductDTO> lvResultListDto = ProductConvert.convertToDTOs(lvResultList);
+        List<ProductDTO> lvResultListDto = super.convertDTOs(lvResultList);
 
         assignActiveImages(lvResultListDto);
         assignSummaryVariantInfo(lvResultListDto);
@@ -104,7 +110,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
         List<FileStorage> lvImageList = new ArrayList<>();
         int batchSize = 1000; // Số lượng tối đa trong một truy vấn
         for (int i = 0; i < lvProductIds.size(); i += batchSize) {
-            List<Long> batch = lvProductIds.subList(i, Math.min(i + batchSize, lvProductIds.size()));
+            List<Long> batch = new ArrayList<>(lvProductIds.subList(i, Math.min(i + batchSize, lvProductIds.size())));
             lvImageList.addAll(mvFileStorageRepository.findProductImageActive(batch));
         }
 
@@ -130,7 +136,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
         List<ProductSummaryInfoModel> lvVariantInfoList = new ArrayList<>();
         int batchSize = 1000;
         for (int i = 0; i < lvProductIds.size(); i += batchSize) {
-            List<Long> batch = lvProductIds.subList(i, Math.min(i + batchSize, lvProductIds.size()));
+            List<Long> batch = new ArrayList<>(lvProductIds.subList(i, Math.min(i + batchSize, lvProductIds.size())));
             lvVariantInfoList.addAll(mvProductDetailRepository.findProductVariantInfo(batch));
         }
 
@@ -174,7 +180,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
     @Override
     public List<Product> findProductsIdAndProductName() {
         List<Product> products = new ArrayList<>();
-        for (Object[] objects : mvProductRepository.findIdAndName()) {
+        for (Object[] objects : mvEntityRepository.findIdAndName()) {
             products.add(new Product(Integer.parseInt(String.valueOf(objects[0])), String.valueOf(objects[1])));
         }
         return products;
@@ -200,15 +206,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
 
     @Override
     public ProductDTO findById(Long id, boolean pThrowException) {
-        Optional<Product> productOpt = mvProductRepository.findById(id);
-        if (productOpt.isPresent()) {
-            return ProductConvert.convertToDTO(productOpt.get());
-        }
-        if (pThrowException) {
-            throw new EntityNotFoundException(new Object[] {"product base"}, null, null);
-        } else {
-            return null;
-        }
+        return super.findById(id, pThrowException);
     }
 
     @Override
@@ -222,7 +220,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
 
             //productToSave.setCreatedBy(CommonUtils.getUserPrincipal().getId());
             //productToSave.setStatus(ProductStatus.ACT);
-            Product productSaved = mvProductRepository.save(productToSave);
+            Product productSaved = mvEntityRepository.save(productToSave);
 
             ProductDescription productDescription = null;
             if (ObjectUtils.isNotEmpty(product.getDescription())) {
@@ -231,9 +229,9 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
                         .description(product.getDescription()).build());
             }
 
-            systemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_C, MasterObject.Product, "Thêm mới sản phẩm", product.getProductName());
-            logger.info("Insert product success! {}", product);
-            return ProductConvert.convertToDTO(productSaved);
+            mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_C, MasterObject.Product, "Thêm mới sản phẩm", product.getProductName());
+            mvLogger.info("Insert product success! {}", product);
+            return ProductConvert.toDto(productSaved);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "product"), ex);
         }
@@ -242,7 +240,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
     @Transactional
     @Override
     public ProductDTO update(ProductDTO productDTO, Long productId) {
-        Optional<Product> productOpt = mvProductRepository.findById(productId);
+        Optional<Product> productOpt = mvEntityRepository.findById(productId);
         if (productOpt.isEmpty()) {
             throw new AppException(ErrorCode.ENTITY_NOT_FOUND, new Object[]{"product"}, null, getClass(), null);
         }
@@ -277,7 +275,7 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
         ProductDescription productDescriptionUpdated = mvProductDescriptionRepository.save(productDescription);
 
         //lvProduct.setProductDescription(productDescriptionUpdated);
-        Product productUpdated = mvProductRepository.save(lvProduct);
+        Product productUpdated = mvEntityRepository.save(lvProduct);
 
         changeLog.setNewObject(productUpdated);
         changeLog.doAudit();
@@ -285,9 +283,9 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
         String logTitle = "Cập nhật sản phẩm: " + productUpdated.getProductName();
 
         mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, productUpdated.getId(), null, null);
-        systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.Product, logTitle, changeLog);
-        logger.info("Update product success! productId={}", productId);
-        return ProductConvert.convertToDTO(productUpdated);
+        mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.Product, logTitle, changeLog);
+        mvLogger.info("Update product success! productId={}", productId);
+        return ProductConvert.toDto(productUpdated);
     }
 
     @Transactional
@@ -298,9 +296,9 @@ public class ProductInfoServiceImpl extends BaseService implements ProductInfoSe
             if (productInUse(productToDelete.getId())) {
                 throw new DataInUseException(ErrorCode.ERROR_DATA_LOCKED.getDescription());
             }
-            mvProductRepository.deleteById(productToDelete.getId());
-            systemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_D, MasterObject.Product, "Xóa sản phẩm", productToDelete.getProductName());
-            logger.info("Delete product success! productId={}", id);
+            mvEntityRepository.deleteById(productToDelete.getId());
+            mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_D, MasterObject.Product, "Xóa sản phẩm", productToDelete.getProductName());
+            mvLogger.info("Delete product success! productId={}", id);
             return MessageCode.DELETE_SUCCESS.getDescription();
         } catch (RuntimeException ex) {
             throw new AppException("Delete product fail! productId=" + id, ex);

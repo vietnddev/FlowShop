@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.product.entity;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;

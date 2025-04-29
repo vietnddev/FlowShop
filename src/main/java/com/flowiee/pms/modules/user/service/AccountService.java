@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.user.service;
 
+import com.flowiee.pms.modules.user.dto.AccountDTO;
 import com.flowiee.pms.modules.user.entity.Account;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface AccountService {
     Account updateProfile(Account pAccount);
 
     String delete(Long pAccountId);
+
+    AccountDTO getMyProfile();
 }

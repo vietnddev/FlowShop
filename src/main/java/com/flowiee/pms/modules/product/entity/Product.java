@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -38,17 +38,17 @@ public class Product extends BaseEntity implements Serializable {
     String PID;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_type_id", nullable = false)
     Category productType;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "brand_id", nullable = false)
     Category brand;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "unit_id", nullable = false)
     Category unit;
 
@@ -80,11 +80,11 @@ public class Product extends BaseEntity implements Serializable {
     @Column(name = "notes")
     String internalNotes;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "garment_factory_id")
     GarmentFactory garmentFactory;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "supplier_id")
     Supplier supplier;
 
@@ -113,9 +113,9 @@ public class Product extends BaseEntity implements Serializable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     List<ProductReview> listProductPreviews;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "productBase", fetch = FetchType.LAZY)
-    List<ProductPrice> listProductBasePrice;
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "productBase", fetch = FetchType.LAZY)
+//    List<ProductPrice> listProductBasePrice;
 
     @JsonIgnore
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
@@ -131,50 +131,6 @@ public class Product extends BaseEntity implements Serializable {
     public Product(long id, String name) {
         super.id = id;
         this.productName = name;
-    }
-
-    public ProductPrice getPrice(Long pPriceId) {
-        if (getListProductBasePrice() != null) {
-            for (ProductPrice price : getListProductBasePrice()) {
-                Long lvPriceId = price.getId();
-                if (lvPriceId.equals(pPriceId))
-                    return price;
-            }
-            return null;
-        }
-        return null;
-    }
-
-    public ProductPrice getPrice() {
-        if (getListProductBasePrice() != null) {
-            for (ProductPrice price : getListProductBasePrice()) {
-                if (ProductPrice.STATE_ACTIVE.equals(price.getState()))
-                    return price;
-            }
-            return null;
-        }
-        return null;
-    }
-
-    public FileStorage getImage(Long pImageId) {
-        if (getListImages() != null) {
-            return getListImages().stream()
-                    .filter(image -> image.getId().equals(pImageId))
-                    .findAny()
-                    .orElse(null);
-        }
-        return null;
-    }
-
-    public FileStorage getImage() {
-        if (getListImages() != null) {
-            for (FileStorage image : getListImages()) {
-                if (image.isActive())
-                    return image;
-            }
-            return null;
-        }
-        return null;
     }
 
     public boolean isClothes() {

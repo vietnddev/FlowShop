@@ -30,6 +30,8 @@ public interface ProductImageService {
 
     FileStorage findImageActiveOfProduct(long pProductId);
 
+    FileStorage findImageActiveOfProductVariant(long pProductVariantId);
+
     Map<Long, FileStorage> getImageActiveOfProductVariants(List<Long> pProductVariantIds);
 
     FileStorage changeImageProduct(MultipartFile fileToChange, long fileId);

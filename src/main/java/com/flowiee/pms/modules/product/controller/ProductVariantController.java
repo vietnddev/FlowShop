@@ -74,7 +74,7 @@ public class ProductVariantController extends BaseController {
     @Operation(summary = "Create product variant")
     @PostMapping("/variant/create")
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
-    public AppResponse<ProductDetail> createProductVariant(@RequestBody ProductVariantDTO productVariantDTO) {
+    public AppResponse<ProductVariantDTO> createProductVariant(@RequestBody ProductVariantDTO productVariantDTO) {
         try {
             return mvCHelper.success(mvProductVariantService.save(productVariantDTO));
         } catch (RuntimeException ex) {
@@ -85,7 +85,7 @@ public class ProductVariantController extends BaseController {
     @Operation(summary = "Update product variant")
     @PutMapping("/variant/update/{id}")
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
-    public AppResponse<ProductDetail> updateProductVariant(@RequestBody ProductVariantDTO productVariant, @PathVariable("id") Long productVariantId) {
+    public AppResponse<ProductVariantDTO> updateProductVariant(@RequestBody ProductVariantDTO productVariant, @PathVariable("id") Long productVariantId) {
         if (mvProductVariantService.findById(productVariantId, true) == null) {
             throw new ResourceNotFoundException("Product variant not found!");
         }

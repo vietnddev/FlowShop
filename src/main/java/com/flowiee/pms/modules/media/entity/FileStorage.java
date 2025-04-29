@@ -16,7 +16,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -84,44 +84,49 @@ public class FileStorage extends BaseEntity implements Serializable {
     String fileType;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "product_id")
     Product product;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "product_variant_id")
     ProductDetail productDetail;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "material_id")
     Material material;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "order_id")
     Order order;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "upload_by", nullable = false)
-    Account account;
+    Account uploadBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "ticket_import_id")
     TicketImport ticketImport;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "ticket_export_id")
     TicketExport ticketExport;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "product_combo_id")
     ProductCombo productCombo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "product_damaged_id")
     ProductDamaged productDamaged;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "account_id", nullable = false)
+    Account account;
 
     @Column(name = "is_active", nullable = false)
     boolean isActive;
@@ -143,7 +148,7 @@ public class FileStorage extends BaseEntity implements Serializable {
             this.fileSize = file.getSize();
             this.contentType = file.getContentType();
             this.directoryPath = CommonUtils.getPathDirectory(pModule).substring(CommonUtils.getPathDirectory(pModule).indexOf("uploads"));
-            this.account = new Account(CommonUtils.getUserPrincipal().getId());
+            this.uploadBy = new Account(CommonUtils.getUserPrincipal().getId());
             if (productId != null) {
                 this.product = new Product(productId);
             }
@@ -160,6 +165,7 @@ public class FileStorage extends BaseEntity implements Serializable {
 				+ ", originalName=" + originalName + ", ghiChu=" + note + ", extension=" + extension + ", contentType="
 				+ contentType + ", fileSize=" + fileSize + ", content=" + Arrays.toString(content)
 				+ ", directoryPath=" + directoryPath + ", sort=" + sort + ", status=" + status + ", module=" + module
-				+ ", product=" + product + ", productVariant=" + productDetail + ", account=" + account + ", isActive=" + isActive + "]";
+				//+ ", product=" + product + ", productVariant=" + productDetail + ", account=" + account
+                + ", isActive=" + isActive + "]";
 	}        
 }

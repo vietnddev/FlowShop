@@ -8,7 +8,7 @@ import com.flowiee.pms.modules.user.entity.Account;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 
 @Builder
@@ -28,7 +28,7 @@ public class SystemLog extends BaseEntity implements java.io.Serializable {
 	@Column(name = "module", length = 50, nullable = false)
 	String module;
 
-	@Column(name = "function", nullable = false)
+	@Column(name = "action_function", nullable = false)
 	String function;
 
 	@Column(name = "title")
@@ -40,17 +40,19 @@ public class SystemLog extends BaseEntity implements java.io.Serializable {
 	@Column(name = "action_mode", nullable = false)
 	String mode;
 
-	@Column(name = "content", length = 4000, nullable = false)
+	@Lob
+	@Column(name = "content", nullable = false, columnDefinition = "TEXT")
 	String content;
 
-	@Column(name = "content_change", length = 4000)
+	@Lob
+	@Column(name = "content_change", columnDefinition = "TEXT")
 	String contentChange;
 
 	@Column(name = "ip", length = 20)
 	String ip;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "account_id", nullable = false)
 	Account account;
 

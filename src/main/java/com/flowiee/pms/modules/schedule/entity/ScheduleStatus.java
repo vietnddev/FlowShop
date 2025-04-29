@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.schedule.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor

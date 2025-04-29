@@ -3,9 +3,9 @@ package com.flowiee.pms.modules.system.entity;
 import java.io.Serial;
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 import com.flowiee.pms.common.base.entity.BaseEntity;
 
@@ -32,7 +32,7 @@ public class Language extends BaseEntity implements Serializable {
 	@Column(name = "code", nullable = false)
     String code;
     
-    @Column(name = "key", nullable = false)
+    @Column(name = "property_key", nullable = false)
     String key;
     
     @Column(name = "value", nullable = false)

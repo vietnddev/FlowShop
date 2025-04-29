@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.system.service;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface ResetPasswordService {
     String resetPassword(Long pAccountId);

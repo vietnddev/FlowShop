@@ -1,5 +1,14 @@
 # 📌 FlowShop – Sales Management System
 
+### Guideline
+- Introduction
+- Key features
+- Database
+- Tech stack
+- Setup
+
+----
+
 ## 🧾 Introduction
 
 FlowShop is a sales management system designed specifically for my fashion store, Flowiee.  
@@ -51,9 +60,16 @@ The system currently manages **over 70 entities**, ensuring comprehensive data o
 
 ## 🛠️ Technologies Used
 
-- **Backend**: Java Spring Boot, Spring Security, Spring Data JPA, REST API, Thymeleaf  
-- **Frontend**: JavaScript, jQuery, HTML/CSS, Bootstrap  
-- **Database**: Oracle  
+- **Backend**: Java 21, Spring Boot 3.2.2, Maven 3.9.5
+- **Frontend**: JavaScript, Ajax, Bootstrap
+- **Database**: MySQL
+
+---
+
+## Setup
+`mvn spring-boot:run`
+
+`mvn clean package`
 
 ---
 

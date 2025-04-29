@@ -16,8 +16,8 @@ public interface PromotionInfoRepository extends JpaRepository<PromotionInfo, Lo
             "where 1=1 " +
             "and (:title is null or p.title like %:title%) " +
             "and ((:startTime is null and :endTime is null) or ((p.startTime >= :startTime) and (p.endTime <= :endTime))) " +
-            "and (:status is null or (:status = 'I' or (case when ((trunc(p.startTime) <= trunc(current_date)) and (trunc(p.endTime) >= trunc(current_date))) then 'A' else 'I' end) = 'A')) " +
-            "and (:status is null or (:status = 'A' or (case when ((trunc(p.startTime) <= trunc(current_date)) and (trunc(p.endTime) >= trunc(current_date))) then 'A' else 'I' end) = 'I'))")
+            "and (:status is null or (:status = 'I' or (case when ((function('date', p.startTime) <= function('date', current_date)) and (function('date', p.endTime) >= function('date', current_date))) then 'A' else 'I' end) = 'A')) " +
+            "and (:status is null or (:status = 'A' or (case when ((function('date', p.startTime) <= function('date', current_date)) and (function('date', p.endTime) >= function('date', current_date))) then 'A' else 'I' end) = 'I'))")
     Page<PromotionInfo> findAll(@Param("title") String title,
                                 @Param("startTime") LocalDateTime startTime,
                                 @Param("endTime") LocalDateTime endTime,

@@ -5,7 +5,7 @@ import com.flowiee.pms.modules.product.entity.Material;
 import com.flowiee.pms.modules.product.entity.ProductDetail;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 

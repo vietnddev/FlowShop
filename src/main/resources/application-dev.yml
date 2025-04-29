@@ -1,42 +1,22 @@
-# Config webapp
-server:
-  port: 8085
-  servlet:
-    session:
-      timeout: 3600
 spring:
-  # MySQL TTL
-  # datasource:
-  #   driver-class-name: com.mysql.cj.jdbc.Driver
-  #   url: jdbc:mysql://localhost:3306/flowiee
-  #   username: root
-  #   password: 080100
-
-  # Oracle local
   datasource:
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@127.0.0.1:1521:orcl
-    username: flowiee
-    password: 080100
-
-  # MySQL Google cloud
-  # datasource:
-  #   driver-class-name: com.mysql.cj.jdbc.Driver
-  #   url: jdbc:mysql://35.225.47.208:3306/flowiee
-  #   username: root
-  #   password: 123qwe!@#
-
-  # Config dung lượng file upload
-  servlet:
-    multipart:
-      max-file-size: 20MB
-      max-request-size: 100MB
-
-  # Auto restart
+    driver-class-name: com.mysql.cj.jdbc.Driver #driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:mysql://localhost:3306/fs        #url: jdbc:oracle:thin:@127.0.0.1:1521:orcl
+    username: root                              #username: flowiee
+    password: root                              #password: 080100
+    hikari:
+      initialization-fail-timeout: 5000
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 5
   devtools:
     restart:
-      enabled: true
-
+      enabled: false
+  thymeleaf:
+    cache: false
+  jpa:
+    hibernate:
+      ddl-auto: update
 system:
   login:
     bypass: true

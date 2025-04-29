@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/fs}
+    password: ${DBMS_PASSWORD:root}
+    username: ${DBMS_USERNAME:root}
+    hikari:
+      initialization-fail-timeout: 5000
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 5
+  devtools:
+    restart:
+      enabled: false
+  thymeleaf:
+    cache: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+system:
+  login:
+    bypass: false

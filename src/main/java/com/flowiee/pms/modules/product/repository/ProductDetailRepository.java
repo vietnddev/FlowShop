@@ -19,7 +19,7 @@ public interface ProductDetailRepository extends JpaRepository <ProductDetail, L
     @Query("from ProductDetail b where b.product.id=:productId and b.color.id=:colorId and b.size.id=:sizeId and b.fabricType.id=:fabricTypeId")
     ProductDetail findByColorAndSize(@Param("productId") Long productId, @Param("colorId") Long colorId, @Param("sizeId")  Long sizeId, @Param("fabricTypeId")  Long fabricTypeId);
 
-    @Query("select sum(nvl(p.soldQty, 0)) as totalQtySell from ProductDetail p where p.product.id=:productId")
+    @Query("select sum(coalesce(p.soldQty, 0)) as totalQtySell from ProductDetail p where p.product.id=:productId")
     Integer findTotalQtySell(@Param("productId") Long productId);
 
     @Modifying

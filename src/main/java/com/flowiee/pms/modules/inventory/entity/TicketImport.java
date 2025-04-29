@@ -15,7 +15,7 @@ import com.flowiee.pms.common.enumeration.TicketImportStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;

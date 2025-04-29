@@ -19,8 +19,8 @@ public interface VoucherInfoRepository extends BaseRepository<VoucherInfo, Long>
            "and (:ids is null or v.id in :ids) " +
            "and (:title is null or v.title like %:title%) " +
            "and ((:startTime is null and :endTime is null) or ((v.startTime >= :startTime) and (v.endTime <= :endTime))) " +
-           "and (:status is null or (:status = 'I' or (case when ((trunc(v.startTime) <= trunc(current_date)) and (trunc(v.endTime) >= trunc(current_date))) then 'A' else 'I' end) = 'A')) " +
-           "and (:status is null or (:status = 'A' or (case when ((trunc(v.startTime) <= trunc(current_date)) and (trunc(v.endTime) >= trunc(current_date))) then 'A' else 'I' end) = 'I'))")
+           "and (:status is null or (:status = 'I' or (case when ((function('date', v.startTime) <= function('date', current_date)) and (function('date', v.endTime) >= function('date', current_date))) then 'A' else 'I' end) = 'A')) " +
+           "and (:status is null or (:status = 'A' or (case when ((function('date', v.startTime) <= function('date', current_date)) and (function('date', v.endTime) >= function('date', current_date))) then 'A' else 'I' end) = 'I'))")
     Page<VoucherInfo> findAll(@Param("ids") List<Long> voucherIds,
                               @Param("title") String title,
                               @Param("startTime") LocalDateTime startTime,

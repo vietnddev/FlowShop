@@ -7,7 +7,7 @@ import com.flowiee.pms.modules.product.entity.ProductDetail;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 

@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Query;
+import jakarta.persistence.Query;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +74,7 @@ public class SalesPerformanceStatisticsServiceImpl extends BaseService implement
                        "    SELECT ID, NAME, COLOR FROM CATEGORY WHERE TYPE = 'SALES_CHANNEL' AND CODE <> 'ROOT' " +
                        "), " +
                        "ORDER_TEMP(SALESCHANNELID, VALUE) AS ( " +
-                       "    SELECT o.CHANNEL, NVL(((d.PRICE * d.QUANTITY) - d.EXTRA_DISCOUNT) - o.AMOUNT_DISCOUNT, 0) AS VALUE " +
+                       "    SELECT o.CHANNEL, COALESCE(((d.PRICE * d.QUANTITY) - d.EXTRA_DISCOUNT) - o.AMOUNT_DISCOUNT, 0) AS VALUE " +
                        "    FROM ORDERS o " +
                        "    LEFT JOIN ORDER_DETAIL d ON d.ORDER_ID = o.ID " +
                        "), " +

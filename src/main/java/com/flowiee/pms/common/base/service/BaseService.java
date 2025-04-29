@@ -18,13 +18,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -167,6 +168,16 @@ public class BaseService {
         }
     }
 
+    protected void addLikeCondition(
+            CriteriaBuilder cb,
+            List<Predicate> predicates,
+            String value,
+            Path<String> field) { // Thay varargs bằng single field
+        if (value != null && field != null) {
+            predicates.add(cb.like(cb.lower(field), "%" + value.toLowerCase() + "%"));
+        }
+    }
+
     protected <T extends Comparable<? super T>> void addBetweenCondition(
             CriteriaBuilder cb,
             List<Predicate> predicates,
@@ -184,13 +195,27 @@ public class BaseService {
     protected <T> TypedQuery<Long> initCriteriaCountQuery(CriteriaBuilder lvCriteriaBuilder,
                                                           List<Predicate> predicates,
                                                           Class<T> entityClass) {
+//        CriteriaQuery<Long> countQuery = lvCriteriaBuilder.createQuery(Long.class);
+//        Root<T> countRoot = countQuery.from(entityClass);
+//        // Copy các điều kiện từ danh sách ban đầu
+//        if (predicates != null && !predicates.isEmpty()) {
+//            countQuery.where(predicates.toArray(new Predicate[0]));
+//        }
+//        // Chọn count distinct
+//        countQuery.select(lvCriteriaBuilder.countDistinct(countRoot));
+//        return mvEntityManager.createQuery(countQuery);
+
         CriteriaQuery<Long> countQuery = lvCriteriaBuilder.createQuery(Long.class);
         Root<T> countRoot = countQuery.from(entityClass);
-        // Copy các điều kiện từ danh sách ban đầu
-        if (predicates != null && !predicates.isEmpty()) {
-            countQuery.where(predicates.toArray(new Predicate[0]));
+
+        List<Predicate> countPredicates = new ArrayList<>();
+        if (predicates != null) {
+            for (Predicate p : predicates) {
+                countPredicates.add(p);
+            }
         }
-        // Chọn count distinct
+
+        countQuery.where(countPredicates.toArray(new Predicate[0]));
         countQuery.select(lvCriteriaBuilder.countDistinct(countRoot));
         return mvEntityManager.createQuery(countQuery);
     }
@@ -204,7 +229,7 @@ public class BaseService {
         pCriteriaQuery.distinct(true);
 
         if (pPageable.getSort().isSorted()) {
-            List<javax.persistence.criteria.Order> orders = pPageable.getSort().stream()
+            List<jakarta.persistence.criteria.Order> orders = pPageable.getSort().stream()
                     .map(sortOrder  -> {
                         if (sortOrder.isAscending()) {
                             return pCriteriaBuilder.asc(pRoot.get(sortOrder.getProperty()));

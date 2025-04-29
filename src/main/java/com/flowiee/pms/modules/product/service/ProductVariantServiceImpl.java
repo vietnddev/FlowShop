@@ -51,9 +51,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-import javax.validation.ConstraintViolationException;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -2,6 +2,8 @@ package com.flowiee.pms.common.security;
 
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.constants.Constants;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
+//import jakarta.annotation.PostConstruct;
+//import jakarta.servlet.http.HttpServletRequest;
 
 @RequestScope
 @Component

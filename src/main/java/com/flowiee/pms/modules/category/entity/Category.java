@@ -18,7 +18,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Builder
 @Entity
@@ -39,8 +39,8 @@ public class Category extends BaseEntity implements Serializable {
 	@Column(name = "type", length = 20, nullable = false)
 	String type;
 
-	@Column(name = "code", length = 20, columnDefinition = "VARCHAR2(20) DEFAULT ''")
-	String code;
+	@Column(name = "code", length = 20)
+	String code = "";
 
 	@Column(name = "name", length = 50, nullable = false)
 	String name;
@@ -66,7 +66,7 @@ public class Category extends BaseEntity implements Serializable {
 	@Column(name = "is_default", length = 1, nullable = false)
 	String isDefault;
 
-	@Column(name = "status", length = 20, nullable = false)
+	@Column(name = "status", nullable = false)
 	Boolean status;
 
 	@JsonIgnore

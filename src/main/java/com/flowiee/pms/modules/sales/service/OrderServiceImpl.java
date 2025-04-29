@@ -43,15 +43,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-import javax.transaction.Transactional;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
@@ -125,6 +125,10 @@ public class OrderServiceImpl extends BaseGService<Order, OrderDTO, OrderReposit
             lvOrderTimeFrom = lvFromDateToDate[0];
             lvOrderTimeTo = lvFromDateToDate[1];
         }
+
+//        QueryBuilder<Order> queryBuilder = createQueryBuilder(Order.class)
+//                .addEqual("id", pOrderId);
+
 
         CriteriaBuilder lvCriteriaBuilder = mvEntityManager.getCriteriaBuilder();
         CriteriaQuery<Order> lvCriteriaQuery = lvCriteriaBuilder.createQuery(Order.class);
@@ -480,7 +484,7 @@ public class OrderServiceImpl extends BaseGService<Order, OrderDTO, OrderReposit
     }
 
     public boolean isWithinReturnPeriod(LocalDateTime successfulDeliveryTime, LocalDateTime currentDay, int periodDays) {
-        long daysBetween = ChronoUnit.DAYS.between(successfulDeliveryTime, currentDay);
+        long daysBetween = Duration.between(successfulDeliveryTime, currentDay).toDays();
         return daysBetween < periodDays;
     }
 

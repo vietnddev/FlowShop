@@ -25,9 +25,9 @@ public class ProductConvert {
             .unit(inputDTO.getUnit())
             .garmentFactory(inputDTO.getGarmentFactory())
             .supplier(inputDTO.getSupplier())
-            .productVariantList(inputDTO.getProductVariantList())
-            .listImages(inputDTO.getListImages())
-            .listProductHistories(inputDTO.getListProductHistories())
+            //.productVariantList(inputDTO.getProductVariantList())
+            //.listImages(inputDTO.getListImages())
+            //.listProductHistories(inputDTO.getListProductHistories())
             .build();
 
         if (outputEntity.getProductType() == null && inputDTO.getProductTypeId() != null)

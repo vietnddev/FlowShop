@@ -1,3 +1,9 @@
+#Port
+server:
+  port: 8085
+  servlet:
+    session:
+      timeout: 3600
 #API prefix
 app:
   api:
@@ -5,11 +11,12 @@ app:
 #spring config
 spring:
   profiles:
-    active: dev
+    active: aws
   application:
     name: sms
   main:
     allow-circular-references: true
+    lazy-initialization: true
     resources:
       static-locations:
         - classpath:/static/**
@@ -19,7 +26,6 @@ spring:
     prefix: classpath:/templates/webapp/views/
     suffix: .html
     mode: HTML
-    cache: false
     encoding: UTF-8
   #banner
   banner:
@@ -27,7 +33,7 @@ spring:
   # Database
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
 #    naming:
 #      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 #    properties:
@@ -37,6 +43,14 @@ spring:
       hibernate:
         session_factory:
           statement_inspector: com.flowiee.pms.common.config.CustomHibernateInterceptor
+        enhancer.enableLazyInitialization: false
+        default_batch_fetch_size: 20
+    open-in-view: false
+  # File's size request
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
 #Log
 logging:
   level:

@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -198,7 +198,7 @@ public class ProductImportServiceImpl extends BaseImportService {
             lvPDto.setBrandId(p.getBrandId());
             lvPDto.setProductTypeId(p.getProductTypeId());
             lvPDto.setUnitId(p.getUnitId());
-            Product productSaved = productService.save(lvPDto);
+            ProductDTO productSaved = productService.save(lvPDto);
 
             p.getProductVariantTempList().forEach(pv -> {
                 ProductPriceDTO lvPriceDto = new ProductPriceDTO();
@@ -208,7 +208,7 @@ public class ProductImportServiceImpl extends BaseImportService {
                 lvPriceDto.setCostPrice(pv.getCostPrice());
 
                 ProductVariantDTO lvPvDto = new ProductVariantDTO();
-                lvPvDto.setProduct(productSaved);
+                lvPvDto.setProduct(new Product(productSaved.getId()));
                 lvPvDto.setColorId(pv.getColorId());
                 lvPvDto.setSizeId(pv.getSizeId());
                 lvPvDto.setFabricTypeId(pv.getFabricTypeId());

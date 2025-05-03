@@ -55,6 +55,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
@@ -154,7 +156,7 @@ public class CoreStartUp {
     }
 
 	@EventListener
-	private void loadServerInfo(WebServerInitializedEvent event) {
+	void loadServerInfo(WebServerInitializedEvent event) {
 		int serverPort = event.getWebServer().getPort();
 		String ipAddress = "localhost";
 		try {
@@ -229,124 +231,143 @@ public class CoreStartUp {
 		if ("Y".equals(systemConfigInitData.getValue())) {
 			return;
 		}
-		//Init category
-		File lvCsvDataFile = FileUtils.getFileDataCategoryInit();
-		CSVParser parser = new CSVParserBuilder().withSeparator(',').build();
-		FileReader lvFileReader = new FileReader(lvCsvDataFile);
-		CSVReader lvCsvReader = new CSVReaderBuilder(lvFileReader).withCSVParser(parser).build();
-		List<Category> lvListCategory = new ArrayList<>();
-		int lineCsv = 0;
-		for (String[] row : lvCsvReader.readAll()) {
-			if (lineCsv > 0) {//header
-				Category category = Category.builder()
-						.type(CoreUtils.trim(row[CATEGORY_TYPE_COL_INDEX]))
-						.code(CoreUtils.trim(row[CATEGORY_CODE_COL_INDEX]))
-						.name(CoreUtils.trim(row[CATEGORY_NAME_COL_INDEX]))
-						.status(true)//.status(Boolean.parseBoolean(CoreUtils.trim(row[CATEGORY_STATUS_COL_INDEX])))
-						.isDefault(CoreUtils.trim(row[CATEGORY_ISDEFAULT_COL_INDEX]))
-						.endpoint(CoreUtils.trim(row[CATEGORY_ENDPOINT_COL_INDEX]))
-						.build();
-				initAudit(category);
-				lvListCategory.add(category);
-			}
-			lineCsv ++;
-		}
-		lvListCategory.remove(0);//header
-		mvCategoryRepository.saveAll(lvListCategory);
-		lvFileReader.close();
-		lvCsvReader.close();
 
-		String[] lvSheets = new String[]{"BRANCH", "GROUP_ACCOUNT", "ACCOUNT", "CUSTOMER", "SCHEDULE"};
-		File lvXlsxDataFile = FileUtils.getFileDataSystemInit();
-		XSSFWorkbook lvWorkbook = new XSSFWorkbook(lvXlsxDataFile);
-		for (String lvSheetName : lvSheets) {
-			XSSFSheet lvSheet = lvWorkbook.getSheet(lvSheetName);
-			if (lvSheet == null) {
-				continue;
+		//Init category
+		try {
+			Resource resource = new ClassPathResource("static/data/csv/Category.csv");
+			InputStream inputStream = resource.getInputStream();
+			InputStreamReader lvFileReader = new InputStreamReader(inputStream);
+
+			//File lvCsvDataFile = FileUtils.getFileDataCategoryInit();
+			CSVParser parser = new CSVParserBuilder().withSeparator(',').build();
+			//FileReader lvFileReader = new FileReader(lvCsvDataFile);
+			CSVReader lvCsvReader = new CSVReaderBuilder(lvFileReader).withCSVParser(parser).build();
+			List<Category> lvListCategory = new ArrayList<>();
+			int lineCsv = 0;
+			for (String[] row : lvCsvReader.readAll()) {
+				if (lineCsv > 0) {//header
+					Category category = Category.builder()
+							.type(CoreUtils.trim(row[CATEGORY_TYPE_COL_INDEX]))
+							.code(CoreUtils.trim(row[CATEGORY_CODE_COL_INDEX]))
+							.name(CoreUtils.trim(row[CATEGORY_NAME_COL_INDEX]))
+							.status(true)//.status(Boolean.parseBoolean(CoreUtils.trim(row[CATEGORY_STATUS_COL_INDEX])))
+							.isDefault(CoreUtils.trim(row[CATEGORY_ISDEFAULT_COL_INDEX]))
+							.endpoint(CoreUtils.trim(row[CATEGORY_ENDPOINT_COL_INDEX]))
+							.build();
+					initAudit(category);
+					lvListCategory.add(category);
+				}
+				lineCsv ++;
 			}
-			switch (lvSheetName) {
-				case "BRANCH":
-					for (int i = 0; i < lvSheet.getPhysicalNumberOfRows(); i++) {
-						XSSFRow lvRow = lvSheet.getRow(i + 1);
-						if (lvRow == null) continue;
-						Branch lvBranch = Branch.builder()
-								.branchCode(getValue(lvRow, BRANCH_CODE_COL_INDEX))
-								.branchName(getValue(lvRow, BRANCH_NAME_COL_INDEX))
-								.build();
-						initAudit(lvBranch);
-						try {
-							mvBranchRepository.save(lvBranch);
-						} catch (DataIntegrityViolationException ex) {}
-					}
-					break;
-				case "GROUP_ACCOUNT":
-					for (int i = 0; i < lvSheet.getPhysicalNumberOfRows(); i++) {
-						XSSFRow lvRow = lvSheet.getRow(i + 1);
-						if (lvRow == null) continue;
-						GroupAccount lvGroupAccount = GroupAccount.builder()
-								.groupCode(getValue(lvRow, GROUP_ACCOUNT_CODE_COL_INDEX))
-								.groupName(getValue(lvRow, GROUP_ACCOUNT_NAME_COL_INDEX))
-								.build();
-						initAudit(lvGroupAccount);
-						try {
-							mvGroupAccountRepository.save(lvGroupAccount);
-						} catch (DataIntegrityViolationException ex) {}
-					}
-					break;
-				case "ACCOUNT":
-					for (int i = 0; i < lvSheet.getPhysicalNumberOfRows(); i++) {
-						XSSFRow lvRow = lvSheet.getRow(i + 1);
-						if (lvRow == null) continue;
-						String lvBranchCode = getValue(lvRow, ACCOUNT_BRANCH_CODE_COL_INDEX);
-						String lvGroupCode = getValue(lvRow, ACCOUNT_GROUPACCOUNT_CODE_COL_INDEX);
-						Account lvAccount = Account.builder()
-								.username(getValue(lvRow, ACCOUNT_USERNAME_COL_INDEX))
-								.password(PasswordUtils.encodePassword(getValue(lvRow, ACCOUNT_PASSWORD_COL_INDEX)))
-								.fullName(getValue(lvRow, ACCOUNT_FULLNAME_COL_INDEX))
-								.sex(getValue(lvRow, ACCOUNT_SEX_COL_INDEX).equals("M"))
-								.role(getValue(lvRow, ACCOUNT_ROLE_COL_INDEX))
-								.branch(mvBranchRepository.findByCode(lvBranchCode))
-								.groupAccount(mvGroupAccountRepository.findByCode(lvGroupCode))
-								.status(getValue(lvRow, ACCOUNT_STATUS_COL_INDEX))
-								.build();
-						initAudit(lvAccount);
-						try {
-							mvAccountRepository.save(lvAccount);
-						} catch (DataIntegrityViolationException ex) {}
-					}
-					break;
-				case "CUSTOMER":
-					for (int i = 0; i < lvSheet.getPhysicalNumberOfRows(); i++) {
-						XSSFRow lvRow = lvSheet.getRow(i + 1);
-						if (lvRow == null) continue;
-						Customer lvCustomer = Customer.builder()
-								.code(getValue(lvRow, CUSTOMER_CODE_COL_INDEX))
-								.customerName(getValue(lvRow, CUSTOMER_NAME_COL_INDEX))
-								.dateOfBirth(LocalDate.now())
-								.gender(getValue(lvRow, CUSTOMER_SEX_COL_INDEX))
-								.build();
-						initAudit(lvCustomer);
-						try {
-							mvCustomerRepository.save(lvCustomer);
-						} catch (DataIntegrityViolationException ex) {}
-					}
-					break;
-				case "SCHEDULE":
-					for (int i = 0; i < lvSheet.getPhysicalNumberOfRows(); i++) {
-						XSSFRow lvRow = lvSheet.getRow(i + 1);
-						if (lvRow == null) continue;
-						try {
-							mvScheduleRepository.save(Schedule.builder()
-									.scheduleId(getValue(lvRow, SCHEDULE_ID_COL_INDEX))
-									.scheduleName(getValue(lvRow, SCHEDULE_NAME_COL_INDEX))
-									.enable(getValue(lvRow, SCHEDULE_ENABLE_COL_INDEX).equals("Y"))
-									.build());
-						} catch (DataIntegrityViolationException ex) {}
-					}
-					break;
-			}
+			lvListCategory.remove(0);//header
+			mvCategoryRepository.saveAll(lvListCategory);
+			lvFileReader.close();
+			lvCsvReader.close();
+		} catch (Exception e) {
+			logger.error("Failed to init category data", e);
 		}
-		lvWorkbook.close();
+
+		try {
+			String[] lvSheets = new String[]{"BRANCH", "GROUP_ACCOUNT", "ACCOUNT", "CUSTOMER", "SCHEDULE"};
+
+            Resource resource = new ClassPathResource("static/data/excel/SystemDataInit.xlsx");
+            InputStream inputStream = resource.getInputStream();
+
+			//File lvXlsxDataFile = FileUtils.getFileDataSystemInit();
+			//XSSFWorkbook lvWorkbook = new XSSFWorkbook(lvXlsxDataFile);
+            XSSFWorkbook lvWorkbook = new XSSFWorkbook(inputStream);
+			for (String lvSheetName : lvSheets) {
+				XSSFSheet lvSheet = lvWorkbook.getSheet(lvSheetName);
+				if (lvSheet == null) {
+					continue;
+				}
+				switch (lvSheetName) {
+					case "BRANCH":
+						for (int i = 0; i < lvSheet.getPhysicalNumberOfRows(); i++) {
+							XSSFRow lvRow = lvSheet.getRow(i + 1);
+							if (lvRow == null) continue;
+							Branch lvBranch = Branch.builder()
+									.branchCode(getValue(lvRow, BRANCH_CODE_COL_INDEX))
+									.branchName(getValue(lvRow, BRANCH_NAME_COL_INDEX))
+									.build();
+							initAudit(lvBranch);
+							try {
+								mvBranchRepository.save(lvBranch);
+							} catch (DataIntegrityViolationException ex) {}
+						}
+						break;
+					case "GROUP_ACCOUNT":
+						for (int i = 0; i < lvSheet.getPhysicalNumberOfRows(); i++) {
+							XSSFRow lvRow = lvSheet.getRow(i + 1);
+							if (lvRow == null) continue;
+							GroupAccount lvGroupAccount = GroupAccount.builder()
+									.groupCode(getValue(lvRow, GROUP_ACCOUNT_CODE_COL_INDEX))
+									.groupName(getValue(lvRow, GROUP_ACCOUNT_NAME_COL_INDEX))
+									.build();
+							initAudit(lvGroupAccount);
+							try {
+								mvGroupAccountRepository.save(lvGroupAccount);
+							} catch (DataIntegrityViolationException ex) {}
+						}
+						break;
+					case "ACCOUNT":
+						for (int i = 0; i < lvSheet.getPhysicalNumberOfRows(); i++) {
+							XSSFRow lvRow = lvSheet.getRow(i + 1);
+							if (lvRow == null) continue;
+							String lvBranchCode = getValue(lvRow, ACCOUNT_BRANCH_CODE_COL_INDEX);
+							String lvGroupCode = getValue(lvRow, ACCOUNT_GROUPACCOUNT_CODE_COL_INDEX);
+							Account lvAccount = Account.builder()
+									.username(getValue(lvRow, ACCOUNT_USERNAME_COL_INDEX))
+									.password(PasswordUtils.encodePassword(getValue(lvRow, ACCOUNT_PASSWORD_COL_INDEX)))
+									.fullName(getValue(lvRow, ACCOUNT_FULLNAME_COL_INDEX))
+									.sex(getValue(lvRow, ACCOUNT_SEX_COL_INDEX).equals("M"))
+									.role(getValue(lvRow, ACCOUNT_ROLE_COL_INDEX))
+									.branch(mvBranchRepository.findByCode(lvBranchCode))
+									.groupAccount(mvGroupAccountRepository.findByCode(lvGroupCode))
+									.status(getValue(lvRow, ACCOUNT_STATUS_COL_INDEX))
+                                    .failLogonCount(0)
+									.build();
+							initAudit(lvAccount);
+							try {
+								mvAccountRepository.save(lvAccount);
+							} catch (DataIntegrityViolationException ex) {}
+						}
+						break;
+					case "CUSTOMER":
+						for (int i = 0; i < lvSheet.getPhysicalNumberOfRows(); i++) {
+							XSSFRow lvRow = lvSheet.getRow(i + 1);
+							if (lvRow == null) continue;
+							Customer lvCustomer = Customer.builder()
+									.code(getValue(lvRow, CUSTOMER_CODE_COL_INDEX))
+									.customerName(getValue(lvRow, CUSTOMER_NAME_COL_INDEX))
+									.dateOfBirth(LocalDate.now())
+									.gender(getValue(lvRow, CUSTOMER_SEX_COL_INDEX))
+									.build();
+							initAudit(lvCustomer);
+							try {
+								mvCustomerRepository.save(lvCustomer);
+							} catch (DataIntegrityViolationException ex) {}
+						}
+						break;
+					case "SCHEDULE":
+						for (int i = 0; i < lvSheet.getPhysicalNumberOfRows(); i++) {
+							XSSFRow lvRow = lvSheet.getRow(i + 1);
+							if (lvRow == null) continue;
+							try {
+								mvScheduleRepository.save(Schedule.builder()
+										.scheduleId(getValue(lvRow, SCHEDULE_ID_COL_INDEX))
+										.scheduleName(getValue(lvRow, SCHEDULE_NAME_COL_INDEX))
+										.enable(getValue(lvRow, SCHEDULE_ENABLE_COL_INDEX).equals("Y"))
+										.build());
+							} catch (DataIntegrityViolationException ex) {}
+						}
+						break;
+				}
+			}
+			lvWorkbook.close();
+		} catch (Exception e) {
+			logger.error("Failed to init system data", e);
+		}
 
 		systemConfigInitData.setValue("Y");
 		mvConfigRepository.save(systemConfigInitData);

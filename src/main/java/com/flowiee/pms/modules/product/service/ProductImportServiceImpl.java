@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

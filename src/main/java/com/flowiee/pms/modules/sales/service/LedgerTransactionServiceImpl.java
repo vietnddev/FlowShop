@@ -11,7 +11,7 @@ import com.flowiee.pms.modules.sales.repository.LedgerTransactionRepository;
 import com.flowiee.pms.common.enumeration.LedgerTranStatus;
 import com.flowiee.pms.common.enumeration.MasterObject;
 import com.flowiee.pms.modules.log.service.SystemLogService;
-import org.apache.commons.lang3.ObjectUtils;;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;

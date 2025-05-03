@@ -21,7 +21,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

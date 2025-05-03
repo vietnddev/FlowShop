@@ -15,13 +15,14 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends BaseRepository<Order, Long> {
-    @Query(value = "select sum((select sum(d.price * d.quantity) from order_detail d where d.order_id = o.id) - o.amount_discount) from orders o where trunc(o.order_time) = trunc(current_date)", nativeQuery = true)
+    @Query(value = "select sum((select sum(d.price * d.quantity) from order_detail d where d.order_id = o.id) - o.amount_discount) from orders o where function('date', o.order_time) = function('date', current_date)", nativeQuery = true)
     Double findRevenueToday();
 
-//    @Query("select nvl(sum(o.totalAmountDiscount), 0) from Order o where extract(month from o.thoiGianDatHang) = extract(month from current_date)")
+//    @Query("select coalesce(sum(o.totalAmountDiscount), 0) from Order o where extract(month from o.thoiGianDatHang) = extract(month from current_date)")
 //    Double findRevenueThisMonth();
 
-    @Query("from Order o where trunc(o.orderTime) = trunc(current_date)")
+    //@Query("from Order o where trunc(o.orderTime) = trunc(current_date)")
+    @Query("from Order o where function('date', o.orderTime) = function('date', current_date)")//2025-04-28
     List<Order> findOrdersToday();
 
     @Modifying
@@ -59,7 +60,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
            "    extract(year from o.orderTime) AS year, " +
            "    extract(month from o.orderTime) AS month, " +
            "    count(o.id) AS order_count, " +
-           "    nvl(sum(od.price - o.amountDiscount), 0) AS avgValue " +
+           "    coalesce(sum(od.price - o.amountDiscount), 0) AS avgValue " +
            "from Order o " +
            "left join OrderDetail od on od.order.id = o.id " +
            "where 1=1 " +
@@ -82,7 +83,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
     @Query("from Order where customer.id = :customerId")
     List<Order> findByCustomer(@Param("customerId") Long customerId);
 
-    @Query("from Order where DeliverySuccessTime between :fromDate and :toDate")
+    @Query("from Order where deliverySuccessTime between :fromDate and :toDate")
     List<Order> findBySuccessfulDeliveryTime(@Param("fromDate") LocalDateTime pFromDate, @Param("toDate") LocalDateTime pToDate);
 
     @Query("from Order o where o.salesChannel.id = :salesChannelId")

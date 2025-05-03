@@ -18,9 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -204,7 +204,7 @@ public class BaseService {
         pCriteriaQuery.distinct(true);
 
         if (pPageable.getSort().isSorted()) {
-            List<javax.persistence.criteria.Order> orders = pPageable.getSort().stream()
+            List<jakarta.persistence.criteria.Order> orders = pPageable.getSort().stream()
                     .map(sortOrder  -> {
                         if (sortOrder.isAscending()) {
                             return pCriteriaBuilder.asc(pRoot.get(sortOrder.getProperty()));

@@ -1,9 +1,4 @@
 spring:
-  # datasource:
-  #  driver-class-name: oracle.jdbc.driver.OracleDriver
-  #  url: jdbc:oracle:thin:@127.0.0.1:1521:orcl
-  #  username: flowiee
-  #  password: 080100
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/fs}
@@ -11,7 +6,7 @@ spring:
     username: ${DBMS_USERNAME:root}
   devtools:
     restart:
-      enabled: true
+      enabled: false
 system:
   login:
-    bypass: true
+    bypass: false

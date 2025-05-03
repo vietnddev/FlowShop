@@ -1,3 +1,9 @@
+#Port
+server:
+  port: 8085
+  servlet:
+    session:
+      timeout: 3600
 #API prefix
 app:
   api:
@@ -5,7 +11,7 @@ app:
 #spring config
 spring:
   profiles:
-    active: dev
+    active: aws
   application:
     name: sms
   main:
@@ -37,6 +43,11 @@ spring:
       hibernate:
         session_factory:
           statement_inspector: com.flowiee.pms.common.config.CustomHibernateInterceptor
+  # File's size request
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
 #Log
 logging:
   level:

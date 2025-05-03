@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Query;
+import jakarta.persistence.Query;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -38,14 +38,14 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         int currentMonth = LocalDate.now().getMonth().getValue();
 
         //Revenue today
-//      String revenueTodaySQL = "SELECT NVL(SUM(d.TOTAL_AMOUNT_AFTER_DISCOUNT), 0) FROM PRO_ORDER d WHERE TRUNC(d.THOI_GIAN_DAT_HANG) = TRUNC(SYSDATE)";
+//      String revenueTodaySQL = "SELECT COALESCE(SUM(d.TOTAL_AMOUNT_AFTER_DISCOUNT), 0) FROM PRO_ORDER d WHERE TRUNC(d.THOI_GIAN_DAT_HANG) = TRUNC(SYSDATE)";
 //      logger.info("[getRevenueToday() - SQL findData]: " + revenueTodaySQL);
 //      Query revenueTodayQuery = entityManager.createNativeQuery(revenueTodaySQL);
 //      String revenueToday = CommonUtil.formatToVND(Float.parseFloat(String.valueOf(revenueTodayQuery.getSingleResult())));
 //      entityManager.close();
 
         //Revenue this month
-//      String revenueThisMonthSQL = "SELECT NVL(SUM(d.TOTAL_AMOUNT_AFTER_DISCOUNT), 0) FROM PRO_ORDER d WHERE EXTRACT(MONTH FROM d.THOI_GIAN_DAT_HANG) = EXTRACT(MONTH FROM SYSDATE)";
+//      String revenueThisMonthSQL = "SELECT COALESCE(SUM(d.TOTAL_AMOUNT_AFTER_DISCOUNT), 0) FROM PRO_ORDER d WHERE EXTRACT(MONTH FROM d.THOI_GIAN_DAT_HANG) = EXTRACT(MONTH FROM SYSDATE)";
 //      logger.info("[getRevenueThisMonth() - SQL findData]: " + revenueThisMonthSQL);
 //      Query revenueThisMonthSQLQuery = entityManager.createNativeQuery(revenueThisMonthSQL);
 //      String revenueThisMonth = CommonUtil.formatToVND(Float.parseFloat(String.valueOf(revenueThisMonthSQLQuery.getSingleResult())));
@@ -67,11 +67,11 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
 
         //Products top sell
         String productsTopSellSQL = "SELECT * FROM " +
-                                    "(SELECT s.VARIANT_NAME, NVL(SUM(d.QUANTITY), 0) AS Total " +
+                                    "(SELECT s.VARIANT_NAME, COALESCE(SUM(d.QUANTITY), 0) AS Total " +
                                     "FROM PRODUCT_DETAIL s " +
                                     "LEFT JOIN ORDER_DETAIL d ON s.id = d.PRODUCT_VARIANT_ID " +
                                     "GROUP BY s.ID, s.VARIANT_NAME " +
-                                    "ORDER BY total DESC) " +
+                                    "ORDER BY total DESC) t " +
                                     "WHERE ROWNUM <= 10";
         logger.info("[getProductsTopSell() - SQL findData]: ");
         Query productsTopSellSQLQuery = mvEntityManager.createNativeQuery(productsTopSellSQL);
@@ -85,7 +85,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         //Revenue month of year
         String revenueMonthOfYearSQL = "SELECT " +
                                        "    TO_CHAR(MONTHS.MONTH, 'MM') AS MONTH, " +
-                                       "    NVL(SUM(d.PRICE * d.QUANTITY - NVL(o.AMOUNT_DISCOUNT, 0)), 0) AS REVENUE " +
+                                       "    COALESCE(SUM(d.PRICE * d.QUANTITY - COALESCE(o.AMOUNT_DISCOUNT, 0)), 0) AS REVENUE " +
                                        "FROM " +
                                        "    (SELECT TO_DATE('01-' || LEVEL || '-2024', 'DD-MM-YYYY') AS MONTH " +
                                        "     FROM DUAL " +
@@ -119,7 +119,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
                                        ") " +
                                        "SELECT " +
                                        "    TO_CHAR(MD.MONTH_DAY, 'DD') AS DAY, " +
-                                       "    NVL(SUM(d.PRICE * d.QUANTITY - o.AMOUNT_DISCOUNT), 0) AS REVENUE " +
+                                       "    COALESCE(SUM(d.PRICE * d.QUANTITY - o.AMOUNT_DISCOUNT), 0) AS REVENUE " +
                                        "FROM " +
                                        "    MONTH_DAYS MD " +
                                        "LEFT JOIN " +
@@ -148,7 +148,7 @@ public class DashboardServiceImpl extends BaseService implements DashboardServic
         String revenueBySalesChannelSQL = "SELECT " +
                                           "c.NAME, " +
                                           "c.COLOR, " +
-                                          "NVL(SUM(d.PRICE * d.QUANTITY - o.AMOUNT_DISCOUNT), 0) AS TOTAL " +
+                                          "COALESCE(SUM(d.PRICE * d.QUANTITY - o.AMOUNT_DISCOUNT), 0) AS TOTAL " +
                                           "FROM (SELECT * FROM CATEGORY WHERE TYPE = 'SALES_CHANNEL') c " +
                                           "LEFT JOIN ORDERS o ON c.ID = o.CHANNEL " +
                                           "LEFT JOIN ORDER_DETAIL d ON o.ID = d.ORDER_ID " +

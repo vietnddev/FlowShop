@@ -13,7 +13,7 @@ public class UpdateEventListener implements PostUpdateEventListener {
     }
 
     @Override
-    public boolean requiresPostCommitHanding(EntityPersister persister) {
+    public boolean requiresPostCommitHandling(EntityPersister entityPersister) {
         return false;
     }
 }

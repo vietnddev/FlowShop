@@ -6,7 +6,7 @@ import com.flowiee.pms.common.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;

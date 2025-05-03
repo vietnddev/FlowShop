@@ -18,8 +18,8 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import java.math.BigDecimal;
 import java.util.*;
 

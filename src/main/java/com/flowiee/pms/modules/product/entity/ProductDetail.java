@@ -16,7 +16,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.util.Assert;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;

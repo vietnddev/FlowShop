@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.system.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Builder
@@ -36,7 +36,7 @@ public class MailMedia implements Serializable {
     private String language;
 
     @Lob
-    @Column(name = "message", nullable = false, columnDefinition = "CLOB")
+    @Column(name = "message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "is_html", nullable = false)

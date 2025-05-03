@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.system.service;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 
 public interface SendMailService {

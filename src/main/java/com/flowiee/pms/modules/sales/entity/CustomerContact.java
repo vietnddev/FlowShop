@@ -7,7 +7,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.util.Assert;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Builder

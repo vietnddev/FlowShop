@@ -4,7 +4,7 @@ import com.flowiee.pms.common.base.entity.BaseEntity;
 import com.flowiee.pms.modules.sales.entity.Order;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;

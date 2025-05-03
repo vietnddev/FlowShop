@@ -43,9 +43,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-import javax.transaction.Transactional;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;

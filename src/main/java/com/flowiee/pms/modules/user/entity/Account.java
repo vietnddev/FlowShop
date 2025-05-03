@@ -16,7 +16,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.util.Assert;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;

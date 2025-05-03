@@ -64,20 +64,20 @@ public enum Pages {
 
     public String getTemplate() {
         if (this.equals(SYS_LOGIN)) {
-            return "/login";
+            return "login";
         }
         if (this.equals(PRO_DASHBOARD)) {
-            return "/pages/dashboard/dashboard";
+            return "pages/dashboard/dashboard";
         }
         String basePath = "";
         if (module.equals(MODULE.SYSTEM)) {
-            basePath = "/pages/system";
+            basePath = "pages/system";
         } else if (module.equals(MODULE.PRODUCT)) {
-            basePath = "/pages/product";
+            basePath = "pages/product";
         } else if (module.equals(MODULE.SALES)) {
-            basePath = "/pages/sales";
+            basePath = "pages/sales";
         } else if (module.equals(MODULE.STORAGE)) {
-            basePath = "/pages/storage";
+            basePath = "pages/storage";
         }
         return basePath + "/" + template;
     }

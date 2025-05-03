@@ -32,8 +32,8 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import java.util.*;
 import java.util.stream.Collectors;
 

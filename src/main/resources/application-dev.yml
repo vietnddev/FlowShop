@@ -1,42 +1,48 @@
-# Config webapp
 server:
-  port: 8085
-  servlet:
-    session:
-      timeout: 3600
+  tomcat:
+    background-processor-delay: 30
+    threads:
+      max: 10
+      min-spare: 3
 spring:
-  # MySQL TTL
-  # datasource:
-  #   driver-class-name: com.mysql.cj.jdbc.Driver
-  #   url: jdbc:mysql://localhost:3306/flowiee
-  #   username: root
-  #   password: 080100
-
-  # Oracle local
   datasource:
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@127.0.0.1:1521:orcl
-    username: flowiee
-    password: 080100
-
-  # MySQL Google cloud
-  # datasource:
-  #   driver-class-name: com.mysql.cj.jdbc.Driver
-  #   url: jdbc:mysql://35.225.47.208:3306/flowiee
-  #   username: root
-  #   password: 123qwe!@#
-
-  # Config dung lượng file upload
-  servlet:
-    multipart:
-      max-file-size: 20MB
-      max-request-size: 100MB
-
-  # Auto restart
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/fs}
+    password: ${DBMS_PASSWORD:root}
+    username: ${DBMS_USERNAME:root}
+    hikari:
+      initialization-fail-timeout: 5000
+      connection-timeout: 30000
+      maximum-pool-size: 5
+      minimum-idle: 2
+    livereload:
+      enabled: false
+  thymeleaf:
+    cache: true
+  jpa:
+    hibernate:
+      ddl-auto: none
   devtools:
     restart:
-      enabled: true
-
+      enabled: false
+    livereload:
+      enabled: false
+    add-properties: false
+  jmx:
+    enabled: false
+logging:
+  level:
+    com:
+      zaxxer:
+        hikari: WARN
+      flowiee: INFO
+    org:
+      springframework:
+        data: WARN
+      apache:
+        tomcat: WARN
+        catalina: WARN
+      hibernate: WARN
 system:
   login:
-    bypass: true
+    bypass: false

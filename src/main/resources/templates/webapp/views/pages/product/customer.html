@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quản lý khách hàng</title>
+    <th:block th:replace="~{header :: stylesheets}"></th:block>
+    <style>
+        .table td.vertical-center {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="~{header :: header}"></div>
+
+        <div th:replace="~{sidebar :: sidebar}"></div>
+
+        <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
+            <section class="content">
+                <div class="container-fluid vertical-center">
+                    <div class="row">
+                        <div class="col-12">
+                            <!--Search tool-->
+                            <div th:replace="~{fragments :: searchTool(${configSearchTool})}" id="searchTool"></div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row justify-content-between">
+                                        <div class="col-4" style="display: flex; align-items: center">
+                                            <h3 class="card-title"><strong>DANH SÁCH KHÁCH HÀNG</strong></h3>
+                                        </div>
+                                        <div class="col-4 text-right">
+                                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modelAddKhachHang" id="testOK">Thêm mới</button>
+                                            <div class="modal fade" id="modelAddKhachHang">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content text-left">
+                                                        <form th:action="@{/customer/insert}" method="post">
+                                                            <div class="modal-header">
+                                                                <strong class="modal-title">Thêm mới khách hàng</strong>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="row">
+                                                                    <div class="col-12">
+                                                                        <div class="form-group">
+                                                                            <label>Tên khách hàng</label>
+                                                                            <input type="text" class="form-control" required name="customerName"/>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label>Giới tính</label>
+                                                                            <select class="custom-select col-sm" name="sex" data-placeholder="Chọn giới tính">
+                                                                                <option selected value="1">Nam</option>
+                                                                                <option selected value="0">Nữ</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label>Số điện thoại</label>
+                                                                            <input type="text" class="form-control" required name="phoneDefault"/>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label>Email</label>
+                                                                            <input type="email" class="form-control" name="emailDefault"/>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label>Địa chỉ</label>
+                                                                            <input type="text" class="form-control" required name="addressDefault"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer justify-content-end">
+                                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                                                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <!-- /.modal-content -->
+                                                </div>
+                                                <!-- /.modal-dialog -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>STT</th>
+                                                <th>Tên khách hàng</th>
+                                                <th>Giới tính</th>
+                                                <th>Sinh nhật</th>
+                                                <th>Số điện thoại</th>
+                                                <th>Email</th>
+                                                <th>Địa chỉ</th>
+                                                <th>Current debit amount</th>
+                                                <th>Total purchase</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="contentTable"></tbody>
+                                    </table>
+                                </div>
+                                <div class="card-footer">
+                                    <div th:replace="~{fragments :: pagination}"></div>
+                                </div>
+
+                                <!--<div class="modal fade" th:id="'update-' + ${list.id}">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <form th:action="@{/customer/update/{id}(id=${list.id})}" th:object="${customer}" method="post">
+                                                <div class="modal-header">
+                                                    <strong class="modal-title">Cập nhật thông tin khách hàng</strong>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <div class="form-group">
+                                                                <label>Tên khách hàng</label>
+                                                                <input type="text" class="form-control" required name="name" th:value="${list.customerName}"/>
+                                                            </div>
+                                                            <div class="form-group" th:if="${list.sex} == 'Nam'">
+                                                                <label>Giới tính</label>
+                                                                <select class="custom-select" name="sex">
+                                                                    <option value="M" selected>Nam</option>
+                                                                    <option value="F">Nữ</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group" th:if="${list.sex} == 'Nữ'">
+                                                                <label>Giới tính</label>
+                                                                <select class="custom-select" name="sex">
+                                                                    <option value="M">Nam</option>
+                                                                    <option value="F" selected>Nữ</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Số điện thoại</label>
+                                                                <input type="text" class="form-control" required name="phoneDefault" th:value="${list.phoneDefault}"/>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Email</label>
+                                                                <input type="email" class="form-control" name="emailDefault" th:value="${list.emailDefault}"/>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Địa chỉ</label>
+                                                                <input type="text" class="form-control" required name="addressDefault" th:value="${list.addressDefault}"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer justify-content-end">
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                                                        <button type="submit" class="btn btn-primary">Lưu</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>-->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <th:block th:replace="~{footer :: footer}"></th:block>
+
+        <aside class="control-sidebar control-sidebar-dark"></aside>
+
+        <th:block th:replace="~{header :: scripts}"></th:block>
+    </div>
+
+    <script>
+        let mvCustomers = {};
+
+        $(document).ready(function () {
+            loadCustomers(getPageSize(), getPageNum());
+            updateTableContentWhenOnClickPagination(loadCustomers);
+        });
+
+        function loadCustomers(pageSize, pageNum) {
+            let apiURL = mvHostURLCallApi + '/customer/all';
+            let params = {pageSize: pageSize, pageNum: pageNum}
+            $.get(apiURL, params, function (response) {
+                if (response.status === "OK") {
+                    let mvCustomers = response.data;
+                    let pagination = response.pagination;
+
+                    updatePaginationUI(pagination.pageNum, pagination.pageSize, pagination.totalPage, pagination.totalElements);
+
+                    let contentTable = $('#contentTable');
+                    contentTable.empty();
+                    $.each(mvCustomers, function (index, d) {
+                        let sex = "Nam";
+                        if (d.sex === false) {
+                            sex = "Nữ";
+                        }
+                        contentTable.append(`
+                            <tr>
+                                <td class="vertical-center">${(((pageNum - 1) * pageSize + 1) + index)}</td>
+                                <td class="vertical-center"><a href="/customer/${d.id}">${d.customerName}</a></td>
+                                <td class="vertical-center">${sex}</td>
+                                <td class="vertical-center">${d.dateOfBirth}</td>
+                                <td class="vertical-center">${d.phoneDefault}</td>
+                                <td class="vertical-center">${d.emailDefault}</td>
+                                <td class="vertical-center">${d.addressDefault}</td>
+                                <td class="vertical-center">${d.outstandingBalanceAmount}</td>
+                                <td class="vertical-center">${d.totalPurchase}</td>
+                                <td class="vertical-center">
+                                    <button class="btn btn-outline-info btn-sm">
+                                        <a href="customer/${d.id}"><i class="fa-solid fa-eye"></i></a>
+                                   </button>
+                                    <button class="btn btn-outline-warning btn-sm" data-toggle="modal" data-target="'#update-' + ${d.id}">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+            }).fail(function () {
+                showErrorModal("Could not connect to the server");
+            });
+        }
+    </script>
+</body>
+</html>

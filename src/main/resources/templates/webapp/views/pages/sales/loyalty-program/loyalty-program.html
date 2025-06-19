@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quản lý tích điểm, đổi thưởng</title>
+    <div th:replace="~{header :: stylesheets}"></div>
+    <style>
+        .table td.vertical-center {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div th:replace="~{header :: header}"></div>
+
+        <div th:replace="~{sidebar :: sidebar}"></div>
+
+        <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
+            <div class="content" style="padding-left: 20px; padding-right: 20px">
+                <!-- Small boxes (Stat box) -->
+                <div class="row">
+                    <div class="col-12">
+                        <!--Search tool-->
+                        <div th:replace="~{fragments :: searchTool(${configSearchTool})}" id="searchTool"></div>
+
+                        <div class="card" style="font-size: 14px">
+                            <div class="card-header row justify-content-between ml-0 mr-0" style="font-weight: bold; font-size: 16px">
+                                <ul class="col-8 nav nav-pills">
+                                    <li class="nav-item"><a class="nav-link active" href="#PROGRAM_TAB" id="programTabLabel" data-toggle="tab">Chương trình tích điểm</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#GIFT_TAB" id="giftTabLabel" data-toggle="tab">Quà đổi thưởng</a></li>
+                                </ul>
+                                <div class="col-4 text-right">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createProgramModal">
+                                        <i class="fa-solid"></i>Thêm chương trình
+                                    </button>
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createGiftModal">
+                                        <i class="fa-solid"></i>Thêm quà
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body" style="padding-left: 5px; padding-top: 3px; padding-right: 5px; padding-bottom: 5px; font-size: 16px">
+                                <div class="row mt-2 mb-2">
+                                    <div class="col-sm-12">
+                                        <div class="tab-content">
+                                            <div class="active tab-pane" id="PROGRAM_TAB">
+                                                <div class="card-body p-0">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>STT</th>
+                                                            <th>Nội dung</th>
+                                                            <th>Người nhập</th>
+                                                            <th>Thời gian nhập</th>
+                                                            <th>Ghi chú</th>
+                                                            <th>Trạng thái</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody id="programTbl"></tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div th:replace="~{fragments :: pagination}"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="tab-pane" id="GIFT_TAB">
+                                                <div class="card-body p-0">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>STT</th>
+                                                            <th>Nội dung</th>
+                                                            <th>Người xuất</th>
+                                                            <th>Thời gian xuất</th>
+                                                            <th>Ghi chú</th>
+                                                            <th>Trạng thái</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody id="giftTbl"></tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <div th:replace="~{fragments :: pagination}"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Modal create new loyalty program-->
+                    <div th:replace="~{pages/sales/fragments/loyalty-program-fragments :: createProgramModal}"></div>
+                    <!--Modal create new loyalty gift-->
+                    <div th:replace="~{pages/sales/fragments/loyalty-program-fragments :: createGiftModal}"></div>
+                </div>
+            </div>
+        </div>
+
+        <div th:replace="~{modal_fragments :: confirm_modal}"></div>
+
+        <div th:replace="~{footer :: footer}"></div>
+
+        <aside class="control-sidebar control-sidebar-dark"></aside>
+
+        <div th:replace="~{header :: scripts}"></div>
+
+        <script th:src="@{/js/sales/CreateLoyaltyProgram.js}"></script>
+        <script th:src="@{/js/sales/CreateLoyaltyGift.js}"></script>
+    </div>
+
+    <script>
+        let mvSuppliers = {};
+        let mvId;
+        let mvName = $("#nameField");
+        let mvPhoneNumber = $("#phoneNumberField");
+        let mvEmail = $("#emailField");
+        let mvAddress = $("#addressField");
+        let mvProvide = $("#productProvidedField");
+        let mvNote = $("#noteField");
+
+        $(document).ready(function() {
+            loadStorageItems(getPageSize(), getPageNum());
+            $("#programTabLabel").on("click", function () {
+                loadPrograms(getPageSize(), getPageNum());
+            })
+            $("#giftTabLabel").on("click", function () {
+                loadGifts(getPageSize(), getPageNum());
+            })
+            updateTableContentWhenOnClickPagination(loadPrograms);
+            updateTableContentWhenOnClickPagination2(loadGifts);
+
+            //createNewTicketImport();
+            //createNewTicketExport();
+            //updateStorageInfo();
+        });
+
+        function loadPrograms(pageSize, pageNum) {
+            let apiURL = mvHostURLCallApi + "/stg/ticket-import/all";
+            let params = {pageSize: pageSize, pageNum: pageNum, storageId: mvStorageId}
+            $.get(apiURL, params, function (response) {
+                if (response.status === "OK") {
+                    let data = response.data;
+                    let pagination = response.pagination;
+                    updatePaginationUI(pagination.pageNum, pagination.pageSize, pagination.totalPage, pagination.totalElements);
+
+                    let contentTable = $('#programTbl');
+                    contentTable.empty();
+                    $.each(data, function (index, d) {
+                        contentTable.append(`
+                    <tr>
+                        <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>
+                        <td><a href="/stg/ticket-import/${d.id}">${d.title}</td>
+                        <td>${d.importer}</td>
+                        <td>${d.importTime}</td>
+                        <td>${d.note}</td>
+                        <td>${mvTicketImportStatus[d.status]}</td>
+                    </tr>
+                `);
+                    });
+                }
+            }).fail(function () {
+                showErrorModal("Could not connect to the server");
+            });
+        }
+
+        function loadGifts(pageSize, pageNum) {
+            let apiURL = mvHostURLCallApi + "/stg/ticket-export/all";
+            let params = {pageSize: pageSize, pageNum: pageNum, storageId: mvStorageId}
+            $.get(apiURL, params, function (response) {
+                if (response.status === "OK") {
+                    let data = response.data;
+                    let pagination = response.pagination;
+                    updatePaginationUI2(pagination.pageNum, pagination.pageSize, pagination.totalPage, pagination.totalElements);
+
+                    let contentTable = $('#giftTbl');
+                    contentTable.empty();
+                    $.each(data, function (index, d) {
+                        contentTable.append(`
+                    <tr>
+                        <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>
+                        <td><a href="/stg/ticket-export/${d.id}">${d.title}</td>
+                        <td>${d.exporter}</td>
+                        <td>${d.exportTime}</td>
+                        <td>${d.note}</td>
+                        <td>${mvTicketExportStatus[d.status]}</td>
+                    </tr>
+                `);
+                    });
+                }
+            }).fail(function () {
+                showErrorModal("Could not connect to the server");
+            });
+        }
+    </script>
+</body>
+</html>

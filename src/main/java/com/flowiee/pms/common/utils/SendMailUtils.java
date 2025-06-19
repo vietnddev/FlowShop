@@ -1,8 +1,6 @@
 package com.flowiee.pms.common.utils;
 
-import org.apache.log4j.Priority;
 import org.jfree.util.Log;
-
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Map;
@@ -65,7 +63,7 @@ public class SendMailUtils {
             return lvContentBuilder.toString();
         }
         catch (Exception e) {
-            Log.log(Priority.WARN.toInt(), e);
+            Log.error(e);
             return pTemplateContent;
         }
     }

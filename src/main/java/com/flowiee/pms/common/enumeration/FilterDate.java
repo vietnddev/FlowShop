@@ -1,6 +1,6 @@
 package com.flowiee.pms.common.enumeration;
 
-import com.flowiee.pms.exception.BadRequestException;
+import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.utils.CoreUtils;
 import lombok.Getter;
 

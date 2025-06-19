@@ -1,8 +1,8 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.base.CoreStartUp;
+import com.flowiee.pms.common.base.FlwSys;
 import com.flowiee.pms.common.enumeration.ConfigCode;
-import com.flowiee.pms.entity.system.SystemConfig;
+import com.flowiee.pms.modules.system.entity.SystemConfig;
 
 public class SysConfigUtils {
     public static boolean isValid(SystemConfig pSystemConfig) {
@@ -13,7 +13,7 @@ public class SysConfigUtils {
     }
 
     public static boolean isYesOption(ConfigCode pConfigCode) {
-        SystemConfig lvSystemConfig = CoreStartUp.getSystemConfigs().get(pConfigCode);
+        SystemConfig lvSystemConfig = FlwSys.getSystemConfigs().get(pConfigCode);
         return isYesOption(lvSystemConfig);
     }
 

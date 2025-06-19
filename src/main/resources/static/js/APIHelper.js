@@ -18,6 +18,25 @@ function callApiDelete(apiURL, redirectTo) {
     });
 }
 
+function downloadSelectionCategory(element, optionDefault, type) {
+    let endpoint = mvHostURLCallApi + "/category/" + type;
+
+    element.empty();
+    if (optionDefault != null) {
+        element.append(`<option value="">${optionDefault}</option>`);
+    }
+
+    $.get(endpoint, function (response) {
+        if (response.status === "OK") {
+            $.each(response.data, function (index, d) {
+                element.append(`<option value="${d.id}">${d.name}</option>`);
+            });
+        }
+    }).fail(function () {
+        showErrorModal("Could not connect to the server");
+    });
+}
+
 function downloadCategoryForSelection(element, endpoint) {
     $.get(endpoint, function (response) {
         if (response.status === "OK") {

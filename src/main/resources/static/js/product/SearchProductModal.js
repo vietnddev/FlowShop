@@ -2,7 +2,7 @@ let mvProductSearchModalList = [];
 let mvProductSearchModalListSelected = [];
 
 function setupSearchModalInCreateOrderPage() {
-    getListOfProductsOnSearchModal(mvPageSizeDefault, 1);
+    getListOfProductsOnSearchModal(getPageSize(), getPageNum());
     updateTableContentWhenOnClickPagination(getListOfProductsOnSearchModal);
     chooseProductOnSearchModal();
     searchItemsOnModal();
@@ -14,7 +14,7 @@ function setupSearchModalInCreateOrderPage() {
 
 function searchItemsOnModal() {
     $("#btnSearchModal").on("click", function () {
-        getListOfProductsOnSearchModal(mvPageSizeDefault, 1);
+        getListOfProductsOnSearchModal(getPageSize(), getPageNum());
     })
 }
 

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quản lý nhà cung cấp</title>
+    <div th:replace="~{header :: stylesheets}"></div>
+    <style>
+        .table td.vertical-center {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{header :: header}"></div>
+
+    <div th:replace="~{sidebar :: sidebar}"></div>
+
+    <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
+        <section class="content">
+            <div class="container-fluid vertical-center">
+                <div class="row">
+                    <div class="col-12">
+                        <!--Search tool-->
+                        <div th:replace="~{fragments :: searchTool(${configSearchTool})}" id="searchTool"></div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row justify-content-between">
+                                    <div class="col-4" style="display: flex; align-items: center">
+                                        <h3 class="card-title"><strong>DANH SÁCH NHÀ CUNG CẤP</strong></h3>
+                                    </div>
+                                    <div class="col-4 text-right">
+                                        <button type="button" class="btn btn-success" id="btnInsert">Thêm mới</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Tên nhà cung cấp</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Email</th>
+                                            <th>Địa chỉ</th>
+                                            <th>Loại sản phẩm cung cấp</th>
+                                            <th>Ghi chú</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="contentTable"></tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer">
+                                <div th:replace="~{fragments :: pagination}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal create and update supplier -->
+                <div th:replace="~{pages/sales/supplier/fragments/supplier-fragments :: modalInsertAndUpdate}"></div>
+            </div>
+        </section>
+    </div>
+
+    <div th:replace="~{modal_fragments :: confirm_modal}"></div>
+
+    <div th:replace="~{footer :: footer}"></div>
+
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+
+    <div th:replace="~{header :: scripts}"></div>
+
+    <script th:src="@{/js/supplier/LoadSuppliers.js}"></script>
+    <script th:src="@{/js/supplier/CreateAndUpdateSupplier.js}"></script>
+</div>
+<script>
+    let mvSuppliers = {};
+    let mvId;
+    let mvName = $("#nameField");
+    let mvPhoneNumber = $("#phoneNumberField");
+    let mvEmail = $("#emailField");
+    let mvAddress = $("#addressField");
+    let mvProvide = $("#productProvidedField");
+    let mvNote = $("#noteField");
+
+    $(document).ready(function () {
+        loadSuppliers(getPageSize(), getPageNum());
+        updateTableContentWhenOnClickPagination(loadSuppliers);
+        preCreateSupplier();
+        preUpdateSupplier();
+        submitInsertOrUpdate();
+        deleteSupplier();
+    });
+
+    function deleteSupplier() {
+        $(document).on("click", ".btn-delete", function () {
+            let supplier = mvSuppliers[$(this).attr("id")];
+            mvId = supplier.id;
+            $(this).attr("actionType", "delete");
+            $(this).attr("entityName", supplier.name);
+            showConfirmModal($(this), "Thông báo hệ thống", "Bạn chắc chắn muốn xóa nhà cung cấp: " + supplier.name);
+        });
+
+        $('#yesButton').on("click", function () {
+            let apiURL = mvHostURLCallApi + "/supplier/delete/" + mvId;
+            callApiDelete(apiURL);
+        });
+    }
+</script>
+</body>
+</html>

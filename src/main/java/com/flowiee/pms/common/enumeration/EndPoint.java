@@ -19,9 +19,11 @@ public enum EndPoint {
     URL_PRODUCT_VOUCHER("/san-pham/voucher", "SIDEBAR", true),
     URL_PRODUCT_PROMOTION("/promotion", "SIDEBAR", true),
     URL_PRODUCT_COMBO("/product/combo", "SIDEBAR", true),
+
     URL_SALES_LEDGER("/ledger", "SIDEBAR", true),
     URL_SALES_LEDGER_RECEIPT("/ledger/trans/receipt", "SIDEBAR", true),
     URL_SALES_LEDGER_PAYMENT("/ledger/trans/payment", "SIDEBAR", true),
+
     URL_STG_DASHBOARD("/stg", "SIDEBAR", true),
     URL_STG_DOCUMENT("/stg/doc", "SIDEBAR", true),
     URL_STG_MATERIAL("/stg/material", "SIDEBAR", true),
@@ -36,7 +38,9 @@ public enum EndPoint {
 
     URL_STG_MATERIAL_IMPORT("/stg/material/import", "MAIN", true),
     URL_STG_MATERIAL_IMPORT_TEMPLATE( "/stg/material/template", "MAIN", true),
-    URL_STG_MATERIAL_EXPORT("/stg/material/export", "MAIN", true);
+    URL_STG_MATERIAL_EXPORT("/stg/material/export", "MAIN", true),
+
+    URL_MEDIA_DEFAULT_PRODUCT("/media/default/product", "", true);
 
     private final String value;
     private final String type;

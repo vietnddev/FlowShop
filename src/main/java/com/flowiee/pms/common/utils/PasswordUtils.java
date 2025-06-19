@@ -1,7 +1,7 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.base.CoreStartUp;
-import com.flowiee.pms.entity.system.SystemConfig;
+import com.flowiee.pms.common.base.FlwSys;
+import com.flowiee.pms.modules.system.entity.SystemConfig;
 import com.flowiee.pms.common.enumeration.ConfigCode;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -16,7 +16,7 @@ public class PasswordUtils {
     }
 
     public static int getPasswordLength() {
-        SystemConfig pwdLengthCnf = CoreStartUp.getSystemConfigs().get(ConfigCode.passwordLength);
+        SystemConfig pwdLengthCnf = FlwSys.getSystemConfigs().get(ConfigCode.passwordLength);
         if (SysConfigUtils.isValid(pwdLengthCnf)) {
             return pwdLengthCnf.getIntValue();
         }

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-    <property name="LOGS" value="logs" />
-    <property name="DOCKER_LOGS" value="./logs" />
+<configuration debug="false" scan="false">
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <property name="LOGS" value="${LOGS_DIR:-logs}" />
+    <property name="DOCKER_LOGS" value="${DOCKER_LOGS_DIR:-./logs}" />
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <springProperty scope="context" name="application_name" source="spring.application.name"/>
@@ -10,9 +12,9 @@
     <springProfile name="!docker">
         <property name="CUSTOM_KEY_DEFAULT" value="${application_name:-defaultApp}" />
         <property name="CONSOLE_LOG_PATTERN"
-                  value="%clr(%d{MM-dd HH:mm:ss.SSS}){faint} [%X{customKey:-${CUSTOM_KEY_DEFAULT}}] %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%t]){faint} %clr(%logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+                  value="%clr(%d{MM-dd HH:mm:ss.SSS}){faint} [%X{customKey:-${CUSTOM_KEY_DEFAULT}}] %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(-){faint} %clr([%t]){faint} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
         <property name="FILE_LOG_PATTERN"
-                  value="%d{HH:mm:ss.SSS} [%X{customKey:-${CUSTOM_KEY_DEFAULT}}] %p %C{1} [%t]: %m%n"/>
+                  value="%d{HH:mm:ss.SSS} [%X{customKey:-${CUSTOM_KEY_DEFAULT}}] %p [%t]: %m%n"/>
 
         <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
@@ -25,7 +27,6 @@
             <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
                 <Pattern>${FILE_LOG_PATTERN}</Pattern>
             </encoder>
-            <!--Hôm nay là ngày cuối cùng em làm việc tại công ty. Chiều nay em mời mọi người trà chiều để cảm ơn quãng thời gian đã đồng hành cùng nhau nha-->
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
                 <!-- rollover daily and when the file reaches 10 MegaBytes -->
                 <fileNamePattern>${LOGS}/${application_name}-%d{yyyy-MM-dd}.%i.log

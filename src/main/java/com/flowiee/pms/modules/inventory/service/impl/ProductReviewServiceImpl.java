@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.ProductReview;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.modules.inventory.dto.ProductReviewDTO;
@@ -20,7 +21,7 @@ public class ProductReviewServiceImpl extends BaseService<ProductReview, Product
     }
 
     @Override
-    public List<ProductReviewDTO> findAll() {
+    public List<ProductReviewDTO>find(BaseParameter pParam) {
         return convertDTOs(mvEntityRepository.findAll());
     }
 

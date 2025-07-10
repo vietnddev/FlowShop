@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ProductPriceDTO implements Serializable {
-    Product productBase;
-    ProductDetail productVariant;
+    Product productBase;//Change to DTO or remove in next version
+    ProductDetail productVariant;//Change to DTO or remove in next version
     BigDecimal retailPrice;
     BigDecimal retailPriceDiscount;
     BigDecimal wholesalePrice;

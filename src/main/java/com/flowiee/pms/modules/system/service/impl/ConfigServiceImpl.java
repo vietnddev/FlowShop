@@ -3,6 +3,7 @@ package com.flowiee.pms.modules.system.service.impl;
 import com.flowiee.pms.common.base.StartUp;
 import com.flowiee.pms.common.base.FlwSys;
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.system.entity.SystemConfig;
 import com.flowiee.pms.modules.system.entity.SystemLog;
@@ -57,8 +58,8 @@ public class ConfigServiceImpl extends BaseService<SystemConfig, SystemConfigDTO
     }
 
     @Override
-    public List<SystemConfigDTO> findAll() {
-        return super.findAll();
+    public List<SystemConfigDTO>find() {
+        return super.find(new BaseParameter());
     }
 
     @Override
@@ -89,7 +90,7 @@ public class ConfigServiceImpl extends BaseService<SystemConfig, SystemConfigDTO
             throw new AppException(ErrorCode.SYSTEM_BUSY, new Object[]{}, null, getClass(), null);
         }
         mvAppRefreshing = true;
-        LOG.info("Begin refresh app data");
+
         try {
             ShopInfo lvShopInfo = CommonUtils.mvShopInfo != null ? CommonUtils.mvShopInfo : new ShopInfo();
             //Reload system configs
@@ -152,7 +153,7 @@ public class ConfigServiceImpl extends BaseService<SystemConfig, SystemConfigDTO
             throw new AppException("An error occurred while refreshing app configuration", ex);
         } finally {
             mvAppRefreshing = false;
-            LOG.info("Finish refresh app data");
+            LOG.info("Configuration has been successfully refreshed.");
         }
     }
 

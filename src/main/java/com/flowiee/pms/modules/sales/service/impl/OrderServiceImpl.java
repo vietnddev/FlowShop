@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.*;
 import com.flowiee.pms.modules.inventory.service.TicketImportService;
 import com.flowiee.pms.modules.media.entity.FileStorage;
@@ -22,7 +23,6 @@ import com.flowiee.pms.modules.sales.repository.CustomerRepository;
 import com.flowiee.pms.modules.system.repository.ConfigRepository;
 import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.modules.system.service.CategoryService;
-import com.flowiee.pms.modules.staff.service.AccountService;
 import com.flowiee.pms.modules.system.service.SendCustomerNotificationService;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
@@ -97,7 +97,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     private static final int GENERATE_TRACKING_CODE_MAX_RETRIES = 30;
 
     @Override
-    public List<OrderDTO> findAll() {
+    public List<OrderDTO>find() {
         return findAll(-1, -1, null, null, null, null, null, null, null, null, null, null, null, null, null).getContent();
     }
 
@@ -161,7 +161,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         String lvCouponCode = pRequest.getCouponCode();
         LocalDateTime lvOrderTime = getOrderTime(pRequest.getOrderTime());
 
-        OrderCart lvCart = mvCartService.findById(pRequest.getCartId(), true);
+        OrderCart lvCart = mvCartService.findEntById(pRequest.getCartId(), true);
         if (ObjectUtils.isEmpty(lvCart.getListItems())) throw new BadRequestException("At least one product in the order!");
 
         Category lvPaymentMethod = mvCategoryService.findEntById(pRequest.getPaymentMethodId(), true);
@@ -239,7 +239,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
 
         //Save detail items
         List<OrderDetail> lvOrderItemsList = mvOrderItemsService.save(lvCart.getId(), lvOrderSaved.getId(), lvCart.getListItems());
-        BigDecimal totalAmountDiscount = OrderUtils.calTotalAmount_(lvOrderItemsList, lvOrderSaved.getAmountDiscount());
+        BigDecimal totalAmountDiscount = OrderUtils.calAmount(lvOrderItemsList, lvOrderSaved.getAmountDiscount());
         if (totalAmountDiscount.doubleValue() <= 0) {
             throw new BadRequestException("The value of order must greater than zero!");
         }
@@ -250,8 +250,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
             mvCustomerRepository.updateBonusPoint(lvCustomer.getId(), bonusPoints);
         }
 
-        //Remove all of items in cart
-        mvCartItemsService.deleteAllItems(lvCart.getId());
+        mvCartService.markOrderFinished(lvCart.getId());
 
         //Log
         mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_ORD_C, MasterObject.Order, "Thêm mới đơn hàng", lvOrderSaved.getCode());
@@ -424,7 +423,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
             orderTodayQty = ordersToday.size();
         }
         LocalDate currentDate = LocalDate.now();
-        String year = String.valueOf(currentDate.getYear());
+        String year = String.valueOf(currentDate.getYear()).substring(2);
         String month = String.format("%02d", currentDate.getMonthValue());
         String day = String.format("%02d", currentDate.getDayOfMonth());
         return year + month + day + String.format("%03d", orderTodayQty + 1);

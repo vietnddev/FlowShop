@@ -1,7 +1,7 @@
 package com.flowiee.pms.common.base.service;
 
 import com.flowiee.pms.common.base.repository.BaseRepository;
-import com.flowiee.pms.common.utils.DateTimeUtil;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.sales.entity.Customer;
 import com.flowiee.pms.modules.sales.entity.OrderCart;
@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -85,9 +82,9 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
         return convertDTOs(mvEntityRepository.findAllById(pIds));
     }
 
-    public List<D> findAll() {
-        List<E> lvEntities = mvEntityRepository.findAll();
-        return lvEntities.isEmpty() ? List.of() : convertDTOs(lvEntities);
+    public List<D> find(BaseParameter pParam) {
+        Page<E> lvEntities = mvEntityRepository.findAll(getPageable(pParam.getPageNum(), pParam.getPageSize()));
+        return lvEntities.isEmpty() ? List.of() : convertDTOs(lvEntities.getContent());
     }
 
     public D save(D pDto) {

@@ -1,12 +1,15 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.common.utils.OrderUtils;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.modules.sales.dto.CustomerContactDTO;
 import com.flowiee.pms.common.security.UserSession;
+import com.flowiee.pms.modules.sales.model.OrderReq;
 import com.flowiee.pms.modules.sales.service.CustomerContactService;
 import com.flowiee.pms.modules.sales.service.CustomerService;
 import com.flowiee.pms.modules.system.service.ConfigService;
@@ -22,6 +25,7 @@ import com.flowiee.pms.modules.sales.repository.CustomerRepository;
 import com.flowiee.pms.modules.sales.repository.OrderRepository;
 
 import com.flowiee.pms.modules.system.service.SystemLogService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -64,23 +68,34 @@ public class CustomerServiceImpl extends BaseService<Customer, CustomerDTO, Cust
     }
 
     @Override
-    public List<CustomerDTO> findAll() {
-        return this.findAll(-1, -1, null, null, null, null, null, null).getContent();
-    }
-
-    @Override
     public Page<CustomerDTO> findAll(int pageSize, int pageNum, String name, String sex, Date birthday, String phone, String email, String address) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("customerName").ascending());
         Page<Customer> customers = mvEntityRepository.findAll(name, sex, birthday, phone, email, address, pageable);
-        List<CustomerDTO> customerDTOs = CustomerDTO.fromCustomers(customers.getContent());
-        this.setContactDefault(customerDTOs);
+        List<CustomerDTO> customerDTOs = super.convertDTOs(customers.getContent());
+
+        for (CustomerDTO lvDTO : customerDTOs) {
+            List<Order> lvOrders = mvOrderRepository.findByCustomer(lvDTO.getId());
+
+            int lvTotalPurchaseCount = lvOrders.size();
+            LocalDate lvLastOrder = CollectionUtils.isEmpty(lvOrders) ? null : lvOrders.getFirst().getOrderTime().toLocalDate();
+            BigDecimal lvTotalPurchaseAmount = OrderUtils.calAmount(lvOrders);
+            BigDecimal lvOutstandingBalanceAmount = new BigDecimal("0.01");
+
+            lvDTO.setLastOrder(lvLastOrder);
+            lvDTO.setTotalPurchasedCount(lvTotalPurchaseCount);
+            lvDTO.setTotalPurchasedAmount(lvTotalPurchaseAmount);
+            lvDTO.setOutstandingBalanceAmount(lvOutstandingBalanceAmount);
+
+            setContactDefault(lvDTO);
+        }
+
         return new PageImpl<>(customerDTOs, pageable, customerDTOs.size());
     }
 
     @Override
     public List<CustomerDTO> findCustomerNewInMonth() {
         List<CustomerDTO> customerDTOs = CustomerDTO.fromCustomers(mvEntityRepository.findCustomerNewInMonth());
-        this.setContactDefault(customerDTOs);
+        this.setContactDefaults(customerDTOs);
         return customerDTOs;
     }
 
@@ -92,7 +107,7 @@ public class CustomerServiceImpl extends BaseService<Customer, CustomerDTO, Cust
     @Override
     public CustomerDTO findById(Long pId, boolean pThrowException) {
         CustomerDTO lvCustomer = super.findDtoById(pId, pThrowException);
-        this.setContactDefault(List.of(lvCustomer));
+        this.setContactDefaults(List.of(lvCustomer));
         return lvCustomer;
     }
 
@@ -167,7 +182,7 @@ public class CustomerServiceImpl extends BaseService<Customer, CustomerDTO, Cust
     @Transactional
     @Override
     public CustomerDTO update(CustomerDTO pCustomer, Long customerId) {
-        Customer lvCustomer = this.findById(customerId, true);
+        Customer lvCustomer = this.findEntById(customerId, true);
         //lvCustomer.set
         //lvCustomer.set
         //lvCustomer.set
@@ -255,15 +270,19 @@ public class CustomerServiceImpl extends BaseService<Customer, CustomerDTO, Cust
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
 
-    private void setContactDefault(List<CustomerDTO> customerDTOs) {
+    private void setContactDefaults(List<CustomerDTO> customerDTOs) {
         for (CustomerDTO c : customerDTOs) {
-            CustomerContactDTO phoneDefault = mvCustomerContactService.findContactUseDefault(c.getId(), ContactType.P);
-            CustomerContactDTO emailDefault = mvCustomerContactService.findContactUseDefault(c.getId(), ContactType.E);
-            CustomerContactDTO addressDefault = mvCustomerContactService.findContactUseDefault(c.getId(), ContactType.A);
-            c.setPhoneDefault(phoneDefault != null ? phoneDefault.getValue() : "");
-            c.setEmailDefault(emailDefault != null ? emailDefault.getValue() : "");
-            c.setAddressDefault(addressDefault != null ? addressDefault.getValue() : "");
+            setContactDefault(c);
         }
+    }
+
+    private void setContactDefault(CustomerDTO pCustomerDTO) {
+        CustomerContactDTO phoneDefault = mvCustomerContactService.findContactUseDefault(pCustomerDTO.getId(), ContactType.P);
+        CustomerContactDTO emailDefault = mvCustomerContactService.findContactUseDefault(pCustomerDTO.getId(), ContactType.E);
+        CustomerContactDTO addressDefault = mvCustomerContactService.findContactUseDefault(pCustomerDTO.getId(), ContactType.A);
+        pCustomerDTO.setPhoneDefault(phoneDefault != null ? phoneDefault.getValue() : "");
+        pCustomerDTO.setEmailDefault(emailDefault != null ? emailDefault.getValue() : "");
+        pCustomerDTO.setAddressDefault(addressDefault != null ? addressDefault.getValue() : "");
     }
 
     @Override
@@ -295,7 +314,7 @@ public class CustomerServiceImpl extends BaseService<Customer, CustomerDTO, Cust
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         Page<Customer> customers = mvEntityRepository.findVIPCustomers(pageable);
         List<CustomerDTO> customerDTOs = CustomerDTO.fromCustomers(customers.getContent());
-        this.setContactDefault(customerDTOs);
+        this.setContactDefaults(customerDTOs);
 
         return new PageImpl<>(customerDTOs, pageable, customerDTOs.size());
     }
@@ -305,7 +324,7 @@ public class CustomerServiceImpl extends BaseService<Customer, CustomerDTO, Cust
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         Page<Customer> customers = mvEntityRepository.findBlackListCustomers(pageable);
         List<CustomerDTO> customerDTOs = CustomerDTO.fromCustomers(customers.getContent());
-        this.setContactDefault(customerDTOs);
+        this.setContactDefaults(customerDTOs);
 
         return new PageImpl<>(customerDTOs, pageable, customerDTOs.size());
     }

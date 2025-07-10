@@ -4,6 +4,7 @@ import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.system.dto.BranchDTO;
 import com.flowiee.pms.modules.system.service.BranchService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
@@ -31,7 +32,7 @@ public class BranchController extends BaseController {
     @PreAuthorize("@vldModuleSystem.readBranch(true)")
     public AppResponse<List<BranchDTO>> findAllBranches() {
         try {
-            return mvCHelper.success(branchService.findAll());
+            return mvCHelper.success(branchService.find());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "branch"), ex);
         }

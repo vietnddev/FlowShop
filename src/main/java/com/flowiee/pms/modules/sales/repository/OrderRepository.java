@@ -80,7 +80,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
     @Query("from Order where orderStatus in (:orderStatus)")
     List<Order> findByOrderStatus(List<OrderStatus> orderStatus);
 
-    @Query("from Order where customer.id = :customerId")
+    @Query("from Order where customer.id = :customerId order by orderTime desc")
     List<Order> findByCustomer(@Param("customerId") Long customerId);
 
     @Query("from Order where deliverySuccessTime between :fromDate and :toDate")

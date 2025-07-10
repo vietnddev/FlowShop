@@ -48,9 +48,9 @@ public class StorageController extends BaseController {
                                                       @RequestParam(value = "pageNum", required = false) Integer pageNum) {
         try {
             if (pageSize == null || pageNum == null) {
-                return mvCHelper.success(mvStorageService.findAll());
+                return mvCHelper.success(mvStorageService.find(-1, -1).getContent());
             }
-            Page<StorageDTO> storagePage = mvStorageService.findAll(pageSize, pageNum - 1);
+            Page<StorageDTO> storagePage = mvStorageService.find(pageSize, pageNum - 1);
             return mvCHelper.success(storagePage.getContent(), pageNum, pageSize, storagePage.getTotalPages(), storagePage.getTotalElements());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "storage"), ex);

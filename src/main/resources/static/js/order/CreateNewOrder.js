@@ -14,7 +14,7 @@ function createOrder() {
         let paymentMethodId = $('#paymentMethodField').val();
         let orderStatusId = $('#orderStatusField').val();
         let note = $('#noteFieldCart').val();
-        let cartId = mvCartId;
+        let cartId = mvCurrentCartId;
         let receiveName = $('#receiveNameField').val();
         let receivePhoneNumber = $('#receivePhoneNumberField').val();
         let receiveEmail = $('#receiveEmailField').val();

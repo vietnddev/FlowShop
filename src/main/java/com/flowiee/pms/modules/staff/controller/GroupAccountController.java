@@ -36,7 +36,7 @@ public class GroupAccountController extends BaseController {
     @PreAuthorize("@vldModuleSystem.readGroupAccount(true)")
     public AppResponse<List<GroupAccountDTO>> findAll(@RequestParam("pageSize") int pageSize, @RequestParam("pageNum") int pageNum) {
         try {
-            Page<GroupAccountDTO> groupAccounts = groupAccountService.findAll(pageSize, pageNum - 1);
+            Page<GroupAccountDTO> groupAccounts = groupAccountService.find(pageSize, pageNum - 1);
             return mvCHelper.success(groupAccounts.getContent(), pageNum, pageSize, groupAccounts.getTotalPages(), groupAccounts.getTotalElements());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "group account"), ex);

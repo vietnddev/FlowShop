@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.staff.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.staff.entity.GroupAccount;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.utils.ChangeLog;
@@ -30,12 +31,12 @@ public class GroupAccountServiceImpl extends BaseService<GroupAccount, GroupAcco
     }
 
     @Override
-    public List<GroupAccountDTO> findAll() {
-        return this.findAll(-1, -1).getContent();
+    public List<GroupAccountDTO>find(BaseParameter pParam) {
+        return this.find(-1, -1).getContent();
     }
 
     @Override
-    public Page<GroupAccountDTO> findAll(int pageSize, int pageNum) {
+    public Page<GroupAccountDTO> find(int pageSize, int pageNum) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("groupName").ascending());
         Page<GroupAccount> groupAccountPage = mvEntityRepository.findAll(pageable);
         return new PageImpl<>(convertDTOs(groupAccountPage.getContent()), pageable, groupAccountPage.getTotalElements());

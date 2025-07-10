@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.service.ProductDamagedService;
 import com.flowiee.pms.common.enumeration.Pages;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class ProductDamagedControllerView extends BaseController {
     public ModelAndView loadProductPage() {
         setupSearchTool(true, List.of());
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_PRODUCT_DAMAGED.getTemplate());
-        modelAndView.addObject("productDamagedList", productDamagedService.findAll());
+        modelAndView.addObject("productDamagedList", productDamagedService.find());
         return baseView(modelAndView);
     }
 }

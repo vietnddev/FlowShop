@@ -35,7 +35,7 @@ public class MaterialController extends BaseController {
         try {
             if (pageSize == null) pageSize = -1;
             if (pageNum == null) pageNum = 1;
-            Page<MaterialDTO> materials = mvMaterialService.findAll(pageSize, pageNum - 1, null, null, null, null, null, null);
+            Page<MaterialDTO> materials = mvMaterialService.find(pageSize, pageNum - 1, null, null, null, null, null, null);
             return mvCHelper.success(materials.getContent(), pageNum, pageSize, materials.getTotalPages(), materials.getTotalElements());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "material"), ex);

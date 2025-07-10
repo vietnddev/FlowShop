@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.system.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.system.service.BranchService;
 import com.flowiee.pms.common.enumeration.Pages;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +26,7 @@ public class BranchControllerView extends BaseController {
     @PreAuthorize("@vldModuleSystem.readBranch(true)")
     public ModelAndView findAllBranches() {
         ModelAndView modelAndView = new ModelAndView(Pages.SYS_BRANCH.getTemplate());
-        modelAndView.addObject("branches", branchService.findAll());
+        modelAndView.addObject("branches", branchService.find());
         return baseView(modelAndView);
     }
 }

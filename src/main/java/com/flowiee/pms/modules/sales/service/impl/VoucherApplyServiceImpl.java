@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.exception.EntityNotFoundException;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.sales.service.VoucherApplyService;
 import com.flowiee.pms.modules.sales.dto.VoucherApplyDTO;
 import com.flowiee.pms.modules.sales.entity.VoucherApply;
@@ -30,11 +31,6 @@ public class VoucherApplyServiceImpl implements VoucherApplyService {
     @Override
     public List<VoucherApplyDTO> findByProductId(Long productId) {
         return this.extractDataQuery(mvVoucherApplyRepository.findAll(productId));
-    }
-
-    @Override
-    public List<VoucherApply> findAll() {
-        return mvVoucherApplyRepository.findAll();
     }
 
     @Override

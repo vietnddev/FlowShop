@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.ProductCombo;
 import com.flowiee.pms.modules.inventory.entity.ProductComboApply;
 import com.flowiee.pms.common.exception.BadRequestException;
@@ -57,7 +58,7 @@ public class ProductComboServiceImpl extends BaseService<ProductCombo, ProductCo
     }
 
     @Override
-    public List<ProductComboDTO> findAll() {
+    public List<ProductComboDTO>find(BaseParameter pParam) {
         return this.findAll(-1, -1).getContent();
     }
 

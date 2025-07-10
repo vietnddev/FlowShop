@@ -37,15 +37,16 @@ function loadOrders(pageSize, pageNum) {
                 });
 
                 contentTable.append(`
-                    <tr aria-expanded="false">
-                        <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>
-                        <td><a href="/sls/order/${d.id}">${d.code}</a></td>
+                    <tr aria-expanded="false">                        
+                        <td><a href="/sls/order/${d.id}">${(((pageNum - 1) * pageSize + 1) + index)}. ${d.code}</a></td>
                         <td>${d.orderTime}</td>               
                         <td>${d.receiverName}</td>
                         <td>${d.receiverPhone}</td>
                         <td>${formatCurrency(d.totalAmountDiscount)}</td>
                         <td class="text-right">${d.items.length} <i class="fa-solid fa-caret-down ml-1" data-widget="expandable-table"></i></td>
                         <td>${d.salesChannelName}</td>                        
+                        <td>-Paument status-</td>
+                        <td>-Delivery type-</td>
                         <td>${d.orderStatusName}</td>
                         <td><a class="btn btn-sm btn-info btn-print-invoice" href="/sls/order/print-invoice/${d.id}" orderId="${d.id}"><i class="fa-solid fa-print"></i></a></td>
                     </tr>

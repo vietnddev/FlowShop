@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.sales.service.LoyaltyProgramService;
 import com.flowiee.pms.modules.sales.repository.LoyaltyProgramRepository;
 import com.flowiee.pms.modules.sales.repository.LoyaltyRuleRepository;
@@ -36,7 +37,7 @@ public class LoyaltyProgramServiceImpl implements LoyaltyProgramService {
     private final OrderRepository orderRepository;
 
     @Override
-    public List<LoyaltyProgram> findAll() {
+    public List<LoyaltyProgram> find() {
         return loyaltyProgramRepository.findAll();
     }
 
@@ -119,7 +120,7 @@ public class LoyaltyProgramServiceImpl implements LoyaltyProgramService {
         if (lvCustomerOpt.isEmpty())
             throw new ResourceNotFoundException("Customer not found!");
 
-        BigDecimal lvTotalAmount = OrderUtils.calTotalAmount_(pOrder.getListOrderDetail(), pOrder.getAmountDiscount());
+        BigDecimal lvTotalAmount = OrderUtils.calAmount(pOrder.getListOrderDetail(), pOrder.getAmountDiscount());
         BigDecimal lvPoints = getPoints(lvTotalAmount, lvLoyaltyProgram);
         if (lvPoints.doubleValue() <= 0)
             throw new BadRequestException("Points must be greater than zero!");

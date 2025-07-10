@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.constants.JpaHints;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.modules.inventory.dto.*;
 import com.flowiee.pms.modules.inventory.service.*;
@@ -111,7 +112,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     }
 
     @Override
-    public List<ProductVariantDTO> findAll() {
+    public List<ProductVariantDTO>find(BaseParameter pParam) {
         return this.findAll(ProductVariantSearchRequest.builder().checkInAnyCart(false).build()).getContent();
     }
 
@@ -209,6 +210,11 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         mvProductPriceService.assignPriceInfo(lvDto, lvProductPrice);
 
         return lvDto;
+    }
+
+    @Override
+    public ProductDetail findEntById(Long pId, boolean throwException) {
+        return super.findEntById(pId, throwException);
     }
 
     @Transactional

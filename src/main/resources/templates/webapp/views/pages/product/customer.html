@@ -91,13 +91,13 @@
                                             <tr>
                                                 <th>STT</th>
                                                 <th>Tên khách hàng</th>
-                                                <th>Giới tính</th>
-                                                <th>Sinh nhật</th>
-                                                <th>Số điện thoại</th>
+                                                <th>Phone number</th>
                                                 <th>Email</th>
-                                                <th>Địa chỉ</th>
-                                                <th>Current debit amount</th>
-                                                <th>Total purchase</th>
+                                                <th>Address</th>
+                                                <th>Orders</th>
+                                                <th>Total spent</th>
+                                                <th>Debit amount</th>
+                                                <th>Last order</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -206,13 +206,13 @@
                             <tr>
                                 <td class="vertical-center">${(((pageNum - 1) * pageSize + 1) + index)}</td>
                                 <td class="vertical-center"><a href="/customer/${d.id}">${d.customerName}</a></td>
-                                <td class="vertical-center">${sex}</td>
-                                <td class="vertical-center">${d.dateOfBirth}</td>
                                 <td class="vertical-center">${d.phoneDefault}</td>
                                 <td class="vertical-center">${d.emailDefault}</td>
                                 <td class="vertical-center">${d.addressDefault}</td>
-                                <td class="vertical-center">${d.outstandingBalanceAmount}</td>
-                                <td class="vertical-center">${d.totalPurchase}</td>
+                                <td class="vertical-center">${d.totalPurchasedCount}</td>
+                                <td class="vertical-center">${formatUSCurrency(d.totalPurchasedAmount)}</td>
+                                <td class="vertical-center">${formatUSCurrency(d.outstandingBalanceAmount)}</td>
+                                <td class="vertical-center">${d.lastOrder}</td>
                                 <td class="vertical-center">
                                     <button class="btn btn-outline-info btn-sm">
                                         <a href="customer/${d.id}"><i class="fa-solid fa-eye"></i></a>

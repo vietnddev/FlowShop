@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
@@ -38,12 +39,7 @@ public class StorageServiceImpl extends BaseService<Storage, StorageDTO, Storage
     }
 
     @Override
-    public List<StorageDTO> findAll() {
-        return this.findAll(-1, -1).getContent();
-    }
-
-    @Override
-    public Page<StorageDTO> findAll(int pageSize, int pageNum) {
+    public Page<StorageDTO> find(int pageSize, int pageNum) {
         Pageable pageable = getPageable(pageNum, pageSize);
         Page<Storage> storages = mvEntityRepository.findAll(pageable);
         return new PageImpl<>(StorageDTO.convertToDTOs(storages.getContent()), pageable, storages.getTotalElements());

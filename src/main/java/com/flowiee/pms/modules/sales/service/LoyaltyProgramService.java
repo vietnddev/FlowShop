@@ -8,6 +8,8 @@ import com.flowiee.pms.common.base.service.ICurdService;
 import java.util.List;
 
 public interface LoyaltyProgramService extends ICurdService<LoyaltyProgram> {
+    List<LoyaltyProgram> find();
+
     LoyaltyRule findRuleById(Long ruleId, boolean throwException);
 
     List<LoyaltyProgram> getActivePrograms();

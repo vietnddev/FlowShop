@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.sales.service.PromotionApplyService;
 import com.flowiee.pms.modules.sales.entity.PromotionApply;
 import com.flowiee.pms.common.exception.EntityNotFoundException;
@@ -26,11 +27,6 @@ public class PromotionApplyServiceImpl implements PromotionApplyService {
 
     @Override
     public List<PromotionApplyDTO> findAll(Long voucherInfoId , Long productId) {
-        return List.of();
-    }
-
-    @Override
-    public List<PromotionApplyDTO> findAll() {
         return List.of();
     }
 

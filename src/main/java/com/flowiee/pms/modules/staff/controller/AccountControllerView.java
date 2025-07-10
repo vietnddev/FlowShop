@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.staff.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.DataExistsException;
@@ -46,9 +47,9 @@ public class AccountControllerView extends BaseController {
     public ModelAndView findAllAccount() {
         ModelAndView modelAndView = new ModelAndView(Pages.SYS_ACCOUNT.getTemplate());
         modelAndView.addObject("account", new Account());
-        modelAndView.addObject("listAccount", accountService.findAll());
-        modelAndView.addObject("groupAccount", groupAccountService.findAll());
-        modelAndView.addObject("listBranch", branchService.findAll());
+        modelAndView.addObject("listAccount", accountService.find());
+        modelAndView.addObject("groupAccount", groupAccountService.find(-1, -1).getContent());
+        modelAndView.addObject("listBranch", branchService.find());
         return baseView(modelAndView);
     }
 
@@ -60,8 +61,8 @@ public class AccountControllerView extends BaseController {
         ModelAndView modelAndView = new ModelAndView(Pages.SYS_ACCOUNT_DETAIL.getTemplate());
         modelAndView.addObject("listRole", roleOfAccount);
         modelAndView.addObject("accountInfo", AccountDTO.toDTO(account));
-        modelAndView.addObject("groupAccount", groupAccountService.findAll());
-        modelAndView.addObject("listBranch", branchService.findAll());
+        modelAndView.addObject("groupAccount", groupAccountService.find(-1, -1).getContent());
+        modelAndView.addObject("listBranch", branchService.find());
 
         return baseView(modelAndView);
     }

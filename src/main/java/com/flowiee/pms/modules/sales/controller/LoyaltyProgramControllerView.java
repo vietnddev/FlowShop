@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.sales.entity.LoyaltyProgram;
 import com.flowiee.pms.modules.sales.service.LoyaltyProgramService;
 import com.flowiee.pms.common.enumeration.Pages;
@@ -21,7 +22,7 @@ public class LoyaltyProgramControllerView extends BaseController {
     @GetMapping
     @PreAuthorize("@vldModuleSales.readLoyaltyProgram(true)")
     public ModelAndView getPrograms() {
-        List<LoyaltyProgram> loyaltyProgramList = loyaltyProgramService.findAll();
+        List<LoyaltyProgram> loyaltyProgramList = loyaltyProgramService.find();
 
         ModelAndView modelAndView = new ModelAndView(Pages.SLS_LOYALTY_PROGRAM.getTemplate());
         modelAndView.addObject("loyaltyProgramList", loyaltyProgramList);

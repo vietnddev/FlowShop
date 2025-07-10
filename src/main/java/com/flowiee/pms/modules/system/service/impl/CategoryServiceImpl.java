@@ -195,6 +195,11 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
     }
 
     @Override
+    public List<Category> findDeliveryType() {
+        return findSubCategory(CATEGORY.SHIP_METHOD, null, null, -1, -1).getContent();
+    }
+
+    @Override
     public boolean categoryInUse(Long categoryId) {
         Category lvCategoryMdl = super.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("category with id " + categoryId));

@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.modules.inventory.dto.StorageDTO;
 import com.flowiee.pms.modules.inventory.dto.TicketExportDTO;
@@ -70,8 +71,8 @@ public class TicketExportServiceImpl extends BaseService<TicketExport, TicketExp
     }
 
     @Override
-    public List<TicketExportDTO> findAll() {
-        return super.findAll();
+    public List<TicketExportDTO>find(BaseParameter pParam) {
+        return super.find(pParam);
     }
 
     @Override

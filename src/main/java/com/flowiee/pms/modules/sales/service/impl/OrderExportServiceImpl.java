@@ -27,7 +27,7 @@ public class OrderExportServiceImpl extends BaseExportService {
     protected void writeData(Object pCondition) {
         XSSFSheet sheet = mvWorkbook.getSheetAt(0);
 
-        List<OrderDTO> listData = mvOrderReadService.findAll();
+        List<OrderDTO> listData = mvOrderReadService.find();
         for (int i = 0; i < listData.size(); i++) {
             OrderDTO orderDTO = listData.get(i);
             XSSFRow row = sheet.createRow(i + 4);

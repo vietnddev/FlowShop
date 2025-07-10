@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderReadService {
-    List<OrderDTO> findAll();
+    List<OrderDTO> find();
 
     Page<OrderDTO> findAll(int pageSize, int pageNum, String pTxtSearch, Long pOrderId, Long pPaymentMethodId,
                            OrderStatus pOrderStatus, Long pSalesChannelId, Long pSellerId, Long pCustomerId,

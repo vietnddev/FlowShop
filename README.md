@@ -5,7 +5,6 @@
 - Key features
 - Database
 - Tech stack
-- Setup
 
 ----
 
@@ -54,7 +53,7 @@ It helps automate business processes, reduce manual work, and enhance store mana
 
 ## 💾 Database Management
 
-The system currently manages **over 70 entities**, ensuring comprehensive data organization and efficient operations.
+The system currently manages **over 50 entities**, ensuring comprehensive data organization and efficient operations.
 
 ---
 
@@ -63,13 +62,6 @@ The system currently manages **over 70 entities**, ensuring comprehensive data o
 - **Backend**: Java 21, Spring Boot 3.2.2, Maven 3.9.5
 - **Frontend**: JavaScript, Ajax, Bootstrap
 - **Database**: MySQL
-
----
-
-## Setup
-`mvn spring-boot:run`
-
-`mvn clean package`
 
 ---
 
@@ -97,7 +89,7 @@ The system currently manages **over 70 entities**, ensuring comprehensive data o
 <p align="center">
   <img src="https://github.com/user-attachments/assets/934cc6b9-f654-4d80-8b19-43c975d2d80d" alt="Login Page" width="600"/>
   <br>
-  <i>Product Selection Pop-up</strong>
+  <i>Pop-up pick items into cart</strong>
 </p>
 
 <p align="center">

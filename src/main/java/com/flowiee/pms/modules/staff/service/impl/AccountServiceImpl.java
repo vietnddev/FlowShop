@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.staff.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.enumeration.*;
@@ -149,8 +150,8 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
     }
 
     @Override
-    public List<AccountDTO> findAll() {
-        return super.findAll().stream()
+    public List<AccountDTO>find() {
+        return super.find(new BaseParameter()).stream()
                 .peek(a -> {
                     a.setPassword(null);
                     a.setAvatar("/media/default/user");

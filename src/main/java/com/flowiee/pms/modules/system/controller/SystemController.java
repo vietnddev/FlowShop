@@ -42,7 +42,7 @@ public class SystemController extends BaseController {
     @PreAuthorize("@vldModuleSystem.readConfig(true)")
     public AppResponse<List<SystemConfigDTO>> findConfigs() {
         try {
-            return mvCHelper.success(configService.findAll());
+            return mvCHelper.success(configService.find());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "configs"), ex);
         }

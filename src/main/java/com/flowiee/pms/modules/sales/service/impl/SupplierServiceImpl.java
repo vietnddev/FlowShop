@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.sales.entity.Supplier;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.utils.ChangeLog;
@@ -31,7 +32,7 @@ public class SupplierServiceImpl extends BaseService<Supplier, SupplierDTO, Supp
     }
 
     @Override
-    public List<SupplierDTO> findAll() {
+    public List<SupplierDTO> find(BaseParameter pParam) {
         return this.findAll(-1, -1, null).getContent();
     }
 

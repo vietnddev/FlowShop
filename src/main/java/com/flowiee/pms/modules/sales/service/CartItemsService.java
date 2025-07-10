@@ -8,6 +8,8 @@ import com.flowiee.pms.modules.sales.dto.ItemsDTO;
 import java.util.List;
 
 public interface CartItemsService extends ICurdService<ItemsDTO> {
+    Items findEntById(Long pId, boolean throwException);
+
     List<CartItemModel> findAllItemsForSales();
 
     Integer findQuantityOfItemProduct(Long cartId, Long productVariantId);

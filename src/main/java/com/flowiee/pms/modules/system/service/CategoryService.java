@@ -41,6 +41,8 @@ public interface CategoryService {
 
     List<Category> findLedgerPaymentTypes();
 
+    List<Category> findDeliveryType();
+
     boolean categoryInUse(Long categoryId);
 
     Map<CATEGORY, List<Category>> findByType(List<CATEGORY> categoryTypeList);

@@ -9,20 +9,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -59,11 +55,6 @@ public class WebSecurityConfig {
 	}
 
 	@Bean
-	public AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource() {
-		return new WebAuthenticationDetailsSource();
-	}
-
-	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity
 				.csrf(csrf -> csrf.disable())
@@ -82,14 +73,13 @@ public class WebSecurityConfig {
 						.loginProcessingUrl(getAuthEndPoint())
 						.failureUrl(EndPoint.URL_LOGIN.getValue() + "?success=fail")
 						.defaultSuccessUrl("/")
-						//.authenticationDetailsSource(authenticationDetailsSource())
 				)
 				//.addFilterBefore(devAuthBypassFilter, UsernamePasswordAuthenticationFilter.class)
 				.logout(logout -> logout
 						.logoutUrl(EndPoint.URL_LOGOUT.getValue())
 						.logoutSuccessUrl(EndPoint.URL_LOGIN.getValue())
-						//.deleteCookies("JSESSIONID")
-						//.invalidateHttpSession(true)
+						.deleteCookies("JSESSIONID")
+						.invalidateHttpSession(true)
 				)
 				.exceptionHandling(exception -> exception
 						.accessDeniedPage("/error/403")
@@ -104,11 +94,6 @@ public class WebSecurityConfig {
 
 	public static String getAuthEndPoint() {
 		return "/j_spring_security_check";
-	}
-
-	@Bean
-	public SessionRegistry sessionRegistry() {
-		return new SessionRegistryImpl();
 	}
 
 	@Bean

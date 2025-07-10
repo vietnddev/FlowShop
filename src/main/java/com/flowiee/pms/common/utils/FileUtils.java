@@ -10,7 +10,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
-import org.springframework.mock.web.MockMultipartFile;
+//import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -156,16 +156,71 @@ public class FileUtils {
         // Đọc nội dung file thành byte array
         byte[] fileContent = Files.readAllBytes(file.toPath());
         // Tạo MultipartFile
-        return new MockMultipartFile(
-                "file",        // Tên trường trong form
-                file.getName(),      // Tên file gốc
-                contentType,         // Loại nội dung
-                fileContent          // Dữ liệu file
-        );
+//        return new MockMultipartFile(
+//                "file",        // Tên trường trong form
+//                file.getName(),      // Tên file gốc
+//                contentType,         // Loại nội dung
+//                fileContent          // Dữ liệu file
+//        );
+        return new CustomMultipartFile(fileContent, file.getName(), contentType);
     }
 
     public static File getFileUploaded(FileStorage fileModel) {
         Path path = Paths.get(getFileUploadPath() + File.separator + fileModel.getDirectoryPath() + File.separator + fileModel.getStorageName());
         return new File(path.toUri());
+    }
+
+    public static class CustomMultipartFile implements MultipartFile {
+        private final byte[] fileContent;
+        private final String fileName;
+        private final String contentType;
+
+        public CustomMultipartFile(byte[] fileContent, String fileName, String contentType) {
+            this.fileContent = fileContent;
+            this.fileName = fileName;
+            this.contentType = contentType;
+        }
+
+        @Override
+        public String getName() {
+            return "file"; // Tên trường trong form
+        }
+
+        @Override
+        public String getOriginalFilename() {
+            return this.fileName;
+        }
+
+        @Override
+        public String getContentType() {
+            return this.contentType;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return this.fileContent == null || this.fileContent.length == 0;
+        }
+
+        @Override
+        public long getSize() {
+            return this.fileContent.length;
+        }
+
+        @Override
+        public byte[] getBytes() {
+            return this.fileContent;
+        }
+
+        @Override
+        public InputStream getInputStream() {
+            return new ByteArrayInputStream(this.fileContent);
+        }
+
+        @Override
+        public void transferTo(File dest) throws IOException {
+            try (FileOutputStream out = new FileOutputStream(dest)) {
+                out.write(this.fileContent);
+            }
+        }
     }
 }

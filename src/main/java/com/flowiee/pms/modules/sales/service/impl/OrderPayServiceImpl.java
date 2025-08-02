@@ -50,7 +50,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         if (paymentTime == null) paymentTime = LocalDateTime.now();
         orderRepository.updatePaymentStatus(orderId, paymentTime, paymentMethod, paymentAmount, paymentNote);
 
-        BigDecimal lvOrderValue = OrderUtils.calTotalAmount_(lvOrder.getListOrderDetail(), lvOrder.getAmountDiscount());
+        BigDecimal lvOrderValue = OrderUtils.calAmount(lvOrder.getListOrderDetail(), lvOrder.getAmountDiscount());
         if (paymentAmount.compareTo(lvOrderValue) < 0) {
             customerDebtRepository.save(CustomerDebt.builder()
                     .customer(lvOrder.getCustomer())
@@ -63,7 +63,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         }
 
         logger.info("Begin generate receipt issued when completed an order");
-        BigDecimal lvOrderAmount = OrderUtils.calTotalAmount_(lvOrder.getListOrderDetail(), lvOrder.getAmountDiscount());
+        BigDecimal lvOrderAmount = OrderUtils.calAmount(lvOrder.getListOrderDetail(), lvOrder.getAmountDiscount());
         Category groupObject = categoryRepository.findByTypeAndCode(CATEGORY.GROUP_OBJECT.name(), "KH");//Customer
         Category receiptType = categoryRepository.findByTypeAndCode(CATEGORY.RECEIPT_TYPE.name(), "PO");//Payment for order
         LedgerTransactionDTO lvLedgerTransactionDTO = modelMapper.map(LedgerTransaction.builder()

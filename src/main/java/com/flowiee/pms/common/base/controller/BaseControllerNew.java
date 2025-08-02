@@ -2,6 +2,7 @@ package com.flowiee.pms.common.base.controller;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.enumeration.CATEGORY;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
@@ -50,7 +51,7 @@ public abstract class BaseControllerNew<D> {
 
     protected AppResponse<List<D>> handleFindAll() {
         try {
-            return mvCHelper.success(getService().findAll());
+            return mvCHelper.success(getService().find(new BaseParameter()));
         } catch (RuntimeException ex) {
             throw new AppException("Error fetching data", ex);
         }

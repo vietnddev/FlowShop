@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.ProductPrice;
 import com.flowiee.pms.modules.sales.entity.Items;
@@ -51,11 +52,6 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     CartItemsRepository   mvCartItemsRepository;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
-
-    @Override
-    public List<OrderDetail> findAll() {
-        return mvOrderDetailRepository.findAll();
-    }
 
     @Override
     public OrderDetail findById(Long orderDetailId, boolean pThrowException) {

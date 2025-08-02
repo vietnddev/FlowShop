@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.constants.JpaHints;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.dto.ProductPriceDTO;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.inventory.model.ProductSearchRequest;
@@ -82,7 +83,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
     }
 
     @Override
-    public List<ProductDTO> findAll() {
+    public List<ProductDTO>find(BaseParameter pParam) {
         return this.findAll(ProductSearchRequest.builder().build(), false).getContent();
     }
 
@@ -261,6 +262,10 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
 
                     mvProductVariantService.save(lvVariant);
                 }
+            }
+
+            if (pProduct.getAttributes() != null) {
+                //
             }
 
             mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_C, MasterObject.Product, "Thêm mới sản phẩm", lvProductSaved.getProductName());

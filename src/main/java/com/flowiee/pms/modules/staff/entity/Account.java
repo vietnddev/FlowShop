@@ -9,7 +9,6 @@ import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.common.enumeration.AccountStatus;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.system.entity.Branch;
-import com.flowiee.pms.modules.system.entity.ImportHistory;
 import com.flowiee.pms.modules.system.entity.SystemLog;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -113,10 +112,6 @@ public class Account extends BaseEntity implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
 	List<Customer> listCustomer;
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-	List<ImportHistory> listHistoryImportData;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)

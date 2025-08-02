@@ -1,0 +1,46 @@
+.table td, th {
+    vertical-align: middle;
+}
+.modal-dialog.modal-xl {
+    max-width: 1400px; /* Tăng chiều rộng của modal */
+}
+.modal-content {
+    margin: auto; /* Canh giữa modal */
+}
+.modal-dialog {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; /* Đảm bảo modal luôn căn giữa */
+}
+.cart-tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: #6c757d;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    position: relative;
+    margin-right: 2px;
+}
+.cart-tag .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.item-quantity-input {
+    max-width: 85px;
+}
+.item-quantity-input input::-webkit-inner-spin-button,
+.item-quantity-input input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.item-quantity-input input {
+    text-align: center;
+}

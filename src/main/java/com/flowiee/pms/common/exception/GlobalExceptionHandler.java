@@ -120,7 +120,6 @@ public class GlobalExceptionHandler extends BaseController {
     @ExceptionHandler
     public ResponseEntity<AppResponse<?>> exceptionHandler(RuntimeException ex) {
         mvLogger.error(ex.getMessage(), ex);
-        ex.printStackTrace();
 
         BaseException lvBaseException = new BaseException();
         lvBaseException.setMessage(ex.getMessage());
@@ -132,7 +131,6 @@ public class GlobalExceptionHandler extends BaseController {
     @ExceptionHandler
     public ResponseEntity<AppResponse<?>> exceptionHandler(Exception ex) {
         mvLogger.error(ex.getMessage(), ex);
-        ex.printStackTrace();
 
         BaseException lvBaseException = new BaseException();
         lvBaseException.setMessage(ex.getMessage());

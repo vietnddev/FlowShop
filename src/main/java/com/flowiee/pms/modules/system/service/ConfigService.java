@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ConfigService {
-    List<SystemConfigDTO> findAll();
+    List<SystemConfigDTO> find();
 
     Optional<SystemConfig> findById(Long configId);
 

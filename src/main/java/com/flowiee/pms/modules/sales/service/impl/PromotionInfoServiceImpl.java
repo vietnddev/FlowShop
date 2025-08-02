@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.modules.sales.service.PromotionApplyService;
 import com.flowiee.pms.modules.sales.service.PromotionService;
@@ -39,12 +40,6 @@ public class PromotionInfoServiceImpl implements PromotionService {
     ProductInfoService      mvProductInfoService;
     PromotionApplyService mvPromotionApplyService;
     PromotionInfoRepository mvPromotionInfoRepository;
-
-    @Override
-    public List<PromotionInfoDTO> findAll() {
-        Page<PromotionInfoDTO> promotionInfos = this.findAll(-1, -1, null, null, null, null);
-        return promotionInfos.getContent();
-    }
 
     @Override
     public Page<PromotionInfoDTO> findAll(int pageSize, int pageNum, String pTitle, LocalDateTime pStartTime, LocalDateTime pEndTime, String pStatus) {

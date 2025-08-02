@@ -25,7 +25,7 @@ public class BranchControllerView extends BaseController {
     @PreAuthorize("@vldModuleSystem.readBranch(true)")
     public ModelAndView findAllBranches() {
         ModelAndView modelAndView = new ModelAndView(Pages.SYS_BRANCH.getTemplate());
-        modelAndView.addObject("branches", branchService.findAll());
+        modelAndView.addObject("branches", branchService.find());
         return baseView(modelAndView);
     }
 }

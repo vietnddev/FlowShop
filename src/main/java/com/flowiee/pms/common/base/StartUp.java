@@ -54,12 +54,10 @@ import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.transaction.annotation.Transactional;
 
 @Configuration
@@ -75,9 +73,7 @@ public class StartUp {
 	private final GroupAccountRepository mvGroupAccountRepository;
 	private final ConfigService mvConfigService;
 	private final TemplateSendEmail      mvTemplateSendEmail;
-	private final Environment            mvEnvironment;
 	private final ScheduleRepository mvScheduleRepository;
-	private final SessionRegistry 		 mvSessionRegistry;
 
 	public static LocalDateTime     START_APP_TIME;
 	public static String            mvResourceUploadPath      = null;
@@ -112,16 +108,12 @@ public class StartUp {
     @Bean
     CommandLineRunner init() {
     	return args -> {
-			String[] lvActiveProfiles = mvEnvironment.getActiveProfiles();
-			logger.info("Running in {} environment", lvActiveProfiles[0].toUpperCase());
-
     		initConfig();
 			initData();
 			configReport();
             configEndPoint();
 
             mvConfigService.refreshApp();
-			logger.info("System configuration loading finished");
 
 			List<TemplateSendEmail.Template> lvGeneralMailTemplates = mvTemplateSendEmail.getGeneralMailTemplates();
 			lvGeneralMailTemplates.forEach(lvTemplate -> {
@@ -145,9 +137,9 @@ public class StartUp {
 				lvTemplate.setTemplateContent(lvTemplateContent.toString());
 				FlwSys.getEmailTemplateConfigs().put(lvNotificationType, lvTemplate);
 			});
-			logger.info("Email template loading finished");
+			logger.info("Email template has been loaded.");
 
-			expireAllSessions();
+			//expireAllSessions();
 
 			START_APP_TIME = LocalDateTime.now();
         };
@@ -160,7 +152,7 @@ public class StartUp {
 		try {
 			ipAddress = InetAddress.getLocalHost().getHostAddress();
 		} catch (UnknownHostException e) {
-			Log.info("Can't get local host address");
+			Log.info("Couldn't get local host address");
 		}
 		CommonUtils.mvServerInfo = new ServerInfo(ipAddress, serverPort);
 		logger.info("Server is running on IP: " + ipAddress + ", Port: " + serverPort);
@@ -409,17 +401,6 @@ public class StartUp {
 
 	private String getValue(XSSFRow pRow, int pIndex) {
     	return CoreUtils.trim(pRow.getCell(pIndex).toString());
-	}
-
-	public void expireAllSessions() {
-    	try {
-			for (Object principal : mvSessionRegistry.getAllPrincipals()) {
-				List<SessionInformation> sessions = mvSessionRegistry.getAllSessions(principal, false);
-				for (SessionInformation session : sessions) {
-					session.expireNow();
-				}
-			}
-		} catch (Exception e) {}
 	}
 
 //	private final List<BaseScheduleStartUp> schedules;

@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.modules.inventory.entity.TicketImport;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
+import com.flowiee.pms.modules.inventory.model.ProductVariantSearchRequest;
 import com.flowiee.pms.modules.sales.dto.SupplierDTO;
 import com.flowiee.pms.modules.inventory.service.MaterialService;
 import com.flowiee.pms.modules.inventory.service.ProductVariantService;
@@ -36,7 +37,7 @@ public class TicketImportControllerView extends BaseController {
     @PreAuthorize("@vldModuleSales.importGoods(true)")
     public ModelAndView viewTickets() {
         ModelAndView modelAndView = new ModelAndView(Pages.STG_TICKET_IMPORT.getTemplate());
-        modelAndView.addObject("listStorages", mvStorageService.findAll());
+        modelAndView.addObject("listStorages", mvStorageService.find(-1, -1).getContent());
         return baseView(modelAndView);
     }
 
@@ -56,10 +57,10 @@ public class TicketImportControllerView extends BaseController {
         ModelAndView modelAndView = new ModelAndView(Pages.STG_TICKET_IMPORT_DETAIL.getTemplate());
         modelAndView.addObject("ticketImportId", ticketImportId);
         modelAndView.addObject("ticketImportDetail", ticketImport);
-        modelAndView.addObject("listProductVariant", mvProductVariantService.findAll());
-        modelAndView.addObject("listMaterial", mvMaterialService.findAll());
+        modelAndView.addObject("listProductVariant", mvProductVariantService.findAll(ProductVariantSearchRequest.builder().build()));
+        modelAndView.addObject("listMaterial", mvMaterialService.find(-1, -1, null, null, null, null, null, null).getContent());
         modelAndView.addObject("listSupplier", suppliers);
-        modelAndView.addObject("listStorage", mvStorageService.findAll());
+        modelAndView.addObject("listStorage", mvStorageService.find(-1, -1));
         return baseView(modelAndView);
     }
 
@@ -67,7 +68,7 @@ public class TicketImportControllerView extends BaseController {
     @GetMapping("/search")
     @PreAuthorize("@vldModuleSales.importGoods(true)")
     public void search() {
-        List<TicketImport> data = mvTicketImportService.findAll();
+        List<TicketImport> data = mvTicketImportService.findAll(-1, -1, null, null, null, null, null, null).getContent();
         if (data != null) {
             for (TicketImport o : data) {
                 System.out.println(o.toString());

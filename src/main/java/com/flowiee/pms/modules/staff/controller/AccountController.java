@@ -37,7 +37,7 @@ public class AccountController extends BaseController {
     @PreAuthorize("@vldModuleSystem.readAccount(true)")
     public AppResponse<List<AccountDTO>> findAllAccounts() {
         try {
-            return mvCHelper.success(accountService.findAll());
+            return mvCHelper.success(accountService.find());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "account"), ex);
         }

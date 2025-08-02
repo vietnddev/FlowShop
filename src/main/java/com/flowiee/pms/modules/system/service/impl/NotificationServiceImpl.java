@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.system.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.system.entity.Notification;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.modules.system.dto.NotificationDTO;
@@ -22,8 +23,8 @@ public class NotificationServiceImpl extends BaseService<Notification, Notificat
     private final Logger LOG = LoggerFactory.getLogger(getClass());
 
     @Override
-    public List<NotificationDTO> findAll() {
-        return super.findAll();
+    public List<NotificationDTO>find() {
+        return super.find(new BaseParameter());
     }
 
     @Override

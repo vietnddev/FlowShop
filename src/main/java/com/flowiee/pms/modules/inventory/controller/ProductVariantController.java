@@ -3,6 +3,8 @@ package com.flowiee.pms.modules.inventory.controller;
 import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.constants.Constants;
+import com.flowiee.pms.modules.inventory.dto.ProductPriceDTO;
+import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.ProductHistory;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
@@ -114,20 +116,12 @@ public class ProductVariantController extends BaseController {
     }
 
     @Operation(summary = "Update price")
-    @PutMapping(value = "/variant/price/update/{productVariantId}")
+    @PutMapping(value = "/variant/{variantId}/price/update")
     @PreAuthorize("@vldModuleProduct.priceManagement(true)")
-    public AppResponse<String> updatePrice(@PathVariable("productVariantId") Long productVariantId,
-                                           @RequestParam(value = "originalPrice", required = false) BigDecimal originalPrice,
-                                           @RequestParam(value = "discountPrice", required = false) BigDecimal discountPrice) {
-        try {
-            if (mvProductVariantService.findById(productVariantId, true) == null) {
-                throw new BadRequestException();
-            }
-            //return mvCHelper.success(mvProductPriceService.updatePrice(productVariantId, originalPrice, discountPrice));
-            return mvCHelper.success("This endpoint doesn't support!");
-        } catch (RuntimeException ex) {
-            throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "price"), ex);
-        }
+    public AppResponse<ProductPriceDTO> updatePrice(@PathVariable("variantId") Long productVariantId,
+                                           @RequestBody ProductPriceDTO pPrice) {
+        ProductDetail lvProductVariant = mvProductVariantService.findEntById(productVariantId, true);
+        return mvCHelper.success(mvProductPriceService.updatePrice(lvProductVariant, pPrice));
     }
 
     @Operation(summary = "Check product variant already exists")

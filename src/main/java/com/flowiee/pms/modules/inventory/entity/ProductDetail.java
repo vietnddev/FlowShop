@@ -188,7 +188,7 @@ public class ProductDetail extends BaseEntity implements Serializable {
     }
 
     public int getAvailableSalesQty() {
-        return storageQty - defectiveQty;
+        return storageQty == null ? 0 : storageQty - defectiveQty;
     }
 
     public boolean isExpiredDate() {

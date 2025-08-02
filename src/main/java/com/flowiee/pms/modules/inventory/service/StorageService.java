@@ -7,7 +7,7 @@ import com.flowiee.pms.modules.inventory.dto.StorageDTO;
 import org.springframework.data.domain.Page;
 
 public interface StorageService extends ICurdService<StorageDTO> {
-    Page<StorageDTO> findAll(int pageSize, int pageNum);
+    Page<StorageDTO> find(int pageSize, int pageNum);
 
     Page<StorageItems> findStorageItems(int pageSize, int pageNum, Long storageId, String searchText);
 

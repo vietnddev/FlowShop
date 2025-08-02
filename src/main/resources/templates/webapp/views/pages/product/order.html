@@ -31,7 +31,9 @@
                             <div class="card">
                                 <div class="card-header">
                                     <div class="row justify-content-between">
-                                        <div class="col-4" style="display: flex; align-items: center"></div>
+                                        <div class="col-4" style="display: flex; align-items: center">
+                                            <strong>ORDERS</strong>
+                                        </div>
                                         <div class="col-6 text-right">
                                             <a th:href="@{/api/v1/sls/order/export}" class="btn btn-info btn-sm">
                                                 <i class="fa-solid fa-cloud-arrow-down mr-2"></i>Xuất dữ liệu
@@ -39,20 +41,21 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-body align-items-center p-0">
-                                    <table class="table table-bordered table-hover align-items-center">
+                                <div class="card-body table-responsive p-0" style="height: 500px">
+                                    <table class="table table-head-fixed text-nowrap">
                                         <thead class="align-self-center">
                                             <tr class="align-self-center">
-                                                <th>STT</th>
-                                                <th>Mã đơn</th>
-                                                <th>Thời gian</th>
-                                                <th>Tên khách</th>
+                                                <th>No.</th>
+                                                <th>Time</th>
+                                                <th>Customer</th>
                                                 <th>Phone</th>
-                                                <th>Số tiền</th>
+                                                <th>Total</th>
                                                 <th>Items</th>
-                                                <th>Kênh bán</th>
-                                                <th>Trạng thái</th>
-                                                <th>Thao tác</th>
+                                                <th>Channel</th>
+                                                <th>Payment status</th>
+                                                <th>Delivery type</th>
+                                                <th>Status</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody id="contentTable"></tbody>

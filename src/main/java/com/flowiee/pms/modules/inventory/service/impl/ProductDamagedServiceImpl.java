@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.ProductDamaged;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.media.entity.FileStorage;
@@ -38,8 +39,8 @@ public class ProductDamagedServiceImpl extends BaseService<ProductDamaged, Produ
     }
 
     @Override
-    public List<ProductDamagedDTO> findAll() {
-        return super.findAll();
+    public List<ProductDamagedDTO>find() {
+        return super.find(new BaseParameter());
     }
 
     @Override

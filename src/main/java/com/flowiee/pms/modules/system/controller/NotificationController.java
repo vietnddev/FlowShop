@@ -4,6 +4,7 @@ import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.system.dto.NotificationDTO;
 import com.flowiee.pms.modules.system.service.NotificationService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
@@ -30,7 +31,7 @@ public class NotificationController extends BaseController {
     public AppResponse<List<NotificationDTO>> findAll(@RequestParam(value = "pageSize", required = false) Integer pageSize,
                                                    @RequestParam(value = "pageNum", required = false) Integer pageNum) {
         try {
-            return mvCHelper.success(notificationService.findAll());
+            return mvCHelper.success(notificationService.find());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "notification"), ex);
         }

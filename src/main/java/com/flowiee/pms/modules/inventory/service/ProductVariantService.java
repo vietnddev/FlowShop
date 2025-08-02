@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.service;
 
+import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.model.ProductVariantSearchRequest;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantTempDTO;
 import com.flowiee.pms.common.base.service.ICurdService;
@@ -20,4 +21,6 @@ public interface ProductVariantService extends ICurdService<ProductVariantDTO> {
     void updateLowStockThreshold(Long productId, int threshold);
 
     void updateStockQuantity(Long pProductVariantId, Integer pQuantity, String pUpdateType);
+
+    ProductDetail findEntById(Long pVariantId, boolean pThrowException);
 }

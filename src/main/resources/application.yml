@@ -15,7 +15,7 @@ spring:
   application:
     name: sms
   main:
-    allow-circular-references: true
+    allow-circular-references: false
     lazy-initialization: true
   resources:
     static-locations:
@@ -35,11 +35,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-      temp:
-        use_jdbc_metadata_defaults: false
-      jdbc:
-        lob.non_contextual_creation: true
-      generate_statistics: false
+#      temp:
+#        use_jdbc_metadata_defaults: false
+#      jdbc:
+#        lob.non_contextual_creation: true
+#      generate_statistics: false
       hbm2ddl.auto: none
 #    naming:
 #      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
@@ -52,10 +52,10 @@ spring:
           statement_inspector: com.flowiee.pms.common.config.CustomHibernateInterceptor
         enhancer:
           enableLazyInitialization: true
-        default_batch_fetch_size: 20
-        transaction:
-          coordinator_class: jdbc
-    #open-in-view: false
+#        default_batch_fetch_size: 20
+#        transaction:
+#          coordinator_class: jdbc
+#    open-in-view: false
   # File's size request
   servlet:
     multipart:

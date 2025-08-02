@@ -71,7 +71,9 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
 
     @Transactional
     @Override
-    public String updatePrice(ProductDetail pProductVariant, ProductPriceDTO pRequestPrice) {
+    public ProductPriceDTO updatePrice(ProductDetail pProductVariant, ProductPriceDTO pRequestPrice) {
+        ProductPriceDTO lvPriceUpdated = new ProductPriceDTO();
+
         List<ProductPrice> lvCurrentPrices = mvEntityRepository.findPresentPrices(pProductVariant.getId());
         if (CollectionUtils.isNotEmpty(lvCurrentPrices)) {
             for (ProductPrice lvCPrice : lvCurrentPrices) {
@@ -82,8 +84,12 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
                     this.save(pProductVariant, pRequestPrice);
                 }
             }
+            lvPriceUpdated = new ProductPriceDTO();
+            lvPriceUpdated.setRetailPrice(pRequestPrice.getRetailPrice());
+            lvPriceUpdated.setCostPrice(pRequestPrice.getCostPrice());
+            lvPriceUpdated.setLastUpdatedAt(LocalDateTime.now());
         } else {
-            this.save(pProductVariant, pRequestPrice);
+            lvPriceUpdated = extractPrice(this.save(pProductVariant, pRequestPrice));
         }
 
 
@@ -101,7 +107,7 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
         //price.setRetailPrice(newPrice);
         //priceRepo.save(price);
 
-        return "OK";
+        return lvPriceUpdated;
     }
 
     @Override
@@ -130,30 +136,34 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
     public ProductVariantDTO assignPriceInfo(ProductVariantDTO pDto, List<ProductPrice> pProductPrice) {
         if (pDto != null) {
             if (pProductPrice != null) {
-                ProductPriceDTO lvPriceDto = new ProductPriceDTO();
-                for (ProductPrice lvPrice : pProductPrice)
-                {
-                    PriceType lvType = lvPrice.getPriceType();
-                    BigDecimal lvValue = lvPrice.getPriceValue();
-                    LocalDateTime lvLastUpdated = lvPrice.getLastUpdatedAt();
-
-                    if (PriceType.RTL.equals(lvType)) {
-                        lvPriceDto.setRetailPrice(lvValue);
-                        lvPriceDto.setLastUpdatedAt(lvLastUpdated);
-                    } else if (PriceType.WHO.equals(lvType)) {
-                        lvPriceDto.setWholesalePrice(lvValue);
-                        lvPriceDto.setLastUpdatedAt(lvLastUpdated);
-                    } else if (PriceType.CSP.equals(lvType)) {
-                        lvPriceDto.setCostPrice(lvValue);
-                        lvPriceDto.setLastUpdatedAt(lvLastUpdated);
-                    }
-                }
-                pDto.setPrice(lvPriceDto);
+                pDto.setPrice(extractPrice(pProductPrice));
             } else {
                 pDto.setPrice(new ProductPriceDTO());
             }
         }
         return pDto;
+    }
+
+    private ProductPriceDTO extractPrice(List<ProductPrice> pProductPrices) {
+        ProductPriceDTO lvPriceDto = new ProductPriceDTO();
+        for (ProductPrice lvPrice : pProductPrices)
+        {
+            PriceType lvType = lvPrice.getPriceType();
+            BigDecimal lvValue = lvPrice.getPriceValue();
+            LocalDateTime lvLastUpdated = lvPrice.getLastUpdatedAt();
+
+            if (PriceType.RTL.equals(lvType)) {
+                lvPriceDto.setRetailPrice(lvValue);
+                lvPriceDto.setLastUpdatedAt(lvLastUpdated);
+            } else if (PriceType.WHO.equals(lvType)) {
+                lvPriceDto.setWholesalePrice(lvValue);
+                lvPriceDto.setLastUpdatedAt(lvLastUpdated);
+            } else if (PriceType.CSP.equals(lvType)) {
+                lvPriceDto.setCostPrice(lvValue);
+                lvPriceDto.setLastUpdatedAt(lvLastUpdated);
+            }
+        }
+        return lvPriceDto;
     }
 
     private boolean isPriceChanged(ProductPrice pCPrice, ProductPriceDTO pRPrice) {

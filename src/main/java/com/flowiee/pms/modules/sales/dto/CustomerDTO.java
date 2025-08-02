@@ -1,8 +1,14 @@
 package com.flowiee.pms.modules.sales.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.flowiee.pms.common.base.dto.BaseDTO;
 import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.modules.sales.entity.Customer;
-import lombok.*;
+import com.flowiee.pms.modules.sales.entity.*;
+import com.flowiee.pms.modules.system.dto.CategoryDTO;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serial;
@@ -16,18 +22,39 @@ import java.util.List;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CustomerDTO extends Customer implements Serializable {
+public class CustomerDTO extends BaseDTO implements Serializable {
 	@Serial
 	static final long serialVersionUID = 1L;
-	
+
+    String code;
+    String customerName;
+
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    LocalDate dateOfBirth;
+
+    String gender;
+    String maritalStatus;
+    String referralSource;
+    Boolean isBlackList;
+    String blackListReason;
+    Integer bonusPoints = 0;
+    Boolean hasOutstandingBalance = false;
+    BigDecimal outstandingBalanceAmount = BigDecimal.ZERO;
+    Boolean isVIP = false;
+    CategoryDTO groupCustomer;
+
 	String phoneDefault;
     String emailDefault;
     String addressDefault;
     BigDecimal orderAvgValue;
     String customerGroup;
     String profilePictureUrl;
-    LocalDate lastPurchaseDate;
-    BigDecimal totalPurchase;
+    LocalDate lastOrder;
+    BigDecimal totalPurchasedAmount;
+    Integer totalPurchasedCount;
+
+    //List<OrderDTO> listOrder;
+    List<CustomerContactDTO> listCustomerContact;
 
     public static CustomerDTO fromCustomer(Customer customer) {
         CustomerDTO dto = new CustomerDTO();
@@ -43,12 +70,12 @@ public class CustomerDTO extends Customer implements Serializable {
         dto.setBonusPoints(customer.getBonusPoints());
         dto.setHasOutstandingBalance(customer.getHasOutstandingBalance());
         dto.setOutstandingBalanceAmount(CoreUtils.coalesce(customer.getOutstandingBalanceAmount()));
-        dto.setListOrder(customer.getListOrder());
-        dto.setListProductReviews(customer.getListProductReviews());
-        dto.setListCustomerContact(customer.getListCustomerContact());
-        dto.setLoyaltyTransactionList(customer.getLoyaltyTransactionList());
-        dto.setTotalPurchase(BigDecimal.ZERO);
-        mappingBaseAudit(dto, customer);
+        //dto.setListOrder(customer.getListOrder());
+        //dto.setListProductReviews(customer.getListProductReviews());
+        //dto.setListCustomerContact(customer.getListCustomerContact());
+        //dto.setLoyaltyTransactionList(customer.getLoyaltyTransactionList());
+        dto.setTotalPurchasedAmount(BigDecimal.ZERO);
+        //mappingBaseAudit(dto, customer);
 
         return dto;
     }

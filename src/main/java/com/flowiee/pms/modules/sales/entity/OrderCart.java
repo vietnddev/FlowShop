@@ -19,7 +19,10 @@ import java.util.List;
 public class OrderCart extends BaseEntity implements Serializable {
 	@Serial
 	static final long serialVersionUID = 1L;
-	
+
+	@Column(name = "is_finish")
+	Boolean isFinish;
+
 	@OneToMany(mappedBy = "orderCart", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<Items> listItems;
 

@@ -81,7 +81,7 @@ public class DashboardServiceImpl implements DashboardService {
                                     "GROUP BY s.ID, s.VARIANT_NAME " +
                                     "ORDER BY total DESC) t " +
                                     "LIMIT 10";
-        logger.info("[getProductsTopSell() - SQL findData]: ");
+        //logger.info("[getProductsTopSell() - SQL findData]: ");
         Query productsTopSellSQLQuery = mvEntityManager.createNativeQuery(productsTopSellSQL.toLowerCase());
         List<Object[]> productsTopSellResultList = productsTopSellSQLQuery.getResultList();
         LinkedHashMap<String, Integer> productsTopSell = new LinkedHashMap<>();
@@ -123,7 +123,7 @@ public class DashboardServiceImpl implements DashboardService {
                 "    m.month " +
                 "ORDER BY " +
                 "    m.month";
-        logger.info("[getRevenueMonthOfYearSQL() - SQL findData]: ");
+        //logger.info("[getRevenueMonthOfYearSQL() - SQL findData]: ");
         Query revenueMonthOfYearSQLQuery = mvEntityManager.createNativeQuery(revenueMonthOfYearSQL.toLowerCase());
         revenueMonthOfYearSQLQuery.setParameter(1, currentYear);
         List<Object[]> revenueMonthOfYearSQLResultList = revenueMonthOfYearSQLQuery.getResultList();
@@ -176,7 +176,7 @@ public class DashboardServiceImpl implements DashboardService {
                                           "LEFT JOIN ORDERS o ON c.ID = o.CHANNEL " +
                                           "LEFT JOIN ORDER_DETAIL d ON o.ID = d.ORDER_ID " +
                                           "GROUP BY c.NAME, c.COLOR";
-        logger.info("[getRevenueBySalesChannel() - SQL findData]: ");
+        //logger.info("[getRevenueBySalesChannel() - SQL findData]: ");
         Query revenueBySalesChannelQuery = mvEntityManager.createNativeQuery(revenueBySalesChannelSQL.toLowerCase());
         List<Object[]> revenueBySalesChannelResultList = revenueBySalesChannelQuery.getResultList();
         LinkedHashMap<String, Float> revenueSalesChannel = new LinkedHashMap<>();

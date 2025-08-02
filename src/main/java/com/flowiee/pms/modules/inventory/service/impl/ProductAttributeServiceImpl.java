@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.ProductAttribute;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.utils.ChangeLog;
@@ -34,7 +35,7 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
     }
 
     @Override
-    public List<ProductAttributeDTO> findAll() {
+    public List<ProductAttributeDTO>find(BaseParameter pParam) {
         return this.findAll(-1, -1, null).getContent();
     }
 

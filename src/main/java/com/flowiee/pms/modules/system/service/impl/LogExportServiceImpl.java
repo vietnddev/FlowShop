@@ -30,7 +30,7 @@ public class LogExportServiceImpl extends BaseExportService {
     protected void writeData(Object pCondition) {
         XSSFSheet sheet = mvWorkbook.getSheetAt(0);
 
-        List<SystemLog> listData = mvSystemLogService.findAll(-1, -1).getContent();
+        List<SystemLog> listData = mvSystemLogService.findAll(Integer.MAX_VALUE, 0).getContent();
         for (int i = 0; i < listData.size(); i++) {
             SystemLog systemLog = listData.get(i);
 

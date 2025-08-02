@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.enumeration.*;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.sales.entity.CustomerContact;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.DataInUseException;
@@ -27,8 +28,8 @@ public class CustomerContactServiceImpl extends BaseService<CustomerContact, Cus
     }
 
     @Override
-    public List<CustomerContactDTO> findAll() {
-        return super.findAll();
+    public List<CustomerContactDTO>find(BaseParameter pParam) {
+        return super.find(pParam);
     }
 
     @Override

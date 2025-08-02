@@ -11,10 +11,8 @@ import com.flowiee.pms.modules.system.service.CategoryService;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.common.exception.*;
 import com.flowiee.pms.modules.system.dto.CategoryDTO;
-import com.flowiee.pms.modules.sales.repository.OrderRepository;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.*;
-import com.flowiee.pms.modules.system.repository.CategoryHistoryRepository;
 import com.flowiee.pms.modules.system.repository.CategoryRepository;
 
 import com.flowiee.pms.modules.system.service.SystemLogService;
@@ -30,21 +28,17 @@ import java.util.*;
 
 @Service
 public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, CategoryRepository> implements CategoryService {
-    private Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     private final CategoryRepository mvCategoryRepository;
     private final CategoryHistoryService mvCategoryHistoryService;
-    private final CategoryHistoryRepository mvCategoryHistoryRepository;
-    private final OrderRepository mvOrderRepository;
     private final SystemLogService mvSystemLogService;
     private final ModelMapper mvModelMapper;
 
-    public CategoryServiceImpl(CategoryRepository pEntityRepository, CategoryRepository mvCategoryRepository, CategoryHistoryService mvCategoryHistoryService, CategoryHistoryRepository mvCategoryHistoryRepository, OrderRepository mvOrderRepository, SystemLogService mvSystemLogService, ModelMapper mvModelMapper) {
+    public CategoryServiceImpl(CategoryRepository pEntityRepository, CategoryRepository mvCategoryRepository, CategoryHistoryService mvCategoryHistoryService, SystemLogService mvSystemLogService, ModelMapper mvModelMapper) {
         super(Category.class, CategoryDTO.class, pEntityRepository);
         this.mvCategoryRepository = mvCategoryRepository;
         this.mvCategoryHistoryService = mvCategoryHistoryService;
-        this.mvCategoryHistoryRepository = mvCategoryHistoryRepository;
-        this.mvOrderRepository = mvOrderRepository;
         this.mvSystemLogService = mvSystemLogService;
         this.mvModelMapper = mvModelMapper;
     }
@@ -106,7 +100,6 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
             throw new DataInUseException(ErrorCode.ERROR_DATA_LOCKED.getDescription());
         }
 
-        //mvCategoryHistoryRepository.deleteAllByCategory(categoryId);
         mvEntityRepository.deleteById(categoryId);
 
         mvSystemLogService.writeLogDelete(MODULE.CATEGORY, ACTION.CTG_D, MasterObject.Category, "Xóa danh mục " + lvCurrentCategory.getType(), lvCurrentCategory.getName());
@@ -150,21 +143,6 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
     }
 
     @Override
-    public List<Category> findUnits() {
-        return findSubCategory(CATEGORY.UNIT, null, null, -1, -1).getContent();
-    }
-
-    @Override
-    public List<Category> findColors() {
-        return findSubCategory(CATEGORY.COLOR, null, null, -1, -1).getContent();
-    }
-
-    @Override
-    public List<Category> findSizes() {
-        return findSubCategory(CATEGORY.SIZE, null, null, -1, -1).getContent();
-    }
-
-    @Override
     public List<Category> findSalesChannels() {
         return findSubCategory(CATEGORY.SALES_CHANNEL, null, null, -1, -1).getContent();
     }
@@ -192,6 +170,11 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
     @Override
     public List<Category> findLedgerPaymentTypes() {
         return findSubCategory(CATEGORY.PAYMENT_TYPE, null, null, -1, -1).getContent();
+    }
+
+    @Override
+    public List<Category> findDeliveryType() {
+        return findSubCategory(CATEGORY.SHIP_METHOD, null, null, -1, -1).getContent();
     }
 
     @Override

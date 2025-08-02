@@ -212,19 +212,21 @@
                                         <div class="row">
                                             <div class="col-4">
                                                 <div class="row" style="height: 150px">
-                                                    <div class="col-12"><label class="mr-1">Thời gian thanh toán:</label><span id="paymentTimeField">[[${orderDetail.paymentTime}]]</span></div>
-                                                    <div class="col-12"><label class="mr-1">Hình thức thanh toán:</label> [[${orderDetail.payMethodName}]]</div>
+                                                    <div class="col-12"><label class="mr-1">Thời gian thanh toán:</label><span id="paymentTimeField" th:if="${orderDetail.paymentTime != null}">[[${orderDetail.paymentTime}]]</span></div>
+                                                    <div class="col-12"><label class="mr-1">Hình thức thanh toán:</label> [[${orderDetail.paymentMethod.name}]]</div>
                                                     <div class="col-12"><label class="mr-1">Số tiền thanh toán:</label> [[${orderDetail.paymentAmount != null} ? ${#numbers.formatDecimal (orderDetail.paymentAmount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '']]</div>
                                                     <div class="col-12"><label class="mr-1">Ghi chú:</label> [[${orderDetail.paymentNote}]]</div>
+                                                    <div class="col-12"><label class="mr-1">Trạng thái thanh toán:</label> [[${orderDetail.paymentStatus ? 'Đã thanh toán' : 'Chưa thanh toán'}]]</div>
                                                 </div>
                                                 <hr>
                                                 <div class="row justify-content-between">
                                                     <div class="col-2" style="display: flex; align-items: center"></div>
                                                     <div class="col-10 text-right">
-                                                        <button type="button" class="btn btn-primary">In</button>
-                                                        <button th:if="${allowDoPay}" type="button" class="btn btn-success" id="btnDoPay">
-                                                            Thanh toán
+                                                        <a class="btn btn-sm btn-info btn-print-invoice" th:orderId="${orderDetailId}"><i class="fa-solid fa-print"></i></a>
+                                                        <button class="btn btn-sm btn-success" th:if="${allowDoPay}" type="button" id="btnDoPay">
+                                                            <i class="fa-solid fa-check mr-1"></i> Confirm payment
                                                         </button>
+
                                                         <!--POPUP THANH TOÁN-->
                                                         <div class="modal fade" id="modalThanhToan">
                                                             <div class="modal-dialog">
@@ -359,6 +361,7 @@
 
         let mvOrderDetail = {};
         let mvTicketExportTable= $("#tableContentTicket");
+
         $(document).ready(function () {
             setupSelectMultiple();
             init();
@@ -367,12 +370,21 @@
             updateOrder();
             loadTicketExportInfo();
             loadItemsForSales();
+
+            createListener();
         });
 
         function init() {
             let rawPaymentTime = $('#paymentTimeField').text();
             let formattedTime = moment(rawPaymentTime, "YYYY-MM-DD HH:mm:ss.S").format('DD/MM/YYYY HH:mm:ss');
             $('#paymentTimeField').text(formattedTime);
+        }
+
+        function createListener() {
+            $(document).on("click", ".btn-print-invoice", function (e) {
+                e.preventDefault();
+                window.open(mvHostURL + "/sls/order/print-invoice/" + parseInt($(this).attr("orderId")), "_blank");
+            })
         }
 
         function loadOrderDetail() {

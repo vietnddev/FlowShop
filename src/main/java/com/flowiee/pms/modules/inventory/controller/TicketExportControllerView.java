@@ -2,7 +2,6 @@ package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.modules.inventory.dto.TicketExportDTO;
-import com.flowiee.pms.modules.inventory.entity.TicketExport;
 import com.flowiee.pms.common.enumeration.Pages;
 import com.flowiee.pms.modules.inventory.service.TicketExportService;
 import com.flowiee.pms.common.enumeration.TicketExportStatus;

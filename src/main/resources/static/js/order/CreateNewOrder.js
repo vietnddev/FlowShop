@@ -14,7 +14,7 @@ function createOrder() {
         let paymentMethodId = $('#paymentMethodField').val();
         let orderStatusId = $('#orderStatusField').val();
         let note = $('#noteFieldCart').val();
-        let cartId = mvCartId;
+        let cartId = mvCurrentCartId;
         let receiveName = $('#receiveNameField').val();
         let receivePhoneNumber = $('#receivePhoneNumberField').val();
         let receiveEmail = $('#receiveEmailField').val();
@@ -44,8 +44,9 @@ function createOrder() {
             data: JSON.stringify(body),
             success: function (response) {
                 if (response.status === "OK") {
-                    alert('Create new order success!')
-                    window.location =  mvHostURL + '/sls/order';
+                    let orderCreated = response.data;
+                    alert('Your order has been created!')
+                    window.location =  mvHostURL + '/sls/order/' + orderCreated.id;
                 }
             },
             error: function (xhr) {

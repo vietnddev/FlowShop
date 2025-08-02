@@ -1,12 +1,14 @@
 package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.modules.sales.dto.CustomerContactDTO;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;
+import com.flowiee.pms.modules.sales.model.OrderReq;
 import com.flowiee.pms.modules.sales.service.CustomerContactService;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.modules.sales.service.CustomerService;
-import com.flowiee.pms.modules.sales.service.OrderReadService;
+import com.flowiee.pms.modules.sales.service.OrderService;
 
 import com.flowiee.pms.common.enumeration.ContactType;
 import com.flowiee.pms.common.enumeration.Pages;
@@ -19,7 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -27,7 +29,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class CustomerControllerView extends BaseController {
-    OrderReadService mvOrderReadService;
+    OrderService mvOrderService;
     CustomerService mvCustomerService;
     CustomerContactService mvCustomerContactService;
 
@@ -40,7 +42,8 @@ public class CustomerControllerView extends BaseController {
                                        @Nullable @RequestParam("email") String email,
                                        @Nullable @RequestParam("address") String address) {
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_CUSTOMER.getTemplate());
-        modelAndView.addObject("listCustomer", mvCustomerService.findAll(-1, -1, name, sex, birthday != null ? DateUtils.convertStringToDate(birthday, "YYYY/MM/dd") : null, phone, email, address));
+        modelAndView.addObject("customer", new CustomerDTO());
+        modelAndView.addObject("listCustomer", mvCustomerService.find(-1, -1, name, sex, birthday != null ? DateUtils.convertStringToDate(birthday, "YYYY/MM/dd") : null, phone, email, address));
         modelAndView.addObject("filter_name", name);
         modelAndView.addObject("filter_sex", sex);
         modelAndView.addObject("filter_birthday", birthday);
@@ -61,18 +64,27 @@ public class CustomerControllerView extends BaseController {
             if (c.isEmailContact()) c.setCode(ContactType.E.getLabel());
             if (c.isAddressContact()) c.setCode(ContactType.A.getLabel());
         });
+
+        OrderReq lvOrderReq = OrderReq.builder().customerId(customerId).build();
+        lvOrderReq.setPageNum(-1);
+        lvOrderReq.setPageSize(-1);
+
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_CUSTOMER_DETAIL.getTemplate());
         modelAndView.addObject("customerDetail", customerDTO);
         modelAndView.addObject("listCustomerContact", listContacts);
-        modelAndView.addObject("listDonHang", mvOrderReadService.getOrdersByCustomer(-1, -1, customerId).getContent());
+        modelAndView.addObject("listDonHang", mvOrderService.find(lvOrderReq).getContent());
         return baseView(modelAndView);
     }
 
     @PostMapping("/insert")
     @PreAuthorize("@vldModuleSales.insertCustomer(true)")
-    public ModelAndView insertCustomer(CustomerDTO customer) {
-        mvCustomerService.save(customer);
-        return new ModelAndView("redirect:/customer");
+    public ModelAndView insertCustomer(@ModelAttribute CustomerDTO customer, HttpServletRequest request) {
+        try {
+            mvCustomerService.save(customer);
+            return new ModelAndView("redirect:/customer");
+        } catch (AppException e) {
+            return refreshPage(request);
+        }
     }
 
     @PostMapping("/update/{id}")

@@ -8,10 +8,9 @@ import java.util.List;
 
 @Data
 public class ProductAttributeDTO extends BaseDTO implements Serializable {
-    private ProductVariantDTO productDetail;
+    private Long productId;
     private String attributeName;
     private String attributeValue;
-    private int sort;
-    private boolean status;
-    private List<ProductHistoryDTO> listProductHistory;
+    private Integer sort;
+    private Boolean status;
 }

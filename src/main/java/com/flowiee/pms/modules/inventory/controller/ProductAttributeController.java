@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.dto.ProductAttributeDTO;
@@ -22,14 +21,13 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ProductAttributeController extends BaseController {
     ProductAttributeService mvProductAttributeService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Create product attribute")
     @PostMapping("/attribute/create")
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
     public AppResponse<ProductAttributeDTO> createProductAttribute(@RequestBody ProductAttributeDTO productAttribute) {
         try {
-            return mvCHelper.success(mvProductAttributeService.save(productAttribute));
+            return AppResponse.success(mvProductAttributeService.save(productAttribute));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "product attribute"), ex);
         }
@@ -40,7 +38,7 @@ public class ProductAttributeController extends BaseController {
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
     public AppResponse<ProductAttributeDTO> updateProductAttribute(@RequestBody ProductAttributeDTO productAttribute, @PathVariable("id") Long productAttributeId) {
         try {
-            return mvCHelper.success(mvProductAttributeService.update(productAttribute, productAttributeId));
+            return AppResponse.success(mvProductAttributeService.update(productAttribute, productAttributeId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "product attribute"), ex);
         }
@@ -50,6 +48,6 @@ public class ProductAttributeController extends BaseController {
     @DeleteMapping("/attribute/delete/{id}")
     @PreAuthorize("@vldModuleProduct.deleteProduct(true)")
     public AppResponse<String> deleteProductAttribute(@PathVariable("id") Long productAttributeId) {
-        return mvCHelper.success(mvProductAttributeService.delete(productAttributeId));
+        return AppResponse.success(mvProductAttributeService.delete(productAttributeId));
     }
 }

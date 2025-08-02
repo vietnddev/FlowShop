@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.Product;
 import com.flowiee.pms.modules.inventory.entity.ProductAttribute;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
@@ -26,7 +27,7 @@ public class ProductHistoryServiceImpl extends BaseService<ProductHistory, Produ
     }
 
     @Override
-    public List<ProductHistoryDTO> findAll() {
+    public List<ProductHistoryDTO>find(BaseParameter pParam) {
         return super.convertDTOs(mvEntityRepository.findAll());
     }
 

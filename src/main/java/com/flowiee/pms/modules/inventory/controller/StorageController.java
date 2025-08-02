@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
@@ -39,7 +38,6 @@ public class StorageController extends BaseController {
     @NonFinal
     @Qualifier("storageExportServiceImpl")
     ExportService  mvExportService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all storages")
     @GetMapping("/all")
@@ -48,10 +46,10 @@ public class StorageController extends BaseController {
                                                       @RequestParam(value = "pageNum", required = false) Integer pageNum) {
         try {
             if (pageSize == null || pageNum == null) {
-                return mvCHelper.success(mvStorageService.findAll());
+                return AppResponse.success(mvStorageService.find(-1, -1).getContent());
             }
-            Page<StorageDTO> storagePage = mvStorageService.findAll(pageSize, pageNum - 1);
-            return mvCHelper.success(storagePage.getContent(), pageNum, pageSize, storagePage.getTotalPages(), storagePage.getTotalElements());
+            Page<StorageDTO> storagePage = mvStorageService.find(pageSize, pageNum - 1);
+            return AppResponse.paged(storagePage);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "storage"), ex);
         }
@@ -62,7 +60,7 @@ public class StorageController extends BaseController {
     @PreAuthorize("@vldModuleStorage.readStorage(true)")
     public AppResponse<StorageDTO> findDetailStorage(@PathVariable("storageId") Long storageId) {
         StorageDTO storage = mvStorageService.findById(storageId, true);
-        return mvCHelper.success(storage);
+        return AppResponse.success(storage);
     }
 
     @Operation(summary = "Create storage")
@@ -70,7 +68,7 @@ public class StorageController extends BaseController {
     @PreAuthorize("@vldModuleStorage.insertStorage(true)")
     public AppResponse<StorageDTO> createStorage(@RequestBody StorageDTO storageDTO) {
         try {
-            return mvCHelper.success(mvStorageService.save(storageDTO));
+            return AppResponse.success(mvStorageService.save(storageDTO));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "storage"), ex);
         }
@@ -81,7 +79,7 @@ public class StorageController extends BaseController {
     @PreAuthorize("@vldModuleStorage.updateStorage(true)")
     public AppResponse<StorageDTO> updateStorage(@RequestBody StorageDTO storage, @PathVariable("storageId") Long storageId) {
         try {
-            return mvCHelper.success(mvStorageService.update(storage, storageId));
+            return AppResponse.success(mvStorageService.update(storage, storageId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "storage"), ex);
         }
@@ -91,7 +89,7 @@ public class StorageController extends BaseController {
     @DeleteMapping("/delete/{storageId}")
     @PreAuthorize("@vldModuleStorage.deleteStorage(true)")
     public AppResponse<String> deleteStorage(@PathVariable("storageId") Long storageId) {
-        return mvCHelper.success(mvStorageService.delete(storageId));
+        return AppResponse.success(mvStorageService.delete(storageId));
     }
 
     @Operation(summary = "Find detail storage")
@@ -103,7 +101,7 @@ public class StorageController extends BaseController {
                                                             @RequestParam(value = "searchText", required = false) String searchText) {
         try {
             Page<StorageItems> storageItemsPage = mvStorageService.findStorageItems(pageSize, pageNum -1, storageId, searchText);
-            return mvCHelper.success(storageItemsPage.getContent(), pageNum, pageSize, storageItemsPage.getTotalPages(), storageItemsPage.getTotalElements());
+            return AppResponse.success(storageItemsPage.getContent(), pageNum, pageSize, storageItemsPage.getTotalPages(), storageItemsPage.getTotalElements());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "storage"), ex);
         }

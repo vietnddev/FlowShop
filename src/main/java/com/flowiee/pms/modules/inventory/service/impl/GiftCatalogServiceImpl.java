@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.GiftCatalog;
 import com.flowiee.pms.modules.inventory.dto.GiftCatalogDTO;
 import com.flowiee.pms.modules.inventory.repository.GiftCatalogRepository;
@@ -16,8 +17,8 @@ public class GiftCatalogServiceImpl extends BaseService<GiftCatalog, GiftCatalog
     }
 
     @Override
-    public List<GiftCatalogDTO> findAll() {
-        return super.findAll();
+    public List<GiftCatalogDTO>find(BaseParameter pParam) {
+        return super.find(pParam);
     }
 
     @Override

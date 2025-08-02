@@ -156,10 +156,10 @@ public class ProductImageServiceImpl implements ProductImageService {
         FileStorage imageToActive = mvFileStorageService.findById(pImageId, true);
 
         //Bỏ image default hiện tại
-        FileStorage imageActiving = mvFileStorageRepository.findProductImageActive(pProductId, null);
-        if (imageActiving != null) {
-            imageActiving.setActive(false);
-            mvFileStorageRepository.save(imageActiving);
+        Optional<FileStorage> imageActiving = mvFileStorageRepository.findProductImageActive(pProductId, null);
+        if (imageActiving.isPresent()) {
+            imageActiving.get().setActive(false);
+            mvFileStorageRepository.save(imageActiving.get());
         }
         //Active lại image theo id được truyền vào
         imageToActive.setActive(true);
@@ -171,10 +171,10 @@ public class ProductImageServiceImpl implements ProductImageService {
         FileStorage imageToActive = mvFileStorageService.findById(pImageId, true);
 
         //Bỏ image default hiện tại
-        FileStorage imageActivating = mvFileStorageRepository.findProductImageActive(null, pProductVariantId);
-        if (ObjectUtils.isNotEmpty(imageActivating)) {
-            imageActivating.setActive(false);
-            mvFileStorageRepository.save(imageActivating);
+        Optional<FileStorage> imageActivating = mvFileStorageRepository.findProductImageActive(null, pProductVariantId);
+        if (imageActivating.isPresent()) {
+            imageActivating.get().setActive(false);
+            mvFileStorageRepository.save(imageActivating.get());
         }
         //Active lại image theo id được truyền vào
         imageToActive.setActive(true);
@@ -183,12 +183,12 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     @Override
     public FileStorage findImageActiveOfProduct(long pProductId) {
-        return mvFileStorageRepository.findProductImageActive(pProductId, null);
+        return mvFileStorageRepository.findProductImageActive(pProductId, null).orElse(null);
     }
 
     @Override
     public FileStorage findImageActiveOfProductVariant(long pProductVariantId) {
-        return mvFileStorageRepository.findProductImageActive(null, pProductVariantId);
+        return mvFileStorageRepository.findProductImageActive(null, pProductVariantId).orElse(null);
     }
 
     @Override

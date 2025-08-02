@@ -2,6 +2,7 @@ package com.flowiee.pms.common.base.controller;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.enumeration.CATEGORY;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
@@ -14,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,6 @@ import java.util.Map;
 public abstract class BaseControllerNew<D> {
     @Autowired
     protected UserSession mvUserSession;
-    @Autowired
-    ControllerHelper mvCHelper;
 
     @Getter
     @Setter
@@ -50,7 +49,7 @@ public abstract class BaseControllerNew<D> {
 
     protected AppResponse<List<D>> handleFindAll() {
         try {
-            return mvCHelper.success(getService().findAll());
+            return AppResponse.success(getService().find(new BaseParameter()));
         } catch (RuntimeException ex) {
             throw new AppException("Error fetching data", ex);
         }
@@ -58,7 +57,7 @@ public abstract class BaseControllerNew<D> {
 
     protected AppResponse<D> handleFindById(Long pId) {
         try {
-            return mvCHelper.success(getService().findDtoById(pId, true));
+            return AppResponse.success(getService().findDtoById(pId, true));
         } catch (RuntimeException ex) {
             throw new AppException("Entity not found with ID " + pId, ex);
         }
@@ -66,7 +65,7 @@ public abstract class BaseControllerNew<D> {
 
     protected AppResponse<D> handleCreate(D pDto) {
         try {
-            return mvCHelper.success(getService().save(pDto));
+            return AppResponse.success(getService().save(pDto));
         } catch (RuntimeException ex) {
             throw new AppException("Error creating entity", ex);
         }
@@ -74,7 +73,7 @@ public abstract class BaseControllerNew<D> {
 
     protected AppResponse<D> handleUpdate(D dto, Long pId) {
         try {
-            return mvCHelper.success(getService().update(dto, pId));
+            return AppResponse.success(getService().update(dto, pId));
         } catch (RuntimeException ex) {
             throw new AppException("Error updating entity with ID " + pId, ex);
         }
@@ -82,7 +81,7 @@ public abstract class BaseControllerNew<D> {
 
     protected AppResponse<String> handleDelete(Long pId) {
         try {
-            return mvCHelper.success(getService().delete(pId));
+            return AppResponse.success(getService().delete(pId));
         } catch (RuntimeException ex) {
             throw new AppException("Error deleting entity with ID " + pId, ex);
         }

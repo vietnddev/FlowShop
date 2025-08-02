@@ -1,24 +1,21 @@
-server:
-  tomcat:
-    background-processor-delay: 30
-    threads:
-      max: 10
-      min-spare: 3
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/fs}
-    password: ${DBMS_PASSWORD:root}
-    username: ${DBMS_USERNAME:root}
+    #url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/fs}
+    #password: ${DBMS_PASSWORD:root}
+    #username: ${DBMS_USERNAME:root}
+    url: ${DBMS_CONNECTION:jdbc:mysql://mysql-fws-nguyenducviet0682.b.aivencloud.com:10883/defaultdb}
+    username: ${DBMS_USERNAME:avnadmin}
+    password: ${DBMS_PASSWORD:AVNS_wrpsLhopYsCDqHJPTRV}
     hikari:
       initialization-fail-timeout: 5000
-      connection-timeout: 30000
+      connection-timeout: 20000
       maximum-pool-size: 5
       minimum-idle: 2
     livereload:
       enabled: false
   thymeleaf:
-    cache: true
+    cache: false
   jpa:
     hibernate:
       ddl-auto: none
@@ -30,19 +27,6 @@ spring:
     add-properties: false
   jmx:
     enabled: false
-logging:
-  level:
-    com:
-      zaxxer:
-        hikari: WARN
-      flowiee: INFO
-    org:
-      springframework:
-        data: WARN
-      apache:
-        tomcat: WARN
-        catalina: WARN
-      hibernate: WARN
 system:
   login:
-    bypass: false
+    bypass: true

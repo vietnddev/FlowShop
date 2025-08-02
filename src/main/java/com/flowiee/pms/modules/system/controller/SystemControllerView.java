@@ -35,7 +35,7 @@ public class SystemControllerView extends BaseController {
     @PreAuthorize("@vldModuleSystem.readConfig(true)")
     public ModelAndView showConfig() {
         ModelAndView modelAndView = new ModelAndView(Pages.SYS_CONFIG.getTemplate());
-        modelAndView.addObject("listConfig", configService.findAll());
+        modelAndView.addObject("listConfig", configService.find());
         return baseView(modelAndView);
     }
 

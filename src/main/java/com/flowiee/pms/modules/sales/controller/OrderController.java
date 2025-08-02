@@ -1,13 +1,13 @@
 package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.EntityNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;
+import com.flowiee.pms.modules.sales.model.OrderReq;
 import com.flowiee.pms.modules.system.model.EximResult;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.common.exception.AppException;
@@ -15,9 +15,7 @@ import com.flowiee.pms.modules.sales.model.CreateOrderReq;
 import com.flowiee.pms.modules.sales.model.UpdateOrderReq;
 import com.flowiee.pms.modules.system.service.ExportService;
 import com.flowiee.pms.modules.sales.service.OrderPayService;
-import com.flowiee.pms.modules.sales.service.OrderProcessService;
-import com.flowiee.pms.modules.sales.service.OrderReadService;
-import com.flowiee.pms.modules.sales.service.OrderWriteService;
+import com.flowiee.pms.modules.sales.service.OrderService;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import com.flowiee.pms.common.enumeration.OrderStatus;
@@ -37,7 +35,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -45,15 +42,12 @@ import java.util.List;
 @Tag(name = "Order API", description = "Quản lý đơn hàng")
 @RequiredArgsConstructor
 public class OrderController extends BaseController {
-    private final OrderProcessService mvOrderProcessService;
-    private final OrderReadService mvOrderReadService;
-    private final OrderWriteService mvOrderWriteService;
+    private final OrderService mvOrderService;
     private final OrderPayService mvOrderPayService;
     @Autowired
     @NonFinal
     @Qualifier("orderExportServiceImpl")
     private ExportService mvExportService;
-    private final ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all orders")
     @GetMapping("/all")
@@ -81,9 +75,25 @@ public class OrderController extends BaseController {
             if (!CoreUtils.isNullStr(pFromDate)) {
                 lvToDate = DateTimeUtil.convertStringToDateTime(pToDate, DateTimeUtil.FORMAT_DATE);
             }
-            Page<OrderDTO> orderPage = mvOrderReadService.findAll(pageSize, pageNum - 1, pTxtSearch, pOrderId, pPaymentMethodId, pOrderStatus, pSalesChannelId, pSellerId, pCustomerId, pBranchId, pGroupCustomerId,
-                    pDateFilter, lvFromDate, lvToDate, null);
-            return mvCHelper.success(orderPage.getContent(), pageNum, pageSize, orderPage.getTotalPages(), orderPage.getTotalElements());
+
+            OrderReq lvOrderReq = OrderReq.builder()
+                    .txtSearch(pTxtSearch)
+                    .orderId(pOrderId)
+                    .paymentMethodId(pPaymentMethodId)
+                    .orderStatus(pOrderStatus)
+                    .salesChannelId(pSalesChannelId)
+                    .sellerId(pSellerId)
+                    .customerId(pCustomerId)
+                    .branchId(pBranchId)
+                    .groupCustomerId(pGroupCustomerId)
+                    .dateFilter(pDateFilter)
+                    .fromDate(lvFromDate)
+                    .toDate(lvToDate)
+                    .build();
+            lvOrderReq.setPageNum(pageNum - 1);
+            lvOrderReq.setPageSize(pageSize);
+            Page<OrderDTO> orderPage = mvOrderService.find(lvOrderReq);
+            return AppResponse.paged(orderPage);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "order"), ex);
         }
@@ -93,15 +103,15 @@ public class OrderController extends BaseController {
     @GetMapping("/{orderId}")
     @PreAuthorize("@vldModuleSales.readOrder(true)")
     public AppResponse<OrderDTO> findOrderDetail(@PathVariable("orderId") Long pOrderId) {
-        OrderDTO lvOrder = mvOrderReadService.findById(pOrderId, true);
-        return mvCHelper.success(lvOrder);
+        OrderDTO lvOrder = mvOrderService.findDtoById(pOrderId, true);
+        return AppResponse.success(lvOrder);
     }
 
     @Operation(summary = "Create new order")
     @PostMapping("/insert")
     public AppResponse<OrderDTO> createOrder(@RequestBody CreateOrderReq request) {
         try {
-            return mvCHelper.success(mvOrderWriteService.createOrder(request));
+            return AppResponse.success(mvOrderService.createOrder(request));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "order") + "\n" + ex.getMessage(), ex);
         }
@@ -111,14 +121,14 @@ public class OrderController extends BaseController {
     @PutMapping("/update/{orderId}")
     @PreAuthorize("@vldModuleSales.updateOrder(true)")
     public AppResponse<OrderDTO> update(@RequestBody UpdateOrderReq pRequest, @PathVariable("orderId") Long pOrderId) {
-        return mvCHelper.success(mvOrderWriteService.updateOrder(pRequest, pOrderId));
+        return AppResponse.success(mvOrderService.updateOrder(pRequest, pOrderId));
     }
 
     @DeleteMapping("/delete/{orderId}")
     @PreAuthorize("@vldModuleSales.deleteOrder(true)")
     public AppResponse<String> deleteOrder(@PathVariable("orderId") Long orderId) {
         //Check them trang thai
-        return mvCHelper.success(mvOrderWriteService.deleteOrder(orderId));
+        return AppResponse.success(mvOrderService.deleteOrder(orderId));
     }
 
     @PutMapping("/do-pay/{orderId}")
@@ -128,8 +138,7 @@ public class OrderController extends BaseController {
                                           @RequestParam("paymentMethod") Long paymentMethod,
                                           @RequestParam("paymentAmount") BigDecimal paymentAmount,
                                           @RequestParam(value = "paymentNote", required = false) String paymentNote) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy h:mm a");
-        return mvCHelper.success(mvOrderPayService.doPay(orderId, LocalDateTime.parse(paymentTime, formatter), paymentMethod, paymentAmount, paymentNote));
+        return AppResponse.success(mvOrderPayService.doPay(orderId, paymentTime, paymentMethod, paymentAmount, paymentNote));
     }
 
     @GetMapping("/export")
@@ -142,7 +151,7 @@ public class OrderController extends BaseController {
     @GetMapping("/scan/QR-Code/{code}")
     public ModelAndView findOrderInfoByQRCode(@PathVariable("code") String pOrderCode) {
         try {
-            Order lvOrder = mvOrderReadService.getOrderByCode(pOrderCode);
+            Order lvOrder = mvOrderService.findByCode(pOrderCode);
             if (lvOrder == null) {
                 throw new EntityNotFoundException(new Object[]{"order"}, null, null);
             }
@@ -155,20 +164,20 @@ public class OrderController extends BaseController {
     @PostMapping("/process/{type}/{orderId}")
     @PreAuthorize("@vldModuleSales.updateOrder(true)")
     public AppResponse<String> processOrder(@PathVariable("type") String pType, @PathVariable("orderId") Long pOrderId) {
-        OrderDTO lvOrder = mvOrderReadService.findById(pOrderId, true);
+        OrderDTO lvOrder = mvOrderService.findDtoById(pOrderId, true);
         switch (CoreUtils.trim(pType).toLowerCase()) {
             case "cancel":
-                mvOrderProcessService.cancelOrder(lvOrder, "");
+                mvOrderService.doCancel(lvOrder, "");
                 break;
             case "return":
-                mvOrderProcessService.returnOrder(lvOrder);
+                mvOrderService.doReturn(lvOrder);
                 break;
             case "complete":
-                mvOrderProcessService.completeOrder(lvOrder);
+                mvOrderService.doComplete(lvOrder);
                 break;
             default:
                 throw new BadRequestException("Process type is invalid!");
         }
-        return mvCHelper.success("Successfully!");
+        return AppResponse.success("Successfully!");
     }
 }

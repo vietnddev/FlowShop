@@ -23,12 +23,6 @@ public interface CategoryService {
 
     Page<Category> findSubCategory(CATEGORY categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum);
 
-    List<Category> findUnits();
-
-    List<Category> findColors();
-
-    List<Category> findSizes();
-
     List<Category> findSalesChannels();
 
     List<Category> findPaymentMethods();
@@ -40,6 +34,8 @@ public interface CategoryService {
     List<Category> findLedgerReceiptTypes();
 
     List<Category> findLedgerPaymentTypes();
+
+    List<Category> findDeliveryType();
 
     boolean categoryInUse(Long categoryId);
 

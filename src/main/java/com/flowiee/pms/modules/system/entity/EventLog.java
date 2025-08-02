@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.system.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 

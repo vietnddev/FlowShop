@@ -43,6 +43,14 @@
                                         <input type="email" class="form-control" placeholder="Email" name="email">
                                     </div>
                                     <div class="form-group">
+                                        <label>Branch</label>
+                                        <select class="custom-select" name="branch">
+                                            <option th:each="list : ${listBranch}"
+                                                    th:value="${list.id}"
+                                                    th:text="${list.branchName}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
                                         <label>Nhóm người dùng</label>
                                         <select class="custom-select" name="groupAccount">
                                             <option th:each="gr : ${groupAccount}"

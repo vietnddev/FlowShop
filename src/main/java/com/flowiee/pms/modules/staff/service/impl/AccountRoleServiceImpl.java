@@ -21,6 +21,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class AccountRoleServiceImpl implements RoleService {
     private static Map<String, List<String>> mvRightsAreGrantedInRuntime = new HashMap<>();
 
@@ -38,6 +38,13 @@ public class AccountRoleServiceImpl implements RoleService {
     private final SystemLogService systemLogService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
+
+    public AccountRoleServiceImpl(@Lazy AccountRepository mvAccountRepository, @Lazy GroupAccountService mvGroupAccountService, AccountRoleRepository mvAccountRoleRepository, SystemLogService systemLogService) {
+        this.mvAccountRepository = mvAccountRepository;
+        this.mvGroupAccountService = mvGroupAccountService;
+        this.mvAccountRoleRepository = mvAccountRoleRepository;
+        this.systemLogService = systemLogService;
+    }
 
     @Override
     public List<RoleModel> findAllRoleByAccountId(Long accountId) {

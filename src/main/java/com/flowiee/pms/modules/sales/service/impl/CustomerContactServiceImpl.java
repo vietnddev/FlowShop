@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.enumeration.*;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.sales.entity.CustomerContact;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.DataInUseException;
@@ -27,8 +28,8 @@ public class CustomerContactServiceImpl extends BaseService<CustomerContact, Cus
     }
 
     @Override
-    public List<CustomerContactDTO> findAll() {
-        return super.findAll();
+    public List<CustomerContactDTO>find(BaseParameter pParam) {
+        return super.find(pParam);
     }
 
     @Override
@@ -41,10 +42,14 @@ public class CustomerContactServiceImpl extends BaseService<CustomerContact, Cus
         }
         String lvContactType = pCustomerContact.getCode();
         String lvContactValue = pCustomerContact.getValue();
-        CustomerContact contactExists = mvEntityRepository.findByContactTypeAndValue(lvContactType, lvContactValue);
-        if (contactExists != null) {
-            throw new BadRequestException(String.format("Customer contact %s existed!", lvContactType));
+
+        if (!ContactType.A.name().equals(pCustomerContact.getCode())) {
+            CustomerContact contactExists = mvEntityRepository.findByContactTypeAndValue(lvContactType, lvContactValue);
+            if (contactExists != null) {
+                throw new BadRequestException(String.format("Customer contact %s existed!", lvContactType));
+            }
         }
+
         pCustomerContact.setUsed(false);
 
         return super.save(pCustomerContact);

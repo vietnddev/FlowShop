@@ -1,6 +1,9 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.enumeration.PriceType;
+import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.sales.entity.Items;
 import com.flowiee.pms.modules.sales.entity.OrderCart;
 import com.flowiee.pms.common.exception.BadRequestException;
@@ -18,7 +21,9 @@ import com.flowiee.pms.common.enumeration.MessageCode;
 import com.flowiee.pms.modules.sales.service.CartItemsService;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,21 +32,18 @@ public class CartItemsServiceImpl extends BaseService<Items, ItemsDTO, CartItems
     private final OrderCartRepository cartRepository;
     private final ProductComboService mvProductComboService;
     private final ProductVariantService mvProductVariantService;
-    private final UserSession userSession;
 
     public CartItemsServiceImpl(CartItemsRepository pCartItemsRepository, OrderCartRepository pCartRepository,
-                                ProductComboService pProductComboService, ProductVariantService pProductVariantService,
-                                UserSession userSession) {
+                                ProductComboService pProductComboService, ProductVariantService pProductVariantService) {
         super(Items.class, ItemsDTO.class, pCartItemsRepository);
         this.cartRepository = pCartRepository;
         this.mvProductComboService = pProductComboService;
         this.mvProductVariantService = pProductVariantService;
-        this.userSession = userSession;
     }
 
     @Override
-    public List<ItemsDTO> findAll() {
-        return super.findAll();
+    public List<ItemsDTO>find(BaseParameter pParam) {
+        return super.find(pParam);
     }
 
     @Override
@@ -50,10 +52,15 @@ public class CartItemsServiceImpl extends BaseService<Items, ItemsDTO, CartItems
     }
 
     @Override
+    public Items findEntById(Long pId, boolean throwException) {
+        return super.findEntById(pId, throwException);
+    }
+
+    @Override
     public List<CartItemModel> findAllItemsForSales() {
         List<CartItemModel> cartItemModelList = new ArrayList<>();
-        OrderCart cart = cartRepository.findByAccountId(userSession.getUserPrincipal().getId()).get(0);
-        List<ProductComboDTO> productCombos = mvProductComboService.findAll();
+        OrderCart cart = cartRepository.findByAccountId(getUserPrincipal().getId()).get(0);
+        List<ProductComboDTO> productCombos = mvProductComboService.findAll(-1, -1).getContent();
         List<ProductVariantDTO> productVariantDTOs = mvProductVariantService.findAll(ProductVariantSearchRequest.builder()
                 .availableForSales(true)
                 .checkInAnyCart(false)
@@ -115,10 +122,25 @@ public class CartItemsServiceImpl extends BaseService<Items, ItemsDTO, CartItems
 
     @Override
     public ItemsDTO save(ItemsDTO pDto) {
-        if (pDto == null || pDto.getOrderCart() == null || pDto.getProductDetail() == null) {
+        if (pDto == null || pDto.getCartId() == null || pDto.getProductDetail() == null) {
             throw new BadRequestException();
         }
-        return super.save(pDto);
+
+        OrderCart lvCart = new OrderCart();
+        lvCart.setId(pDto.getCartId());
+
+        Items lvItem = Items.builder()
+                .orderCart(lvCart)
+                .productDetail(new ProductDetail(pDto.getProductDetail().getId()))
+                .priceType(PriceType.L.name())
+                .price(pDto.getPrice())
+                .priceOriginal(pDto.getPriceOriginal())
+                .extraDiscount(BigDecimal.ZERO)
+                .quantity(pDto.getQuantity())
+                .note("")
+                .build();
+
+        return super.convertDTO(mvEntityRepository.save(lvItem));
     }
 
     @Override

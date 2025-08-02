@@ -6,7 +6,7 @@ import com.flowiee.pms.modules.sales.entity.Customer;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 

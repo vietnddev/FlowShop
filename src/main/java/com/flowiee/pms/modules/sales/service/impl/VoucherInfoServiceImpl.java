@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.modules.sales.dto.VoucherTicketDTO;
 import com.flowiee.pms.modules.sales.service.VoucherApplyService;
@@ -48,7 +49,7 @@ public class VoucherInfoServiceImpl extends BaseService<VoucherInfo, VoucherInfo
     }
 
     @Override
-    public List<VoucherInfoDTO> findAll() {
+    public List<VoucherInfoDTO>find(BaseParameter pParam) {
         Page<VoucherInfoDTO> voucherInfos = this.findAll(-1, -1, null, null, null, null, null);
         return voucherInfos.getContent();
     }

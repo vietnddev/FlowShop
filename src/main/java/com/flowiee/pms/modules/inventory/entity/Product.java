@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -113,9 +113,10 @@ public class Product extends BaseEntity implements Serializable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     List<ProductReview> listProductPreviews;
 
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "productBase", fetch = FetchType.LAZY)
-//    List<ProductPrice> listProductBasePrice;
+    @JsonIgnore
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    List<ProductAttribute> attributeList;
 
     @JsonIgnore
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)

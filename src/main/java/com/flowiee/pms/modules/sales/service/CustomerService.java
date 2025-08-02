@@ -12,7 +12,7 @@ import java.util.List;
 public interface CustomerService extends ICurdService<CustomerDTO> {
     Customer findEntById(Long pCustomerId, boolean pThrowException);
 
-    Page<CustomerDTO> findAll(int pageSize, int pageNum, String name, String sex, Date birthday, String phone, String email, String address);
+    Page<CustomerDTO> find(int pageSize, int pageNum, String name, String sex, Date birthday, String phone, String email, String address);
 
     List<CustomerDTO> findCustomerNewInMonth();
 

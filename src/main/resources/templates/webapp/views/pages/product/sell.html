@@ -3,25 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tạo đơn</title>
+    <title>Create order</title>
     <th:block th:replace="~{header :: stylesheets}"></th:block>
-    <style rel="stylesheet">
-        .table td, th {
-            vertical-align: middle;
-        }
-        .modal-dialog.modal-xl {
-            max-width: 1400px; /* Tăng chiều rộng của modal */
-        }
-        .modal-content {
-            margin: auto; /* Canh giữa modal */
-        }
-        .modal-dialog {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh; /* Đảm bảo modal luôn căn giữa */
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/Cart.css}">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
     <div class="wrapper">
@@ -34,34 +18,44 @@
             <!-- Main content -->
 
             <div class="container-fluid">
-                <div class="card">
+                <div class="card mb-2">
                     <div class="card-body p-2">
                         <div class="row">
                             <div class="col-4 d-flex justify-content-start align-items-center">
-                                <button class="btn btn-sm btn-default w-auto" id="btnAddItems">
-                                    <i class="fa-solid fa-plus mr-2"></i> Pick product
+                                <button class="btn btn-sm btn-default w-auto mr-2" id="btnNewCart">
+                                    <i class="fa-solid fa-cart-plus"></i>
                                 </button>
+                                <div id="cart-tags"></div>
                             </div>
                             <div class="col-8 d-flex justify-content-end align-items-center">
+                                <button class="btn btn-sm btn-default w-auto mr-2" id="btnAddItems">
+                                    <i class="fa-solid fa-plus mr-2"></i> Pick product
+                                </button>
+                                <!-- Staff process -->
                                 <select class="custom-select custom-select-sm w-auto mr-2" id="accountField">
                                     <option th:each="list : ${listAccount}" th:value="${list.id}" th:text="${list.fullName}"></option>
                                 </select>
+                                <!-- Order time -->
                                 <div class="input-group input-group-sm date w-auto mr-2" id="reservationdatetime" data-target-input="nearest">
                                     <input type="text" class="form-control datetimepicker-input" data-target="#reservationdatetime" id="orderTimeField" required/>
                                     <div class="input-group-append" data-target="#reservationdatetime" data-toggle="datetimepicker">
                                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                     </div>
                                 </div>
-                                <th:block th:each="cart, cartIndex : ${listCart}">
-                                    <button type="button" class="btn btn-sm btn-primary link-confirm w-auto mr-2" th:cartId="${cart.id}" th:actionType="'create'">
-                                        <i class="fa-solid fa-floppy-disk mr-2"></i> Save
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-default w-auto" data-toggle="modal" id="preDeleteDonHang" th:data-target="'#modalDeleteCart_' + ${cart.id}">
-                                        <i class="fa-solid fa-eraser mr-2"></i> Clear
-                                    </button>
-                                    <!--Modal clear cart-->
-                                    <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalClearCart}"></div>
-                                </th:block>
+                                <!-- Order status -->
+                                <select class="custom-select custom-select-sm w-auto mr-2" id="orderStatusField">
+                                    <option th:each="d : ${orderStatusMap}" th:value="${d.key}" th:text="${d.value}"></option>
+                                </select>
+                                <!-- btn Save -->
+                                <button type="button" class="btn btn-sm btn-primary link-confirm w-auto mr-2" th:actionType="'create'">
+                                    <i class="fa-solid fa-floppy-disk mr-2"></i> Save
+                                </button>
+                                <!-- btn Clear -->
+                                <button type="button" class="btn btn-sm btn-default w-auto" data-toggle="modal" id="preDeleteDonHang" data-target="#modalClearCart">
+                                    <i class="fa-solid fa-eraser mr-2"></i> Clear
+                                </button>
+                                <!-- modal clear -->
+                                <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalClearCart}"></div>
                             </div>
                         </div>
                     </div>
@@ -70,27 +64,26 @@
 
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-9">
-                        <div class="card" style="max-height: 400px; overflow: scroll">
+                    <div class="col-9 pr-0">
+                        <div class="card" style="height: 400px; overflow: scroll">
                             <div class="card-body p-0">
-                                <table class="table table-bordered table-responsive table-head-fixed text-nowrap" id="itemsTable">
+                                <table class="table table-bordered table-head-fixed text-nowrap" id="itemsTable">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th class="text-left">Tên sản phẩm</th>
-                                            <th>Giá bán</th>
-                                            <th>Giảm thêm</th>
-                                            <th>SL</th>
-                                            <th>Thành tiền</th>
+                                            <th class="text-left">Product name</th>
+                                            <th>Price</th>
+                                            <th>Ext. Disc.</th>
+                                            <th>Qty</th>
+                                            <th>Amount</th>
                                             <th></th>
                                         </tr>
                                     </thead>
-                                    <tbody th:each="cart, cartIndex : ${listCart}">
+                                    <tbody id="tblItems">
+                                        <!-- th:each="cart, cartIndex : ${listCart}"
                                         <tr th:each="item, itemIndex : ${cart.listItems}">
-                                            <td th:text="${itemIndex.index + 1}"></td>
                                             <td class="text-left">
                                                 <input type="hidden" id="productVariantIdField" th:value="${item.productDetail.Id}"/>
-                                                <a th:text="${item.productDetail.variantName}"
+                                                <a th:text="${itemIndex.index + 1 + '. ' + item.productDetail.variantName}"
                                                    th:href="@{/san-pham/variant/{id}(id=${item.productDetail.id})}"></a>
                                                 <p class="font-italic" th:text="${item.note}"></p>
                                             </td>
@@ -111,12 +104,10 @@
                                                 <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" th:data-target="'#modalDeleteItems_' + ${item.id}">
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
-                                                <!--Modal update item-->
+                                                &lt;!&ndash;Modal update item&ndash;&gt;
                                                 <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalUpdateItem}"></div>
-                                                <!--Modal delete item-->
-                                                <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalDeleteItem}"></div>
                                             </td>
-                                        </tr>
+                                        </tr>-->
                                     </tbody>
                                 </table>
                             </div>
@@ -124,47 +115,27 @@
                     </div>
 
                     <div class="col-3">
-                        <div class="card" style="max-height: 400px; overflow: scroll">
+                        <div class="card" style="height: 400px; overflow: scroll">
                             <div class="card-body p-2">
-                                <!--KÊNH BÁN HÀNG-->
-                                <div class="form-group">
-                                    <label style="display: flex; align-items: center">Kênh bán hàng</label>
-                                    <select class="custom-select" id="salesChannelField" required>
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="mr-2 mb-0" style="width: 100px">Channel</label>
+                                    <select class="custom-select w-100" id="salesChannelField" required>
                                         <option th:each="list : ${listSalesChannel}" th:value="${list.id}" th:text="${list.name}"></option>
                                     </select>
                                 </div>
-                                <!--KÊNH BÁN HÀNG-->
-                                <!--HÌNH THỨC THANH TOÁN-->
-                                <div class="form-group">
-                                    <label style="display: flex; align-items: center">Hình thức thanh toán</label>
-                                    <select class="custom-select" id="paymentMethodField" required>
-                                        <option th:each="list : ${listPaymentMethod}" th:value="${list.id}" th:text="${list.name}"></option>
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="mr-2 mb-0" style="width: 100px">Delivery type</label>
+                                    <select class="custom-select w-100" id="deliveryTypeField" required>
+                                        <option th:each="list : ${listDeliveryType}" th:value="${list.id}" th:text="${list.name}"></option>
                                     </select>
                                 </div>
-                                <!--HÌNH THỨC THANH TOÁN-->
-                                <!--TRẠNG THÁI ĐƠN HÀNG-->
-                                <div class="form-group">
-                                    <label style="display: flex; align-items: center">Trạng thái đơn hàng</label>
-                                    <!--<select class="custom-select col-sm-6" id="orderStatusField" required>
-                                        <option th:each="list : ${listOrderStatus}" th:value="${list.id}" th:text="${list.name}"></option>
-                                    </select>-->
-                                    <select class="custom-select" id="orderStatusField">
-                                        <option th:each="d : ${orderStatusMap}" th:value="${d.key}" th:text="${d.value}"></option>
-                                    </select>
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="mr-2 mb-0" style="width: 100px">Customer note</label>
+                                    <textarea class="form-control w-100" rows="3" placeholder="Customer note" id="customerNoteFieldCart"></textarea>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-6">Pre-discount</label>
-                                    <label class="col-sm-6 text-right"
-                                           th:text="${#numbers.formatDecimal (totalAmountWithoutDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ'"></label>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-6">Discount</label>
-                                    <span class="col-sm-6 text-right" id="amountDiscountField" th:text="0"></span>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-6">Total amount</label>
-                                    <label class="col-sm-6 text-right" id="totalAmountDiscountField"
-                                           th:text="${#numbers.formatDecimal (totalAmountDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ'"></label>
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="mr-2 mb-0" style="width: 100px">Internal note</label>
+                                    <textarea class="form-control w-100" rows="3" placeholder="Internal note" id="noteFieldCart"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -175,10 +146,12 @@
                     <div class="col-5">
                         <div class="card">
                             <div class="card-body p-2">
-                                <label for="voucherCodeField">Voucher giảm giá</label>
-                                <div class="input-group" style="width: 80%">
+                                <label for="voucherCodeField">Coupon code</label>
+                                <div class="input-group w-100" style="width: 80%">
                                     <input type="text" class="form-control" id="voucherCodeField">
-                                    <span class="input-group-append"><button type="button" class="btn btn-info btn-flat" id="btnCheckVoucherIsAvailable">Kiểm tra</button></span>
+                                    <span class="input-group-append">
+                                        <button type="button" class="btn btn-sm btn-info btn-flat" id="btnCheckVoucherIsAvailable">Check</button>
+                                    </span>
                                 </div>
                                 <div id="ticketInfoBlock">
                                     <span class="row col-12 mt-2" id="voucherTitleField"></span>
@@ -189,7 +162,7 @@
                                     <div class="row col-12 mt-2 form-group" id="isUseVoucherBlock">
                                         <div class="custom-control custom-checkbox">
                                             <input class="custom-control-input" type="checkbox" id="isUseVoucherField">
-                                            <label for="isUseVoucherField" class="custom-control-label">Sử dụng</label>
+                                            <label for="isUseVoucherField" class="custom-control-label">Apply</label>
                                         </div>
                                     </div>
                                 </div>
@@ -202,10 +175,13 @@
                             <div class="card-body p-2">
                                 <div class="row mt-2 align-items-center">
                                     <label class="col-sm-4 col-form-label" for="customerField">Customer</label>
-                                    <div class="col-sm-8">
-                                        <select class="custom-select" id="customerField" required>
-                                            <!-- <option th:each="list : ${listCustomer}" th:value="${list.id}" th:text="${list.customerName}"></option> -->
-                                        </select>
+                                    <div class="col-sm-8 input-group w-100">
+                                        <select class="custom-select" id="customerField" required></select>
+                                        <span class="input-group-append">
+                                            <button type="button" class="btn btn-info" id="btnSearchCustomer">
+                                                <i class="fa-solid fa-mobile-retro"></i>
+                                            </button>
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="row mt-2 align-items-center">
@@ -229,7 +205,7 @@
                                 <div class="row mt-2">
                                     <label class="col-sm-4 col-form-label" for="receiveAddressField">Address</label>
                                     <div class="col-sm-8">
-                                        <textarea class="form-control" id="receiveAddressField" rows="3"></textarea>
+                                        <textarea class="form-control" id="receiveAddressField" rows="2"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -238,14 +214,32 @@
 
                     <div class="col-3">
                         <div class="card">
-                            <div class="card-body">
-                                <div class="form-group w-100">
-                                    <label class="col-form-label">Note in trên đơn</label>
-                                    <textarea class="form-control" placeholder="Note" id="noteFieldCart_"></textarea>
+                            <div class="card-body p-2">
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="mr-2 mb-0" style="width: 100px">Pre-discount</label>
+                                    <span class="w-100 text-right" id="mTotalAmountPreDiscount"></span>
                                 </div>
-                                <div class="form-group w-100">
-                                    <label class="col-form-label">Note nội bộ</label>
-                                    <textarea class="form-control" placeholder="Note" id="noteFieldCart"></textarea>
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="mr-2 mb-0" style="width: 100px">Discount</label>
+                                    <span class="w-100 text-right" id="amountDiscountField" th:text="0"></span>
+                                </div>
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="mr-2 mb-0" style="width: 100px">Final amount</label>
+                                    <span class="w-100 text-right" id="totalAmountDiscountField"></span>
+                                </div>
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="mr-2 mb-0" style="width: 100px">Payment method</label>
+                                    <select class="custom-select w-100" id="paymentMethodField" required>
+                                        <option th:each="list : ${listPaymentMethod}" th:value="${list.id}" th:text="${list.name}"></option>
+                                    </select>
+                                </div>
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="mr-2 mb-0" style="width: 100px">Amount Received</label>
+                                    <input class="form-control text-right w-100" id="amountReceivedField"/>
+                                </div>
+                                <div class="form-group d-flex align-items-center">
+                                    <label class="mr-2 mb-0" style="width: 100px">Amount Return</label>
+                                    <input class="form-control text-right w-100" id="amountReturnField"/>
                                 </div>
                             </div>
                         </div>
@@ -253,17 +247,19 @@
                 </div>
             </div>
 
-            <section class="content">
+            <!--<section class="content">
                 <div class="container-fluid">
                     <div class="card">
                         <div class="card-footer">...</div>
                     </div>
                 </div>
-            </section>
+            </section>-->
 
         </div>
         <div th:replace="~{modal_fragments :: confirm_modal}"></div>
         <div th:replace="~{pages/product/fragments/product-fragments :: searchProductModal}"></div>
+        <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalDeleteItem}"></div>
+        <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalSearchCustomer}"></div>
 
         <div th:replace="~{footer :: footer}"><!-- Nhúng các file JavaScript vào --></div>
 
@@ -271,6 +267,7 @@
 
         <div th:replace="~{header :: scripts}"><!-- Nhúng các file JavaScript vào --></div>
 
+        <script th:src="@{/js/order/Cart.js}"></script>
         <script th:src="@{/js/order/CreateNewOrder.js}"></script>
         <script th:src="@{/js/product/SearchProductModal.js}"></script>
     </div>
@@ -278,7 +275,8 @@
     <script type="text/javascript">
         setupSelectMultiple();
 
-        let mvCartId = [[${listCart.get(0).id}]];
+        let mvCurrentCartId = 0;
+        let mvCurrentCartName = "Cart 0";
         let mvCustomers = {};
         let mvVoucherTicketDetail= {};
         let mvVoucherStatus = "NOK";
@@ -288,17 +286,38 @@
         let mvTotalAmountDiscount = [[${totalAmountWithoutDiscount}]];//$("#totalAmountDiscountField");
         $('#isUseVoucherBlock').hide();
 
+        ///sls/order/ban-hang/cart/{id}/reset(id=${cart.id})
+
         $(document).ready(function () {
             createListener();
+            loadCarts();
             loadCustomers();
-            loadReceiveInformationToForm();
             createOrder();
             checkVoucherIsAvailable();
             useVoucher();
         });
 
         function createListener() {
+            $("#btnNewCart").on("click", function () {
+                addNewCart();
+            });
+
+            $(document).on('click', 'button[name="btnDeleteCart"]', function (event) {
+                event.preventDefault();
+                let cartId = $(this).attr("cartId");
+                deleteCart(cartId);
+            });
+
+            $(document).on('click', 'a[name="btnViewCart"]', function () {
+                const selectedCartId = $(this).attr('cartId');
+                viewCartInfo(selectedCartId);
+            });
+
             $("#btnAddItems").on("click", function () {
+                if ($('.cart-tag').length === 0) {
+                    alert("Please select cart!");
+                    return;
+                }
                 $("#searchProductModal").modal();
                 setupSearchModalInCreateOrderPage();
             });
@@ -306,6 +325,12 @@
             $("#btnSubmitProductOnSearchModal").on("click", function () {
                 submitProductOnSearchModal("createOrder");
                 //$("#searchProductModal").modal("hide");
+            });
+
+            $(document).on('click', '.btnDeleteItem', function () {
+                let itemId = $(this).attr("itemId");
+                let itemName = $(this).attr("itemName");
+                deleteItem(itemId, itemName);
             });
         }
 
@@ -323,15 +348,6 @@
             } else {
                 alert('Call API fail!')
             }
-        }
-
-        function loadReceiveInformationToForm() {
-            $('#customerField').on('click', function () {
-                $('#receiveNameField').val(mvCustomers[$(this).val()].customerName);
-                $('#receivePhoneNumberField').val(mvCustomers[$(this).val()].phoneDefault);
-                $('#receiveEmailField').val(mvCustomers[$(this).val()].emailDefault);
-                $('#receiveAddressField').val(mvCustomers[$(this).val()].addressDefault);
-            });
         }
 
         function checkVoucherIsAvailable() {
@@ -386,6 +402,147 @@
                     $("#totalAmountDiscountField").text(formatCurrency(mvTotalAmountWithoutDiscount));
                 }
             })
+        }
+
+        function loadCarts() {
+            let apiURL = mvHostURLCallApi + '/sls/cart';
+            let params = {};
+            $.get(apiURL, params, function (response) {
+                if (response.status === "OK") {
+                    $.each(response.data, function (index, d) {
+                        appendNewCart(index + 1, d.id);
+                        if (index === 0) {
+                            viewCartInfo(d.id);
+                        }
+                    });
+                }
+            }).fail(function (xhr) {
+                alert("Error: " + $.parseJSON(xhr.responseText).message);
+            });
+        }
+
+        function addNewCart() {
+            let apiURL = mvHostURLCallApi + '/sls/cart/add';
+            let body = {}
+            $.ajax({
+                url: apiURL,
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(body),
+                success: function (response) {
+                    if (response.status === "OK") {
+                        let lvNewCart = response.data;
+                        let lvNumberOfCarts = $('.cart-tag').length;
+                        appendNewCart(lvNumberOfCarts + 1, lvNewCart.id);
+                        if ($('.cart-tag').length === 1) {
+                            mvCurrentCartId = lvNewCart.id;
+                            viewCartInfo(mvCurrentCartId);
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    alert("Error: " + $.parseJSON(xhr.responseText).message);
+                }
+            });
+        }
+
+        function appendNewCart(cartIndex, cartId) {
+            $("#cart-tags").append(`
+                <div class="cart-tag" cartId="${cartId}">
+                    <a cartId="${cartId}" name="btnViewCart" style="cursor: pointer">Cart ${cartIndex}</a> <button class="close-btn" aria-label="Close" name="btnDeleteCart" cartId="${cartId}">&times;</button>
+                </div>
+            `);
+        }
+
+        function deleteCart(pCartId) {
+            let apiURL = mvHostURLCallApi + "/sls/cart/" + pCartId;
+            $.ajax({
+                url: apiURL,
+                type: 'DELETE',
+                success: function(result) {
+                    alert(result.message);
+                    $(`.cart-tag[cartId="${pCartId}"]`).remove();
+                },
+                error: function(xhr, status, error) {
+                    alert(status + ': ' + JSON.stringify(xhr.responseJSON.message));
+                }
+            });
+        }
+
+        function viewCartInfo(pCartId) {
+            // Reset all cart-tag to bg-secondary
+            $('.cart-tag').removeClass('bg-info').addClass('bg-secondary');
+
+            // Load items
+            let apiURL = mvHostURLCallApi + `/sls/cart/${pCartId}`;
+            let params = {};
+            $.get(apiURL, params, function (response) {
+                if (response.status === "OK") {
+                    let data = response.data;
+
+                    $("#tblItems").empty();
+
+                    $.each(data.items, function (index, d) {
+                        appendItem(index + 1, d)
+                    });
+                }
+            }).fail(function (xhr) {
+                alert("Error: " + $.parseJSON(xhr.responseText).message);
+            });
+
+            // Set the selected one to bg-info
+            $('.cart-tag[cartId="' + pCartId + '"]').removeClass('bg-secondary').addClass('bg-info');
+            mvCurrentCartId = pCartId;
+        }
+        
+        function appendItem(pItemIndex, pItem) {
+            $("#tblItems").append(`
+                <tr class="row-item" itemId="${pItem.itemId}">
+                    <td class="text-left">
+                        <a href="/san-pham/variant/${pItem.itemId}">${pItemIndex + '. ' + pItem.itemName}</a>
+                        <p class="font-italic">${pItem.note}</p>
+                    </td>
+                    <td>${formatCurrency(pItem.price)}</td>
+                    <td>${formatCurrency(pItem.extraDiscount)}</td>
+                    <td>
+                        <div class="item-quantity-input input-group input-group-sm" style="flex-wrap: nowrap">
+                            <button class="btn btn-sm btn-outline-secondary btn-minus" type="button">−</button>
+                            <input  class="form-control quantity itemQuantity" min="1" type="number" value="${pItem.quantity}" itemId="${pItem.itemId}"/>
+                            <button class="btn btn-sm btn-outline-secondary btn-plus"  type="button">+</button>
+                        </div>
+                    </td>
+                    <td class="col-item-subTotal">${formatCurrency(pItem.subTotal)}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-primary btnUpdateItem" data-toggle="modal" data-target="#modalUpdateItem"
+                                itemId="${pItem.itemId}" itemName="${pItem.itemName}">
+                            <i class="fa-solid fa-pencil"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger btnDeleteItem" data-toggle="modal" data-target="#modalDeleteItems"
+                                itemId="${pItem.itemId}" itemName="${pItem.itemName}">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `);
+        }
+
+        function deleteItem(itemId, itemName) {
+            $("#modalDeleteItem").modal("show");
+            $("#mdlDItem_itemName").text(itemName);
+            $("#mdlDItem_submit").on("click", function () {
+                let apiURL = mvHostURLCallApi + `/sls/cart/${mvCurrentCartId}/item/${itemId}`;
+                $.ajax({
+                    url: apiURL,
+                    type: 'DELETE',
+                    success: function(result) {
+                        $(`.row-item[itemId="${itemId}"]`).remove();
+                        $("#modalDeleteItem").modal("hide");
+                    },
+                    error: function(xhr, status, error) {
+                        alert(status + ': ' + JSON.stringify(xhr.responseJSON.message));
+                    }
+                });
+            });
         }
     </script>
 </body>

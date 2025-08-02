@@ -19,7 +19,7 @@ public class LedgerTransactionDTO extends BaseDTO implements Serializable {
     BigDecimal amount;
     String description;
     String status;
-    String tranContentName;
-    String groupObjectName;
-    String paymentMethodName;
+    //String tranContentName;
+    //String groupObjectName;
+    //String paymentMethodName;
 }

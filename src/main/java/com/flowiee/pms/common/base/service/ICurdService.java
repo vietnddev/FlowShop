@@ -1,10 +1,10 @@
 package com.flowiee.pms.common.base.service;
 
+import com.flowiee.pms.common.model.BaseParameter;
+
 import java.util.List;
 
 public interface ICurdService<T> {
-    List<T> findAll();
-
     T findById(Long pEntityId, boolean pThrowException);
 
     T save(T pEntity);

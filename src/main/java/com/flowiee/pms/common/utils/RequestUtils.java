@@ -7,7 +7,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Enumeration;

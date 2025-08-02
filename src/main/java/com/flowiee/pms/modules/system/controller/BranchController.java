@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.system.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.system.dto.BranchDTO;
@@ -24,14 +23,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BranchController extends BaseController {
     BranchService branchService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all branches")
     @GetMapping("/all")
     @PreAuthorize("@vldModuleSystem.readBranch(true)")
     public AppResponse<List<BranchDTO>> findAllBranches() {
         try {
-            return mvCHelper.success(branchService.findAll());
+            return AppResponse.success(branchService.find());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "branch"), ex);
         }
@@ -41,7 +39,7 @@ public class BranchController extends BaseController {
     @PreAuthorize("@vldModuleSystem.insertBranch(true)")
     public AppResponse<BranchDTO> createBranch(@RequestBody BranchDTO branch) {
         try {
-            return mvCHelper.success(branchService.save(branch));
+            return AppResponse.success(branchService.save(branch));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.DELETE_ERROR_OCCURRED.getDescription(), "branch"), ex);
         }
@@ -51,7 +49,7 @@ public class BranchController extends BaseController {
     @PreAuthorize("@vldModuleSystem.updateBranch(true)")
     public AppResponse<BranchDTO> updateBranch(@RequestBody BranchDTO branch, @PathVariable("id") Long branchId) {
         try {
-            return mvCHelper.success(branchService.update(branch, branchId));
+            return AppResponse.success(branchService.update(branch, branchId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.DELETE_ERROR_OCCURRED.getDescription(), "branch"), ex);
         }
@@ -61,7 +59,7 @@ public class BranchController extends BaseController {
     @PreAuthorize("@vldModuleSystem.deleteBranch(true)")
     public AppResponse<String> deleteBranch(@PathVariable("id") Long branchId) {
         try {
-            return mvCHelper.success(branchService.delete(branchId));
+            return AppResponse.success(branchService.delete(branchId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.DELETE_ERROR_OCCURRED.getDescription(), "branch"), ex);
         }

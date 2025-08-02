@@ -5,7 +5,7 @@ import com.flowiee.pms.common.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
@@ -22,10 +22,9 @@ public class ProductAttribute extends BaseEntity implements Serializable {
     @Serial
 	static final long serialVersionUID = 1L;
 
-	@JsonIgnoreProperties("listAttributes")
     @ManyToOne
-    @JoinColumn(name = "product_variant_id", nullable = false)
-    ProductDetail productDetail;
+    @JoinColumn(name = "product_id", nullable = false)
+    Product product;
 
     @Column(name = "attribute_name", nullable = false)
     String attributeName;
@@ -48,7 +47,7 @@ public class ProductAttribute extends BaseEntity implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ProductAttribute [id=" + super.id + ", productVariant=" + productDetail + ", attributeName=" + attributeName
+		return "ProductAttribute [id=" + super.id  + ", attributeName=" + attributeName
 				+ ", attributeValue=" + attributeValue + ", sort=" + sort + ", status=" + status + "]";
 	}
 }

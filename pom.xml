@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.2</version>
+		<version>2.7.18</version>
 		<relativePath />
 	</parent>
 	<groupId>com.flowiee</groupId>
@@ -15,14 +15,13 @@
 	<name>FlowShop</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<!--<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
-			<optional>true</optional>
 		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -81,63 +80,33 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.4.14</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>4.1.2</version>
+			<version>5.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>4.1.2</version>
+			<version>5.2.3</version>
 		</dependency>
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.5</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.11.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-text</artifactId>
-			<version>1.10.0</version>
-		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui -->
-		<!--<dependency>
+		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>2.3.0</version>
-		</dependency>-->
-		<!-- Springdoc -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.5.0</version>
+			<version>1.7.0</version>
 		</dependency>
 
 		<!-- Barcode and QRCode -->
 		<dependency><!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
 			<groupId>com.google.zxing</groupId>
 			<artifactId>core</artifactId>
-			<version>3.3.0</version>
+			<version>3.5.3</version>
 		</dependency>
 		<dependency><!-- https://mvnrepository.com/artifact/com.google.zxing/javase -->
 			<groupId>com.google.zxing</groupId>
 			<artifactId>javase</artifactId>
-			<version>3.3.1</version>
+			<version>3.5.3</version>
 		</dependency>
 
 		<!--Report pdf-->
@@ -145,63 +114,35 @@
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
-			<version>6.20.1</version>
+			<version>6.17.0</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports-fonts -->
+
+		<!-- report
+		<!- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports-fonts ->
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports-fonts</artifactId>
 			<version>6.0.0</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/net.sourceforge.jexcelapi/jxl -->
-		<!--<dependency>
-			<groupId>net.sourceforge.jexcelapi</groupId>
-			<artifactId>jxl</artifactId>
-			<version>2.6.12</version>
-		</dependency>-->
-		<!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
-		<!--<dependency>
-			<groupId>org.apache.pdfbox</groupId>
-			<artifactId>pdfbox</artifactId>
-			<version>1.6.0</version>
-		</dependency>-->
-		<!-- https://mvnrepository.com/artifact/com.lowagie/itext -->
-<!--		<dependency>-->
-<!--			<groupId>com.lowagie</groupId>-->
-<!--			<artifactId>itext</artifactId>-->
-<!--			<version>4.2.2</version>-->
-<!--			<type>pom</type>-->
-<!--		</dependency>-->
-		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
+		<!- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all ->
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
 			<version>3.0.17</version>
 			<type>pom</type>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
 			<version>5.5.6</version>
 		</dependency>
-		<!-- gói jar để xuất file pdf -->
 		<dependency>
 			<groupId>com.github.librepdf</groupId>
 			<artifactId>openpdf</artifactId>
 			<version>1.3.8</version>
 		</dependency>
-		<dependency>
-			<groupId>net.logstash.logback</groupId>
-			<artifactId>logstash-logback-encoder</artifactId>
-			<version>6.1</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.json/json -->
-		<!--<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20231013</version>
-		</dependency>-->
+		-->
+
 		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
 		<dependency>
 			<groupId>org.modelmapper</groupId>
@@ -213,12 +154,7 @@
 			<artifactId>opencsv</artifactId>
 			<version>5.5.2</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
-<!--		<dependency>
-			<groupId>org.mapstruct</groupId>
-			<artifactId>mapstruct</artifactId>
-			<version>1.5.5.Final</version>
-		</dependency>-->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
@@ -239,22 +175,19 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.16.1</version>
 		</dependency>
-<!--		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.15.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>2.15.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>2.15.3</version>
-		</dependency>-->
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<skipTests>true</skipTests> <!-- Skip test khi dev -->
+				<spring-boot.run.profiles>dev</spring-boot.run.profiles>
+			</properties>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
 			<plugin>
@@ -267,9 +200,6 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
-					<jvmArguments>
-						-XX:TieredStopAtLevel=1
-					</jvmArguments>
 				</configuration>
 				<executions>
 					<execution>

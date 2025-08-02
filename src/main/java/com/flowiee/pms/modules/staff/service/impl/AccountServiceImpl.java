@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.staff.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.enumeration.*;
@@ -20,21 +21,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class AccountServiceImpl extends BaseService<Account, AccountDTO, AccountRepository> implements AccountService {
     private final SystemLogService mvSystemLogService;
-    private final UserSession mvUserSession;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    public AccountServiceImpl(AccountRepository pEntityRepository, SystemLogService pSystemLogService, UserSession pUserSession) {
+    public AccountServiceImpl(AccountRepository pEntityRepository, SystemLogService pSystemLogService) {
         super(Account.class, AccountDTO.class, pEntityRepository);
         this.mvSystemLogService = pSystemLogService;
-        this.mvUserSession = pUserSession;
     }
 
     @Override
@@ -100,7 +99,7 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
 
     @Override
     public Account updateProfile(Account pAccount) {
-        Account lvProfile = mvUserSession.getUserPrincipal().getEntity();
+        Account lvProfile = getUserPrincipal().getEntity();
         lvProfile.setPhoneNumber(pAccount.getPhoneNumber());
         lvProfile.setEmail(pAccount.getEmail());
         lvProfile.setAddress(pAccount.getAddress());
@@ -126,7 +125,7 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
 
     @Override
     public AccountDTO getMyProfile() {
-        Account lvEntity = mvEntityRepository.findById(mvUserSession.getUserPrincipal().getId())
+        Account lvEntity = mvEntityRepository.findById(getUserPrincipal().getId())
                 .orElseThrow(() -> new BadRequestException("Invalid information!"));
         String lvAvt = lvEntity.getListAvatar().stream()
                 .filter(FileStorage::isActive)
@@ -149,8 +148,8 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
     }
 
     @Override
-    public List<AccountDTO> findAll() {
-        return super.findAll().stream()
+    public List<AccountDTO>find() {
+        return super.find(new BaseParameter()).stream()
                 .peek(a -> {
                     a.setPassword(null);
                     a.setAvatar("/media/default/user");

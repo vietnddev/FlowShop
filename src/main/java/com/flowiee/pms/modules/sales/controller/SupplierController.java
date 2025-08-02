@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.common.base.controller.BaseControllerNew;
 import com.flowiee.pms.common.base.service.BaseService;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
+import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.sales.dto.SupplierDTO;
@@ -23,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SupplierController extends BaseControllerNew<SupplierDTO> {
     private final SupplierService mvSupplierService;
-    private final ControllerHelper mvCHelper;
 
     @Override
     protected BaseService<?, SupplierDTO, ?> getService() {
@@ -33,16 +32,11 @@ public class SupplierController extends BaseControllerNew<SupplierDTO> {
     @Operation(summary = "Find all nhà cung cấp")
     @GetMapping("/all")
     @PreAuthorize("@vldModuleSales.readSupplier(true)")
-    public AppResponse<List<SupplierDTO>> findAll(@RequestParam(value = "pageSize", required = false) Integer pageSize,
-                                                  @RequestParam(value = "pageNum", required = false) Integer pageNum) {
+    public AppResponse<List<SupplierDTO>> findAll(@RequestParam(value = "pageSize", required = false, defaultValue = Constants.DEFAULT_PSIZE) Integer pageSize,
+                                                  @RequestParam(value = "pageNum", required = false, defaultValue = Constants.DEFAULT_PNUM) Integer pageNum) {
         try {
-            if (pageSize != null && pageNum != null) {
-                Page<SupplierDTO> suppliers = mvSupplierService.findAll(pageSize, pageNum - 1, null);
-                return mvCHelper.success(suppliers.getContent(), pageNum, pageSize, suppliers.getTotalPages(), suppliers.getTotalElements());
-            } else {
-                Page<SupplierDTO> suppliers = mvSupplierService.findAll(null, null, null);
-                return mvCHelper.success(suppliers.getContent(), 1, 0, suppliers.getTotalPages(), suppliers.getTotalElements());
-            }
+            Page<SupplierDTO> suppliers = mvSupplierService.findAll(pageSize, pageNum - 1, null);
+            return AppResponse.paged(suppliers);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "supplier"), ex);
         }

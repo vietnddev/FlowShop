@@ -20,7 +20,7 @@ public interface LedgerTransactionRepository extends BaseRepository<LedgerTransa
            "and ((:fromDate is null and :toDate is null) or (:fromDate <= t.createdAt and :toDate >= t.createdAt))")
     Page<LedgerTransaction> findAll(@Param("type") String type, @Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate, Pageable pageable);
 
-    @Query(value = "select tran_index from ledger_transaction where tran_type = :type order by id desc fetch first 1 rows only", nativeQuery = true)
+    @Query(value = "select tran_index from ledger_transaction where tran_type = :type order by id limit 1", nativeQuery = true)
     Long findLastIndex(@Param("type") String type);
 
     @Query("select coalesce(sum((case when t.tranType = 'PT' then t.amount else 0 end) - (case when t.tranType = 'PC' then t.amount else 0 end)), 0) as beginBal " +

@@ -38,7 +38,7 @@ public class LedgerExportServiceImpl extends BaseExportService {
             row.createCell(5).setCellValue(t.getCreatedAt());
             row.createCell(6).setCellValue(t.getCreatedBy());
             row.createCell(7).setCellValue(t.getFromToName());
-            row.createCell(8).setCellValue(t.getGroupObjectName());
+            row.createCell(8).setCellValue(t.getGroupObject().getName());
             row.createCell(9).setCellValue("");
 
             setBorderCell(row, 0, 9);

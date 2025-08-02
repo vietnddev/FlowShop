@@ -8,6 +8,7 @@ import java.util.*;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.exception.AppException;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.system.dto.LanguageDTO;
 import com.flowiee.pms.modules.system.service.LanguageService;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,8 @@ public class LanguageServiceImpl extends BaseService<Language, LanguageDTO, Lang
 	}
 
 	@Override
-	public List<LanguageDTO> findAll() {
-		return super.findAll();
+	public List<LanguageDTO>find(BaseParameter pParam) {
+		return super.find(pParam);
 	}
 
 	@Override

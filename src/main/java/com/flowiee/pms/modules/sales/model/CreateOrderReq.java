@@ -17,6 +17,7 @@ public class CreateOrderReq {
     private Long paymentMethodId;
     private String orderStatus;
     private String note;
+    private String customerNote;
     private String orderTime;
     private String couponCode;
     private String recipientName;

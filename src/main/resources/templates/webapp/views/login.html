@@ -47,4 +47,15 @@
         </div>
         <div th:replace="~{header :: scripts}"></div>
     </body>
+
+    <script>
+        window.onload = function() {
+            let username = "admin";
+            let password = "123456";
+            document.getElementById("username").value = username;
+            document.getElementById("password").value = password;
+
+            document.forms[0].submit();
+        };
+    </script>
 </html>

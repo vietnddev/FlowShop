@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.system.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import com.flowiee.pms.common.enumeration.TemplateExport;
 import com.flowiee.pms.common.exception.AppException;
@@ -40,7 +39,6 @@ public class SystemLogController extends BaseController {
     @NonFinal
     @Autowired
     ExportService exportService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all log")
     @GetMapping("/log/all")
@@ -48,7 +46,7 @@ public class SystemLogController extends BaseController {
     public AppResponse<List<SystemLog>> findLogs(@RequestParam("pageSize") int pageSize, @RequestParam("pageNum") int pageNum) {
         try {
             Page<SystemLog> logPage = logService.findAll(pageSize, pageNum - 1);
-            return mvCHelper.success(logPage.getContent(), pageNum, pageSize, logPage.getTotalPages(), logPage.getTotalElements());
+            return AppResponse.paged(logPage);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "system log"), ex);
         }

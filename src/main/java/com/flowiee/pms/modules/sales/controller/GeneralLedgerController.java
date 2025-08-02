@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.system.model.EximResult;
@@ -39,7 +38,6 @@ public class GeneralLedgerController extends BaseController {
     @NonFinal
     @Autowired
     ExportService mvExportService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find general ledger")
     @GetMapping
@@ -50,7 +48,7 @@ public class GeneralLedgerController extends BaseController {
                                                         @RequestParam(value = "toDate", required = false) LocalDate toDate) {
         try {
             GeneralLedger generalLedger = mvLedgerService.findGeneralLedger(pageSize, pageNum -1, fromDate, toDate);
-            return mvCHelper.success(generalLedger, pageNum, pageSize, generalLedger.getTotalPages(), generalLedger.getTotalElements());
+            return AppResponse.success(generalLedger, pageNum, pageSize, generalLedger.getTotalPages(), generalLedger.getTotalElements());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "generalLedger"), ex);
         }

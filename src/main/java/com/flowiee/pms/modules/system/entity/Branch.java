@@ -7,7 +7,7 @@ import com.flowiee.pms.modules.staff.entity.Account;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;

@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.inventory.entity;
 import com.flowiee.pms.common.base.entity.BaseEntity;
 import lombok.*;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 

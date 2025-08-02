@@ -16,7 +16,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.util.Assert;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -136,11 +136,6 @@ public class ProductDetail extends BaseEntity implements Serializable {
     ProductStatus status;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "productDetail", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    List<ProductAttribute> listAttributes;
-
-    @JsonIgnore
     @OneToMany(mappedBy = "productDetail", fetch = FetchType.LAZY)
     List<OrderDetail> listOrderDetail;
 
@@ -188,7 +183,7 @@ public class ProductDetail extends BaseEntity implements Serializable {
     }
 
     public int getAvailableSalesQty() {
-        return storageQty - defectiveQty;
+        return storageQty == null ? 0 : storageQty - defectiveQty;
     }
 
     public boolean isExpiredDate() {

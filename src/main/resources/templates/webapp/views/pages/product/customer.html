@@ -38,7 +38,7 @@
                                             <div class="modal fade" id="modelAddKhachHang">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content text-left">
-                                                        <form th:action="@{/customer/insert}" method="post">
+                                                        <form th:action="@{/customer/insert}" method="post" th:object="${customer}">
                                                             <div class="modal-header">
                                                                 <strong class="modal-title">Thêm mới khách hàng</strong>
                                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -48,33 +48,33 @@
                                                                     <div class="col-12">
                                                                         <div class="form-group">
                                                                             <label>Tên khách hàng</label>
-                                                                            <input type="text" class="form-control" required name="customerName"/>
+                                                                            <input type="text" class="form-control" th:field="*{customerName}" required/>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label>Giới tính</label>
-                                                                            <select class="custom-select col-sm" name="sex" data-placeholder="Chọn giới tính">
-                                                                                <option selected value="1">Nam</option>
-                                                                                <option selected value="0">Nữ</option>
+                                                                            <select class="custom-select col-sm" th:field="*{gender}">
+                                                                                <option selected value="M">Nam</option>
+                                                                                <option selected value="F">Nữ</option>
                                                                             </select>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label>Số điện thoại</label>
-                                                                            <input type="text" class="form-control" required name="phoneDefault"/>
+                                                                            <input type="text" class="form-control" th:field="*{phoneDefault}"/>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label>Email</label>
-                                                                            <input type="email" class="form-control" name="emailDefault"/>
+                                                                            <input type="email" class="form-control" th:field="*{emailDefault}"/>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label>Địa chỉ</label>
-                                                                            <input type="text" class="form-control" required name="addressDefault"/>
+                                                                            <input type="text" class="form-control" th:field="*{addressDefault}"/>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="modal-footer justify-content-end">
-                                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
-                                                                    <button type="submit" class="btn btn-primary">Lưu</button>
-                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer justify-content-end">
+                                                                <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                                                                <button type="submit" class="btn btn-primary">Lưu</button>
                                                             </div>
                                                         </form>
                                                     </div>
@@ -91,13 +91,13 @@
                                             <tr>
                                                 <th>STT</th>
                                                 <th>Tên khách hàng</th>
-                                                <th>Giới tính</th>
-                                                <th>Sinh nhật</th>
-                                                <th>Số điện thoại</th>
+                                                <th>Phone number</th>
                                                 <th>Email</th>
-                                                <th>Địa chỉ</th>
-                                                <th>Current debit amount</th>
-                                                <th>Total purchase</th>
+                                                <th>Address</th>
+                                                <th>Orders</th>
+                                                <th>Total spent</th>
+                                                <th>Debit amount</th>
+                                                <th>Last order</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -206,13 +206,13 @@
                             <tr>
                                 <td class="vertical-center">${(((pageNum - 1) * pageSize + 1) + index)}</td>
                                 <td class="vertical-center"><a href="/customer/${d.id}">${d.customerName}</a></td>
-                                <td class="vertical-center">${sex}</td>
-                                <td class="vertical-center">${d.dateOfBirth}</td>
                                 <td class="vertical-center">${d.phoneDefault}</td>
                                 <td class="vertical-center">${d.emailDefault}</td>
                                 <td class="vertical-center">${d.addressDefault}</td>
-                                <td class="vertical-center">${d.outstandingBalanceAmount}</td>
-                                <td class="vertical-center">${d.totalPurchase}</td>
+                                <td class="vertical-center">${d.totalPurchasedCount}</td>
+                                <td class="vertical-center">${formatUSCurrency(d.totalPurchasedAmount)}</td>
+                                <td class="vertical-center">${formatUSCurrency(d.outstandingBalanceAmount)}</td>
+                                <td class="vertical-center">${d.lastOrder}</td>
                                 <td class="vertical-center">
                                     <button class="btn btn-outline-info btn-sm">
                                         <a href="customer/${d.id}"><i class="fa-solid fa-eye"></i></a>

@@ -1,11 +1,11 @@
 package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.constants.Constants;
+import com.flowiee.pms.modules.inventory.dto.ProductPriceDTO;
+import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.ProductHistory;
 import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
@@ -25,7 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -37,7 +36,6 @@ public class ProductVariantController extends BaseController {
     ProductVariantService mvProductVariantService;
     ProductHistoryService mvProductHistoryService;
     ProductPriceService   mvProductPriceService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all variants")
     @GetMapping("/variant/all")
@@ -56,14 +54,14 @@ public class ProductVariantController extends BaseController {
                 .productId(productId).brandId(pBrandId).colorId(pColorId)
                 .sizeId(pSizeId).fabricTypeId(fabricTypeId).availableForSales(readyForSales)
                 .checkInAnyCart(true).build());
-        return mvCHelper.success(data.getContent(), data.getNumber() + 1, data.getSize(), data.getTotalPages(), data.getTotalElements());
+        return AppResponse.paged(data);
     }
 
     @Operation(summary = "Find all variants of product")
     @GetMapping("/{productId}/variants")
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public AppResponse<List<ProductVariantDTO>> findVariantsOfProduct(@PathVariable("productId") Long productId) {
-        return mvCHelper.success(mvProductVariantService.findAll(ProductVariantSearchRequest.builder()
+        return AppResponse.success(mvProductVariantService.findAll(ProductVariantSearchRequest.builder()
                 .productId(productId).checkInAnyCart(false).build()).getContent());
     }
 
@@ -72,7 +70,7 @@ public class ProductVariantController extends BaseController {
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public AppResponse<ProductVariantDTO> findDetailProductVariant(@PathVariable("id") Long productVariantId) {
         ProductVariantDTO productVariant = mvProductVariantService.findById(productVariantId, true);
-        return mvCHelper.success(productVariant);
+        return AppResponse.success(productVariant);
     }
 
     @Operation(summary = "Create product variant")
@@ -80,7 +78,7 @@ public class ProductVariantController extends BaseController {
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
     public AppResponse<ProductVariantDTO> createProductVariant(@RequestBody ProductVariantDTO productVariantDTO) {
         try {
-            return mvCHelper.success(mvProductVariantService.save(productVariantDTO));
+            return AppResponse.success(mvProductVariantService.save(productVariantDTO));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "productVariant") + ex.getMessage(), ex);
         }
@@ -93,14 +91,14 @@ public class ProductVariantController extends BaseController {
         if (mvProductVariantService.findById(productVariantId, true) == null) {
             throw new ResourceNotFoundException("Product variant not found!");
         }
-        return mvCHelper.success(mvProductVariantService.update(productVariant, productVariantId));
+        return AppResponse.success(mvProductVariantService.update(productVariant, productVariantId));
     }
 
     @Operation(summary = "Delete product variant")
     @DeleteMapping("/variant/delete/{id}")
     @PreAuthorize("@vldModuleProduct.deleteProduct(true)")
     public AppResponse<String> deleteProductVariant(@PathVariable("id") Long productVariantId) {
-        return mvCHelper.success(mvProductVariantService.delete(productVariantId));
+        return AppResponse.success(mvProductVariantService.delete(productVariantId));
     }
 
     @Operation(summary = "Get price history of product detail")
@@ -110,24 +108,16 @@ public class ProductVariantController extends BaseController {
         if (mvProductVariantService.findById(productVariantId, true) == null) {
             throw new ResourceNotFoundException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product history"));
         }
-        return mvCHelper.success(mvProductHistoryService.findPriceChange(productVariantId));
+        return AppResponse.success(mvProductHistoryService.findPriceChange(productVariantId));
     }
 
     @Operation(summary = "Update price")
-    @PutMapping(value = "/variant/price/update/{productVariantId}")
+    @PutMapping(value = "/variant/{variantId}/price/update")
     @PreAuthorize("@vldModuleProduct.priceManagement(true)")
-    public AppResponse<String> updatePrice(@PathVariable("productVariantId") Long productVariantId,
-                                           @RequestParam(value = "originalPrice", required = false) BigDecimal originalPrice,
-                                           @RequestParam(value = "discountPrice", required = false) BigDecimal discountPrice) {
-        try {
-            if (mvProductVariantService.findById(productVariantId, true) == null) {
-                throw new BadRequestException();
-            }
-            //return mvCHelper.success(mvProductPriceService.updatePrice(productVariantId, originalPrice, discountPrice));
-            return mvCHelper.success("This endpoint doesn't support!");
-        } catch (RuntimeException ex) {
-            throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "price"), ex);
-        }
+    public AppResponse<ProductPriceDTO> updatePrice(@PathVariable("variantId") Long productVariantId,
+                                           @RequestBody ProductPriceDTO pPrice) {
+        ProductDetail lvProductVariant = mvProductVariantService.findEntById(productVariantId, true);
+        return AppResponse.success(mvProductPriceService.updatePrice(lvProductVariant, pPrice));
     }
 
     @Operation(summary = "Check product variant already exists")
@@ -138,7 +128,7 @@ public class ProductVariantController extends BaseController {
                                                                  @RequestParam("sizeId") Long sizeId,
                                                                  @RequestParam("fabricTypeId") Long fabricTypeId) {
         try {
-            return mvCHelper.success(mvProductVariantService.checkVariantExisted(productId, colorId, sizeId, fabricTypeId));
+            return AppResponse.success(mvProductVariantService.checkVariantExisted(productId, colorId, sizeId, fabricTypeId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product"), ex);
         }
@@ -149,7 +139,7 @@ public class ProductVariantController extends BaseController {
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public AppResponse<List<ProductVariantTempDTO>> getStorageHistoryOfProduct(@PathVariable("productVariantId") Long productVariantId) {
         try {
-            return mvCHelper.success(mvProductVariantService.findStorageHistory(productVariantId));
+            return AppResponse.success(mvProductVariantService.findStorageHistory(productVariantId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product"), ex);
         }
@@ -161,6 +151,6 @@ public class ProductVariantController extends BaseController {
     public AppResponse<List<ProductVariantDTO>> getProductsOutOfStock(@RequestParam(value = "pageSize", required = false) Integer pageSize,
                                                                       @RequestParam(value = "pageNum", required = false) Integer pageNum) {
         Page<ProductVariantDTO> productVariantDTOPage = mvProductVariantService.getProductsOutOfStock(-1, -1);
-        return mvCHelper.success(productVariantDTOPage.getContent(), pageNum, pageSize, productVariantDTOPage.getTotalPages(), productVariantDTOPage.getTotalElements());
+        return AppResponse.success(productVariantDTOPage.getContent(), pageNum, pageSize, productVariantDTOPage.getTotalPages(), productVariantDTOPage.getTotalElements());
     }
 }

@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.sales.dto.LedgerTransactionDTO;
 import com.flowiee.pms.modules.sales.service.LedgerPaymentService;
@@ -28,7 +27,6 @@ import java.util.List;
 public class LedgerTransactionController extends BaseController {
     LedgerReceiptService mvLedgerReceiptService;
     LedgerPaymentService mvLedgerPaymentService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all trans receipts")
     @GetMapping("/receipt/all")
@@ -36,7 +34,7 @@ public class LedgerTransactionController extends BaseController {
     public AppResponse<List<LedgerTransactionDTO>> findLedgerReceipts(@RequestParam(value = "pageSize", required = false) Integer pageSize,
                                                                       @RequestParam(value = "pageNum", required = false) Integer pageNum) {
         Page<LedgerTransactionDTO> ledgerReceipts = mvLedgerReceiptService.findAll(pageSize, pageNum - 1, null, null);
-        return mvCHelper.success(ledgerReceipts.getContent(), pageNum, pageSize, ledgerReceipts.getTotalPages(), ledgerReceipts.getTotalElements());
+        return AppResponse.paged(ledgerReceipts);
     }
 
     @Operation(summary = "Find all trans payments")
@@ -45,6 +43,6 @@ public class LedgerTransactionController extends BaseController {
     public AppResponse<List<LedgerTransactionDTO>> findLedgerPayments(@RequestParam(value = "pageSize", required = false) Integer pageSize,
                                                                    @RequestParam(value = "pageNum", required = false) Integer pageNum) {
         Page<LedgerTransactionDTO> ledgerReceipts = mvLedgerPaymentService.findAll(pageSize, pageNum - 1, null, null);
-        return mvCHelper.success(ledgerReceipts.getContent(), pageNum, pageSize, ledgerReceipts.getTotalPages(), ledgerReceipts.getTotalElements());
+        return AppResponse.paged(ledgerReceipts);
     }
 }

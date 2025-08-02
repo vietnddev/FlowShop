@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.staff.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.modules.staff.dto.AccountDTO;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.common.exception.AppException;
@@ -30,14 +29,13 @@ import java.util.List;
 public class AccountController extends BaseController {
     RoleService    roleService;
     AccountService accountService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all accounts")
     @GetMapping("/all")
     @PreAuthorize("@vldModuleSystem.readAccount(true)")
     public AppResponse<List<AccountDTO>> findAllAccounts() {
         try {
-            return mvCHelper.success(accountService.findAll());
+            return AppResponse.success(accountService.find());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "account"), ex);
         }
@@ -47,7 +45,7 @@ public class AccountController extends BaseController {
     @GetMapping("/{accountId}")
     @PreAuthorize("@vldModuleSystem.readAccount(true)")
     public AppResponse<Account> findDetailAccount(@PathVariable("accountId") Long accountId) {
-        return mvCHelper.success(accountService.findEntById(accountId, true));
+        return AppResponse.success(accountService.findEntById(accountId, true));
     }
 
     @Operation(summary = "Create account")
@@ -61,7 +59,7 @@ public class AccountController extends BaseController {
             if (accountService.findByUsername(account.getUsername()) != null) {
                 throw new DataExistsException("Username exists!");
             }
-            return mvCHelper.success(accountService.save(account));
+            return AppResponse.success(accountService.save(account));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "account"), ex);
         }
@@ -71,7 +69,7 @@ public class AccountController extends BaseController {
     @PutMapping(value = "/update/{accountId}")
     @PreAuthorize("@vldModuleSystem.updateAccount(true)")
     public AppResponse<Account> update(@RequestBody Account account, @PathVariable("accountId") Long accountId) {
-        return mvCHelper.success(accountService.update(account, accountId));
+        return AppResponse.success(accountService.update(account, accountId));
     }
 
     @PutMapping("/update-permission/{accountId}")
@@ -92,7 +90,7 @@ public class AccountController extends BaseController {
 //                    }
 //                }
 //            }
-            return mvCHelper.success(null);
+            return AppResponse.success(null);
         } catch (RuntimeException ex) {
             throw new AppException(ex);
         }
@@ -102,7 +100,7 @@ public class AccountController extends BaseController {
     @DeleteMapping(value = "/delete/{accountId}")
     @PreAuthorize("@vldModuleSystem.deleteAccount(true)")
     public AppResponse<String> deleteAccount(@PathVariable("accountId") Long accountId) {
-        return mvCHelper.success(accountService.delete(accountId));
+        return AppResponse.success(accountService.delete(accountId));
     }
 
     @Operation(summary = "Find roles of account")
@@ -110,7 +108,7 @@ public class AccountController extends BaseController {
     @PreAuthorize("@vldModuleSystem.readAccount(true)")
     public AppResponse<List<RoleModel>> findRolesOfAccount(@PathVariable("accountId") Long accountId) {
         try {
-            return mvCHelper.success(roleService.findAllRoleByAccountId(accountId));
+            return AppResponse.success(roleService.findAllRoleByAccountId(accountId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "role"), ex);
         }

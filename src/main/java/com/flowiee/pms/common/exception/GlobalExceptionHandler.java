@@ -2,7 +2,6 @@ package com.flowiee.pms.common.exception;
 
 import com.flowiee.pms.common.base.FlwSys;
 import com.flowiee.pms.common.base.exception.BaseException;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.modules.system.entity.SystemConfig;
@@ -25,7 +24,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler extends BaseController {
     private final MailMediaService mailMediaService;
-    private final ControllerHelper mvCHelper;
 
     private Map<Class, Boolean> mvExceptionNotifyEmail = new HashMap<>();
 
@@ -65,21 +63,21 @@ public class GlobalExceptionHandler extends BaseController {
             modelAndView.addObject("error", error);
             return baseView(modelAndView);
         } else {
-            return ResponseEntity.badRequest().body(mvCHelper.fail(HttpStatus.BAD_REQUEST, ex.getMessage()));
+            return ResponseEntity.badRequest().body(AppResponse.fail(HttpStatus.BAD_REQUEST, ex.getMessage()));
         }
     }
 
     @ExceptionHandler
     public ResponseEntity<AppResponse<Object>> exceptionHandler(BadRequestException ex) {
         mvLogger.error(ex.getMessage(), ex);
-        return ResponseEntity.badRequest().body(mvCHelper.fail(HttpStatus.BAD_REQUEST, ex.getMessage()));
+        return ResponseEntity.badRequest().body(AppResponse.fail(HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<AppResponse<?>> exceptionHandler(DataExistsException ex) {
         mvLogger.error(ex.getMessage(), ex);
         notifyEmail(ex);
-        return ResponseEntity.badRequest().body(mvCHelper.fail(HttpStatus.CONFLICT, ex.getMessage()));
+        return ResponseEntity.badRequest().body(AppResponse.fail(HttpStatus.CONFLICT, ex.getMessage()));
     }
 
     @ExceptionHandler
@@ -94,7 +92,7 @@ public class GlobalExceptionHandler extends BaseController {
     @ExceptionHandler
     public ResponseEntity<AppResponse<Object>> exceptionHandler(DataInUseException ex) {
         mvLogger.error(ex.getMessage(), ex);
-        return ResponseEntity.internalServerError ().body(mvCHelper.fail(HttpStatus.LOCKED, ex.getMessage()));
+        return ResponseEntity.internalServerError ().body(AppResponse.fail(HttpStatus.LOCKED, ex.getMessage()));
     }
 
     @ExceptionHandler
@@ -106,7 +104,7 @@ public class GlobalExceptionHandler extends BaseController {
             modelAndView.addObject("error", error);
             return baseView(modelAndView);
         } else {
-            return ResponseEntity.badRequest().body(mvCHelper.fail(HttpStatus.LOCKED, ex.getMessage()));
+            return ResponseEntity.badRequest().body(AppResponse.fail(HttpStatus.LOCKED, ex.getMessage()));
         }
     }
 
@@ -114,30 +112,28 @@ public class GlobalExceptionHandler extends BaseController {
     public ResponseEntity<AppResponse<Object>> exceptionHandler(AppException ex) {
         mvLogger.error(ex.getMessage(), ex);
         notifyEmail(ex);
-        return ResponseEntity.internalServerError ().body(mvCHelper.fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
+        return ResponseEntity.internalServerError ().body(AppResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<AppResponse<?>> exceptionHandler(RuntimeException ex) {
         mvLogger.error(ex.getMessage(), ex);
-        ex.printStackTrace();
 
         BaseException lvBaseException = new BaseException();
         lvBaseException.setMessage(ex.getMessage());
         notifyEmail(lvBaseException);
 
-        return ResponseEntity.internalServerError().body(mvCHelper.fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
+        return ResponseEntity.internalServerError().body(AppResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<AppResponse<?>> exceptionHandler(Exception ex) {
         mvLogger.error(ex.getMessage(), ex);
-        ex.printStackTrace();
 
         BaseException lvBaseException = new BaseException();
         lvBaseException.setMessage(ex.getMessage());
         notifyEmail(lvBaseException);
 
-        return ResponseEntity.internalServerError().body(mvCHelper.fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
+        return ResponseEntity.internalServerError().body(AppResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
     }
 }

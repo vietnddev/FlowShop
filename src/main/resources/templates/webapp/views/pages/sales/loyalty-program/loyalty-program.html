@@ -49,22 +49,30 @@
                                         <div class="tab-content">
                                             <div class="active tab-pane" id="PROGRAM_TAB">
                                                 <div class="card-body p-0">
-                                                    <table class="table table-bordered">
+                                                    <table id="example1" class="table table-bordered table-striped dataTable dtr-inline">
                                                         <thead>
-                                                        <tr>
-                                                            <th>STT</th>
-                                                            <th>Nội dung</th>
-                                                            <th>Người nhập</th>
-                                                            <th>Thời gian nhập</th>
-                                                            <th>Ghi chú</th>
-                                                            <th>Trạng thái</th>
-                                                        </tr>
+                                                            <tr>
+                                                                <th>No.</th>
+                                                                <th>Name</th>
+                                                                <th>Description</th>
+                                                                <th>Start date</th>
+                                                                <th>End date</th>
+                                                                <th>Is active</th>
+                                                                <th>Is default</th>
+                                                            </tr>
                                                         </thead>
-                                                        <tbody id="programTbl"></tbody>
+                                                        <tbody>
+                                                            <tr th:each="i, index: ${loyaltyPrograms}">
+                                                                <td th:text="${index.index + 1}"></td>
+                                                                <td th:text="${i.name}"></td>
+                                                                <td th:text="${i.description}"></td>
+                                                                <td th:text="${i.startDate}"></td>
+                                                                <td th:text="${i.endDate}"></td>
+                                                                <td th:text="${i.isActive}"></td>
+                                                                <td th:text="${i.isDefault}"></td>
+                                                            </tr>
+                                                        </tbody>
                                                     </table>
-                                                </div>
-                                                <div class="card-footer">
-                                                    <div th:replace="~{fragments :: pagination}"></div>
                                                 </div>
                                             </div>
 
@@ -127,10 +135,10 @@
         $(document).ready(function() {
             loadStorageItems(getPageSize(), getPageNum());
             $("#programTabLabel").on("click", function () {
-                loadPrograms(getPageSize(), getPageNum());
+                //loadPrograms(getPageSize(), getPageNum());
             })
             $("#giftTabLabel").on("click", function () {
-                loadGifts(getPageSize(), getPageNum());
+                //loadGifts(getPageSize(), getPageNum());
             })
             updateTableContentWhenOnClickPagination(loadPrograms);
             updateTableContentWhenOnClickPagination2(loadGifts);

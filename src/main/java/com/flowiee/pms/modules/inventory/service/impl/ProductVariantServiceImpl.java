@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.constants.JpaHints;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.modules.inventory.dto.*;
 import com.flowiee.pms.modules.inventory.service.*;
@@ -39,7 +40,7 @@ import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.modules.inventory.util.ProductVariantConvert;
 import com.google.zxing.WriterException;
-import jakarta.persistence.EntityGraph;
+import javax.persistence.EntityGraph;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +52,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.criteria.*;
-import jakarta.validation.ConstraintViolationException;
+import javax.persistence.criteria.*;
+import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -73,7 +74,6 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     private final OrderCartRepository mvCartRepository;
     private final GenerateBarcodeService mvGenerateBarcodeService;
     private final ProductPriceService mvProductPriceService;
-    private final UserSession mvUserSession;
     private final SystemLogService mvSystemLogService;
     private final ProductInfoService mvProductInfoService;
     private final CartService mvCartService;
@@ -87,9 +87,8 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
                                      @Lazy TicketExportService pTicketExportService, CategoryService pCategoryService,
                                      StorageService pStorageService, OrderCartRepository pCartRepository,
                                      GenerateBarcodeService pGenerateBarcodeService, ProductPriceService pProductPriceService,
-                                     UserSession pUserSession, SystemLogService pSystemLogService,
-                                     @Lazy ProductInfoService pProductInfoService, SendOperatorNotificationService pSendOperatorNotificationService,
-                                     @Lazy CartService pCartService, @Lazy ProductImageService pProductImageService) {
+                                     SystemLogService pSystemLogService, SendOperatorNotificationService pSendOperatorNotificationService,
+                                     @Lazy ProductInfoService pProductInfoService, @Lazy CartService pCartService, @Lazy ProductImageService pProductImageService) {
         super(ProductDetail.class, ProductVariantDTO.class, pEntityRepository);
         this.mvSendOperatorNotificationService = pSendOperatorNotificationService;
         this.mvProductVariantTempRepository = pProductVariantTempRepository;
@@ -102,7 +101,6 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         this.mvCartRepository = pCartRepository;
         this.mvGenerateBarcodeService = pGenerateBarcodeService;
         this.mvProductPriceService = pProductPriceService;
-        this.mvUserSession = pUserSession;
         this.mvSystemLogService = pSystemLogService;
         this.mvProductInfoService = pProductInfoService;
         this.mvCategoryService = pCategoryService;
@@ -111,7 +109,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     }
 
     @Override
-    public List<ProductVariantDTO> findAll() {
+    public List<ProductVariantDTO>find(BaseParameter pParam) {
         return this.findAll(ProductVariantSearchRequest.builder().checkInAnyCart(false).build()).getContent();
     }
 
@@ -187,7 +185,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     }
 
     private OrderCart getCurrentCart() {
-        List<OrderCart> cartList = mvCartRepository.findByAccountId(mvUserSession.getUserPrincipal().getId());
+        List<OrderCart> cartList = mvCartRepository.findByAccountId(getUserPrincipal().getId());
         if (ObjectUtils.isNotEmpty(cartList)) {
             return cartList.get(0);
         }
@@ -209,6 +207,11 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         mvProductPriceService.assignPriceInfo(lvDto, lvProductPrice);
 
         return lvDto;
+    }
+
+    @Override
+    public ProductDetail findEntById(Long pId, boolean throwException) {
+        return super.findEntById(pId, throwException);
     }
 
     @Transactional
@@ -286,7 +289,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
 
         TicketImport ticketImportSaved = mvTicketImportService.save(TicketImport.builder()
                 .title("Initialize storage")
-                .importer(mvUserSession.getUserPrincipal().getUsername())
+                .importer(getUserPrincipal().getUsername())
                 .importTime(LocalDateTime.now())
                 .note(initMessage)
                 .status(TicketImportStatus.COMPLETED.name())
@@ -307,7 +310,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
 
         TicketExportDTO lvTicketExport = new TicketExportDTO();
         lvTicketExport.setTitle("Initialize storage");
-        lvTicketExport.setExporter(mvUserSession.getUserPrincipal().getUsername());
+        lvTicketExport.setExporter(getUserPrincipal().getUsername());
         lvTicketExport.setExportTime(LocalDateTime.now());
         lvTicketExport.setNote(initMessage);
         lvTicketExport.setStatus(TicketExportStatus.COMPLETED.name());

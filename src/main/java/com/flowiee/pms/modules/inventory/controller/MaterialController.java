@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.dto.MaterialDTO;
 import com.flowiee.pms.common.exception.AppException;
@@ -25,7 +24,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MaterialController extends BaseController {
     MaterialService mvMaterialService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all nguyên vật liệu")
     @GetMapping("/all")
@@ -35,8 +33,8 @@ public class MaterialController extends BaseController {
         try {
             if (pageSize == null) pageSize = -1;
             if (pageNum == null) pageNum = 1;
-            Page<MaterialDTO> materials = mvMaterialService.findAll(pageSize, pageNum - 1, null, null, null, null, null, null);
-            return mvCHelper.success(materials.getContent(), pageNum, pageSize, materials.getTotalPages(), materials.getTotalElements());
+            Page<MaterialDTO> materials = mvMaterialService.find(pageSize, pageNum - 1, null, null, null, null, null, null);
+            return AppResponse.paged(materials);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "material"), ex);
         }
@@ -47,7 +45,7 @@ public class MaterialController extends BaseController {
     @PreAuthorize("@vldModuleProduct.insertMaterial(true)")
     public AppResponse<MaterialDTO> insert(@RequestBody MaterialDTO materialDTO) {
         try {
-            return mvCHelper.success(mvMaterialService.save(materialDTO));
+            return AppResponse.success(mvMaterialService.save(materialDTO));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "material"), ex);
         }

@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.system.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.modules.inventory.entity.ProductCrawled;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.ForbiddenException;
@@ -31,7 +30,6 @@ import java.util.List;
 public class SystemController extends BaseController {
     ConfigService    configService;
     CrawlerService   crawlerService;
-    ControllerHelper mvCHelper;
     ProductCrawlerRepository productCrawlerRepository;
 
     private static boolean mvSystemCrawlingData = false;
@@ -42,7 +40,7 @@ public class SystemController extends BaseController {
     @PreAuthorize("@vldModuleSystem.readConfig(true)")
     public AppResponse<List<SystemConfigDTO>> findConfigs() {
         try {
-            return mvCHelper.success(configService.findAll());
+            return AppResponse.success(configService.find());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "configs"), ex);
         }
@@ -52,12 +50,12 @@ public class SystemController extends BaseController {
     @PutMapping("/config/update/{id}")
     @PreAuthorize("@vldModuleSystem.updateConfig(true)")
     public AppResponse<SystemConfigDTO> updateConfig(@RequestBody SystemConfigDTO config, @PathVariable("id") Long configId) {
-        return mvCHelper.success(configService.update(config, configId));
+        return AppResponse.success(configService.update(config, configId));
     }
 
     @GetMapping("/refresh")
     public AppResponse<String> refreshApp() {
-        return mvCHelper.success(configService.refreshApp());
+        return AppResponse.success(configService.refreshApp());
     }
 
     @PostMapping("/crawler-data")
@@ -67,11 +65,11 @@ public class SystemController extends BaseController {
             throw new ForbiddenException("403");
         }
         if (mvSystemCrawlingData) {
-            return mvCHelper.success(null, "System is crawling data, please try late!");
+            return AppResponse.success(null, "System is crawling data, please try late!");
         }
         mvSystemCrawlingData = true;
         try {
-            return mvCHelper.success(crawlerService.crawl(), "Successfully crawler data");
+            return AppResponse.success(crawlerService.crawl(), "Successfully crawler data");
         } catch (AppException ex) {
             throw new AppException();
         } finally {
@@ -82,7 +80,7 @@ public class SystemController extends BaseController {
     @GetMapping("/data-temp")
     public AppResponse<List<ProductCrawled>> getDataTemp(@RequestParam("pageSize") int pageSize, @RequestParam("pageNum") int pageNum) {
         Page<ProductCrawled> productCrawledPage = productCrawlerRepository.findAll(PageRequest.of(pageNum - 1, pageSize));
-        return mvCHelper.success(productCrawledPage.getContent(), pageNum, pageSize, productCrawledPage.getTotalPages(), productCrawledPage.getTotalElements());
+        return AppResponse.paged(productCrawledPage);
     }
 
     @PostMapping("/data-temp/merge")
@@ -91,12 +89,12 @@ public class SystemController extends BaseController {
             throw new ForbiddenException("403");
         }
         if (mvSystemMergingData) {
-            return mvCHelper.success(null, "System is merging data, please try late!");
+            return AppResponse.success(null, "System is merging data, please try late!");
         }
         mvSystemMergingData = true;
         try {
             crawlerService.merge();
-            return mvCHelper.success(null, "Successfully merged data");
+            return AppResponse.success(null, "Successfully merged data");
         } catch (AppException ex) {
             throw new AppException(ex.getDisplayMessage(), ex);
         } finally {

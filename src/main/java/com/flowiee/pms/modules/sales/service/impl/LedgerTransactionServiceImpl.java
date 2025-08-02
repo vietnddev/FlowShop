@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.sales.entity.LedgerTransaction;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
@@ -33,7 +34,7 @@ public class LedgerTransactionServiceImpl extends BaseService<LedgerTransaction,
     }
 
     @Override
-    public List<LedgerTransactionDTO> findAll() {
+    public List<LedgerTransactionDTO>find(BaseParameter pParam) {
         return this.findAll(-1, -1, null, null).getContent();
     }
 
@@ -48,10 +49,10 @@ public class LedgerTransactionServiceImpl extends BaseService<LedgerTransaction,
                 }
             }
             if (trans.getGroupObject() != null) {
-                trans.setGroupObjectName(trans.getGroupObject().getName());
+                //trans.setGroupObjectName(trans.getGroupObject().getName());
             }
             if (trans.getTranContent() != null) {
-                trans.setTranContentName(trans.getTranContent().getName());
+                //trans.setTranContentName(trans.getTranContent().getName());
             }
         }
         return new PageImpl<>(convertDTOs(lvLedgerTransactions.getContent()), pageable, lvLedgerTransactions.getTotalElements());

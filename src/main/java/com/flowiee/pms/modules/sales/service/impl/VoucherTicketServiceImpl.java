@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.sales.service.VoucherService;
 import com.flowiee.pms.modules.sales.service.VoucherTicketService;
 import com.flowiee.pms.modules.sales.entity.VoucherTicket;
@@ -37,8 +38,8 @@ public class VoucherTicketServiceImpl extends BaseService<VoucherTicket, Voucher
     }
 
     @Override
-    public List<VoucherTicketDTO> findAll() {
-        return super.findAll();
+    public List<VoucherTicketDTO>find(BaseParameter pParam) {
+        return super.find(pParam);
     }
 
     @Override

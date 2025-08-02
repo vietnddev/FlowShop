@@ -4,7 +4,7 @@ import com.flowiee.pms.common.base.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
@@ -19,7 +19,10 @@ import java.util.List;
 public class OrderCart extends BaseEntity implements Serializable {
 	@Serial
 	static final long serialVersionUID = 1L;
-	
+
+	@Column(name = "is_finish")
+	Boolean isFinish;
+
 	@OneToMany(mappedBy = "orderCart", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<Items> listItems;
 

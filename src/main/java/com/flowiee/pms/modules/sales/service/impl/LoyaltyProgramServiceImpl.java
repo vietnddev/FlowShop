@@ -1,111 +1,121 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
+import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.modules.sales.dto.LoyaltyProgramDTO;
 import com.flowiee.pms.modules.sales.service.LoyaltyProgramService;
 import com.flowiee.pms.modules.sales.repository.LoyaltyProgramRepository;
-import com.flowiee.pms.modules.sales.repository.LoyaltyRuleRepository;
 import com.flowiee.pms.modules.sales.repository.LoyaltyTransactionRepository;
 import com.flowiee.pms.modules.sales.entity.*;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
-import com.flowiee.pms.common.exception.EntityNotFoundException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.modules.sales.repository.CustomerRepository;
-import com.flowiee.pms.modules.sales.repository.OrderRepository;
 import com.flowiee.pms.common.utils.OrderUtils;
 import com.flowiee.pms.common.enumeration.LoyaltyTransactionType;
 import com.flowiee.pms.common.enumeration.MessageCode;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-public class LoyaltyProgramServiceImpl implements LoyaltyProgramService {
-    private final LoyaltyTransactionRepository loyaltyTransactionRepository;
-    private final LoyaltyProgramRepository loyaltyProgramRepository;
-    private final LoyaltyRuleRepository loyaltyRuleRepository;
-    private final CustomerRepository customerRepository;
-    private final OrderRepository orderRepository;
+public class LoyaltyProgramServiceImpl extends BaseService<LoyaltyProgram, LoyaltyProgramDTO, LoyaltyProgramRepository> implements LoyaltyProgramService {
+    private final LoyaltyTransactionRepository mvLoyaltyTransactionRepository;
+    private final LoyaltyProgramRepository mvLoyaltyProgramRepository;
+    private final CustomerRepository mvCustomerRepository;
 
-    @Override
-    public List<LoyaltyProgram> findAll() {
-        return loyaltyProgramRepository.findAll();
+    public LoyaltyProgramServiceImpl(LoyaltyProgramRepository pLoyaltyProgramRepository, LoyaltyTransactionRepository pLoyaltyTransactionRepository, CustomerRepository pCustomerRepository) {
+        super(LoyaltyProgram.class, LoyaltyProgramDTO.class, pLoyaltyProgramRepository);
+        this.mvLoyaltyTransactionRepository = pLoyaltyTransactionRepository;
+        this.mvLoyaltyProgramRepository = pLoyaltyProgramRepository;
+        this.mvCustomerRepository = pCustomerRepository;
     }
 
     @Override
-    public LoyaltyProgram findById(Long programId, boolean pThrowException) {
-        Optional<LoyaltyProgram> entityOptional = loyaltyProgramRepository.findById(programId);
-        if (entityOptional.isEmpty() && pThrowException) {
-            throw new EntityNotFoundException(new Object[] {"loyalty program"}, null, null);
-        }
-        return entityOptional.orElse(null);
+    public List<LoyaltyProgram> find() {
+        return mvLoyaltyProgramRepository.findAll();
     }
 
     @Override
-    public LoyaltyProgram save(LoyaltyProgram program) {
-        LocalDateTime lvStartDate = program.getStartDate();
-        LocalDateTime lvEndDate = program.getEndDate();
+    public LoyaltyProgramDTO findById(Long programId, boolean pThrowException) {
+        return super.findDtoById(programId, pThrowException);
+    }
+
+    @Override
+    public LoyaltyProgramDTO save(LoyaltyProgramDTO pProgram) {
+        LocalDate lvStartDate = pProgram.getStartDate();
+        LocalDate lvEndDate = pProgram.getEndDate();
         if (!lvStartDate.isBefore(lvEndDate))
             throw new BadRequestException("The end time must be greater than the start time!");
 
-        return loyaltyProgramRepository.save(program);
+        if (Boolean.TRUE.equals(pProgram.getIsDefault())) {
+            LoyaltyProgram lvProgramAlreadyDefault = mvLoyaltyProgramRepository.findDefaultProgram();
+            lvProgramAlreadyDefault.setIsDefault(false);
+            mvLoyaltyProgramRepository.save(lvProgramAlreadyDefault);
+        }
+
+        return super.save(pProgram);
     }
 
     @Override
-    public LoyaltyProgram update(LoyaltyProgram updateProgram, Long loyaltyProgramId) {
-        LoyaltyProgram existingProgram = findById(loyaltyProgramId, true);
+    public LoyaltyProgramDTO update(LoyaltyProgramDTO updateProgram, Long loyaltyProgramId) {
+        LoyaltyProgram existingProgram = super.findEntById(loyaltyProgramId, true);
         if (!existingProgram.isExpired()) {
             existingProgram.setName(updateProgram.getName());
             existingProgram.setDescription(updateProgram.getDescription());
             //existingProgram.setPointConversionRate(updateProgram.getPointConversionRate());
             existingProgram.setStartDate(updateProgram.getStartDate());
             existingProgram.setEndDate(updateProgram.getEndDate());
-            existingProgram.setActive(updateProgram.isActive());
+            existingProgram.setActive(updateProgram.getIsActive());
+            existingProgram.setIsDefault(updateProgram.getIsDefault());
+            if (updateProgram.getIsDefault()) {
+                LoyaltyProgram lvProgramAlreadyDefault = mvLoyaltyProgramRepository.findDefaultProgram();
+                lvProgramAlreadyDefault.setIsDefault(false);
+                mvLoyaltyProgramRepository.save(lvProgramAlreadyDefault);
+            }
         }
 
-        return loyaltyProgramRepository.save(existingProgram);
+        return convertDTO(mvLoyaltyProgramRepository.save(existingProgram));
     }
 
     @Override
     public String delete(Long loyaltyProgramId) {
-        LoyaltyProgram existingProgram = findById(loyaltyProgramId, true);
+        LoyaltyProgram existingProgram = super.findEntById(loyaltyProgramId, true);
         if (!existingProgram.getLoyaltyTransactionList().isEmpty()) {
             throw new BadRequestException("The program has a transaction that does not allow deletion!");
         }
-        loyaltyProgramRepository.deleteById(loyaltyProgramId);
+        mvLoyaltyProgramRepository.deleteById(loyaltyProgramId);
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
 
     @Override
     public List<LoyaltyProgram> getActivePrograms() {
-        return loyaltyProgramRepository.findActiveProgram();
+        return mvLoyaltyProgramRepository.findActiveProgram();
     }
 
     @Override
     public LoyaltyProgram getDefaultProgram() {
-        return loyaltyProgramRepository.findDefaultProgram();
+        return mvLoyaltyProgramRepository.findDefaultProgram();
     }
 
     @Override
     public LoyaltyProgram enableProgram(Long loyaltyProgramId) {
-        LoyaltyProgram existingProgram = this.findById(loyaltyProgramId, true);
+        LoyaltyProgram existingProgram = super.findEntById(loyaltyProgramId, true);
         existingProgram.setActive(true);
-        return loyaltyProgramRepository.save(existingProgram);
+        return mvLoyaltyProgramRepository.save(existingProgram);
     }
 
     @Override
     public LoyaltyProgram disableProgram(Long loyaltyProgramId) {
-        LoyaltyProgram existingProgram = this.findById(loyaltyProgramId, true);
+        LoyaltyProgram existingProgram = this.findEntById(loyaltyProgramId, true);
         existingProgram.setActive(false);
-        return loyaltyProgramRepository.save(existingProgram);
+        return mvLoyaltyProgramRepository.save(existingProgram);
     }
 
     @Transactional
@@ -115,63 +125,49 @@ public class LoyaltyProgramServiceImpl implements LoyaltyProgramService {
         if (lvLoyaltyProgram == null)
             throw new BadRequestException("No loyalty program applied!");
 
-        Optional<Customer> lvCustomerOpt = customerRepository.findById(pOrder.getCustomer().getId());
+        Optional<Customer> lvCustomerOpt = mvCustomerRepository.findById(pOrder.getCustomer().getId());
         if (lvCustomerOpt.isEmpty())
             throw new ResourceNotFoundException("Customer not found!");
 
-        BigDecimal lvTotalAmount = OrderUtils.calTotalAmount_(pOrder.getListOrderDetail(), pOrder.getAmountDiscount());
-        BigDecimal lvPoints = getPoints(lvTotalAmount, lvLoyaltyProgram);
-        if (lvPoints.doubleValue() <= 0)
+        BigDecimal lvTotalAmount = OrderUtils.calAmount(pOrder.getListOrderDetail(), pOrder.getAmountDiscount());
+        int lvPoints = getPoints(lvTotalAmount, lvLoyaltyProgram);
+        if (lvPoints <= 0)
             throw new BadRequestException("Points must be greater than zero!");
 
         Customer lvCustomer = lvCustomerOpt.get();
-        lvCustomer.setBonusPoints(lvCustomer.getBonusPoints() + lvPoints.intValue());
-        customerRepository.save(lvCustomer);
+        lvCustomer.setBonusPoints(lvCustomer.getBonusPoints() + lvPoints);
+        mvCustomerRepository.save(lvCustomer);
 
         LoyaltyTransaction transaction = new LoyaltyTransaction();
         transaction.setCustomer(lvCustomer);
         transaction.setLoyaltyProgram(lvLoyaltyProgram);
         transaction.setTransactionType(LoyaltyTransactionType.ACCUMULATE);
-        transaction.setPoints(lvPoints.intValue());
+        transaction.setPoints(lvPoints);
         transaction.setTransactionDate(LocalDateTime.now());
-        transaction.setRemark(String.format("Accumulate %s points from order %s", lvPoints.intValue(), pOrder.getCode()));
-        loyaltyTransactionRepository.save(transaction);
+        transaction.setRemark(String.format("Accumulate %s points from order %s", lvPoints, pOrder.getCode()));
+        mvLoyaltyTransactionRepository.save(transaction);
     }
 
     private LoyaltyProgram getProgramForAccumulatePoints(Long pProgramId) {
-        LoyaltyProgram lvLoyaltyProgram = this.findById(pProgramId, false);
-        if (lvLoyaltyProgram != null) {
-            return lvLoyaltyProgram;
-        } else {
-            LoyaltyProgram lvDefaultProgram = loyaltyProgramRepository.findDefaultProgram();
-            if (lvDefaultProgram != null) {
-                return lvDefaultProgram;
-            }
-        }
-        return null;
+        return this.findEntById(pProgramId, false);
     }
 
-    private BigDecimal getPoints(BigDecimal orderValue, LoyaltyProgram program) {
-        List<LoyaltyRule> ruleList = program.getLoyaltyRuleList();
-        if (ObjectUtils.isEmpty(ruleList)) {
-            throw new AppException("No applicable loyalty rule found!");
-        }
-        for (LoyaltyRule rule : ruleList) {
-            BigDecimal lvMinValue = rule.getMinOrderValue();
-            BigDecimal lvMaxValue = rule.getMaxOrderValue();
-            BigDecimal lvPointConversionRate = rule.getPointConversionRate();
+    private int getPoints(BigDecimal orderValue, LoyaltyProgram program) {
+        BigDecimal lvMinApplyValue = program.getMinOrderValue();
+        BigDecimal lvMaxApplyValue = program.getMaxOrderValue();
+        BigDecimal lvPointConversionRate = program.getPointConversionRate();
 
-            if (orderValue.compareTo(lvMinValue) >= 0 && (lvMaxValue == null || orderValue.compareTo(lvMaxValue) < 0)) {
-                return orderValue.multiply(lvPointConversionRate).setScale(0, RoundingMode.HALF_UP);
-            }
-        }
-        return BigDecimal.ZERO;
+//        if (orderValue.compareTo(lvMinApplyValue) >= 0 && (lvMaxApplyValue == null || orderValue.compareTo(lvMaxApplyValue) < 0)) {
+//            return orderValue.multiply(lvPointConversionRate).setScale(0, RoundingMode.HALF_UP).intValue();
+//        }
+
+        return orderValue.multiply(lvPointConversionRate).setScale(0, RoundingMode.HALF_UP).intValue();
     }
 
     @Transactional
     @Override
     public void redeemPoints(Long pCustomerId, int pointsToRedeem) {
-        Optional<Customer> lvCustomerOpt = customerRepository.findById(pCustomerId);
+        Optional<Customer> lvCustomerOpt = mvCustomerRepository.findById(pCustomerId);
         if (lvCustomerOpt.isEmpty())
             throw new ResourceNotFoundException("Customer not found!");
 
@@ -184,60 +180,10 @@ public class LoyaltyProgramServiceImpl implements LoyaltyProgramService {
         transaction.setTransactionType(LoyaltyTransactionType.REDEEM);
         transaction.setPoints(pointsToRedeem);
         transaction.setTransactionDate(LocalDateTime.now());
-        loyaltyTransactionRepository.save(transaction);
+        mvLoyaltyTransactionRepository.save(transaction);
 
         // Deduct points
         lvCustomer.setBonusPoints(lvCustomer.getBonusPoints() - pointsToRedeem);
-        customerRepository.save(lvCustomer);
-    }
-
-    @Override
-    public void addRule(LoyaltyRule loyaltyRule, Long programId) {
-        LoyaltyProgram loyaltyProgram = this.findById(programId, true);
-        if (loyaltyProgram.isExpired() || !loyaltyProgram.isActive()) {
-            throw new BadRequestException("Program is inactive!");
-        }
-        if (loyaltyRule.getMinOrderValue() == null || loyaltyRule.getMinOrderValue().doubleValue() <= 0) {
-            throw new BadRequestException("Min value must be greater than 0!");
-        }
-        if (loyaltyProgram.getLoyaltyRuleList() == null) loyaltyProgram.setLoyaltyRuleList(new ArrayList<>());
-
-        loyaltyProgram.getLoyaltyRuleList().add(loyaltyRule);
-
-        loyaltyProgramRepository.save(loyaltyProgram);
-    }
-
-    @Override
-    public void updateRule(LoyaltyRule pLoyaltyRule, Long pRuleId, Long pProgramId) {
-        if (pLoyaltyRule.getMinOrderValue() == null || pLoyaltyRule.getMinOrderValue().doubleValue() <= 0)
-            throw new BadRequestException("Min value must be greater than 0!");
-
-        LoyaltyProgram loyaltyProgram = this.findById(pProgramId, true);
-        if (loyaltyProgram.isExpired() || !loyaltyProgram.isActive()) {
-            throw new BadRequestException("Program is inactive!");
-        }
-
-        LoyaltyRule lvLoyaltyRule = findRuleById(pRuleId, true);
-        lvLoyaltyRule.setMinOrderValue(pLoyaltyRule.getMinOrderValue());
-        lvLoyaltyRule.setMaxOrderValue(pLoyaltyRule.getMaxOrderValue());
-        lvLoyaltyRule.setPointConversionRate(pLoyaltyRule.getPointConversionRate());
-        lvLoyaltyRule.setCurrencyUnit(pLoyaltyRule.getCurrencyUnit());
-
-        loyaltyRuleRepository.save(lvLoyaltyRule);
-    }
-
-    @Override
-    public void removeRule(Long pRuleId) {
-        LoyaltyRule lvLoyaltyRule = findRuleById(pRuleId, true);
-        loyaltyRuleRepository.deleteById(lvLoyaltyRule.getId());
-    }
-
-    @Override
-    public LoyaltyRule findRuleById(Long pRuleId, boolean throwException) {
-        Optional<LoyaltyRule> loyaltyRule = loyaltyRuleRepository.findById(pRuleId);
-        if (loyaltyRule.isEmpty())
-            new BadRequestException("Loyalty rule doesn't exists!");
-
-        return loyaltyRule.get();
+        mvCustomerRepository.save(lvCustomer);
     }
 }

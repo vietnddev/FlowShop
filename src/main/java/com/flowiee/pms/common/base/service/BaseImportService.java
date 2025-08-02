@@ -1,10 +1,8 @@
 package com.flowiee.pms.common.base.service;
 
 import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.modules.system.entity.ImportHistory;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.modules.system.model.EximResult;
-import com.flowiee.pms.modules.system.repository.AppImportRepository;
 import com.flowiee.pms.modules.system.service.ImportService;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.enumeration.TemplateExport;
@@ -35,9 +33,6 @@ import java.time.LocalTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseImportService implements ImportService {
     protected abstract void writeData() throws AppException, IOException;
-
-    @Autowired
-    protected AppImportRepository mvFileImportRepository;
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
     protected XSSFSheet mvDataSheet;
@@ -81,7 +76,7 @@ public abstract class BaseImportService implements ImportService {
                 setFileContentError();
             }
 
-            postImport(templateExport, null);
+            postImport(templateExport);
 
             return mvEximResult;
         } catch (Exception e) {
@@ -106,7 +101,7 @@ public abstract class BaseImportService implements ImportService {
 
     }
 
-    public void postImport(TemplateExport pTemplateExport, ImportHistory pImportInfoMdl) throws AppException {
+    public void postImport(TemplateExport pTemplateExport) throws AppException {
 
     }
 

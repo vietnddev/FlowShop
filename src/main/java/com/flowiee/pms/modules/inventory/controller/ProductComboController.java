@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.dto.ProductComboDTO;
@@ -25,7 +24,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductComboController extends BaseController {
     ProductComboService mvProductComboService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all combos")
     @GetMapping("/all")
@@ -33,7 +31,7 @@ public class ProductComboController extends BaseController {
     public AppResponse<List<ProductComboDTO>> findProductCombos(@RequestParam(value = "pageSize", required = false) Integer pageSize,
                                                                 @RequestParam(value = "pageNum", required = false) Integer pageNum) {
         Page<ProductComboDTO> productComboPage = mvProductComboService.findAll(pageSize, pageNum - 1);
-        return mvCHelper.success(productComboPage.getContent(), pageNum, pageSize, productComboPage.getTotalPages(), productComboPage.getTotalElements());
+        return AppResponse.paged(productComboPage);
     }
 
     @Operation(summary = "Find detail combo")
@@ -41,7 +39,7 @@ public class ProductComboController extends BaseController {
     @PreAuthorize("@vldModuleProduct.readCombo(true)")
     public AppResponse<ProductComboDTO> findDetailCombo(@PathVariable("comboId") Long comboId) {
         ProductComboDTO productCombo = mvProductComboService.findById(comboId, true);
-        return mvCHelper.success(productCombo);
+        return AppResponse.success(productCombo);
     }
 
     @Operation(summary = "Create new combo")
@@ -49,7 +47,7 @@ public class ProductComboController extends BaseController {
     @PreAuthorize("@vldModuleProduct.insertCombo(true)")
     public AppResponse<ProductComboDTO> createCombo(@RequestBody ProductComboDTO productCombo) {
         try {
-            return mvCHelper.success(mvProductComboService.save(productCombo));
+            return AppResponse.success(mvProductComboService.save(productCombo));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "product combo"), ex);
         }
@@ -60,7 +58,7 @@ public class ProductComboController extends BaseController {
     @PreAuthorize("@vldModuleProduct.updateCombo(true)")
     public AppResponse<ProductComboDTO> updateProductCombo(@RequestBody ProductComboDTO productCombo, @PathVariable("comboId") Long comboId) {
         try {
-            return mvCHelper.success(mvProductComboService.update(productCombo, comboId));
+            return AppResponse.success(mvProductComboService.update(productCombo, comboId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "product combo"), ex);
         }
@@ -70,6 +68,6 @@ public class ProductComboController extends BaseController {
     @DeleteMapping("/delete/{comboId}")
     @PreAuthorize("@vldModuleProduct.deleteCombo(true)")
     public AppResponse<String> deleteCombo(@PathVariable("comboId") Long comboId) {
-        return mvCHelper.success(mvProductComboService.delete(comboId));
+        return AppResponse.success(mvProductComboService.delete(comboId));
     }
 }

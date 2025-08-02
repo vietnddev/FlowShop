@@ -1,14 +1,17 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
+import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.PriceUtils;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.ProductPrice;
+import com.flowiee.pms.modules.sales.dto.OrderCartDTO;
 import com.flowiee.pms.modules.sales.entity.Items;
 import com.flowiee.pms.modules.sales.entity.OrderCart;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
-import com.flowiee.pms.common.exception.EntityNotFoundException;
 import com.flowiee.pms.modules.sales.dto.ItemsDTO;
 import com.flowiee.pms.modules.sales.model.CartItemsReq;
 import com.flowiee.pms.modules.sales.model.CartReq;
@@ -23,7 +26,6 @@ import com.flowiee.pms.modules.sales.service.CartItemsService;
 import com.flowiee.pms.modules.sales.service.CartService;
 import com.flowiee.pms.modules.system.service.SystemLogService;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -38,8 +40,7 @@ import java.util.*;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
-public class CartServiceImpl implements CartService {
+public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderCartRepository> implements CartService {
     CartItemsService mvCartItemsService;
     OrderCartRepository mvCartRepository;
     CartItemsRepository mvCartItemsRepository;
@@ -47,8 +48,29 @@ public class CartServiceImpl implements CartService {
     ProductPriceRepository mvProductPriceRepository;
     ModelMapper mvModelMapper;
     SystemLogService systemLogService;
+    UserSession mvUserSession;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
+
+    public CartServiceImpl(OrderCartRepository pCartRepository, CartItemsService pCartItemsService, CartItemsRepository pCartItemsRepository, ProductVariantService pProductVariantService, ProductPriceRepository pProductPriceRepository, ModelMapper pModelMapper, SystemLogService pSystemLogService, UserSession pUserSession) {
+        super(OrderCart.class, OrderCartDTO.class, pCartRepository);
+        this.mvCartItemsService = pCartItemsService;
+        this.mvCartRepository = pCartRepository;
+        this.mvCartItemsRepository = pCartItemsRepository;
+        this.mvProductVariantService = pProductVariantService;
+        this.mvProductPriceRepository = pProductPriceRepository;
+        this.mvModelMapper = pModelMapper;
+        this.systemLogService = pSystemLogService;
+        this.mvUserSession = pUserSession;
+    }
+
+    @Override
+    public OrderCartDTO addDraftCart() {
+        OrderCartDTO lvCartDto = new OrderCartDTO();
+        lvCartDto.setIsFinish(false);
+        lvCartDto.setCreatedBy(mvUserSession.getUserPrincipal().getId());
+        return super.save(lvCartDto);
+    }
 
     @Override
     public List<OrderCart> findCartByAccountId(Long accountId) {
@@ -83,48 +105,92 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<OrderCart> findAll() {
-        return mvCartRepository.findAll();
+    public List<OrderCartDTO>find(BaseParameter pParam) {
+        return super.find(pParam);
     }
 
     @Override
-    public OrderCart findById(Long id, boolean pThrowException) {
-        Optional<OrderCart> optionalCart = mvCartRepository.findById(id);
-        if (optionalCart.isEmpty() && pThrowException) {
-            throw new EntityNotFoundException(new Object[] {"cart"}, null, null);
-        }
-        return optionalCart.orElse(null);
+    public OrderCartDTO findById(Long id, boolean pThrowException) {
+        return super.findDtoById(id, pThrowException);
     }
 
     @Override
-    public OrderCart save(OrderCart orderCart) {
-        if (orderCart == null) {
-            throw new BadRequestException();
-        }
-        return mvCartRepository.save(orderCart);
+    public OrderCart findEntById(Long pId, boolean throwException) {
+        return super.findEntById(pId, throwException);
     }
 
     @Override
-    public OrderCart update(OrderCart cart, Long cartId) {
-        if (this.findById(cartId, true) == null) {
-            throw new BadRequestException();
+    public OrderCartDTO findDtoById(Long pId, boolean throwException) {
+        OrderCart lvCart = super.findEntById(pId, throwException);
+
+        List<Items> lvItems = lvCart.getListItems();
+        List<ItemsDTO> lvItemDTOs = new ArrayList<>();
+        if (lvItems != null) {
+            for (Items lvItem : lvItems) {
+                ProductDetail lvProductVariant = lvItem.getProductDetail();
+
+                ItemsDTO lvItemDTO = new ItemsDTO();
+                lvItemDTO.setCartId(lvCart.getId());
+                lvItemDTO.setItemId(lvItem.getId());
+                lvItemDTO.setItemName(lvProductVariant.getVariantName());
+                lvItemDTO.setPrice(lvItem.getPrice());
+                lvItemDTO.setQuantity(lvItem.getQuantity());
+                lvItemDTO.setExtraDiscount(lvItem.getExtraDiscount());
+                lvItemDTO.setNote(lvItem.getNote());
+                //(Price * Quantity) - Extra Discount
+                BigDecimal lvSubTotal = (lvItemDTO.getPrice().multiply(BigDecimal.valueOf(lvItem.getQuantity()))).subtract(lvItemDTO.getExtraDiscount());
+                lvItemDTO.setSubTotal(lvSubTotal);
+
+                lvItemDTOs.add(lvItemDTO);
+            }
         }
-        cart.setId(cartId);
-        return mvCartRepository.save(cart);
+
+        OrderCartDTO lvCartDto = new OrderCartDTO();
+        lvCartDto.setId(lvCart.getId());
+        lvCartDto.setSalesChannelId(0l);
+        lvCartDto.setPaymentMethodId(0l);
+        lvCartDto.setItems(lvItemDTOs);
+
+        return lvCartDto;
     }
 
+    @Override
+    public List<OrderCartDTO> findCurrentUserCarts() {
+        List<OrderCart> lvCurrentUserCarts = mvCartRepository.findByAccountId(mvUserSession.getUserPrincipal().getId());
+        List<OrderCartDTO> lvCartDTOs = new ArrayList<>();
+        for (OrderCart lvCart : lvCurrentUserCarts) {
+            OrderCartDTO lvCartDto = new OrderCartDTO();
+            lvCartDto.setId(lvCart.getId());
+            lvCartDto.setCreatedBy(lvCart.getCreatedBy());
+            lvCartDTOs.add(lvCartDto);
+        }
+        return lvCartDTOs;
+    }
+
+    @Override
+    public OrderCartDTO save(OrderCartDTO orderCart) {
+        return super.save(orderCart);
+    }
+
+    @Override
+    public OrderCartDTO update(OrderCartDTO cart, Long cartId) {
+        return super.update(cart, cartId);
+    }
+
+    @Transactional
     @Override
     public String delete(Long cartId) {
-        if (this.findById(cartId, true) == null) {
-            throw new BadRequestException();
-        }
+        OrderCart cart = super.findEntById(cartId, true);
+        mvCartItemsRepository.deleteAllItems(cart.getId());
         mvCartRepository.deleteById(cartId);
+
         systemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_CART_C, MasterObject.Cart, "Xóa/Reset giỏ hàng", "cartId = " + cartId);
+
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
 
     @Override
-    public Double calTotalAmountWithoutDiscount(long cartId) {
+    public BigDecimal calTotalAmountWithoutDiscount(long cartId) {
         return mvCartItemsRepository.calTotalAmountWithoutDiscount(cartId);
     }
 
@@ -153,7 +219,7 @@ public class CartServiceImpl implements CartService {
     @Transactional
     @Override
     public void resetCart(Long cartId) {
-        OrderCart cart = this.findById(cartId, true);
+        OrderCart cart = super.findEntById(cartId, true);
         mvCartItemsRepository.deleteAllItems(cart.getId());
     }
 
@@ -199,7 +265,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void addItemsToCart(CartReq cartReq) {
         Long lvCartId = cartReq.getCartId();
-        OrderCart orderCart = findById(lvCartId, true);
+        OrderCart orderCart = super.findEntById(lvCartId, true);
 
         List<CartItemsReq> itemsList = cartReq.getItems();
         if (ObjectUtils.isEmpty(itemsList)) {
@@ -239,6 +305,7 @@ public class CartServiceImpl implements CartService {
                         .note("")
                         .build(),
                         ItemsDTO.class);
+                itemsDto.setCartId(orderCart.getId());
                 mvCartItemsService.save(itemsDto);
             }
         }
@@ -246,7 +313,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void updateItemsOfCart(Items pItemToUpdate, Long itemId) {
-        ItemsDTO lvItem = mvCartItemsService.findById(itemId, true);
+        Items lvItem = mvCartItemsService.findEntById(itemId, true);
         if (pItemToUpdate.getQuantity() <= 0) {
             mvCartItemsService.delete(lvItem.getId());
         } else {
@@ -279,7 +346,91 @@ public class CartServiceImpl implements CartService {
             if (pItemToUpdate.getExtraDiscount() != null) {
                 lvItem.setExtraDiscount(pItemToUpdate.getExtraDiscount());
             }
-            mvCartItemsService.update(lvItem, lvItem.getId());
+
+            mvCartItemsService.update(mvModelMapper.map(lvItem, ItemsDTO.class), lvItem.getId());
         }
+    }
+
+    @Override
+    public List<ItemsDTO> findItems(Long pCartId) {
+        OrderCart lvCart = super.findEntById(pCartId, true);
+
+        List<Items> lvItems = lvCart.getListItems();
+        if (CollectionUtils.isEmpty(lvItems)) {
+            return List.of();
+        }
+
+        List<ItemsDTO> lvItemDTOs = new ArrayList<>();
+        for (Items lvItem : lvItems) {
+            ItemsDTO lvItemDto = new ItemsDTO();
+
+            List<ProductPrice> lvItemPrices = mvProductPriceRepository.findPresentPrices(lvItem.getProductDetail().getId());
+
+            ProductVariantDTO lvProductVariantDto = new ProductVariantDTO();
+            lvProductVariantDto.setId(lvItem.getProductDetail().getId());
+
+            lvItemDto.setProductDetail(lvProductVariantDto);
+            lvItemDto.setQuantity(lvItem.getQuantity());
+            lvItemDto.setNote(lvItem.getNote());
+            lvItemDto.setCartId(lvCart.getId());
+            lvItemDto.setPrice(PriceUtils.getPriceValue(lvItemPrices, com.flowiee.pms.modules.inventory.enums.PriceType.RTL));
+            lvItemDto.setExtraDiscount(lvItem.getExtraDiscount());
+
+            lvItemDTOs.add(lvItemDto);
+        }
+
+        return lvItemDTOs;
+    }
+
+    @Transactional
+    @Override
+    public String deleteItem(Long pCartId, Long pItemId) {
+        OrderCart lvCart = super.findEntById(pCartId, true);
+        //Check something...
+
+        mvCartItemsRepository.deleteById(pItemId);
+
+        return MessageCode.DELETE_SUCCESS.getDescription();
+    }
+
+    @Override
+    public ItemsDTO updateItemQuantity(Long pCartId, Long pItemId, Integer pQuantity) {
+        Optional<Items> lvItem = mvCartItemsRepository.findById(pItemId);
+        if (lvItem.isPresent()) {
+            ProductDetail lvProductVariant = lvItem.get().getProductDetail();
+            if (lvProductVariant.getAvailableSalesQty() == 0 || lvProductVariant.getAvailableSalesQty() < pQuantity) {
+                throw new AppException(ErrorCode.ProductOutOfStock, new Object[]{lvProductVariant.getVariantName()}, null, getClass(), null);
+            }
+
+            lvItem.get().setQuantity(pQuantity);
+            Items lvItemUpdated = mvCartItemsRepository.save(lvItem.get());
+
+            ItemsDTO lvItemDTO = new ItemsDTO();
+            lvItemDTO.setCartId(lvItemUpdated.getOrderCart().getId());
+            lvItemDTO.setItemId(lvItemUpdated.getId());
+            lvItemDTO.setPrice(lvItemUpdated.getPrice());
+            lvItemDTO.setQuantity(lvItemUpdated.getQuantity());
+            lvItemDTO.setExtraDiscount(lvItemUpdated.getExtraDiscount());
+            lvItemDTO.setNote(lvItemUpdated.getNote());
+            //(Price * Quantity) - Extra Discount
+            BigDecimal lvSubTotal = (lvItemDTO.getPrice().multiply(BigDecimal.valueOf(lvItemUpdated.getQuantity()))).subtract(lvItemDTO.getExtraDiscount());
+            lvItemDTO.setSubTotal(lvSubTotal);
+
+            return lvItemDTO;
+        }
+
+        throw new BadRequestException();
+    }
+
+    @Override
+    public BigDecimal getCartValuePreDiscount(Long pCartId) {
+        return mvCartItemsRepository.calTotalAmountWithoutDiscount(pCartId);
+    }
+
+    @Override
+    public void markOrderFinished(Long pCartId) {
+        OrderCart lvCart = super.findEntById(pCartId, true);
+        lvCart.setIsFinish(true);
+        mvEntityRepository.save(lvCart);
     }
 }

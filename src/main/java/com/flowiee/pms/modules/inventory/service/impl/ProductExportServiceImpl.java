@@ -11,7 +11,7 @@ import com.flowiee.pms.modules.inventory.entity.ProductPrice;
 import com.flowiee.pms.common.base.service.BaseExportService;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.system.service.CategoryService;
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -19,8 +19,8 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.*;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -82,7 +82,7 @@ public class ProductExportServiceImpl extends BaseExportService {
             lvCriteriaQuery.distinct(true);
 
             if (lvPageable.getSort().isSorted()) {
-                List<jakarta.persistence.criteria.Order> orders = lvPageable.getSort().stream()
+                List<javax.persistence.criteria.Order> orders = lvPageable.getSort().stream()
                         .map(sortOrder  -> {
                             if (sortOrder.isAscending()) {
                                 return lvCriteriaBuilder.asc(lvRoot.get(sortOrder.getProperty()));

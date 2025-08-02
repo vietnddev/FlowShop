@@ -10,7 +10,7 @@ import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.utils.ReportUtils;
 import com.flowiee.pms.modules.sales.service.OrderGenerateQRCodeService;
 import com.flowiee.pms.modules.sales.service.OrderPrintInvoiceService;
-import com.flowiee.pms.modules.sales.service.OrderReadService;
+import com.flowiee.pms.modules.sales.service.OrderService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,8 +20,8 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Path;
@@ -31,7 +31,7 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class OrderPrintInvoiceServiceImpl implements OrderPrintInvoiceService {
-    OrderReadService mvOrderReadService;
+    OrderService mvOrderService;
     OrderGenerateQRCodeService mvOrderGenerateQRCodeService;
 
     @Override

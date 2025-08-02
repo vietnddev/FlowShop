@@ -1,8 +1,8 @@
 package com.flowiee.pms.common.security;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.HashMap;
 import java.util.Map;
 

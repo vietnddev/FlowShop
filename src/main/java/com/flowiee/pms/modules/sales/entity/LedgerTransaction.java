@@ -7,7 +7,7 @@ import com.flowiee.pms.modules.system.entity.Category;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -61,12 +61,12 @@ public class LedgerTransaction extends BaseEntity implements Serializable {
     @Column(name = "status")
     String status;
 
-    @Transient
-    String tranContentName;
-
-    @Transient
-    String groupObjectName;
-
-    @Transient
-    String paymentMethodName;
+//    @Transient
+//    String tranContentName;
+//
+//    @Transient
+//    String groupObjectName;
+//
+//    @Transient
+//    String paymentMethodName;
 }

@@ -1,7 +1,8 @@
 package com.flowiee.pms.common.base.service;
 
 import com.flowiee.pms.common.base.repository.BaseRepository;
-import com.flowiee.pms.common.utils.DateTimeUtil;
+import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.common.security.UserPrincipal;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.sales.entity.Customer;
 import com.flowiee.pms.modules.sales.entity.OrderCart;
@@ -12,22 +13,19 @@ import com.flowiee.pms.common.model.Filter;
 import com.flowiee.pms.common.exception.EntityNotFoundException;
 import com.flowiee.pms.modules.system.repository.SystemLogRepository;
 import com.flowiee.pms.common.security.UserSession;
-import jakarta.persistence.EntityGraph;
+import javax.persistence.EntityGraph;
 import lombok.Data;
-import org.apache.commons.collections.CollectionUtils;
+import org.springframework.util.CollectionUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -78,16 +76,16 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
                         null);
     }
 
-    public List<D> findByIds(List<Long> pIds) {
+    public List<E> findByIds(List<Long> pIds) {
         if (CollectionUtils.isEmpty(pIds)) {
             return List.of();
         }
-        return convertDTOs(mvEntityRepository.findAllById(pIds));
+        return mvEntityRepository.findAllById(pIds);
     }
 
-    public List<D> findAll() {
-        List<E> lvEntities = mvEntityRepository.findAll();
-        return lvEntities.isEmpty() ? List.of() : convertDTOs(lvEntities);
+    public List<D> find(BaseParameter pParam) {
+        Page<E> lvEntities = mvEntityRepository.findAll(getPageable(pParam.getPageNum(), pParam.getPageSize()));
+        return lvEntities.isEmpty() ? List.of() : convertDTOs(lvEntities.getContent());
     }
 
     public D save(D pDto) {
@@ -119,8 +117,8 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
                     .title("Delete entity")
                     .content("Delete " + mvEntityClass.getSimpleName() + " with ID is " + pId)
                     .contentChange("-")
-                    .ip(mvUserSession.getUserPrincipal().getIp())
-                    .account(new Account(mvUserSession.getUserPrincipal().getId()))
+                    .ip(getUserPrincipal().getIp())
+                    .account(new Account(getUserPrincipal().getId()))
                     .build());
         }
         return "Entity with ID " + pId + " deleted successfully.";
@@ -366,19 +364,7 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
         return new PageImpl<>(dtoList, entityPage.getPageable(), entityPage.getTotalElements());
     }
 
-    @Data
-    protected class VldModel {
-        private Account salesAssistant;
-        private Category paymentMethod;
-        private Category brand;
-        private Category color;
-        private Category fabricType;
-        private Category size;
-        private Category salesChannel;
-        private Category unit;
-        private Category productType;
-        private Customer customer;
-        private OrderCart orderCart;
-        private VoucherTicket voucherTicket;
+    protected UserPrincipal getUserPrincipal() {
+        return mvUserSession.getUserPrincipal();
     }
 }

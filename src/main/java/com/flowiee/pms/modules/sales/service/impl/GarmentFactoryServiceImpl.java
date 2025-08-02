@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.sales.entity.GarmentFactory;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.modules.sales.dto.GarmentFactoryDTO;
@@ -19,8 +20,8 @@ public class GarmentFactoryServiceImpl extends BaseService<GarmentFactory, Garme
     }
 
     @Override
-    public List<GarmentFactoryDTO> findAll() {
-        return super.findAll();
+    public List<GarmentFactoryDTO>find(BaseParameter pParam) {
+        return super.find(pParam);
     }
 
     @Override

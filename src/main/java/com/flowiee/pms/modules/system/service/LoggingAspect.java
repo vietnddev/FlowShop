@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -31,7 +31,6 @@ public class LoggingAspect {
     private final UserSession mvUserSession;
 
     private ThreadLocal<RequestContext> mvRequestContext = ThreadLocal.withInitial(RequestContext::new); // Tạo ThreadLocal để lưu thông tin của request
-    private int mvResponseLogLength = 2000;
 
     @Getter
     @Setter
@@ -71,7 +70,7 @@ public class LoggingAspect {
 
         mvLogger.info("[REQUEST {}] {}",
                 lvRequestContext.getRequestId(),
-                formatRequestInfo(attributes.getRequest(), joinPoint, attributes));
+                formatRequestInfo(attributes.getRequest(), joinPoint, attributes, lvUsername));
 
         Object result;
         try {
@@ -92,7 +91,7 @@ public class LoggingAspect {
         mvLogger.info("[RESPONSE {}] ({} ms) {}",
                 lvRequestContext.getRequestId(),
                 duration,
-                formatResponse(result));
+                result.toString());
 
         return result;
     }
@@ -106,7 +105,7 @@ public class LoggingAspect {
         return String.format("%s %s - %s.%s with error: %s", lvHttpMethod, lvUri, lvClassName, lvProcessMethod, pMessage);
     }
 
-    public String formatRequestInfo(HttpServletRequest pRequest, JoinPoint pJoinPoint, ServletRequestAttributes pAttributes) {
+    public String formatRequestInfo(HttpServletRequest pRequest, JoinPoint pJoinPoint, ServletRequestAttributes pAttributes, String pUser) {
         String lvHttpMethod = pRequest != null ? pRequest.getMethod() : "N/A";
         String lvUri = pRequest != null ? pRequest.getRequestURI() : "N/A";
         String lvClassName = pJoinPoint.getTarget().getClass().getSimpleName();
@@ -114,12 +113,6 @@ public class LoggingAspect {
         String lvRequestParam = RequestUtils.getRequestParam(pAttributes);
         String lvRequestBody = RequestUtils.getRequestBody(pJoinPoint);
 
-        return String.format("%s %s - %s.%s with params: [%s] & body: [%s]", lvHttpMethod, lvUri, lvClassName, lvProcessMethod, lvRequestParam, lvRequestBody);
-    }
-
-    public String formatResponse(Object pResult) {
-        if (pResult == null) return "null";
-        String output = pResult.toString();
-        return output.length() > mvResponseLogLength ? output.substring(0, mvResponseLogLength) + "..." : output;
+        return String.format("%s %s - %s - %s.%s with params: [%s] & body: [%s]", lvHttpMethod, lvUri, pUser, lvClassName, lvProcessMethod, lvRequestParam, lvRequestBody);
     }
 }

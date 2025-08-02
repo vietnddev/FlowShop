@@ -111,7 +111,7 @@ public abstract class BaseExportService implements ExportService {
     }
 
     protected int getDataEndAtLine() {
-        return mvDataBeginLine + mvDataExportSize - 1;
+        return mvDataBeginLine + (mvDataExportSize > 0 ? mvDataExportSize - 1 : 0);
     }
 
     protected void createDropdownList(List<String> pListValue, String pHeadKey) {

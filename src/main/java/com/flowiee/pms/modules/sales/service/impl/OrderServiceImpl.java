@@ -2,13 +2,16 @@ package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.utils.*;
+import com.flowiee.pms.modules.inventory.dto.TransactionGoodsDTO;
 import com.flowiee.pms.modules.inventory.service.TicketImportService;
+import com.flowiee.pms.modules.inventory.service.TransactionGoodsService;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.sales.entity.VoucherTicket;
 import com.flowiee.pms.modules.sales.entity.Customer;
 import com.flowiee.pms.modules.sales.entity.OrderCart;
 import com.flowiee.pms.modules.sales.entity.OrderDetail;
 import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.modules.sales.model.OrderReq;
 import com.flowiee.pms.modules.sales.service.*;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.staff.repository.AccountRepository;
@@ -20,9 +23,7 @@ import com.flowiee.pms.modules.sales.model.CreateOrderReq;
 import com.flowiee.pms.modules.sales.model.UpdateOrderReq;
 import com.flowiee.pms.modules.sales.repository.CustomerRepository;
 import com.flowiee.pms.modules.system.repository.ConfigRepository;
-import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.modules.system.service.CategoryService;
-import com.flowiee.pms.modules.staff.service.AccountService;
 import com.flowiee.pms.modules.system.service.SendCustomerNotificationService;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
@@ -38,26 +39,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 @Service
-public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderRepository> implements OrderReadService, OrderWriteService {
+public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderRepository> implements OrderService {
     private Logger LOG = LoggerFactory.getLogger(getClass());
 
     private final SendCustomerNotificationService mvSendCustomerNotificationService;
+    private final OrderGenerateQRCodeService mvOrderGenerateQRCodeService;
+    private final TransactionGoodsService mvTransactionGoodsService;
     private final CartService mvCartService;
     private final ConfigRepository mvConfigRepository;
-    private final CartItemsService mvCartItemsService;
     private final OrderItemsService mvOrderItemsService;
-    private final OrderGenerateQRCodeService mvOrderGenerateQRCodeService;
     private final CustomerRepository  mvCustomerRepository;
     private final OrderHistoryService mvOrderHistoryService;
     private final TicketImportService mvTicketImportService;
@@ -66,17 +68,16 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     private final CategoryService mvCategoryService;
     private final CustomerService mvCustomerService;
     private final AccountRepository mvAccountRepository;
-    private final UserSession     mvUserSession;
     private final SystemLogService mvSystemLogService;
 
-    public OrderServiceImpl(OrderRepository pOrderRepository, SendCustomerNotificationService mvSendCustomerNotificationService, CartService mvCartService, ConfigRepository mvConfigRepository, CartItemsService mvCartItemsService, OrderItemsService mvOrderItemsService, OrderGenerateQRCodeService mvOrderGenerateQRCodeService, CustomerRepository mvCustomerRepository, OrderHistoryService mvOrderHistoryService, TicketImportService mvTicketImportService, VoucherTicketService mvVoucherTicketService, LoyaltyProgramService mvLoyaltyProgramService, CategoryService mvCategoryService, CustomerService mvCustomerService, AccountRepository pAccountRepository, UserSession mvUserSession, SystemLogService pSystemLogService) {
+    public OrderServiceImpl(OrderRepository pOrderRepository, SendCustomerNotificationService mvSendCustomerNotificationService, CartService mvCartService, ConfigRepository mvConfigRepository, OrderItemsService mvOrderItemsService, OrderGenerateQRCodeService mvOrderGenerateQRCodeService, CustomerRepository mvCustomerRepository, OrderHistoryService mvOrderHistoryService, TicketImportService mvTicketImportService, VoucherTicketService mvVoucherTicketService, LoyaltyProgramService mvLoyaltyProgramService, CategoryService mvCategoryService, CustomerService mvCustomerService, AccountRepository pAccountRepository, SystemLogService pSystemLogService, TransactionGoodsService pTransactionGoodsService) {
         super(Order.class, OrderDTO.class, pOrderRepository);
         this.mvSendCustomerNotificationService = mvSendCustomerNotificationService;
+        this.mvOrderGenerateQRCodeService = mvOrderGenerateQRCodeService;
+        this.mvTransactionGoodsService = pTransactionGoodsService;
         this.mvCartService = mvCartService;
         this.mvConfigRepository = mvConfigRepository;
-        this.mvCartItemsService = mvCartItemsService;
         this.mvOrderItemsService = mvOrderItemsService;
-        this.mvOrderGenerateQRCodeService = mvOrderGenerateQRCodeService;
         this.mvCustomerRepository = mvCustomerRepository;
         this.mvOrderHistoryService = mvOrderHistoryService;
         this.mvTicketImportService = mvTicketImportService;
@@ -85,59 +86,55 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         this.mvCategoryService = mvCategoryService;
         this.mvCustomerService = mvCustomerService;
         this.mvAccountRepository = pAccountRepository;
-        this.mvUserSession = mvUserSession;
         this.mvSystemLogService = pSystemLogService;
     }
 
-    private BigDecimal mvDefaultShippingCost = BigDecimal.ZERO;
-    private BigDecimal mvDefaultPackagingCost = BigDecimal.ZERO;
-    private BigDecimal mvDefaultGiftWrapCost = BigDecimal.ZERO;
-    private BigDecimal mvDefaultCodFee = BigDecimal.ZERO;
+    private final BigDecimal mvDefaultShippingCost = BigDecimal.ZERO;
+    private final BigDecimal mvDefaultPackagingCost = BigDecimal.ZERO;
+    private final BigDecimal mvDefaultGiftWrapCost = BigDecimal.ZERO;
+    private final BigDecimal mvDefaultCodFee = BigDecimal.ZERO;
 
     private static final int GENERATE_TRACKING_CODE_MAX_RETRIES = 30;
 
     @Override
-    public List<OrderDTO> findAll() {
-        return findAll(-1, -1, null, null, null, null, null, null, null, null, null, null, null, null, null).getContent();
-    }
-
-    @Override
-    public Page<OrderDTO> findAll(int pPageSize, int pPageNum, String pTxtSearch, Long pOrderId, Long pPaymentMethodId,
-                                  OrderStatus pOrderStatus, Long pSalesChannelId, Long pSellerId, Long pCustomerId,
-                                  Long pBranchId, Long pGroupCustomerId, String pDateFilter, LocalDateTime pOrderTimeFrom, LocalDateTime pOrderTimeTo, String pSortBy) {
-        Pageable lvPageable = getPageable(pPageNum, pPageSize, Sort.by(pSortBy != null ? pSortBy : "orderTime").descending());
-        LocalDateTime lvOrderTimeFrom = DateTimeUtil.getFilterStartTime(pOrderTimeFrom);
-        LocalDateTime lvOrderTimeTo = DateTimeUtil.getFilterEndTime(pOrderTimeTo);
-        if (!CoreUtils.isNullStr(pDateFilter)) {
-            LocalDateTime[] lvFromDateToDate = DateTimeUtil.getFromDateToDate(lvOrderTimeFrom, lvOrderTimeTo, pDateFilter);
+    public Page<OrderDTO> find(OrderReq pOrderReq) {
+        Pageable lvPageable = getPageable(pOrderReq.getPageNum(), pOrderReq.getPageSize(), Sort.by("orderTime").descending());
+        LocalDateTime lvOrderTimeFrom = DateTimeUtil.getFilterStartTime(pOrderReq.getFromDate());
+        LocalDateTime lvOrderTimeTo = DateTimeUtil.getFilterEndTime(pOrderReq.getToDate());
+        if (!CoreUtils.isNullStr(pOrderReq.getDateFilter())) {
+            LocalDateTime[] lvFromDateToDate = DateTimeUtil.getFromDateToDate(pOrderReq.getFromDate(), pOrderReq.getToDate(), pOrderReq.getDateFilter());
             lvOrderTimeFrom = lvFromDateToDate[0];
             lvOrderTimeTo = lvFromDateToDate[1];
         }
 
         QueryBuilder<Order> lvQueryBuilder = createQueryBuilder(Order.class)
-                .addEqual("id", pOrderId)
-                .addEqual("paymentMethod.id", pPaymentMethodId)
-                .addEqual("orderStatus", pOrderStatus)
-                .addEqual("salesChannel.id", pSalesChannelId)
-                .addEqual("customer.id", pCustomerId)
-                .addEqual("nhanVienBanHang.id", pSellerId)
-                .addEqual("nhanVienBanHang.branch.id", pBranchId)
-                .addEqual("customer.groupCustomer.id", pGroupCustomerId)
-                .addLike(pTxtSearch, "receiverName", "receiverPhone", "code")
+                .addEqual("id", pOrderReq.getOrderId())
+                .addEqual("paymentMethod.id", pOrderReq.getPaymentMethodId())
+                .addEqual("orderStatus", pOrderReq.getOrderStatus())
+                .addEqual("salesChannel.id", pOrderReq.getSalesChannelId())
+                .addEqual("customer.id", pOrderReq.getCustomerId())
+                .addEqual("nhanVienBanHang.id", pOrderReq.getSellerId())
+                .addEqual("nhanVienBanHang.branch.id", pOrderReq.getBranchId())
+                .addEqual("customer.groupCustomer.id", pOrderReq.getGroupCustomerId())
+                .addLike(pOrderReq.getTxtSearch(), "receiverName", "receiverPhone", "code")
                 .addBetween("orderTime", lvOrderTimeFrom, lvOrderTimeTo);
         List<Order> lvResultList = lvQueryBuilder.build(lvPageable).getResultList();
         long total = lvQueryBuilder.buildCount();
 
-        List<OrderDTO> lvResultListDto = OrderDTO.fromOrders(lvResultList);
-        for (OrderDTO lvOrder : lvResultListDto) {
-            lvOrder.setItems(lvOrder.getListOrderDetail());
+        List<OrderDTO> lvDTOs = new ArrayList<>();
+        for (Order lvOrder : lvResultList) {
+            OrderDTO lvDto = OrderDTO.fromOrder(lvOrder);
+            lvDto.setItems(lvDto.getListOrderDetail());
+            lvDto.setTotalAmount(OrderUtils.calAmount(lvOrder));
+
+            lvDTOs.add(lvDto);
         }
 
-        return new PageImpl<>(lvResultListDto, lvPageable, total);
+        return new PageImpl<>(lvDTOs, lvPageable, total);
     }
 
     @Override
-    public OrderDTO findById(Long pOrderId, boolean pThrowException) {
+    public OrderDTO findDtoById(Long pOrderId, boolean pThrowException) {
         Order lvOrderEnt = super.findEntById(pOrderId, pThrowException);
         OrderDTO lvOrderDto = super.convertDTO(lvOrderEnt);
 
@@ -150,39 +147,56 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     }
 
     @Override
+    public Order findByCode(String pOrderCode) {
+        return mvEntityRepository.findByOrderCode(pOrderCode);
+    }
+
+    @Override
     public OrderDTO findByTrackingCode(String pTrackingCode) {
         return convertDTO(mvEntityRepository.findByTrackingCode(pTrackingCode));
+    }
+
+    @Override
+    public List<Order> findOrdersToday() {
+        return mvEntityRepository.findByOrderTime(LocalDate.now().atStartOfDay(), LocalDate.now().atTime(LocalTime.MAX));
     }
 
     @Transactional
     @Override
     public OrderDTO createOrder(CreateOrderReq pRequest) {
+        OrderCart lvCart = mvCartService.findEntById(pRequest.getCartId(), true);
+        Map<CATEGORY, Category> lvCategoryMap = mvCategoryService.findByIdsAsMap(Set.of(pRequest.getPaymentMethodId(),
+                pRequest.getSalesChannelId()));
+        
         BigDecimal lvAmountDiscount = pRequest.getAmountDiscount();
         String lvCouponCode = pRequest.getCouponCode();
         LocalDateTime lvOrderTime = getOrderTime(pRequest.getOrderTime());
-
-        OrderCart lvCart = mvCartService.findById(pRequest.getCartId(), true);
-        if (ObjectUtils.isEmpty(lvCart.getListItems())) throw new BadRequestException("At least one product in the order!");
-
-        Category lvPaymentMethod = mvCategoryService.findEntById(pRequest.getPaymentMethodId(), true);
-        if (!lvPaymentMethod.getStatus()) throw new BadRequestException("Payment method's status invalid!");
-
-        Category lvSalesChannel = mvCategoryService.findEntById(pRequest.getSalesChannelId(), true);
-        if (!lvSalesChannel.getStatus()) throw new BadRequestException("Sales channel's status invalid!");
-
+        Category lvPaymentMethod = lvCategoryMap.get(CATEGORY.PAYMENT_METHOD);
+        Category lvSalesChannel = lvCategoryMap.get(CATEGORY.SALES_CHANNEL);
         Customer lvCustomer = mvCustomerService.findEntById(pRequest.getCustomerId(), true);
-        if (!lvCustomer.isWalkInCustomer()) {
-            if (Boolean.TRUE.equals(lvCustomer.getIsBlackList())) throw new BadRequestException("The customer is on the blacklist!");
-            if (!CoreUtils.validateEmail(pRequest.getRecipientEmail())) throw new BadRequestException("Email invalid!");
-            if (!CoreUtils.validatePhoneNumber(pRequest.getRecipientPhone(), CommonUtils.defaultCountryCode)) throw new BadRequestException("Phone number invalid!");
-            if (CoreUtils.isNullStr(pRequest.getShippingAddress())) throw new BadRequestException("Address must not empty!");
-        }
-
         Account lvSalesAssistant = mvAccountRepository.findById(pRequest.getSalesAssistantId())
                 .orElseThrow(() -> new BadRequestException("Sales assistant invalid!"));
-        if (lvSalesAssistant.isClosed()) {
-            throw new BadRequestException("Sales assistant's account is closed!");
+        
+        if (ObjectUtils.isEmpty(lvCart.getListItems()))
+            throw new BadRequestException("At least one product in the order!");
+        if (!lvPaymentMethod.getStatus())
+            throw new BadRequestException("Payment method's status invalid!");
+        if (!lvSalesChannel.getStatus())
+            throw new BadRequestException("Sales channel's status invalid!");
+        
+        if (!lvCustomer.isWalkInCustomer()) {
+            if (Boolean.TRUE.equals(lvCustomer.getIsBlackList()))
+                throw new BadRequestException("The customer is on the blacklist!");
+            if (!CoreUtils.validateEmail(pRequest.getRecipientEmail()))
+                throw new BadRequestException("Email invalid!");
+            if (!CoreUtils.validatePhoneNumber(pRequest.getRecipientPhone(), CommonUtils.defaultCountryCode))
+                throw new BadRequestException("Phone number invalid!");
+            if (CoreUtils.isNullStr(pRequest.getShippingAddress()))
+                throw new BadRequestException("Address must not empty!");
         }
+        
+        if (lvSalesAssistant.isClosed())
+            throw new BadRequestException("Sales assistant's account is closed!");
 
         VoucherTicket lvVoucherTicket = null;
         if (!CoreUtils.isNullStr(lvCouponCode)) {
@@ -199,6 +213,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
                 .salesChannel(lvSalesChannel)
                 .nhanVienBanHang(lvSalesAssistant)
                 .note(pRequest.getNote())
+                .customerNote(pRequest.getCustomerNote())
                 .orderTime(lvOrderTime != null ? lvOrderTime : LocalDateTime.now())
                 .receiverName(pRequest.getRecipientName())
                 .receiverPhone(pRequest.getRecipientPhone())
@@ -233,13 +248,12 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         try {
             mvOrderGenerateQRCodeService.generateOrderQRCode(lvOrderSaved.getId());
         } catch (IOException | WriterException e ) {
-            e.printStackTrace();
             LOG.error(String.format("Can't generate QR Code for Order %s", lvOrderSaved.getCode()), e);
         }
 
         //Save detail items
         List<OrderDetail> lvOrderItemsList = mvOrderItemsService.save(lvCart.getId(), lvOrderSaved.getId(), lvCart.getListItems());
-        BigDecimal totalAmountDiscount = OrderUtils.calTotalAmount_(lvOrderItemsList, lvOrderSaved.getAmountDiscount());
+        BigDecimal totalAmountDiscount = OrderUtils.calAmount(lvOrderItemsList, lvOrderSaved.getAmountDiscount());
         if (totalAmountDiscount.doubleValue() <= 0) {
             throw new BadRequestException("The value of order must greater than zero!");
         }
@@ -250,12 +264,11 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
             mvCustomerRepository.updateBonusPoint(lvCustomer.getId(), bonusPoints);
         }
 
-        //Remove all of items in cart
-        mvCartItemsService.deleteAllItems(lvCart.getId());
+        mvCartService.markOrderFinished(lvCart.getId());
 
         //Log
         mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_ORD_C, MasterObject.Order, "Thêm mới đơn hàng", lvOrderSaved.getCode());
-        LOG.info("Insert new order success! insertBy={}", mvUserSession.getUserPrincipal().getUsername());
+        LOG.info("Insert new order success! insertBy={}", getUserPrincipal().getUsername());
 
         return OrderDTO.fromOrder(lvOrderSaved);
     }
@@ -303,6 +316,9 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
                     int lvReturnPeriodDays = lvReturnPeriodDaysMdl.getIntValue();
                     if (!isWithinReturnPeriod(lvSuccessfulDeliveryTime, LocalDateTime.now(), lvReturnPeriodDays))
                         throw new AppException("The return period has expired!");
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + lvRequestOrderStatus);
             }
         }
 
@@ -376,16 +392,6 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     }
 
     @Override
-    public List<Order> findOrdersToday() {
-        return mvEntityRepository.findOrdersToday();
-    }
-
-    @Override
-    public Page<OrderDTO> getOrdersByCustomer(int pageSize, int pageNum, Long pCustomerId) {
-        return this.findAll(pageSize, pageNum, null, null, null, null, null, null, pCustomerId, null, null, null, null, null, null);
-    }
-
-    @Override
     public String updateOrderStatus(Long pOrderId, OrderStatus pOrderStatus, LocalDateTime pSuccessfulDeliveryTime, Long cancellationReasonId) {
         Order lvOrder = super.findById(pOrderId).orElseThrow(() -> new BadRequestException("Order not found!"));
 
@@ -413,18 +419,66 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     }
 
     @Override
-    public Order getOrderByCode(String pOrderCode) {
-        return mvEntityRepository.findByOrderCode(pOrderCode);
+    public void doCancel(OrderDTO pOrder, String pReason) {
+        Order lvOrder = super.findEntById(pOrder.getId(), true);
+        lvOrder.setCancellationReason(null);
+        lvOrder.setCancellationDate(LocalDateTime.now());
+        Order lvOrderUpdated = mvEntityRepository.save(lvOrder);
+
+        if (SysConfigUtils.isYesOption(ConfigCode.sendNotifyCustomerOnOrderConfirmation)) {
+            mvSendCustomerNotificationService.notifyOrderConfirmation(lvOrderUpdated, lvOrderUpdated.getReceiverEmail());
+        }
+
+        //...
+    }
+
+    @Override
+    public void doComplete(OrderDTO pOrder) {
+        Order lvOrder = super.findEntById(pOrder.getId(), true);
+        lvOrder.setOrderStatus(OrderStatus.DLVD);
+        lvOrder.setDeliverySuccessTime(LocalDateTime.now());
+        Order lvOrderUpdated = mvEntityRepository.save(lvOrder);
+
+        Long lvProgramId = null;
+        mvLoyaltyProgramService.accumulatePoints(lvOrderUpdated, lvProgramId);
+
+        //...
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void doReturn(OrderDTO pOrder) {
+        try {
+            Order lvOrder = super.findEntById(pOrder.getId(), true);
+            Long lvStorageId = null;
+            String lvOrderCode = lvOrder.getCode();
+            mvTicketImportService.restockReturnedItems(lvStorageId, lvOrderCode);
+
+            TransactionGoodsDTO dto = new TransactionGoodsDTO();
+            dto.setId(null);
+            dto.setType(TransactionGoodsType.RECEIPT.getValue());
+            dto.setDescription(null);
+
+            mvTransactionGoodsService.createTransactionGoods(dto);
+        } catch (Exception e) {
+            LOG.error("Cancel order got [{}]", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void doRefund(Long pOrderId) {
+        Order lvOrder = super.findEntById(pOrderId, true);
+        //...
     }
 
     private String getNextOrderCode() {
         int orderTodayQty = 0;
-        List<Order> ordersToday = mvEntityRepository.findOrdersToday();
+        List<Order> ordersToday = mvEntityRepository.findByOrderTime(LocalDate.now().atStartOfDay(), LocalDate.now().atTime(LocalTime.MAX));
         if (ordersToday != null) {
             orderTodayQty = ordersToday.size();
         }
         LocalDate currentDate = LocalDate.now();
-        String year = String.valueOf(currentDate.getYear());
+        String year = String.valueOf(currentDate.getYear()).substring(2);
         String month = String.format("%02d", currentDate.getMonthValue());
         String day = String.format("%02d", currentDate.getDayOfMonth());
         return year + month + day + String.format("%03d", orderTodayQty + 1);

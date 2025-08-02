@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.media.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.service.*;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -41,7 +40,6 @@ public class FileController extends BaseController {
     ProductComboService productComboService;
     ProductVariantService productVariantService;
     ProductDamagedService productDamagedService;
-    ControllerHelper mvCHelper;
 
     @PostMapping("/uploads/san-pham/{id}")
     @PreAuthorize("@vldModuleProduct.updateImage(true)")
@@ -164,6 +162,6 @@ public class FileController extends BaseController {
     @DeleteMapping("${app.api.prefix}/file/delete/{id}")
     @PreAuthorize("@vldModuleProduct.updateImage(true)")
     public AppResponse<String> delete(@PathVariable("id") Long fileId) {
-        return mvCHelper.success(fileService.delete(fileId));
+        return AppResponse.success(fileService.delete(fileId));
     }
 }

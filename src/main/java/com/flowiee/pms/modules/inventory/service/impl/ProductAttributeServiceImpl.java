@@ -1,5 +1,7 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.modules.inventory.entity.Product;
 import com.flowiee.pms.modules.inventory.entity.ProductAttribute;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.utils.ChangeLog;
@@ -19,7 +21,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -34,14 +38,14 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
     }
 
     @Override
-    public List<ProductAttributeDTO> findAll() {
+    public List<ProductAttributeDTO>find(BaseParameter pParam) {
         return this.findAll(-1, -1, null).getContent();
     }
 
     @Override
     public Page<ProductAttributeDTO> findAll(int pageSize, int pageNum, Long pProductDetailId) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("sort"));
-        Page<ProductAttribute> productAttributePage = mvEntityRepository.findByProductVariantId(pProductDetailId, pageable);
+        Page<ProductAttribute> productAttributePage = mvEntityRepository.findByProductId(pProductDetailId, pageable);
         return new PageImpl<>(convertDTOs(productAttributePage.getContent()), pageable, productAttributePage.getTotalElements());
     }
 
@@ -52,21 +56,64 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
 
     @Override
     public ProductAttributeDTO save(ProductAttributeDTO pProductAttribute) {
-        ProductAttributeDTO productAttributeSaved = super.save(pProductAttribute);
-        mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Thêm mới thuộc tính sản phẩm", productAttributeSaved.getAttributeName());
-        return productAttributeSaved;
+        ProductAttribute lvAttribute = new ProductAttribute();
+        lvAttribute.setProduct(new Product(pProductAttribute.getProductId()));
+        lvAttribute.setAttributeName(pProductAttribute.getAttributeName());
+        lvAttribute.setAttributeValue(pProductAttribute.getAttributeValue());
+        lvAttribute.setSort(pProductAttribute.getSort());
+        lvAttribute.setStatus(pProductAttribute.getStatus());
+
+        ProductAttribute lvAttributeCreated = mvEntityRepository.save(lvAttribute);
+
+        mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Thêm mới thuộc tính sản phẩm", lvAttributeCreated.getAttributeName());
+
+        return convertDTO(lvAttribute);
+    }
+
+    @Override
+    public List<ProductAttributeDTO> saveAll(List<ProductAttributeDTO> pAttributes) {
+        if (CollectionUtils.isEmpty(pAttributes)) {
+            return Collections.emptyList();
+        }
+
+        // Convert DTO → Entity
+        List<ProductAttribute> entities = pAttributes.stream()
+                .map(dto -> {
+                    ProductAttribute attr = new ProductAttribute();
+                    attr.setProduct(new Product(dto.getProductId()));
+                    attr.setAttributeName(dto.getAttributeName());
+                    attr.setAttributeValue(dto.getAttributeValue());
+                    attr.setSort(dto.getSort());
+                    attr.setStatus(dto.getStatus());
+                    return attr;
+                })
+                .toList();
+
+        List<ProductAttribute> savedEntities = mvEntityRepository.saveAll(entities);
+
+        savedEntities.forEach(attr ->
+                mvSystemLogService.writeLogCreate(
+                        MODULE.PRODUCT,
+                        ACTION.PRO_PRD_U,
+                        MasterObject.ProductAttribute,
+                        "Thêm mới thuộc tính sản phẩm",
+                        attr.getAttributeName()
+                )
+        );
+
+        return convertDTOs(savedEntities);
     }
 
     @Override
     public ProductAttributeDTO update(ProductAttributeDTO pAttribute, Long attributeId) {
-        ProductAttribute attribute = super.findById(attributeId).orElseThrow(() -> new BadRequestException());
+        ProductAttribute attribute = super.findEntById(attributeId, true);
         //enhance later
         ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(attribute));
 
         attribute.setAttributeName(pAttribute.getAttributeName());
         attribute.setAttributeValue(pAttribute.getAttributeValue());
         attribute.setSort(pAttribute.getSort());
-        attribute.setStatus(pAttribute.isStatus());
+        attribute.setStatus(pAttribute.getStatus());
         ProductAttribute lvAttributeUpdated = mvEntityRepository.save(attribute);
 
         changeLog.setNewObject(lvAttributeUpdated);
@@ -74,7 +121,7 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
 
         String logTitle = "Cập nhật thuộc tính sản phẩm";
 
-        mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, lvAttributeUpdated.getProductDetail().getProduct().getId(), lvAttributeUpdated.getProductDetail().getId(), lvAttributeUpdated.getId());
+        mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, lvAttributeUpdated.getProduct().getId(), lvAttributeUpdated.getProduct().getId(), lvAttributeUpdated.getId());
         mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Cập nhật thuộc tính sản phẩm", changeLog);
 
         return convertDTO(lvAttributeUpdated);

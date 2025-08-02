@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.Material;
 import com.flowiee.pms.modules.inventory.entity.MaterialHistory;
 import com.flowiee.pms.common.exception.BadRequestException;
@@ -21,8 +22,8 @@ public class MaterialHistoryServiceImpl extends BaseService<MaterialHistory, Mat
     }
 
     @Override
-    public List<MaterialHistoryDTO> findAll() {
-        return super.findAll();
+    public List<MaterialHistoryDTO>find(BaseParameter pParam) {
+        return super.find(pParam);
     }
 
     @Override

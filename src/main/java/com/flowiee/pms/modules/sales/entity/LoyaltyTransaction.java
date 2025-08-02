@@ -6,7 +6,7 @@ import com.flowiee.pms.common.enumeration.LoyaltyTransactionType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 

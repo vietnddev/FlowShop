@@ -77,12 +77,12 @@ public class LedgerTransactionControllerView extends BaseController {
     }
 
     private void getCategoryOfTransaction(ModelAndView modelAndView, String tranType) {
-        modelAndView.addObject("listGroupObjects", mvCategoryService.findLedgerGroupObjects());
-        modelAndView.addObject("listPaymentMethods", mvCategoryService.findPaymentMethods());
+        modelAndView.addObject("listGroupObjects", mvCategoryService.findByType(CATEGORY.GROUP_OBJECT));
+        modelAndView.addObject("listPaymentMethods", mvCategoryService.findByType(CATEGORY.PAYMENT_METHOD));
         if (LedgerTranType.PT.name().equals(tranType)) {
-            modelAndView.addObject("listTranContents", mvCategoryService.findLedgerReceiptTypes());
+            modelAndView.addObject("listTranContents", mvCategoryService.findByType(CATEGORY.RECEIPT_TYPE));
         } else if (LedgerTranType.PC.name().equals(tranType)) {
-            modelAndView.addObject("listTranContents", mvCategoryService.findLedgerPaymentTypes());
+            modelAndView.addObject("listTranContents", mvCategoryService.findByType(CATEGORY.PAYMENT_TYPE));
         }
     }
 }

@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.system.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.common.enumeration.CATEGORY;
@@ -23,25 +24,15 @@ public interface CategoryService {
 
     Page<Category> findSubCategory(CATEGORY categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum);
 
-    List<Category> findUnits();
-
-    List<Category> findColors();
-
-    List<Category> findSizes();
-
-    List<Category> findSalesChannels();
-
-    List<Category> findPaymentMethods();
+    List<Category> findByIds(List<Long> pIds);
 
     List<Category> findOrderStatus(Long ignoreId);
 
-    List<Category> findLedgerGroupObjects();
-
-    List<Category> findLedgerReceiptTypes();
-
-    List<Category> findLedgerPaymentTypes();
+    List<Category> findByType(CATEGORY pType);
 
     boolean categoryInUse(Long categoryId);
 
     Map<CATEGORY, List<Category>> findByType(List<CATEGORY> categoryTypeList);
+
+    Map<CATEGORY, Category> findByIdsAsMap(Set<Long> ids);
 }

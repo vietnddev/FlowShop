@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.system.schedule.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.util.List;
 
 @Builder

@@ -5,9 +5,9 @@ import com.flowiee.pms.common.base.dto.BaseDTO;
 import com.flowiee.pms.modules.sales.entity.Customer;
 import com.flowiee.pms.modules.sales.entity.VoucherInfo;
 import com.flowiee.pms.modules.sales.entity.VoucherTicket;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

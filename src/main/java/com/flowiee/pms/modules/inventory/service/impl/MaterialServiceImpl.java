@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.Material;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.ACTION;
@@ -44,12 +45,12 @@ public class MaterialServiceImpl extends BaseService<Material, MaterialDTO, Mate
     }
 
     @Override
-    public List<MaterialDTO> findAll() {
-        return this.findAll(-1, -1, null, null, null, null, null, null).getContent();
+    public List<MaterialDTO>find(BaseParameter pParam) {
+        return this.find(-1, -1, null, null, null, null, null, null).getContent();
     }
 
     @Override
-    public Page<MaterialDTO> findAll(int pageSize, int pageNum, Long supplierId, Long unitId, String code, String name, String location, String status) {
+    public Page<MaterialDTO> find(int pageSize, int pageNum, Long supplierId, Long unitId, String code, String name, String location, String status) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("name").ascending());
         Page<Material> materialPage = mvEntityRepository.findAll(supplierId, unitId, code, name, location, status, pageable);
         return new PageImpl<>(convertDTOs(materialPage.getContent()), pageable, materialPage.getTotalElements());

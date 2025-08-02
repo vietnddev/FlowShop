@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.inventory.entity;
 
 import com.flowiee.pms.modules.inventory.enums.PriceChangeType;
 import com.flowiee.pms.modules.staff.entity.Account;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;

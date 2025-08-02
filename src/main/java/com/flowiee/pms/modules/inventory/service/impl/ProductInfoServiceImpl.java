@@ -2,14 +2,13 @@ package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.constants.JpaHints;
+import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.modules.inventory.dto.ProductAttributeDTO;
 import com.flowiee.pms.modules.inventory.dto.ProductPriceDTO;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.inventory.model.ProductSearchRequest;
 import com.flowiee.pms.modules.inventory.repository.ProductPriceRepository;
-import com.flowiee.pms.modules.inventory.service.ProductHistoryService;
-import com.flowiee.pms.modules.inventory.service.ProductInfoService;
-import com.flowiee.pms.modules.inventory.service.ProductPriceService;
-import com.flowiee.pms.modules.inventory.service.ProductVariantService;
+import com.flowiee.pms.modules.inventory.service.*;
 import com.flowiee.pms.modules.system.dto.CategoryDTO;
 import com.flowiee.pms.modules.system.service.SystemLogService;
 import com.flowiee.pms.modules.inventory.entity.Product;
@@ -29,14 +28,13 @@ import com.flowiee.pms.modules.sales.repository.OrderRepository;
 import com.flowiee.pms.modules.media.repository.FileStorageRepository;
 import com.flowiee.pms.modules.system.service.CategoryService;
 import com.flowiee.pms.common.utils.ChangeLog;
-import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.modules.inventory.dto.ProductDTO;
 import com.flowiee.pms.modules.inventory.repository.ProductRepository;
 import com.flowiee.pms.modules.inventory.util.ProductConvert;
-import jakarta.persistence.EntityGraph;
-import org.apache.commons.collections.CollectionUtils;
+import javax.persistence.EntityGraph;
+import org.springframework.util.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,11 +43,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, ProductRepository> implements ProductInfoService {
     private final ProductDescriptionRepository mvProductDescriptionRepository;
+    private final ProductAttributeService mvProductAttributeService;
     private final ProductVariantService mvProductVariantService;
     private final ProductHistoryService mvProductHistoryService;
     private final OrderRepository mvOrderRepository;
@@ -67,22 +67,23 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
                                   OrderRepository pOrderRepository, CategoryService pCategoryService,
                                   FileStorageRepository pFileStorageRepository, ProductDetailRepository pProductDetailRepository,
                                   SystemLogService pSystemLogService, ProductPriceService pProductPriceService,
-                                  ProductPriceRepository pProductPriceRepository) {
+                                  ProductPriceRepository pProductPriceRepository, ProductAttributeService pProductAttributeService) {
         super(Product.class, ProductDTO.class, pProductRepository);
         this.mvProductDescriptionRepository = pProductDescriptionRepository;
+        this.mvProductAttributeService = pProductAttributeService;
+        this.mvProductDetailRepository = pProductDetailRepository;
+        this.mvProductPriceRepository = pProductPriceRepository;
         this.mvProductVariantService = pProductVariantService;
         this.mvProductHistoryService = pProductHistoryService;
+        this.mvFileStorageRepository = pFileStorageRepository;
+        this.mvProductPriceService = pProductPriceService;
+        this.mvSystemLogService = pSystemLogService;
         this.mvOrderRepository = pOrderRepository;
         this.mvCategoryService = pCategoryService;
-        this.mvFileStorageRepository = pFileStorageRepository;
-        this.mvProductDetailRepository = pProductDetailRepository;
-        this.mvSystemLogService = pSystemLogService;
-        this.mvProductPriceService = pProductPriceService;
-        this.mvProductPriceRepository = pProductPriceRepository;
     }
 
     @Override
-    public List<ProductDTO> findAll() {
+    public List<ProductDTO>find(BaseParameter pParam) {
         return this.findAll(ProductSearchRequest.builder().build(), false).getContent();
     }
 
@@ -220,30 +221,28 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
     @Transactional
     @Override
     public ProductDTO save(ProductDTO pProduct) {
-        Product lvProduct = new Product();
-        lvProduct.setProductName(pProduct.getProductName());
-        lvProduct.setBrand(mvCategoryService.findEntById(pProduct.getBrandId(), true));
-        lvProduct.setProductType(mvCategoryService.findEntById(pProduct.getProductTypeId(), true));
-        lvProduct.setUnit(mvCategoryService.findEntById(pProduct.getUnitId(), true));
-        lvProduct.setProductCategory(pProduct.getProductCategory());
-        lvProduct.setInternalNotes(pProduct.getInternalNotes());
-
         try {
-            if (CoreUtils.isNullStr(lvProduct.getProductName()))
-                throw new BadRequestException("Product name is not null!");
+            Map<CATEGORY, Category> lvCategoryMap = mvCategoryService.findByIdsAsMap(Set.of(
+                    pProduct.getBrandId(),
+                    pProduct.getProductTypeId(),
+                    pProduct.getUnitId()
+            ));
 
+            Product lvProduct = new Product();
+            lvProduct.setProductName(pProduct.getProductName());
+            lvProduct.setBrand(lvCategoryMap.get(CATEGORY.BRAND));
+            lvProduct.setProductType(lvCategoryMap.get(CATEGORY.PRODUCT_TYPE));
+            lvProduct.setUnit(lvCategoryMap.get(CATEGORY.UNIT));
+            lvProduct.setProductCategory(pProduct.getProductCategory());
+            lvProduct.setInternalNotes(pProduct.getInternalNotes());
             //productToSave.setStatus(ProductStatus.ACT);
+
             Product lvProductSaved = mvEntityRepository.save(lvProduct);
 
-//            ProductDescription productDescription = null;
-//            if (ObjectUtils.isNotEmpty(product.getDescription())) {
-//                productDescription = mvProductDescriptionRepository.save(ProductDescription.builder()
-//                        .productId(lvProductSaved.getId())
-//                        .description(product.getDescription()).build());
-//            }
-
-            if (pProduct.getVariants() != null) {
-                for (ProductVariantDTO lvVariant : pProduct.getVariants()) {
+            //Create variants
+            List<ProductVariantDTO> lvVariants = pProduct.getVariants();
+            if (!CollectionUtils.isEmpty(lvVariants)) {
+                for (ProductVariantDTO lvVariant : lvVariants) {
                     ProductPriceDTO lvPrice = lvVariant.getPrice();
 
                     lvVariant.setProductId(lvProductSaved.getId());
@@ -261,6 +260,16 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
 
                     mvProductVariantService.save(lvVariant);
                 }
+            }
+
+            //Create attributes
+            List<ProductAttributeDTO> lvAttributes = pProduct.getAttributes();
+            if (!CollectionUtils.isEmpty(lvAttributes)) {
+                lvAttributes.forEach(lvAttr -> {
+                    lvAttr.setProductId(lvProductSaved.getId());
+                    lvAttr.setStatus(true);
+                });
+                mvProductAttributeService.saveAll(lvAttributes);
             }
 
             mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_C, MasterObject.Product, "Thêm mới sản phẩm", lvProductSaved.getProductName());

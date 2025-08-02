@@ -9,7 +9,7 @@ import com.flowiee.pms.modules.inventory.entity.TicketExport;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.modules.sales.entity.Order;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

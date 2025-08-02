@@ -140,7 +140,7 @@ function submitProductOnSearchModal(functionId) {
     if (functionId === "createOrder") {
         let apiURL = mvHostURLCallApi + '/sls/cart/add-items';
         let body = {
-            cartId: mvCartId,
+            cartId: mvCurrentCartId,
             items: mvProductSearchModalListSelected
         }
         $.ajax({
@@ -151,7 +151,8 @@ function submitProductOnSearchModal(functionId) {
             success: function (response) {
                 if (response.status === "OK") {
                     alert(response.message)
-                    window.location.reload();
+                    viewCartInfo(mvCurrentCartId);
+                    $("#searchProductModal").modal("hide");
                 }
             },
             error: function (xhr) {

@@ -12,10 +12,13 @@ RUN mvn clean package -DskipTests
 
 # Stage 2: Runtime
 #FROM amazoncorretto:21.0.4
-FROM eclipse-temurin:21-jre-alpine
+#FROM eclipse-temurin:21-jre-alpine
+FROM ibm-semeru-runtimes:open-17-jre
 
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+
+ENV JAVA_TOOL_OPTIONS="-Xms512m -Xmx1024m"
 
 # Command to run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.modules.inventory.entity.ProductHistory;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
@@ -53,7 +52,6 @@ public class ProductController extends BaseController {
     ProductInfoService mvProductInfoService;
     ProductHistoryService mvProductHistoryService;
     ProductRelatedService mvProductRelatedService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all products")
     @GetMapping("/all")
@@ -72,14 +70,14 @@ public class ProductController extends BaseController {
                                                       @RequestParam(value = "fullInfo", required = false) Boolean fullInfo) {
         try {
             if (fullInfo != null && !fullInfo) {
-                return mvCHelper.success(ProductConvert.convertToDTOs(mvProductInfoService.findProductsIdAndProductName()));
+                return AppResponse.success(ProductConvert.convertToDTOs(mvProductInfoService.findProductsIdAndProductName()));
             }
             Page<ProductDTO> productPage = mvProductInfoService.findAll(ProductSearchRequest.builder()
                     .pageSize(pageSize).pageNum(pageNum - 1).txtSearch(txtSearch)
                     .brandId(pBrand).productTypeId(pProductType).colorId(pColor)
                     .sizeId(pSize).unitId(pUnit).gender(pGender)
                     .isSaleOff(pIsSalesOff).isHotTrend(pIsHotTrend).build(), true);
-            return mvCHelper.success(productPage.getContent(), pageNum, pageSize, productPage.getTotalPages(), productPage.getTotalElements());
+            return AppResponse.paged(productPage);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product"), ex);
         }
@@ -93,60 +91,60 @@ public class ProductController extends BaseController {
         if (product == null) {
             throw new ResourceNotFoundException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product"));
         }
-        return mvCHelper.success(product);
+        return AppResponse.success(product);
     }
 
     @Operation(summary = "Create clothes product")
     @PostMapping("/create")
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
     public AppResponse<ProductDTO> createProduct(@RequestBody ProductDTO pDto) {
-        return mvCHelper.success(mvProductInfoService.save(pDto));
+        return AppResponse.success(mvProductInfoService.save(pDto));
     }
 
     @Operation(summary = "Update product")
     @PutMapping("/update/{id}")
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
     public AppResponse<ProductDTO> updateProduct(@RequestBody ProductDTO product, @PathVariable("id") Long productId) {
-        return mvCHelper.success(mvProductInfoService.update(product, productId));
+        return AppResponse.success(mvProductInfoService.update(product, productId));
     }
 
     @Operation(summary = "Delete product")
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("@vldModuleProduct.deleteProduct(true)")
     public AppResponse<String> deleteProduct(@PathVariable("id") Long productId) {
-        return mvCHelper.success(mvProductInfoService.delete(productId));
+        return AppResponse.success(mvProductInfoService.delete(productId));
     }
 
     @Operation(summary = "Get histories of product")
     @GetMapping(value = "/{productId}/history")
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public AppResponse<List<ProductHistory>> getHistoryOfProduct(@PathVariable("productId") Long productId) {
-        return mvCHelper.success(mvProductHistoryService.findByProduct(productId));
+        return AppResponse.success(mvProductHistoryService.findByProduct(productId));
     }
 
     @Operation(summary = "Add related product")
     @PostMapping("/{productId}/related/{relatedProductId}")
     public AppResponse<String> addRelatedProduct(@PathVariable Long productId, @PathVariable Long relatedProductId) {
         mvProductRelatedService.add(productId, relatedProductId);
-        return mvCHelper.success("Related product added successfully!");
+        return AppResponse.success("Related product added successfully!");
     }
 
     @Operation(summary = "Get related product")
     @GetMapping("/{productId}/related")
     public AppResponse<List<ProductRelatedDTO>> getRelatedProducts(@PathVariable Long productId) {
-        return mvCHelper.success(mvProductRelatedService.get(productId));
+        return AppResponse.success(mvProductRelatedService.get(productId));
     }
 
     @Operation(summary = "Delete related product")
     @GetMapping("/related/{relationId}")
     public AppResponse<String> removeRelatedProduct(@PathVariable Long relationId) {
         mvProductRelatedService.remove(relationId);
-        return mvCHelper.success("Related product deleted successfully!");
+        return AppResponse.success("Related product deleted successfully!");
     }
 
     @GetMapping("/discontinued")
     public AppResponse<List<ProductDTO>> getDiscontinuedProducts() {
-        return mvCHelper.success(mvProductInfoService.getDiscontinuedProducts());
+        return AppResponse.success(mvProductInfoService.getDiscontinuedProducts());
     }
 
     @GetMapping("/import/template")

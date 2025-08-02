@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.sales.service;
 
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
 
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface OrderPrintInvoiceService {

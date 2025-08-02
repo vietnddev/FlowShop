@@ -21,7 +21,7 @@ public class ProductDamagedControllerView extends BaseController {
     public ModelAndView loadProductPage() {
         setupSearchTool(true, List.of());
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_PRODUCT_DAMAGED.getTemplate());
-        modelAndView.addObject("productDamagedList", productDamagedService.findAll());
+        modelAndView.addObject("productDamagedList", productDamagedService.find());
         return baseView(modelAndView);
     }
 }

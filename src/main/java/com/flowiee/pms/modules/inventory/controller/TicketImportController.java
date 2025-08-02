@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.modules.inventory.entity.ProductVariantExim;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;
@@ -30,7 +29,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TicketImportController extends BaseController {
     TicketImportService mvTicketImportService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all phiếu nhập")
     @GetMapping("/all")
@@ -40,7 +38,7 @@ public class TicketImportController extends BaseController {
                                                       @RequestParam(value = "storageId", required = false) Long storageId) {
         try {
             Page<TicketImport> ticketImports = mvTicketImportService.findAll(pageSize, pageNum - 1, null, null, null, null, null, storageId);
-            return mvCHelper.success(TicketImportDTO.fromTicketImports(ticketImports.getContent()), pageNum, pageSize, ticketImports.getTotalPages(), ticketImports.getTotalElements());
+            return AppResponse.success(TicketImportDTO.fromTicketImports(ticketImports.getContent()), pageNum, pageSize, ticketImports.getTotalPages(), ticketImports.getTotalElements());
         } catch (Exception ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "ticket import"), ex);
         }
@@ -54,7 +52,7 @@ public class TicketImportController extends BaseController {
         if (ticketImport == null) {
             throw new ResourceNotFoundException("Ticket import goods not found!");
         }
-        return mvCHelper.success(TicketImportDTO.fromTicketImport(ticketImport));
+        return AppResponse.success(TicketImportDTO.fromTicketImport(ticketImport));
     }
 
     @Operation(summary = "Thêm mới phiếu nhập hàng")
@@ -62,7 +60,7 @@ public class TicketImportController extends BaseController {
     @PreAuthorize("@vldModuleSales.importGoods(true)")
     public AppResponse<TicketImport> createDraftImport(@RequestBody TicketImportDTO ticketImport) {
         try {
-            return mvCHelper.success(mvTicketImportService.createDraftTicketImport(ticketImport));
+            return AppResponse.success(mvTicketImportService.createDraftTicketImport(ticketImport));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "ticket import"), ex);
         }
@@ -75,21 +73,21 @@ public class TicketImportController extends BaseController {
         TicketImportDTO dto = new TicketImportDTO();
         dto.setTitle(pTitle);
         dto.setStorageId(pStorageId);
-        return mvCHelper.success(mvTicketImportService.createDraftTicketImport(dto));
+        return AppResponse.success(mvTicketImportService.createDraftTicketImport(dto));
     }
 
     @Operation(summary = "Cập nhật phiếu nhập hàng")
     @PutMapping("/update/{id}")
     @PreAuthorize("@vldModuleSales.importGoods(true)")
     public AppResponse<TicketImportDTO> updateTicket(@RequestBody TicketImportDTO ticketImportDTO, @PathVariable("id") Long ticketImportId) {
-        return mvCHelper.success(TicketImportDTO.fromTicketImport(mvTicketImportService.update(TicketImport.fromTicketImportDTO(ticketImportDTO), ticketImportId)));
+        return AppResponse.success(TicketImportDTO.fromTicketImport(mvTicketImportService.update(TicketImport.fromTicketImportDTO(ticketImportDTO), ticketImportId)));
     }
 
     @Operation(summary = "Xóa phiếu nhập hàng")
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("@vldModuleSales.importGoods(true)")
     public AppResponse<String> deleteTicket(@PathVariable("id") Long ticketImportId) {
-        return mvCHelper.success(mvTicketImportService.delete(ticketImportId));
+        return AppResponse.success(mvTicketImportService.delete(ticketImportId));
     }
 
     @Operation(summary = "Add sản phẩm vào phiếu nhập hàng")
@@ -97,7 +95,7 @@ public class TicketImportController extends BaseController {
     @PreAuthorize("@vldModuleSales.importGoods(true)")
     public AppResponse<List<ProductVariantExim>> addProductVariantToTicket(@PathVariable("id") Long ticketImportId,
                                                                            @RequestBody List<Long> productVariantIds) {
-        return mvCHelper.success(mvTicketImportService.addProductToTicket(ticketImportId, productVariantIds));
+        return AppResponse.success(mvTicketImportService.addProductToTicket(ticketImportId, productVariantIds));
     }
 
     @Operation(summary = "Add nguyên vật liệu vào phiếu nhập hàng")
@@ -109,7 +107,7 @@ public class TicketImportController extends BaseController {
             throw new BadRequestException("Goods import to add product not found!");
         }
         try {
-            return mvCHelper.success(mvTicketImportService.addMaterialToTicket(ticketImportId, materialIds));
+            return AppResponse.success(mvTicketImportService.addMaterialToTicket(ticketImportId, materialIds));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "ticket_import"), ex);
         }
@@ -120,6 +118,6 @@ public class TicketImportController extends BaseController {
 //    @PreAuthorize("@vldModuleSales.importGoods(true)")
 //    public AppResponse<String> restockReturnedItems(@RequestParam("storageId") Long pStorageId, @RequestParam("orderCode") String pOrderCode) {
 //        mvTicketImportService.restockReturnedItems(pStorageId, pOrderCode);
-//        return mvCHelper.success("Nhập hoàn thành công!");
+//        return AppResponse.success("Nhập hoàn thành công!");
 //    }
 }

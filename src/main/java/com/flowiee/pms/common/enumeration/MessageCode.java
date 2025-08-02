@@ -7,7 +7,7 @@ public enum MessageCode {
     CREATE_SUCCESS(1001, "Created successfully!"),
     UPDATE_SUCCESS(1002, "Updated successfully!"),
     DELETE_SUCCESS(1003, "Deleted successfully!"),
-    IMPORT_SUCCESS(1004, "Deleted successfully!");
+    IMPORT_SUCCESS(1004, "Import successfully!");
 
     private final int code;
     private final String description;

@@ -11,6 +11,6 @@ import com.flowiee.pms.modules.inventory.entity.ProductAttribute;
 
 @Repository
 public interface ProductAttributeRepository extends BaseRepository<ProductAttribute, Long> {
-    @Query(value = "from ProductAttribute t where t.productDetail.id=:productVariantId order by t.sort asc")
-    Page<ProductAttribute> findByProductVariantId(@Param("productVariantId") Long productDetailId, Pageable pageable);
+    @Query(value = "from ProductAttribute t where t.product.id=:productId order by t.sort asc")
+    Page<ProductAttribute> findByProductId(@Param("productId") Long productId, Pageable pageable);
 }

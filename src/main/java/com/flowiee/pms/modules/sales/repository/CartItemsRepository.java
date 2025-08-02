@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.flowiee.pms.modules.sales.entity.Items;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
@@ -27,7 +28,7 @@ public interface CartItemsRepository extends BaseRepository<Items, Long> {
     @Query("select coalesce(sum(coalesce((case when i.price is not null then i.price else i.priceOriginal end), 0) * i.quantity), 0) " +
            "from Items i " +
            "where i.orderCart.id=:cartId")
-    Double calTotalAmountWithoutDiscount(@Param("cartId") long cartId);
+    BigDecimal calTotalAmountWithoutDiscount(@Param("cartId") long cartId);
 
     @Modifying
     @Query("update Items i set i.quantity=:quantity where i.id=:itemId")

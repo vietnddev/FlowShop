@@ -65,6 +65,7 @@ public class ProductDTO extends BaseDTO implements Serializable {
     Long totalSoldQty;
     Long totalStorageQty;
     List<ProductVariantDTO> variants;
+    List<ProductAttributeDTO> attributes;
 
     public ProductDTO(Long id) {
         this.id = id;

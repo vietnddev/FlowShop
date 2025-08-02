@@ -15,7 +15,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Builder
 @Entity

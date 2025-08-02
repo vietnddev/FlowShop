@@ -23,9 +23,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,9 +46,9 @@ public class AccountControllerView extends BaseController {
     public ModelAndView findAllAccount() {
         ModelAndView modelAndView = new ModelAndView(Pages.SYS_ACCOUNT.getTemplate());
         modelAndView.addObject("account", new Account());
-        modelAndView.addObject("listAccount", accountService.findAll());
-        modelAndView.addObject("groupAccount", groupAccountService.findAll());
-        modelAndView.addObject("listBranch", branchService.findAll());
+        modelAndView.addObject("listAccount", accountService.find());
+        modelAndView.addObject("groupAccount", groupAccountService.find(-1, -1).getContent());
+        modelAndView.addObject("listBranch", branchService.find());
         return baseView(modelAndView);
     }
 
@@ -60,8 +60,8 @@ public class AccountControllerView extends BaseController {
         ModelAndView modelAndView = new ModelAndView(Pages.SYS_ACCOUNT_DETAIL.getTemplate());
         modelAndView.addObject("listRole", roleOfAccount);
         modelAndView.addObject("accountInfo", AccountDTO.toDTO(account));
-        modelAndView.addObject("groupAccount", groupAccountService.findAll());
-        modelAndView.addObject("listBranch", branchService.findAll());
+        modelAndView.addObject("groupAccount", groupAccountService.find(-1, -1).getContent());
+        modelAndView.addObject("listBranch", branchService.find());
 
         return baseView(modelAndView);
     }

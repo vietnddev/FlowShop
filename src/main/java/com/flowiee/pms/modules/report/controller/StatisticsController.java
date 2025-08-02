@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.report.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.modules.report.entity.Report;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.report.dto.ReportDTO;
@@ -29,10 +28,9 @@ public class StatisticsController extends BaseController {
     private final RevenueStatisticsService revenueStatisticsService;
     private final ProductStatisticsService productStatisticsService;
     private final ReportService reportService;
-    private final ControllerHelper mvCHelper;
 
     private AppResponse<ReportDTO> generateResult(Report pReport, Object pReportData) {
-        return mvCHelper.success(ReportDTO.builder()
+        return AppResponse.success(ReportDTO.builder()
                 .reportId(pReport.getReportId())
                 .reportName(pReport.getReportName())
                 .data(pReportData)

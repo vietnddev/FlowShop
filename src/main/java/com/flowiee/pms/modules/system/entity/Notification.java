@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Builder
 @Entity

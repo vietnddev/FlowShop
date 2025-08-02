@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.dto.GiftCatalogDTO;
 import com.flowiee.pms.modules.inventory.service.GiftCatalogService;
@@ -18,18 +17,17 @@ import java.util.List;
 public class LoyaltyController extends BaseController {
     private final GiftCatalogService giftCatalogService;
     private final GiftRedemptionService redemptionService;
-    private final ControllerHelper mvCHelper;
 
     @Operation(summary = "Get list of gifts")
     @GetMapping("/gifts")
     public AppResponse<List<GiftCatalogDTO>> getActiveGifts() {
-        return mvCHelper.success(giftCatalogService.getActiveGifts());
+        return AppResponse.success(giftCatalogService.getActiveGifts());
     }
 
     @Operation(summary = "Redeem gift")
     @PostMapping("/redeem")
     public AppResponse<String> redeemGift(@RequestParam Long customerId, @RequestParam Long giftId) {
         redemptionService.redeemGift(customerId, giftId);
-        return mvCHelper.success("Đổi quà thành công!");
+        return AppResponse.success("Đổi quà thành công!");
     }
 }

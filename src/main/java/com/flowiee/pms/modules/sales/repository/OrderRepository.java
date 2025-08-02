@@ -21,9 +21,8 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
 //    @Query("select coalesce(sum(o.totalAmountDiscount), 0) from Order o where extract(month from o.thoiGianDatHang) = extract(month from current_date)")
 //    Double findRevenueThisMonth();
 
-    //@Query("from Order o where trunc(o.orderTime) = trunc(current_date)")
-    @Query("from Order o where function('date', o.orderTime) = function('date', current_date)")//2025-04-28
-    List<Order> findOrdersToday();
+    @Query("from Order o where o.orderTime between :fromTime and :toTime")
+    List<Order> findByOrderTime(@Param("fromTime") LocalDateTime fromTime, @Param("toTime") LocalDateTime toTime);
 
     @Modifying
     @Query("update Order set paymentTime=:paymentTime, paymentMethod.id=:paymentMethod, paymentAmount=:paymentAmount, paymentNote=:paymentNote, paymentStatus = true where id=:orderId")
@@ -80,7 +79,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
     @Query("from Order where orderStatus in (:orderStatus)")
     List<Order> findByOrderStatus(List<OrderStatus> orderStatus);
 
-    @Query("from Order where customer.id = :customerId")
+    @Query("from Order where customer.id = :customerId order by orderTime desc")
     List<Order> findByCustomer(@Param("customerId") Long customerId);
 
     @Query("from Order where deliverySuccessTime between :fromDate and :toDate")

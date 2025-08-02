@@ -4,6 +4,7 @@ import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.exception.AuthenticationException;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,15 +13,17 @@ import java.io.Serial;
 import java.util.Collection;
 import java.util.Set;
 
+@NoArgsConstructor
 @Getter
 @Setter
-public class UserPrincipal extends Account implements UserDetails {
+public class UserPrincipal implements UserDetails {
 	@Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;
     private String username;
     private String password;
+    private String email;
     private Long branchId;
     private String ip;
     private boolean isAccountNonExpired;
@@ -29,26 +32,6 @@ public class UserPrincipal extends Account implements UserDetails {
     private boolean isEnabled;
     private Set<GrantedAuthority> grantedAuthorities;
     private Account entity;
-
-    public UserPrincipal(Account account) {
-        this.id = account.getId();
-        this.username = account.getUsername();
-        this.password = account.getPassword();
-        if (account.getBranch() != null)
-            this.branchId = account.getBranch().getId();
-        this.isAccountNonExpired = true;
-        this.isAccountNonLocked = true;
-        this.isCredentialsNonExpired = true;
-        this.isEnabled = true;
-        this.setEmail(account.getEmail());
-        this.entity = account;
-    }
-
-    public UserPrincipal(Long id, String username, String ip) {
-        this.id = id;
-        this.username = username;
-        this.ip = ip;
-    }
 
     public void setAuthorities(Set<GrantedAuthority> grantedAuthorities) {
         this.grantedAuthorities = grantedAuthorities;
@@ -90,7 +73,11 @@ public class UserPrincipal extends Account implements UserDetails {
     }
 
     public static UserPrincipal anonymousUser() {
-        return new UserPrincipal(0l, "anonymous", "unknown");
+        UserPrincipal lvUserPrincipal = new UserPrincipal();
+        lvUserPrincipal.setId(0L);
+        lvUserPrincipal.setUsername("anonymous");
+        lvUserPrincipal.setIp("unknown");
+        return lvUserPrincipal;
     }
 
     public boolean isAdmin() {

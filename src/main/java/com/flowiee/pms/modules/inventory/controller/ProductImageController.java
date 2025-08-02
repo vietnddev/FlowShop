@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
@@ -36,7 +35,6 @@ public class ProductImageController extends BaseController {
     FileStorageService mvFileStorageService;
     ProductImageService mvProductImageService;
     ProductVariantService mvProductVariantService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Upload images of product")
     @PostMapping(value = "/{productId}/uploads-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -49,7 +47,7 @@ public class ProductImageController extends BaseController {
             if (file.isEmpty()) {
                 throw new FileNotFoundException();
             }
-            return mvCHelper.success(mvProductImageService.saveImageProduct(file, productId, false));
+            return AppResponse.success(mvProductImageService.saveImageProduct(file, productId, false));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "image"), ex);
         } catch (IOException e) {
@@ -68,7 +66,7 @@ public class ProductImageController extends BaseController {
             if (file.isEmpty()) {
                 throw new FileNotFoundException();
             }
-            return mvCHelper.success(mvProductImageService.saveImageProductVariant(file, productVariantId));
+            return AppResponse.success(mvProductImageService.saveImageProductVariant(file, productVariantId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "image"), ex);
         } catch (IOException e) {
@@ -84,7 +82,7 @@ public class ProductImageController extends BaseController {
             if (productId == null || productId <= 0 || imageId == null || imageId <= 0) {
                 throw new BadRequestException();
             }
-            return mvCHelper.success(mvProductImageService.setImageActiveOfProduct(productId, imageId));
+            return AppResponse.success(mvProductImageService.setImageActiveOfProduct(productId, imageId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "update image of product"), ex);
         }
@@ -101,7 +99,7 @@ public class ProductImageController extends BaseController {
             if (file.isEmpty()) {
                 throw new BadRequestException("File attach not found!");
             }
-            return mvCHelper.success(mvProductImageService.changeImageProduct(file, imageId));
+            return AppResponse.success(mvProductImageService.changeImageProduct(file, imageId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "update image of product"), ex);
         }
@@ -115,7 +113,7 @@ public class ProductImageController extends BaseController {
             if (productVariantId == null || productVariantId <= 0 || imageId == null || imageId <= 0) {
                 throw new BadRequestException();
             }
-            return mvCHelper.success(mvProductImageService.setImageActiveOfProductVariant(productVariantId, imageId));
+            return AppResponse.success(mvProductImageService.setImageActiveOfProductVariant(productVariantId, imageId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "update image of product"), ex);
         }
@@ -131,7 +129,7 @@ public class ProductImageController extends BaseController {
             if (fileUpload.isEmpty()) {
                 throw new FileNotFoundException();
             }
-            return mvCHelper.success(mvProductImageService.changeImageProduct(fileUpload, imageId));
+            return AppResponse.success(mvProductImageService.changeImageProduct(fileUpload, imageId));
         } catch (Exception ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "contact"), ex);
         }
@@ -143,7 +141,7 @@ public class ProductImageController extends BaseController {
     public AppResponse<List<FileDTO>> getImagesOfProduct(@PathVariable("productId") Long productId) {
         try {
             List<FileStorage> images = mvProductImageService.getImageOfProduct(productId);
-            return mvCHelper.success(FileDTO.fromFileStorages(images), 1, 0, 1, images.size());
+            return AppResponse.success(FileDTO.fromFileStorages(images), 1, 0, 1, images.size());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "gallery"), ex);
         }

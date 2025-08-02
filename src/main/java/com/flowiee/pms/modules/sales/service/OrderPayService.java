@@ -4,5 +4,5 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public interface OrderPayService {
-    String doPay(Long orderId, LocalDateTime paymentTime, Long paymentMethod, BigDecimal paymentAmount, String paymentNote);
+    String doPay(Long orderId, String paymentTime, Long paymentMethod, BigDecimal paymentAmount, String paymentNote);
 }

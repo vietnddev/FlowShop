@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.staff.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.model.AppResponse;
@@ -29,15 +28,14 @@ import java.util.List;
 public class GroupAccountController extends BaseController {
     RoleService         roleService;
     GroupAccountService groupAccountService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all group account")
     @GetMapping("/all")
     @PreAuthorize("@vldModuleSystem.readGroupAccount(true)")
     public AppResponse<List<GroupAccountDTO>> findAll(@RequestParam("pageSize") int pageSize, @RequestParam("pageNum") int pageNum) {
         try {
-            Page<GroupAccountDTO> groupAccounts = groupAccountService.findAll(pageSize, pageNum - 1);
-            return mvCHelper.success(groupAccounts.getContent(), pageNum, pageSize, groupAccounts.getTotalPages(), groupAccounts.getTotalElements());
+            Page<GroupAccountDTO> groupAccounts = groupAccountService.find(pageSize, pageNum - 1);
+            return AppResponse.paged(groupAccounts);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "group account"), ex);
         }
@@ -47,7 +45,7 @@ public class GroupAccountController extends BaseController {
     @GetMapping("/{groupId}")
     @PreAuthorize("@vldModuleSystem.readGroupAccount(true)")
     public AppResponse<GroupAccountDTO> findDetailAccount(@PathVariable("groupId") Long groupId) {
-        return mvCHelper.success(groupAccountService.findById(groupId, true));
+        return AppResponse.success(groupAccountService.findById(groupId, true));
     }
 
     @Operation(summary = "Create group account")
@@ -58,7 +56,7 @@ public class GroupAccountController extends BaseController {
             if (pGroupAccount == null) {
                 throw new BadRequestException("Invalid group account");
             }
-            return mvCHelper.success(groupAccountService.save(pGroupAccount));
+            return AppResponse.success(groupAccountService.save(pGroupAccount));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "group account"), ex);
         }
@@ -68,14 +66,14 @@ public class GroupAccountController extends BaseController {
     @PutMapping(value = "/update/{groupId}")
     @PreAuthorize("@vldModuleSystem.updateGroupAccount(true)")
     public AppResponse<GroupAccountDTO> update(@RequestBody GroupAccountDTO pGroupAccount, @PathVariable("groupId") Long groupId) {
-        return mvCHelper.success(groupAccountService.update(pGroupAccount, groupId));
+        return AppResponse.success(groupAccountService.update(pGroupAccount, groupId));
     }
 
     @Operation(summary = "Delete group account")
     @DeleteMapping(value = "/delete/{groupId}")
     @PreAuthorize("@vldModuleSystem.deleteGroupAccount(true)")
     public AppResponse<String> delete(@PathVariable("groupId") Long groupId) {
-        return mvCHelper.success(groupAccountService.delete(groupId));
+        return AppResponse.success(groupAccountService.delete(groupId));
     }
 
     @Operation(summary = "Find rights of group")
@@ -83,7 +81,7 @@ public class GroupAccountController extends BaseController {
     @PreAuthorize("@vldModuleSystem.readGroupAccount(true)")
     public AppResponse<List<RoleModel>> findRights(@PathVariable("groupId") Long groupId) {
         try {
-            return mvCHelper.success(roleService.findAllRoleByGroupId(groupId));
+            return AppResponse.success(roleService.findAllRoleByGroupId(groupId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "rights of group account"), ex);
         }
@@ -97,7 +95,7 @@ public class GroupAccountController extends BaseController {
             if (groupAccountService.findById(groupId, true) == null) {
                 throw new BadRequestException("Group not found");
             }
-            return mvCHelper.success(roleService.updateRightsOfGroup(rights, groupId));
+            return AppResponse.success(roleService.updateRightsOfGroup(rights, groupId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "group account"), ex);
         }

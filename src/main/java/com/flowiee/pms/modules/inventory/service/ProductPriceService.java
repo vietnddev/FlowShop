@@ -10,7 +10,7 @@ import java.util.List;
 public interface ProductPriceService {
     List<ProductPrice> save(ProductDetail productVariant, ProductPriceDTO pPriceDTO);
 
-    String updatePrice(ProductDetail pProductVariant, ProductPriceDTO pRequestPrice);
+    ProductPriceDTO updatePrice(ProductDetail pProductVariant, ProductPriceDTO pRequestPrice);
 
     List<ProductPriceDTO> findPresentPrices(List<Long> productVariantIds);
 

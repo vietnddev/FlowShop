@@ -5,5 +5,5 @@ import com.flowiee.pms.modules.staff.dto.GroupAccountDTO;
 import org.springframework.data.domain.Page;
 
 public interface GroupAccountService extends ICurdService<GroupAccountDTO> {
-    Page<GroupAccountDTO> findAll(int pageSize, int pageNum);
+    Page<GroupAccountDTO> find(int pageSize, int pageNum);
 }

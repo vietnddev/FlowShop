@@ -33,7 +33,6 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
     private final ProductDetailRepository productVariantRepository;
     private final MaterialRepository materialRepository;
     private final AccountRepository accountRepository;
-    private final UserSession userSession;
     private final ModelMapper modelMapper;
 
     public TransactionGoodsServiceImpl(TransactionGoodsRepository transactionGoodsRepository,
@@ -45,7 +44,6 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
         this.productVariantRepository = productVariantRepository;
         this.materialRepository = materialRepository;
         this.accountRepository = accountRepository;
-        this.userSession = userSession;
         this.modelMapper = modelMapper;
     }
 
@@ -59,7 +57,7 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
     @Override
     public TransactionGoodsDTO createTransactionGoods(TransactionGoodsDTO transactionGoodsDto) throws Exception {
         try {
-            Account user = accountRepository.findByUsername(userSession.getUserPrincipal().getUsername());
+            Account user = accountRepository.findByUsername(getUserPrincipal().getUsername());
             TransactionGoods transaction = modelMapper.map(transactionGoodsDto, TransactionGoods.class);
             transaction.setId(null);
             transaction.setApprovedTime(LocalDateTime.now());

@@ -15,7 +15,7 @@ public class BaseDTO implements Serializable {
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime lastUpdatedAt;
     private String lastUpdatedBy;
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime deletedAt;
-    private String deletedBy;
+    //@JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    //private LocalDateTime deletedAt;
+    //private String deletedBy;
 }

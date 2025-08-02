@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.model.AppResponse;
@@ -28,7 +27,6 @@ import java.util.List;
 public class CustomerContactController extends BaseController {
     CustomerService mvCustomerService;
     CustomerContactService mvCustomerContactService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find contacts of customer")
     @GetMapping("/{customerId}/contact")
@@ -44,7 +42,7 @@ public class CustomerContactController extends BaseController {
                 if (c.isEmailContact()) c.setCode(ContactType.E.getLabel());
                 if (c.isAddressContact()) c.setCode(ContactType.A.getLabel());
             }
-            return mvCHelper.success(listContacts);
+            return AppResponse.success(listContacts);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "contact"), ex);
         }
@@ -58,7 +56,7 @@ public class CustomerContactController extends BaseController {
             if (customerContact == null || customerContact.getCustomer() == null) {
                 throw new BadRequestException();
             }
-            return mvCHelper.success(mvCustomerContactService.save(customerContact));
+            return AppResponse.success(mvCustomerContactService.save(customerContact));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "contact"), ex);
         }
@@ -72,7 +70,7 @@ public class CustomerContactController extends BaseController {
             if (customerContact == null || customerContact.getCustomer() == null || mvCustomerContactService.findById(contactId, true) == null) {
                 throw new BadRequestException();
             }
-            return mvCHelper.success(mvCustomerContactService.update(customerContact, contactId));
+            return AppResponse.success(mvCustomerContactService.update(customerContact, contactId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "contact"), ex);
         }
@@ -82,7 +80,7 @@ public class CustomerContactController extends BaseController {
     @DeleteMapping("/contact/delete/{contactId}")
     @PreAuthorize("@vldModuleSales.updateCustomer(true)")
     public AppResponse<String> deleteContact(@PathVariable("contactId") Long contactId) {
-        return mvCHelper.success(mvCustomerContactService.delete(contactId));
+        return AppResponse.success(mvCustomerContactService.delete(contactId));
     }
 
     @Operation(summary = "Update contact use default")
@@ -95,7 +93,7 @@ public class CustomerContactController extends BaseController {
             if (customerId <= 0 || contactId <= 0 || mvCustomerService.findById(customerId, true) == null || mvCustomerContactService.findById(contactId, true) == null) {
                 throw new BadRequestException();
             }
-            return mvCHelper.success(mvCustomerContactService.enableContactUseDefault(customerId, contactCode, contactId));
+            return AppResponse.success(mvCustomerContactService.enableContactUseDefault(customerId, contactCode, contactId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "contact"), ex);
         }
@@ -109,7 +107,7 @@ public class CustomerContactController extends BaseController {
             if (contactId <= 0 || mvCustomerContactService.findById(contactId, true) == null) {
                 throw new BadRequestException();
             }
-            return mvCHelper.success(mvCustomerContactService.disableContactUnUseDefault(contactId));
+            return AppResponse.success(mvCustomerContactService.disableContactUnUseDefault(contactId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "contact"), ex);
         }

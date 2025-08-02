@@ -13,7 +13,7 @@ import com.flowiee.pms.common.enumeration.LoyaltyTransactionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Service

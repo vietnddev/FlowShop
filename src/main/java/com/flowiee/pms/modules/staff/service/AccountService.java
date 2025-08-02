@@ -8,7 +8,7 @@ import java.util.List;
 public interface AccountService {
     Account findByUsername(String username);
 
-    List<AccountDTO> findAll();
+    List<AccountDTO> find();
 
     Account findEntById(Long pAccountId, boolean pThrowException);
 

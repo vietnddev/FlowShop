@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.report.service.impl;
 
 import com.flowiee.pms.modules.report.service.SalesPerformanceStatisticsService;
 import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.modules.sales.model.OrderReq;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.staff.entity.GroupAccount;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
@@ -9,17 +10,17 @@ import com.flowiee.pms.modules.report.model.OrderSalesChannelStatisticsModel;
 import com.flowiee.pms.modules.report.model.SalesPerformanceStatisticsModel;
 import com.flowiee.pms.modules.sales.repository.OrderRepository;
 import com.flowiee.pms.modules.staff.repository.AccountRepository;
-import com.flowiee.pms.modules.sales.service.OrderReadService;
+import com.flowiee.pms.modules.sales.service.OrderService;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.OrderUtils;
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.Query;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
 public class SalesPerformanceStatisticsServiceImpl implements SalesPerformanceStatisticsService {
     private final AccountRepository accountRepository;
     private final OrderRepository orderRepository;
-    private final OrderReadService orderReadService;
+    private final OrderService mvOrderService;
     private final ModelMapper modelMapper;
     private final EntityManager mvEntityManager;
 
@@ -40,9 +41,10 @@ public class SalesPerformanceStatisticsServiceImpl implements SalesPerformanceSt
         List<SalesPerformanceStatisticsModel> returnList = new ArrayList<>();
         List<Account> employeeList = accountRepository.findAll();
         for (Account employee : employeeList) {
-            List<OrderDTO> orderList = orderReadService.findAll(-1, -1,
-                    null, null, null, null, null, employee.getId(),
-                    null, null, null, null, null, null, null).getContent();
+            OrderReq lvOrderReq = OrderReq.builder().sellerId(employee.getId()).build();
+            lvOrderReq.setPageNum(-1);
+            lvOrderReq.setPageNum(-1);
+            List<OrderDTO> orderList = mvOrderService.find(lvOrderReq).getContent();
 
             String lvEmployeeName = employee.getFullName();
             GroupAccount lvGroupEmployee = employee.getGroupAccount();

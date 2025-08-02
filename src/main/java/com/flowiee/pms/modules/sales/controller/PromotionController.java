@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.base.controller.ControllerHelper;
 import com.flowiee.pms.modules.sales.entity.PromotionInfo;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
@@ -27,7 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PromotionController extends BaseController {
     PromotionService mvPromotionService;
-    ControllerHelper mvCHelper;
 
     @Operation(summary = "Find all promotions")
     @GetMapping("/all")
@@ -35,14 +33,14 @@ public class PromotionController extends BaseController {
     public AppResponse<List<PromotionInfoDTO>> findPromotions(@RequestParam(value = "pageSize", required = false) Integer pageSize,
                                                               @RequestParam(value = "pageNum", required = false) Integer pageNum) {
         Page<PromotionInfoDTO> promotionPage = mvPromotionService.findAll(pageSize, pageNum - 1, null, null, null, null);
-        return mvCHelper.success(promotionPage.getContent(), pageNum, pageSize, promotionPage.getTotalPages(), promotionPage.getTotalElements());
+        return AppResponse.paged(promotionPage);
     }
 
     @Operation(summary = "Find detail promotion")
     @GetMapping("/{promotionId}")
     @PreAuthorize("@vldModuleSales.readPromotion(true)")
     public AppResponse<PromotionInfo> findDetailPromotion(@PathVariable("promotionId") Long promotionId) {
-        return mvCHelper.success(mvPromotionService.findById(promotionId, true));
+        return AppResponse.success(mvPromotionService.findById(promotionId, true));
     }
 
     @Operation(summary = "Create promotion")
@@ -50,7 +48,7 @@ public class PromotionController extends BaseController {
     @PreAuthorize("@vldModuleSales.insertPromotion(true)")
     public AppResponse<PromotionInfoDTO> createPromotion(@RequestBody CreatePromotionReq request) {
         try {
-            return mvCHelper.success(mvPromotionService.save(request.toPromotionInfoDTO()));
+            return AppResponse.success(mvPromotionService.save(request.toPromotionInfoDTO()));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "promotion"), ex);
         }
@@ -60,13 +58,13 @@ public class PromotionController extends BaseController {
     @PutMapping("/update/{promotionId}")
     @PreAuthorize("@vldModuleSales.updatePromotion(true)")
     public AppResponse<PromotionInfoDTO> updatePromotion(@RequestBody PromotionInfoDTO promotion, @PathVariable("promotionId") Long promotionId) {
-        return mvCHelper.success(mvPromotionService.update(promotion, promotionId));
+        return AppResponse.success(mvPromotionService.update(promotion, promotionId));
     }
 
     @Operation(summary = "Delete promotion")
     @DeleteMapping("/delete/{promotionId}")
     @PreAuthorize("@vldModuleSales.deletePromotion(true)")
     public AppResponse<String> deletePromotion(@PathVariable("promotionId") Long promotionId) {
-        return mvCHelper.success(mvPromotionService.delete(promotionId));
+        return AppResponse.success(mvPromotionService.delete(promotionId));
     }
 }

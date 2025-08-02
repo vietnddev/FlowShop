@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.media.service.impl;
 
 import com.flowiee.pms.common.base.StartUp;
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.media.service.FileStorageService;
@@ -36,11 +37,6 @@ import java.util.Optional;
 public class FileStorageServiceImpl implements FileStorageService {
     FileStorageRepository mvFileRepository;
     ConfigRepository mvConfigRepository;
-
-    @Override
-    public List<FileStorage> findAll() {
-        return mvFileRepository.findAll();
-    }
 
     @Override
     public FileStorage findById(Long fileId, boolean pThrowException) {

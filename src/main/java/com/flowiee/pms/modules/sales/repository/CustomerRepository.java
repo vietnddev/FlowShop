@@ -17,12 +17,12 @@ import java.util.List;
 public interface CustomerRepository extends BaseRepository<Customer, Long> {
     @Query("select distinct c from Customer c " +
            "left join CustomerContact cc on c.id = cc.customer.id " +
-           "where (:name is null or c.customerName like %:name%) " +
+           "where ((:name is null or :name = '') or c.customerName like concat('%', :name, '%')) " +
            "and (:sex is null or c.gender=:sex) " +
            "and (:birthday is null or c.dateOfBirth=:birthday) " +
-           "and (:phone is null or (cc.code = 'P' and cc.isDefault = 'Y' and cc.status = true and cc.value=:phone)) " +
-           "and (:email is null or (cc.code = 'E' and cc.isDefault = 'Y' and cc.status = true and cc.value=:email)) " +
-           "and (:address is null or (cc.code = 'A' and cc.isDefault = 'Y' and cc.status = true and cc.value=:address)) " +
+           "and ((:phone is null or :phone = '') or (cc.code = 'P' and cc.isDefault = 'Y' and cc.status = true and cc.value=:phone)) " +
+           "and ((:email is null or :email = '') or (cc.code = 'E' and cc.isDefault = 'Y' and cc.status = true and cc.value=:email)) " +
+           "and ((:address is null or :address = '') or (cc.code = 'A' and cc.isDefault = 'Y' and cc.status = true and cc.value=:address)) " +
            "order by c.customerName")
     Page<Customer> findAll(@Param("name") String name,
                            @Param("sex") String sex,

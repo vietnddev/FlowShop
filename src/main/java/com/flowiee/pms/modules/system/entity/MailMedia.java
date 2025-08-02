@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.system.entity;
 
 import lombok.*;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Builder

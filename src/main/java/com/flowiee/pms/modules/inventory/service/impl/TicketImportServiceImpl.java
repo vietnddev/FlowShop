@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
+import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.ProductVariantExim;
@@ -74,11 +75,6 @@ public class TicketImportServiceImpl implements TicketImportService {
     SystemLogService systemLogService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
-
-    @Override
-    public List<TicketImport> findAll() {
-        return this.findAll(-1, -1, null, null, null,null, null, null).getContent();
-    }
 
     @Override
     public Page<TicketImport> findAll(int pageSize, int pageNum, String pText, Long pSupplierId, Long pPaymentMethod, String pPayStatus, String pImportStatus, Long pStorageId) {

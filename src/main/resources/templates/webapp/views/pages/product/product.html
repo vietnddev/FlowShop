@@ -40,8 +40,8 @@
                                     </div>
                                 </div>
                                 <!-- /.card-header -->
-                                <div class="card-body align-items-center p-0">
-                                    <table class="table table-bordered table-hover align-items-center">
+                                <div class="card-body table-responsive p-0" style="height: 500px">
+                                    <table class="table table-head-fixed text-nowrap">
                                         <thead class="align-self-center">
                                             <tr class="align-self-center">
                                                 <th>STT</th>
@@ -136,6 +136,39 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="modal fade" id="popUpdatePrice">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <strong class="modal-title">Update price</strong>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="form-group">
+                                                            <label>Product code</label>
+                                                            <input type="text" class="form-control" placeholder="Product code" id="pUP_VariantCode" disabled>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Retail price</label>
+                                                            <input class="form-control" type="text" id="pUP_RetailPrice">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Cost price</label>
+                                                            <input class="form-control" type="text" id="pUP_CostPrice">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer justify-content-end">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                                                <button type="submit" class="btn btn-primary" id="pUP_Confirm">Lưu</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -154,16 +187,16 @@
         <aside class="control-sidebar control-sidebar-dark"></aside>
 
         <div th:replace="~{header :: scripts}"></div>
+        <script th:src="@{/js/product/Products.js}"></script>
     </div>
 
     <script type="text/javascript">
         let mvProductList = [];
         let mvVariantAddedList = [];
+        let mvAttributeAddedList = [];
 
         $(document).ready(function () {
             setupSearchTool();
-
-            createListener();
 
             loadProducts(getPageSize(), getPageNum());
             updateTableContentWhenOnClickPagination(loadProducts);
@@ -176,51 +209,6 @@
                 loadProducts($('#paginationInfo').attr("pageSize"), 1);
             })
         });
-
-        function createListener() {
-            $('#createProduct').on('click', function () {
-                loadCategory();
-            });
-
-            $('#btnAddVariant').on('click', function () {
-                addVariant();
-            });
-
-            $(document).on('click', 'button[name="btnRemoveVariant"]', function () {
-                let $row = $(this).closest('tr');
-
-                let colorId      = $row.find('td[colorId]').attr('colorId');
-                let sizeId       = $row.find('td[sizeId]').attr('sizeId');
-                let fabricTypeId = $row.find('td[fabricTypeId]').attr('fabricTypeId');
-                let key = colorId + "-" + sizeId + "-" + fabricTypeId;
-
-                let index = mvVariantAddedList.findIndex(item => item.key === key);
-                if (index !== -1) {
-                    mvVariantAddedList.splice(index, 1);
-                }
-
-                $row.remove();
-            });
-
-            $(document).on('change', 'input[name="txtVariantRetailPrice"]', function () {
-                let inputValue = $(this).val().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                $(this).val(inputValue);
-            });
-
-            $(document).on('change', 'input[name="txtVariantCostPrice"]', function () {
-                let inputValue = $(this).val().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                $(this).val(inputValue);
-            });
-
-            $('#createProductSubmit').on('click', function () {
-                createProduct();
-            });
-
-            $(document).on('click', 'button[name="btnViewDetail"]', function () {
-                let lvProductInfo = mvProductList[$(this).attr("productId")];
-                showProductDetailOnPopup(lvProductInfo);
-            });
-        }
 
         function loadProducts(pageSize, pageNum) {
             let apiURL = mvHostURLCallApi + '/product/all';
@@ -253,16 +241,21 @@
                         let variantsBlock = '';
                         $.each(p.variants, function (variantIndex, variantInfo) {
                             variantsBlock +=
-                                `<tr>
+                                `<tr variantId="${variantInfo.id}">
                                     <td>${variantIndex + 1}</td>
-                                    <td>${variantInfo.variantCode}</td>
+                                    <td name="variantCode">${variantInfo.variantCode}</td>
                                     <td>${variantInfo.fabricType.name}</td>
                                     <td>${variantInfo.color.name}</td>
                                     <td>${variantInfo.size.name}</td>
-                                    <td class="text-right">${formatCurrency(variantInfo.price.retailPrice)}</td>
-                                    <td class="text-right">${formatCurrency(variantInfo.price.costPrice)}</td>
+                                    <td class="text-right" name="colRetailPrice">${formatUSCurrency(variantInfo.price.retailPrice)}</td>
+                                    <td class="text-right" name="colCostPrice">${formatUSCurrency(variantInfo.price.costPrice)}</td>
                                     <td class="text-right">${variantInfo.storageQty}</td>
                                     <td class="text-right">${variantInfo.soldQty}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#popUpdatePrice" name="btnUpdatePrice" productId="${p.id}" productVariantId="${variantInfo.id}">
+                                            <i class="fa-solid fa-dollar-sign"></i>
+                                        </button>
+                                    </td>
                                 </tr>`;
                         });
 
@@ -288,17 +281,23 @@
                                 <td class="text-center"></td>
                                 <td>${mvProductStatus[p.status]}</td>
                                 <td>
-                                    <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popProductDetail" name="btnViewDetail" productId="${p.id}">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popProductDetail"  name="btnViewDetail"         productId="${p.id}">
                                         <i class="fa-solid fa-circle-info"></i></i>
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popStorageHistory" name="btnViewStorageHistory" productId="${p.id}">
+                                        <i class="fa-solid fa-warehouse"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#popDeleteProduct"     name="btnDeleteProduct"      productId="${p.id}">
+                                        <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
                             <tr class="expandable-body d-none">
-                                <td colspan="11">
+                                <td colspan="12">
                                     <table class="table table-bordered" style="display: none; margin: 6px auto">
                                         <thead>
                                             <tr>
-                                                <th>No.</th><th>Code</th><th>Fabric</th><th>Color</th><th>Size</th><th>Selling price</th><th>Cost price</th><th>Inventory Qty</th><th>Sold Qty</th>
+                                                <th>No.</th><th>Code</th><th>Fabric</th><th>Color</th><th>Size</th><th>Retail price</th><th>Cost price</th><th>Inventory Qty</th><th>Sold Qty</th><th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -329,70 +328,6 @@
             downloadSelectionCategory(colorSelect, 'Chọn color', "color");
             downloadSelectionCategory(sizeSelect, 'Chọn size', "size");
             downloadSelectionCategory(fabricTypeSelect, 'Chọn chất vải', "fabric-type");
-        }
-
-        function addVariant() {
-            let lvTableVariants = $("#tblInsertVariants");
-            let lvColorSelect = $('#colorField');
-            let lvSizeSelect = $('#sizeField');
-            let lvFabricTypeSelect = $('#fabricTypeField');
-
-            if (lvColorSelect.val() === "" || lvSizeSelect.val() === "" || lvFabricTypeSelect.val() === "") {
-                alert("Invalid information!");
-                return;
-            }
-
-            let lvColorId = lvColorSelect.val();
-            let lvColorName = lvColorSelect.find('option:selected').text();
-            let lvSizeId = lvSizeSelect.val();
-            let lvSizeName = lvSizeSelect.find('option:selected').text();
-            let lvFabricTypeId = lvFabricTypeSelect.val();
-            let lvFabricTypeName = lvFabricTypeSelect.find('option:selected').text();
-            let lvRetailPrice = 0;
-            let lvCostPrice = 0;
-            let lvSoldQty = 0;
-            let lvStorageQty = 0;
-            let key = lvColorId + "-" + lvSizeId + "-" + lvFabricTypeId;
-
-            let variant = mvVariantAddedList.find(item => item.key === key);
-            if (variant) {
-                alert("This product already exists!");
-                return;
-            }
-
-            lvTableVariants.append(`
-                <tr>
-                    <td colorId="${lvColorId}">${lvColorName}</td>
-                    <td sizeId="${lvSizeId}">${lvSizeName}</td>
-                    <td fabricTypeId="${lvFabricTypeId}">${lvFabricTypeName}</td>
-                    <td><input type="text"   class="form-control" style="width: 120px" name="txtVariantRetailPrice" value="${lvRetailPrice}"></td>
-                    <td><input type="text"   class="form-control" style="width: 120px" name="txtVariantCostPrice"   value="${lvCostPrice}"></td>
-                    <td><input type="number" class="form-control" style="width: 60px"  name="txtSoldQty"            value="${lvSoldQty}"></td>
-                    <td><input type="number" class="form-control" style="width: 60px"  name="txtStorageQty"         value="${lvStorageQty}"></td>
-                    <td><button type="button" class="btn btn-sm btn-secondary" name="btnRemoveVariant">X</button></td>
-                </tr>
-            `);
-
-            let lvVariant = {
-                key: key,
-                color: {
-                    id: lvColorId
-                },
-                size: {
-                    id: lvSizeId
-                },
-                fabricType: {
-                    id: lvFabricTypeId
-                },
-                price: {
-                    retailPrice: lvRetailPrice,
-                    wholesalePrice: lvRetailPrice,
-                    costPrice: lvCostPrice
-                },
-                soldQty: lvSoldQty,
-                storageQty: lvStorageQty
-            }
-            mvVariantAddedList.push(lvVariant);
         }
 
         function createProduct() {
@@ -432,12 +367,31 @@
                 }
             });
 
+            //Update attribute's actual value
+            $('#tblInsertAttributes tr').each(function () {
+                let $row = $(this);
+
+                let attributeName = $row.find('.attribute-name').text();
+                let attributeValue = $row.find('.attribute-value').text();
+                let attributeSort = $row.find('.attribute-sort').text();
+
+                let key = attributeName;
+
+                let attribute = mvAttributeAddedList.find(item => item.key === key);
+                if (attribute) {
+                    attribute.attributeName = attributeName;
+                    attribute.attributeValue = attributeValue;
+                    attribute.sort = attributeSort;
+                }
+            });
+
             let body = {
                 productTypeId: productTypeId,
                 brandId: brandId,
                 productName: productName,
                 unitId: unitId,
-                variants: mvVariantAddedList
+                variants: mvVariantAddedList,
+                attributes: mvAttributeAddedList
             };
 
             $.ajax({
@@ -456,21 +410,6 @@
                     showErrorModal($.parseJSON(xhr.responseText).message);
                 }
             });
-        }
-
-        function showProductDetailOnPopup(pProductInfo) {
-            let pfProductDetailTitle = $("#pfProductDetailTitle");
-            let pfProductName = $("#pfProductName");
-            let pfProductType = $("#pfProductType");
-            let pfUnit = $("#pfUnit");
-            let pfBrand = $("#pfBrand");
-
-            pfProductDetailTitle.text(pProductInfo.productName);
-            pfProductName.val(pProductInfo.productName);
-
-            downloadSelectionCategory(pfProductType, null, "product-type");
-            downloadSelectionCategory(pfUnit, null, "unit");
-            downloadSelectionCategory(pfBrand, null, "brand");
         }
 
         $(function () {

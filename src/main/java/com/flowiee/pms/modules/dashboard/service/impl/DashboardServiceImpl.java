@@ -2,16 +2,16 @@ package com.flowiee.pms.modules.dashboard.service.impl;
 
 import com.flowiee.pms.modules.dashboard.model.DashboardModel;
 import com.flowiee.pms.modules.dashboard.service.DashboardService;
+import com.flowiee.pms.modules.inventory.repository.ProductDetailRepository;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;
-import com.flowiee.pms.modules.inventory.service.ProductStatisticsService_0;
 import com.flowiee.pms.modules.sales.service.CustomerService;
 
-import com.flowiee.pms.modules.sales.service.OrderReadService;
+import com.flowiee.pms.modules.sales.service.OrderService;
 import com.flowiee.pms.modules.sales.service.OrderStatisticsService;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.CoreUtils;
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.Query;
+import javax.persistence.Query;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,11 +29,11 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
-    OrderReadService mvOrderReadService;
+    ProductDetailRepository mvProductVariantRepository;
+    OrderStatisticsService mvOrderStatisticsService;
     CustomerService mvCustomerService;
-    OrderStatisticsService     mvOrderStatisticsService;
-    ProductStatisticsService_0 mvProductStatisticsService;
     EntityManager mvEntityManager;
+    OrderService mvOrderService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -81,7 +81,7 @@ public class DashboardServiceImpl implements DashboardService {
                                     "GROUP BY s.ID, s.VARIANT_NAME " +
                                     "ORDER BY total DESC) t " +
                                     "LIMIT 10";
-        logger.info("[getProductsTopSell() - SQL findData]: ");
+        //logger.info("[getProductsTopSell() - SQL findData]: ");
         Query productsTopSellSQLQuery = mvEntityManager.createNativeQuery(productsTopSellSQL.toLowerCase());
         List<Object[]> productsTopSellResultList = productsTopSellSQLQuery.getResultList();
         LinkedHashMap<String, Integer> productsTopSell = new LinkedHashMap<>();
@@ -123,7 +123,7 @@ public class DashboardServiceImpl implements DashboardService {
                 "    m.month " +
                 "ORDER BY " +
                 "    m.month";
-        logger.info("[getRevenueMonthOfYearSQL() - SQL findData]: ");
+        //logger.info("[getRevenueMonthOfYearSQL() - SQL findData]: ");
         Query revenueMonthOfYearSQLQuery = mvEntityManager.createNativeQuery(revenueMonthOfYearSQL.toLowerCase());
         revenueMonthOfYearSQLQuery.setParameter(1, currentYear);
         List<Object[]> revenueMonthOfYearSQLResultList = revenueMonthOfYearSQLQuery.getResultList();
@@ -176,7 +176,7 @@ public class DashboardServiceImpl implements DashboardService {
                                           "LEFT JOIN ORDERS o ON c.ID = o.CHANNEL " +
                                           "LEFT JOIN ORDER_DETAIL d ON o.ID = d.ORDER_ID " +
                                           "GROUP BY c.NAME, c.COLOR";
-        logger.info("[getRevenueBySalesChannel() - SQL findData]: ");
+        //logger.info("[getRevenueBySalesChannel() - SQL findData]: ");
         Query revenueBySalesChannelQuery = mvEntityManager.createNativeQuery(revenueBySalesChannelSQL.toLowerCase());
         List<Object[]> revenueBySalesChannelResultList = revenueBySalesChannelQuery.getResultList();
         LinkedHashMap<String, Float> revenueSalesChannel = new LinkedHashMap<>();
@@ -191,12 +191,12 @@ public class DashboardServiceImpl implements DashboardService {
         String revenueToday = CommonUtils.formatToVND(mvOrderStatisticsService.findRevenueToday());
         String revenueThisMonth = CommonUtils.formatToVND(mvOrderStatisticsService.findRevenueThisMonth());
         List<CustomerDTO> customersNew = mvCustomerService.findCustomerNewInMonth();
-        List<Order> ordersToday = mvOrderReadService.findOrdersToday();
+        List<Order> ordersToday = mvOrderService.findOrdersToday();
 
         logger.info("Finished loadDashboard(): " + CommonUtils.now("YYYY/MM/dd HH:mm:ss"));
 
         return DashboardModel.builder()
-                .totalProducts(mvProductStatisticsService.countTotalProductsInStorage())
+                .totalProducts(mvProductVariantRepository.countTotalQuantity())
                 .revenueToday(revenueToday)
                 .revenueThisMonth(revenueThisMonth)
                 .ordersNewTodayQty(ordersToday.size())

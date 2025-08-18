@@ -9,7 +9,6 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serial;
 import java.util.Collection;
 import java.util.Set;
 
@@ -17,9 +16,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class UserPrincipal implements UserDetails {
-	@Serial
-    private static final long serialVersionUID = 1L;
-
     private Long id;
     private String username;
     private String password;
@@ -50,21 +46,6 @@ public class UserPrincipal implements UserDetails {
     @Override
     public String getUsername() {
         return this.username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return this.isAccountNonExpired;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return this.isAccountNonLocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return this.isCredentialsNonExpired;
     }
 
     @Override

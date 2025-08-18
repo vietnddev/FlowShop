@@ -18,14 +18,4 @@ public class BaseEntity extends AuditEntity implements Cloneable {
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
-
-    public static void mappingBaseAudit(BaseEntity sourceEntity, BaseEntity toEntity) {
-        sourceEntity.setId(toEntity.getId());
-        sourceEntity.setCreatedAt(toEntity.getCreatedAt());
-        sourceEntity.setCreatedBy(toEntity.getCreatedBy());
-        sourceEntity.setLastUpdatedAt(toEntity.getLastUpdatedAt());
-        sourceEntity.setLastUpdatedBy(toEntity.getLastUpdatedBy());
-        sourceEntity.setDeletedAt(toEntity.getDeletedAt());
-        sourceEntity.setDeletedBy(toEntity.getDeletedBy());
-    }
 }

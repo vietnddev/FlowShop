@@ -23,6 +23,7 @@ public enum EndPoint {
     URL_SALES_LEDGER("/ledger", "SIDEBAR", true),
     URL_SALES_LEDGER_RECEIPT("/ledger/trans/receipt", "SIDEBAR", true),
     URL_SALES_LEDGER_PAYMENT("/ledger/trans/payment", "SIDEBAR", true),
+    SLS_ORDER_RETURNS("/sls/order/returns", "SIDEBAR", true),
 
     URL_STG_DASHBOARD("/stg", "SIDEBAR", true),
     URL_STG_DOCUMENT("/stg/doc", "SIDEBAR", true),

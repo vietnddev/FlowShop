@@ -26,9 +26,26 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <div class="row justify-content-between">
-                                        <div class="col-4 text-bold" style="display: flex; align-items: center">NHẬT KÝ HỆ THỐNG</div>
-                                        <div class="col-6 text-right">
+                                    <div class="row">
+                                        <div class="col-2 text-bold text-left" style="display: flex; align-items: center">NHẬT KÝ HỆ THỐNG</div>
+                                        <div class="col-8 row justify-content-center">
+                                            <div class="form-group mb-0 mr-1">
+                                                <select class="custom-select custom-select-sm" id="txtActor">
+                                                    <option value="">--Actor--</option>
+                                                    <option th:each="a : ${actors}" th:value="${a.id}" th:text="${a.fullName}"></option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group mb-0 mr-1">
+                                                <input type="date" class="form-control form-control-sm" id="txtFromDate"/>
+                                            </div>
+                                            <div class="form-group mb-0 mr-1">
+                                                <input type="date" class="form-control form-control-sm" id="txtToDate"/>
+                                            </div>
+                                            <div class="form-group mb-0 mr-1">
+                                                <butto class="btn btn-sm btn-primary" id="btnFilter">OK</butto>
+                                            </div>
+                                        </div>
+                                        <div class="col-2 text-right">
                                             <a th:href="@{/api/v1/sys/log/export}" class="btn btn-info btn-sm">
                                                 <i class="fa-solid fa-cloud-arrow-down mr-2"></i>Xuất dữ liệu
                                             </a>
@@ -83,11 +100,21 @@
         $(document).ready(function() {
             loadLogs(getPageSize(), getPageNum());
             updateTableContentWhenOnClickPagination(loadLogs)
+
+            $("#btnFilter").on("click", function () {
+                loadLogs(getPageSize(), getPageNum());
+            });
         });
 
         function loadLogs(pageSize, pageNum) {
-            let apiURL = mvHostURLCallApi + '/sys/log/all';
-            let params = {pageSize: pageSize, pageNum: pageNum}
+            let apiURL = mvHostURLCallApi + '/sys/log';
+            let params = {
+                pageSize: pageSize,
+                pageNum: pageNum,
+                fromDate: $("#txtFromDate").val(),
+                toDate: $("#txtToDate").val(),
+                actor: $("#txtActor").val()
+            }
             $.get(apiURL, params, function (response) {
                 if (response.status === "OK") {
                     let data = response.data;

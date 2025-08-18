@@ -12,7 +12,8 @@ public enum OrderStatus {
     SHIP("Shipped", ""),                  // Đã giao cho đơn vị vận chuyển
     DLVD("Delivered", ""),                // Giao thành công
     CNCL("Cancelled", ""),                // Đã hủy
-    RTND("Returned", ""),                 // Đã trả hàng
+    FRTND("Returned all", ""),            // Đã trả toàn bộ hàng
+    RTND("Returned a part", ""),          // Đã trả một phần hàng
     //FAIL("Failed", ""),                   // Lỗi
     //HOLD("On Hold", ""),                  // Tạm dừng
     //RFND("Refunded", ""),                 // Hoàn tiền

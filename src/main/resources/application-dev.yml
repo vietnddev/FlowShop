@@ -26,4 +26,4 @@ spring:
     enabled: false
 system:
   login:
-    bypass: true
+    bypass: ${BYPASS:false}

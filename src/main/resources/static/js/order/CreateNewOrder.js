@@ -13,6 +13,7 @@ function createOrder() {
         let salesChannelId = $('#salesChannelField').val();
         let paymentMethodId = $('#paymentMethodField').val();
         let orderStatusId = $('#orderStatusField').val();
+        let deliveryMethodId = $('#deliveryTypeField').val();
         let note = $('#noteFieldCart').val();
         let customerNote = $('#customerNoteFieldCart').val();
         let cartId = mvCurrentCartId;
@@ -28,6 +29,7 @@ function createOrder() {
             salesChannelId: salesChannelId,
             paymentMethodId: paymentMethodId,
             orderStatus : orderStatusId,
+            deliveryMethodId: deliveryMethodId,
             note : note, //internal note
             customerNote : customerNote, //customer note
             orderTime : orderTime,

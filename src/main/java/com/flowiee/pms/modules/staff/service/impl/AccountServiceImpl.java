@@ -149,7 +149,7 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
 
     @Override
     public List<AccountDTO>find() {
-        return super.find(new BaseParameter()).stream()
+        return super.find(BaseParameter.builder().build()).stream()
                 .peek(a -> {
                     a.setPassword(null);
                     a.setAvatar("/media/default/user");

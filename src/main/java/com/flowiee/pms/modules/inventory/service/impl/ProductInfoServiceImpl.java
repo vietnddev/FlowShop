@@ -223,16 +223,16 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
     public ProductDTO save(ProductDTO pProduct) {
         try {
             Map<CATEGORY, Category> lvCategoryMap = mvCategoryService.findByIdsAsMap(Set.of(
-                    pProduct.getBrandId(),
-                    pProduct.getProductTypeId(),
-                    pProduct.getUnitId()
-            ));
+                    pProduct.getBrandId(), pProduct.getProductTypeId(), pProduct.getUnitId()));
+            Category lvBrand = lvCategoryMap.get(CATEGORY.BRAND);
+            Category lvProductType = lvCategoryMap.get(CATEGORY.PRODUCT_TYPE);
+            Category lvUnit = lvCategoryMap.get(CATEGORY.UNIT);
 
             Product lvProduct = new Product();
             lvProduct.setProductName(pProduct.getProductName());
-            lvProduct.setBrand(lvCategoryMap.get(CATEGORY.BRAND));
-            lvProduct.setProductType(lvCategoryMap.get(CATEGORY.PRODUCT_TYPE));
-            lvProduct.setUnit(lvCategoryMap.get(CATEGORY.UNIT));
+            lvProduct.setBrand(lvBrand);
+            lvProduct.setProductType(lvProductType);
+            lvProduct.setUnit(lvUnit);
             lvProduct.setProductCategory(pProduct.getProductCategory());
             lvProduct.setInternalNotes(pProduct.getInternalNotes());
             //productToSave.setStatus(ProductStatus.ACT);

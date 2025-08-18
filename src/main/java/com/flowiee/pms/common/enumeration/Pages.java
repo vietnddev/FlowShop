@@ -39,11 +39,12 @@ public enum Pages {
     PRO_COMBO("product-combo",                          MODULE.PRODUCT),
     PRO_COMBO_DETAIL("product-combo-detail",            MODULE.PRODUCT),
 
-    SLS_ORDER_TRACKING("order-tracking",                                 MODULE.SALES),
-    SLS_LEDGER("ledger/general-ledger",                                  MODULE.SALES),
-    SLS_LEDGER_TRANS("ledger/ledger-trans",                              MODULE.SALES),
-    SLS_LEDGER_TRANS_DETAIL("ledger/ledger-trans-detail",                MODULE.SALES),
-    SLS_LOYALTY_PROGRAM("loyalty-program/loyalty-program",               MODULE.SALES),
+    SLS_ORDER_RETURNS("/order/returns",                  MODULE.SALES),
+    SLS_ORDER_TRACKING("order-tracking",                MODULE.SALES),
+    SLS_LEDGER("ledger/general-ledger",                 MODULE.SALES),
+    SLS_LEDGER_TRANS("ledger/ledger-trans",             MODULE.SALES),
+    SLS_LEDGER_TRANS_DETAIL("ledger/ledger-trans-detail", MODULE.SALES),
+    SLS_LOYALTY_PROGRAM("loyalty-program/loyalty-program", MODULE.SALES),
     SLS_LOYALTY_PROGRAM_DETAIL("loyalty-program/loyalty-program-detail", MODULE.SALES),
 
     STG_MATERIAL("material",                            MODULE.STORAGE),

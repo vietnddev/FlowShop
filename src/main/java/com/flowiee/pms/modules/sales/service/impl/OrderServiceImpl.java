@@ -3,16 +3,18 @@ package com.flowiee.pms.modules.sales.service.impl;
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.utils.*;
 import com.flowiee.pms.modules.inventory.dto.TransactionGoodsDTO;
+import com.flowiee.pms.modules.inventory.service.ProductVariantService;
 import com.flowiee.pms.modules.inventory.service.TicketImportService;
 import com.flowiee.pms.modules.inventory.service.TransactionGoodsService;
 import com.flowiee.pms.modules.media.entity.FileStorage;
-import com.flowiee.pms.modules.sales.entity.VoucherTicket;
-import com.flowiee.pms.modules.sales.entity.Customer;
-import com.flowiee.pms.modules.sales.entity.OrderCart;
-import com.flowiee.pms.modules.sales.entity.OrderDetail;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.modules.sales.dto.OrderReturnDTO;
+import com.flowiee.pms.modules.sales.entity.*;
 import com.flowiee.pms.modules.sales.model.OrderReq;
+import com.flowiee.pms.modules.sales.model.OrderReturnReq;
+import com.flowiee.pms.modules.sales.repository.OrderReturnItemRepository;
+import com.flowiee.pms.modules.sales.repository.OrderReturnRepository;
 import com.flowiee.pms.modules.sales.service.*;
+import com.flowiee.pms.modules.sales.utils.OrderReturnCondition;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.staff.repository.AccountRepository;
 import com.flowiee.pms.modules.system.entity.SystemConfig;
@@ -34,10 +36,12 @@ import com.flowiee.pms.modules.sales.repository.OrderRepository;
 import com.flowiee.pms.modules.system.service.SystemLogService;
 import com.google.zxing.WriterException;
 import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
@@ -52,41 +56,49 @@ import java.util.*;
 
 @Service
 public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderRepository> implements OrderService {
+    private final ModelMapper mvModelMapper;
     private Logger LOG = LoggerFactory.getLogger(getClass());
 
     private final SendCustomerNotificationService mvSendCustomerNotificationService;
     private final OrderGenerateQRCodeService mvOrderGenerateQRCodeService;
+    private final OrderReturnItemRepository mvOrderReturnItemRepository;
     private final TransactionGoodsService mvTransactionGoodsService;
-    private final CartService mvCartService;
-    private final ConfigRepository mvConfigRepository;
-    private final OrderItemsService mvOrderItemsService;
-    private final CustomerRepository  mvCustomerRepository;
+    private final OrderReturnRepository mvOrderReturnRepository;
+    private final ProductVariantService mvProductVariantService;
+    private final LoyaltyProgramService mvLoyaltyProgramService;
+    private final VoucherTicketService mvVoucherTicketService;
     private final OrderHistoryService mvOrderHistoryService;
     private final TicketImportService mvTicketImportService;
-    private final VoucherTicketService mvVoucherTicketService;
-    private final LoyaltyProgramService mvLoyaltyProgramService;
+    private final CustomerRepository  mvCustomerRepository;
+    private final OrderItemsService mvOrderItemsService;
+    private final AccountRepository mvAccountRepository;
+    private final ConfigRepository mvConfigRepository;
+    private final SystemLogService mvSystemLogService;
     private final CategoryService mvCategoryService;
     private final CustomerService mvCustomerService;
-    private final AccountRepository mvAccountRepository;
-    private final SystemLogService mvSystemLogService;
+    private final CartService mvCartService;
 
-    public OrderServiceImpl(OrderRepository pOrderRepository, SendCustomerNotificationService mvSendCustomerNotificationService, CartService mvCartService, ConfigRepository mvConfigRepository, OrderItemsService mvOrderItemsService, OrderGenerateQRCodeService mvOrderGenerateQRCodeService, CustomerRepository mvCustomerRepository, OrderHistoryService mvOrderHistoryService, TicketImportService mvTicketImportService, VoucherTicketService mvVoucherTicketService, LoyaltyProgramService mvLoyaltyProgramService, CategoryService mvCategoryService, CustomerService mvCustomerService, AccountRepository pAccountRepository, SystemLogService pSystemLogService, TransactionGoodsService pTransactionGoodsService) {
+    public OrderServiceImpl(OrderRepository pOrderRepository, SendCustomerNotificationService pSendCustomerNotificationService, CartService pCartService, ConfigRepository pConfigRepository, OrderItemsService pOrderItemsService, OrderGenerateQRCodeService pOrderGenerateQRCodeService, CustomerRepository pCustomerRepository, OrderHistoryService pOrderHistoryService, TicketImportService pTicketImportService, VoucherTicketService pVoucherTicketService, LoyaltyProgramService pLoyaltyProgramService, CategoryService pCategoryService, CustomerService pCustomerService, AccountRepository pAccountRepository, SystemLogService pSystemLogService, TransactionGoodsService pTransactionGoodsService, OrderReturnRepository pOrderReturnRepository, OrderReturnItemRepository pOrderReturnItemRepository, ProductVariantService pProductVariantService, ModelMapper pModelMapper) {
         super(Order.class, OrderDTO.class, pOrderRepository);
-        this.mvSendCustomerNotificationService = mvSendCustomerNotificationService;
-        this.mvOrderGenerateQRCodeService = mvOrderGenerateQRCodeService;
+        this.mvSendCustomerNotificationService = pSendCustomerNotificationService;
+        this.mvOrderGenerateQRCodeService = pOrderGenerateQRCodeService;
+        this.mvOrderReturnItemRepository = pOrderReturnItemRepository;
         this.mvTransactionGoodsService = pTransactionGoodsService;
-        this.mvCartService = mvCartService;
-        this.mvConfigRepository = mvConfigRepository;
-        this.mvOrderItemsService = mvOrderItemsService;
-        this.mvCustomerRepository = mvCustomerRepository;
-        this.mvOrderHistoryService = mvOrderHistoryService;
-        this.mvTicketImportService = mvTicketImportService;
-        this.mvVoucherTicketService = mvVoucherTicketService;
-        this.mvLoyaltyProgramService = mvLoyaltyProgramService;
-        this.mvCategoryService = mvCategoryService;
-        this.mvCustomerService = mvCustomerService;
+        this.mvProductVariantService = pProductVariantService;
+        this.mvLoyaltyProgramService = pLoyaltyProgramService;
+        this.mvOrderReturnRepository = pOrderReturnRepository;
+        this.mvVoucherTicketService = pVoucherTicketService;
+        this.mvOrderHistoryService = pOrderHistoryService;
+        this.mvTicketImportService = pTicketImportService;
+        this.mvCustomerRepository = pCustomerRepository;
+        this.mvOrderItemsService = pOrderItemsService;
         this.mvAccountRepository = pAccountRepository;
+        this.mvConfigRepository = pConfigRepository;
         this.mvSystemLogService = pSystemLogService;
+        this.mvCategoryService = pCategoryService;
+        this.mvCustomerService = pCustomerService;
+        this.mvCartService = pCartService;
+        this.mvModelMapper = pModelMapper;
     }
 
     private final BigDecimal mvDefaultShippingCost = BigDecimal.ZERO;
@@ -95,6 +107,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     private final BigDecimal mvDefaultCodFee = BigDecimal.ZERO;
 
     private static final int GENERATE_TRACKING_CODE_MAX_RETRIES = 30;
+    private static final String PREFIX_RETURNS_ORDER_CODE = "TH";
 
     @Override
     public Page<OrderDTO> find(OrderReq pOrderReq) {
@@ -166,13 +179,14 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     public OrderDTO createOrder(CreateOrderReq pRequest) {
         OrderCart lvCart = mvCartService.findEntById(pRequest.getCartId(), true);
         Map<CATEGORY, Category> lvCategoryMap = mvCategoryService.findByIdsAsMap(Set.of(pRequest.getPaymentMethodId(),
-                pRequest.getSalesChannelId()));
+                pRequest.getSalesChannelId(), pRequest.getDeliveryMethodId()));
         
         BigDecimal lvAmountDiscount = pRequest.getAmountDiscount();
         String lvCouponCode = pRequest.getCouponCode();
         LocalDateTime lvOrderTime = getOrderTime(pRequest.getOrderTime());
         Category lvPaymentMethod = lvCategoryMap.get(CATEGORY.PAYMENT_METHOD);
         Category lvSalesChannel = lvCategoryMap.get(CATEGORY.SALES_CHANNEL);
+        Category lvDeliveryMethod = lvCategoryMap.get(CATEGORY.SHIP_METHOD);
         Customer lvCustomer = mvCustomerService.findEntById(pRequest.getCustomerId(), true);
         Account lvSalesAssistant = mvAccountRepository.findById(pRequest.getSalesAssistantId())
                 .orElseThrow(() -> new BadRequestException("Sales assistant invalid!"));
@@ -189,7 +203,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
                 throw new BadRequestException("The customer is on the blacklist!");
             if (!CoreUtils.validateEmail(pRequest.getRecipientEmail()))
                 throw new BadRequestException("Email invalid!");
-            if (!CoreUtils.validatePhoneNumber(pRequest.getRecipientPhone(), CommonUtils.defaultCountryCode))
+            if (CoreUtils.isNullStr(pRequest.getRecipientPhone()))
                 throw new BadRequestException("Phone number invalid!");
             if (CoreUtils.isNullStr(pRequest.getShippingAddress()))
                 throw new BadRequestException("Address must not empty!");
@@ -225,6 +239,8 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
                 .amountDiscount(CoreUtils.coalesce(lvAmountDiscount))
                 .packagingCost(CoreUtils.coalesce(pRequest.getPackagingCost(), mvDefaultPackagingCost))
                 .shippingCost(CoreUtils.coalesce(pRequest.getShippingCost(), mvDefaultShippingCost))
+                .deliveryMethod(lvDeliveryMethod)
+                .deliveredBy("STORE_DELIVERY".equals(lvDeliveryMethod.getCode()) ? "STORE_DELIVERY" : null)
                 .giftWrapCost(CoreUtils.coalesce(pRequest.getGiftWrapCost(), mvDefaultGiftWrapCost))
                 .codFee(CoreUtils.coalesce(pRequest.getCodFee(), mvDefaultCodFee))
                 .isGiftWrapped(false)
@@ -445,12 +461,55 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         //...
     }
 
+    @Transactional
     @Override
-    @Transactional(rollbackOn = Exception.class)
-    public void doReturn(OrderDTO pOrder) {
-        try {
-            Order lvOrder = super.findEntById(pOrder.getId(), true);
-            Long lvStorageId = null;
+    public void doReturn(OrderReturnReq pRequest) throws Exception {
+        Order lvOrder = super.findEntById(pRequest.getId(), true);
+
+        OrderReturn lvReturnsRecord = mvOrderReturnRepository.save(OrderReturn.builder()
+                .order(lvOrder)
+                .returnsCode(getReturnsCode())
+                .reason(pRequest.getReason())
+                .returnDate(LocalDateTime.now())
+                .refundMethod(pRequest.getRefundMethod())
+                .refundAmount(pRequest.getRefundAmount())
+                .isRefunded(pRequest.getIsRefunded())
+                .status(pRequest.getStatus())
+                .build());
+
+        if (!CollectionUtils.isEmpty(pRequest.getItems())) {
+            List<OrderReturnItem> lvRecordedItems = mvOrderReturnItemRepository.saveAll(pRequest.getItems().stream()
+                    .map(i -> OrderReturnItem.builder()
+                            .orderReturn(lvReturnsRecord)
+                            .productId(i.getProductId())
+                            .quantity(i.getQuantity())
+                            .unitPrice(i.getUnitPrice())
+                            .reason(i.getReason())
+                            .condition(i.getCondition())
+                            .build())
+                    .toList());
+
+            for (OrderReturnItem lvItem : lvRecordedItems) {
+                mvProductVariantService.updateStockQuantity(lvItem.getProductId(), lvItem.getQuantity(), "I");
+                if (OrderReturnCondition.DAMAGED.equals(lvItem.getCondition())) {
+                    mvProductVariantService.updateDefectiveQuantity(lvItem.getProductId(), lvItem.getQuantity(), "I");
+                }
+            }
+        }
+
+        //Reverse accumulated point
+        {
+
+        }
+
+        //Refund and update into ledger transaction
+        {
+            //Validate refunding is allowed?
+        }
+
+        //Put items back into storage/inventory
+        {
+            Long lvStorageId = -1L;
             String lvOrderCode = lvOrder.getCode();
             mvTicketImportService.restockReturnedItems(lvStorageId, lvOrderCode);
 
@@ -460,14 +519,30 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
             dto.setDescription(null);
 
             mvTransactionGoodsService.createTransactionGoods(dto);
-        } catch (Exception e) {
-            LOG.error("Cancel order got [{}]", e.getMessage(), e);
+        }
+
+        //Save attached images
+        {
+
+        }
+
+        //Log action returns
+        {
+
         }
     }
 
     @Override
+    public List<OrderReturnDTO> findReturnedOrders() {
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+        List<OrderReturn> lvOrders = mvOrderReturnRepository.findAll(pageable).getContent();
+        return lvOrders.stream()
+                .map(i -> mvModelMapper.map(i, OrderReturnDTO.class))
+                .toList();
+    }
+
+    @Override
     public void doRefund(Long pOrderId) {
-        Order lvOrder = super.findEntById(pOrderId, true);
         //...
     }
 
@@ -509,5 +584,14 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
             }
         }
         throw new IllegalStateException("Unable to generate a unique tracking code after " + GENERATE_TRACKING_CODE_MAX_RETRIES + " attempts");
+    }
+
+    private String getReturnsCode() {
+        String lvLastestCode = CoreUtils.trim(mvOrderReturnRepository.findLastestCode());
+        if (CoreUtils.isNullStr(lvLastestCode)) {
+            return PREFIX_RETURNS_ORDER_CODE + "00001";
+        }
+        int lvCurrentIndex = Integer.parseInt(lvLastestCode.substring(PREFIX_RETURNS_ORDER_CODE.length()));
+        return PREFIX_RETURNS_ORDER_CODE + (lvCurrentIndex + 1);
     }
 }

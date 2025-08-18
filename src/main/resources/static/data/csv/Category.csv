@@ -11505,7 +11505,7 @@ ORDER_TYPE,ROOT,Loại đơn hàng,,1,0,/system/category/order-type
 ORDER_TYPE,S,Đơn sỉ,,1,0,
 ORDER_TYPE,L,Đơn lẻ,,1,0,
 SHIP_METHOD,ROOT,Hình thức vận chuyển,,1,0,/system/category/ship-method
-SHIP_METHOD,ME,Tự đi ship,,1,0,
+SHIP_METHOD,STORE_DELIVERY,Own delivery,,1,0,
 SHIP_METHOD,GHTK,Giao hàng tiết kiệm,,1,0,
 SHIP_METHOD,VTP,Viettel Post,,1,0,
 GROUP_CUSTOMER,ROOT,Nhóm khách hàng,,1,0,/system/category/group-customer

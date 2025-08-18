@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.system.service.impl;
 
 import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.modules.system.service.SystemLogService;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.system.entity.SystemLog;
@@ -21,6 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -29,9 +33,15 @@ public class SystemLogServiceImpl implements SystemLogService {
     UserSession userSession;
 
     @Override
-    public Page<SystemLog> findAll(int pageSize, int pageNum) {
+    public Page<SystemLog> findAll(int pageSize, int pageNum, String pFromDate, String pToDate, Long pActor) {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by("createdAt").descending());
-        Page<SystemLog> logs = mvSystemLogRepository.findAll(pageable);
+        String lvInputDatePattern = "yyyy-MM-dd";
+        LocalDateTime lvFromDate = CoreUtils.isNullStr(pFromDate) ? DateTimeUtil.MIN_TIME :
+                DateTimeUtil.parseToLocalDate(pFromDate, lvInputDatePattern).atStartOfDay();
+        LocalDateTime lvToDate = CoreUtils.isNullStr(pToDate) ? DateTimeUtil.MAX_TIME :
+                DateTimeUtil.parseToLocalDate(pToDate, lvInputDatePattern).atTime(LocalTime.MAX);
+
+        Page<SystemLog> logs = mvSystemLogRepository.findAll(lvFromDate, lvToDate, pActor, pageable);
         for (SystemLog systemLog : logs.getContent()) {
             systemLog.setAccountName(systemLog.getAccount() != null ? systemLog.getAccount().getFullName() : "");
             systemLog.setContentChange(systemLog.getContentChange() != null ? systemLog.getContentChange() : "");

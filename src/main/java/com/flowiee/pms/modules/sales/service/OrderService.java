@@ -1,11 +1,13 @@
 package com.flowiee.pms.modules.sales.service;
 
+import com.flowiee.pms.modules.sales.dto.OrderReturnDTO;
 import com.flowiee.pms.modules.sales.entity.Order;
 
 import com.flowiee.pms.common.enumeration.OrderStatus;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.modules.sales.model.CreateOrderReq;
 import com.flowiee.pms.modules.sales.model.OrderReq;
+import com.flowiee.pms.modules.sales.model.OrderReturnReq;
 import com.flowiee.pms.modules.sales.model.UpdateOrderReq;
 import org.springframework.data.domain.Page;
 
@@ -37,7 +39,9 @@ public interface OrderService {
 
     void doComplete(OrderDTO pOrder);
 
-    void doReturn(OrderDTO pOrder);
+    void doReturn(OrderReturnReq pOrder) throws Exception;
+
+    List<OrderReturnDTO> findReturnedOrders();
 
     void doRefund(Long pOrderId);
 }

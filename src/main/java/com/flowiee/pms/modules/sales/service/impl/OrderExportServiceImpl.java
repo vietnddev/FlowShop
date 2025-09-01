@@ -29,8 +29,6 @@ public class OrderExportServiceImpl extends BaseExportService {
         XSSFSheet sheet = mvWorkbook.getSheetAt(0);
 
         OrderReq lvOrderReq = OrderReq.builder().build();
-        lvOrderReq.setPageNum(-1);
-        lvOrderReq.setPageSize(-1);
         List<OrderDTO> listData = mvOrderService.find(lvOrderReq).getContent();
         for (int i = 0; i < listData.size(); i++) {
             OrderDTO orderDTO = listData.get(i);

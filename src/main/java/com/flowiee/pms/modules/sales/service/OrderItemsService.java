@@ -13,4 +13,6 @@ public interface OrderItemsService extends ICurdService<OrderDetail> {
     List<OrderDetail> save(OrderDTO orderDto, List<String> productVariantIds);
 
     List<OrderDetail> save(Long pCartId, Long pOrderId, List<Items> pItemsList);
+
+    void updateReturnsStatus(long pItemId, boolean pIsReturned);
 }

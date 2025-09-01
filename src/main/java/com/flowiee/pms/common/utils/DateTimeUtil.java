@@ -144,4 +144,9 @@ public class DateTimeUtil {
         }
         return DateTimeUtil.MAX_TIME;
     }
+
+    public static LocalDate parseToLocalDate(String input, String pattern) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        return LocalDate.parse(input, formatter);
+    }
 }

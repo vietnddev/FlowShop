@@ -131,14 +131,12 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         List<Items> lvCartItems = currentCart != null ? mvCartService.getItems(currentCart.getId(), lvProductVariantIds) : List.of();
         List<Long> lvCartItemIds = lvCartItems.isEmpty() ? List.of() : lvCartItems.stream().map(a -> a.getProductDetail().getId()).toList();
 
-        lvProductVariantDTOs.stream()
-                .peek(dto -> {
-                    mvProductPriceService.assignPriceInfo(dto, mvProductPriceRepository.findPresentPrices(dto.getId()));
-                    String lvImageUrl = FileUtils.getImageUrl(lvImageActiveList.get(dto.getId()), true);
-                    dto.setImageSrc(lvImageUrl != null ? lvImageUrl : EndPoint.URL_MEDIA_DEFAULT_PRODUCT.getValue());
-                    dto.setCurrentInCart(lvCartItemIds.contains(dto.getId()));
-                })
-                .collect(Collectors.toList());
+        for (ProductVariantDTO lvDto : lvProductVariantDTOs) {
+            mvProductPriceService.assignPriceInfo(lvDto, mvProductPriceRepository.findPresentPrices(lvDto.getId()));
+            String lvImageUrl = FileUtils.getImageUrl(lvImageActiveList.get(lvDto.getId()), true);
+            lvDto.setImageSrc(lvImageUrl != null ? lvImageUrl : EndPoint.URL_MEDIA_DEFAULT_PRODUCT.getValue());
+            lvDto.setCurrentInCart(lvCartItemIds.contains(lvDto.getId()));
+        }
 
         return new PageImpl<>(lvProductVariantDTOs, lvPageable, lvTotalRecords);
     }
@@ -226,7 +224,6 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             try {
                 mvProductGenerateQRCodeService.generateProductVariantQRCode(lvProductVariantSaved.getId());
             } catch (IOException | WriterException e ) {
-                e.printStackTrace();
                 LOG.error(String.format("Can't generate QR Code for Product %s", lvProductVariantSaved.getVariantCode()), e);
             }
 
@@ -234,16 +231,17 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             try {
                 mvGenerateBarcodeService.generateBarcode(lvProductVariantSaved.getId());
             } catch (IOException | WriterException e ) {
-                e.printStackTrace();
                 LOG.error(String.format("Can't generate Barcode for Product %s", lvProductVariantSaved.getVariantCode()), e);
             }
 
-            if (lvProductVariantSaved.getStorageQty() > 0 && pDto.getStorageIdInitStorageQty() != null) {
-                initInventoryQuantity(lvProductVariantSaved, pDto);
-            }
+            if (pDto.getStorageIdInitStorageQty() != null) {
+                if (lvProductVariantSaved.getStorageQty() > 0) {
+                    initInventoryQuantity(lvProductVariantSaved, pDto);
+                }
 
-            if (lvProductVariantSaved.getSoldQty() > 0 && pDto.getStorageIdInitStorageQty() != null) {
-                initSoldQuantity(lvProductVariantSaved, pDto);
+                if (lvProductVariantSaved.getSoldQty() > 0) {
+                    initSoldQuantity(lvProductVariantSaved, pDto);
+                }
             }
 
             mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Thêm mới biến thể sản phẩm", lvProductVariantSaved.toStringInsert());
@@ -458,6 +456,11 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "product quantity"), ex);
         }
+    }
+
+    @Override
+    public void updateDefectiveQuantity(Long pProductVariantId, Integer pQuantity, String pUpdateType) {
+
     }
 
     @Override

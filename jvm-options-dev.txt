@@ -18,3 +18,4 @@
 -Dspring.output.ansi.enabled=always
 -Dspring.jmx.enabled=false
 -Xshare:auto
+-DBYPASS=true

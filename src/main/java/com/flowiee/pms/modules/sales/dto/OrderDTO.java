@@ -2,6 +2,8 @@ package com.flowiee.pms.modules.sales.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.flowiee.pms.common.enumeration.PriorityLevel;
+import com.flowiee.pms.modules.sales.entity.Customer;
+import com.flowiee.pms.modules.system.dto.CategoryDTO;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.inventory.entity.TicketExport;
 import com.flowiee.pms.modules.sales.entity.CustomerDebt;
@@ -13,7 +15,7 @@ import com.flowiee.pms.common.enumeration.OrderStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -65,7 +67,7 @@ public class OrderDTO implements Serializable {
 	private Long cancellationReason;
 	private LocalDateTime deliverySuccessTime;
 	private LocalDateTime deliveryExpectedTime;
-	private String deliveryMethod;
+	private CategoryDTO deliveryMethod;
 	private String deliveredBy;
 	private String deliveredStatus;
 	private String deliveryPriority;
@@ -99,8 +101,6 @@ public class OrderDTO implements Serializable {
 	private Long ticketExportId;
 	private Boolean accumulateBonusPoints;
 	private List<OrderDetailDTO> listOrderDetail;
-	//@JsonIgnore
-	//private List<OrderDetail> listOrderDetail;
 	private List<OrderDetailDTO> items;
 
 	public OrderDTO(Long id, String code, LocalDateTime orderTime, String receiptName, String receiptPhone, String receiptEmail, String receiptAddress, OrderStatus orderStatus) {
@@ -114,60 +114,57 @@ public class OrderDTO implements Serializable {
 		setOrderStatus(orderStatus);
 	}
 
-	public static OrderDTO fromOrder(Order order) {
-		OrderDTO dto = new OrderDTO(order.getId(), order.getCode(), order.getOrderTime(), order.getReceiverName(),
-				order.getReceiverPhone(), order.getReceiverEmail(), order.getReceiverAddress(), order.getOrderStatus());
-		dto.setCreatedAt(order.getCreatedAt());
+	public static OrderDTO fromOrder(Order pOrder) {
+        Category lvDeliveryMethod = pOrder.getDeliveryMethod();
+        Category lvSalesChannel = pOrder.getSalesChannel();
+        Category lvPaymentMethod = pOrder.getPaymentMethod();
+        Customer lvCustomer = pOrder.getCustomer();
+        Account lvCashier = pOrder.getNhanVienBanHang();
+        TicketExport lvTicketExport = pOrder.getTicketExport();
+        BigDecimal lvAmountDiscount = pOrder.getAmountDiscount();
 
-		dto.setCustomerId(order.getCustomer().getId());
-		dto.setCustomerName(order.getCustomer().getCustomerName());
-
-		dto.setSalesChannelId(order.getSalesChannel().getId());
-		dto.setSalesChannelName(order.getSalesChannel().getName());
-
-		//dto.setOrderStatusId(dto.getPaymentMethod() != null ? order.getTrangThaiDonHang().getId() : null);
-		//dto.setOrderStatusName(dto.getPaymentMethod() != null ? order.getTrangThaiDonHang().getName() : null);
+		OrderDTO dto = new OrderDTO();
+		dto.setId(pOrder.getId());
+		dto.setCode(pOrder.getCode());
+		dto.setOrderTime(pOrder.getOrderTime());
+		dto.setReceiverName(pOrder.getReceiverName());
+		dto.setReceiverPhone(pOrder.getReceiverPhone());
+		dto.setReceiverEmail(pOrder.getReceiverEmail());
+		dto.setReceiverAddress(pOrder.getReceiverAddress());
+		dto.setOrderStatus(pOrder.getOrderStatus());
+		dto.setCreatedAt(pOrder.getCreatedAt());
+		dto.setCustomerId(lvCustomer.getId());
+		dto.setCustomerName(lvCustomer.getCustomerName());
+		dto.setSalesChannelId(lvSalesChannel.getId());
+		dto.setSalesChannelName(lvSalesChannel.getName());
 		dto.setOrderStatus(dto.getOrderStatus());
 		dto.setOrderStatusName(dto.getOrderStatus().getName());
-
-		dto.setPayMethodId(order.getPaymentMethod() != null ? order.getPaymentMethod().getId() : null);
-		dto.setPayMethodName(order.getPaymentMethod() != null ? order.getPaymentMethod().getName() : null);
-
-		dto.setCashierId(order.getNhanVienBanHang().getId());
-		dto.setCashierName(order.getNhanVienBanHang().getFullName());
-
-		dto.setTicketExportId(order.getTicketExport() != null ? order.getTicketExport().getId() : null);
-
-//		if (ObjectUtils.isNotEmpty(order.getListImageQR())) {
-//			FileStorage imageQRCode = order.getListImageQR().get(0);//
-//			dto.setQrCode(FileUtils.getImageUrl(imageQRCode, false));
-//		}
-		dto.setShippingCost(order.getShippingCost());
-		dto.setCodFee(order.getCodFee());
-		dto.setAmountDiscount(order.getAmountDiscount() != null ? order.getAmountDiscount() : new BigDecimal(0));
-		//dto.setTotalAmount(OrderUtils.calTotalAmount(order.getListOrderDetail(), BigDecimal.ZERO));
-		//dto.setTotalAmountDiscount(OrderUtils.calTotalAmount(order.getListOrderDetail(), order.getAmountDiscount()));
-		//dto.setTotalProduct(OrderUtils.countItemsEachOrder(order.getListOrderDetail()));
-		dto.setCouponCode(order.getCouponCode());
-		dto.setPaymentStatus(order.getPaymentStatus() != null && order.getPaymentStatus());
-		dto.setPaymentTime(order.getPaymentTime());
-		dto.setPaymentAmount(order.getPaymentAmount());
-		dto.setPaymentNote(order.getPaymentNote());
-		dto.setNote(order.getNote());
-
-		//dto.setListOrderDetailDTO(OrderDetailDTO.fromOrderDetails(order.getListOrderDetail()));
-		dto.setListOrderDetail(OrderDetailDTO.fromOrderDetails(order.getListOrderDetail()));
+		dto.setPayMethodId(lvPaymentMethod != null ? lvPaymentMethod.getId() : null);
+		dto.setPayMethodName(lvPaymentMethod != null ? lvPaymentMethod.getName() : null);
+		dto.setDeliveryMethod(lvDeliveryMethod != null ? new CategoryDTO(lvDeliveryMethod.getId(), lvDeliveryMethod.getName()) : new CategoryDTO());
+		dto.setCashierId(lvCashier.getId());
+		dto.setCashierName(lvCashier.getFullName());
+		dto.setTicketExportId(lvTicketExport != null ? lvTicketExport.getId() : null);
+		dto.setShippingCost(pOrder.getShippingCost());
+		dto.setCodFee(pOrder.getCodFee());
+		dto.setAmountDiscount(lvAmountDiscount != null ? lvAmountDiscount : new BigDecimal(0));
+		dto.setCouponCode(pOrder.getCouponCode());
+		dto.setPaymentStatus(pOrder.getPaymentStatus() != null && pOrder.getPaymentStatus());
+		dto.setPaymentTime(pOrder.getPaymentTime());
+		dto.setPaymentAmount(pOrder.getPaymentAmount());
+		dto.setPaymentNote(pOrder.getPaymentNote());
+		dto.setNote(pOrder.getNote());
+		dto.setListOrderDetail(OrderDetailDTO.fromOrderDetails(pOrder.getListOrderDetail()));
 
 		return dto;
 	}
 
-	public static List<OrderDTO> fromOrders(List<Order> orders) {
-		List<OrderDTO> list = new ArrayList<>();
-		if (ObjectUtils.isNotEmpty(orders)) {
-			for (Order p : orders) {
-				list.add(OrderDTO.fromOrder(p));
-			}
+	public static List<OrderDTO> fromOrders(List<Order> pOrders) {
+		if (CollectionUtils.isEmpty(pOrders)) {
+			return new ArrayList<>();
 		}
-		return list;
+		return pOrders.stream()
+				.map(OrderDTO::fromOrder)
+				.toList();
 	}
 }

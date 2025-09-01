@@ -3,11 +3,13 @@ package com.flowiee.pms.modules.sales.controller;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.common.utils.OrderUtils;
+import com.flowiee.pms.modules.sales.dto.OrderReturnDTO;
 import com.flowiee.pms.modules.sales.entity.OrderDetail;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.common.exception.BadRequestException;
+import com.flowiee.pms.modules.sales.model.OrderReq;
 import com.flowiee.pms.modules.sales.service.OrderItemsService;
 import com.flowiee.pms.modules.sales.service.OrderPrintInvoiceService;
 import com.flowiee.pms.modules.sales.service.OrderService;
@@ -18,9 +20,8 @@ import com.flowiee.pms.modules.system.service.CategoryService;
 import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.common.enumeration.OrderStatus;
 import com.flowiee.pms.common.enumeration.Pages;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -31,14 +32,13 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/sls/order")
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class OrderControllerView extends BaseController {
-    OrderService mvOrderService;
-    CategoryService mvCategoryService;
-    OrderItemsService mvOrderItemsService;
-    VoucherTicketService mvVoucherTicketService;
-    OrderPrintInvoiceService mvPrintInvoiceService;
+    private final OrderPrintInvoiceService mvPrintInvoiceService;
+    private final VoucherTicketService mvVoucherTicketService;
+    private final OrderItemsService mvOrderItemsService;
+    private final CategoryService mvCategoryService;
+    private final OrderService mvOrderService;
 
     List<OrderStatus> mvOrderStatusCanModifyItem = List.of(OrderStatus.PEND, OrderStatus.CONF, OrderStatus.PROC);
     List<OrderStatus> mvOrderStatusCanDeleteItem = List.of(OrderStatus.PEND, OrderStatus.CONF, OrderStatus.PROC);
@@ -49,6 +49,16 @@ public class OrderControllerView extends BaseController {
     public ModelAndView viewAllOrders() {
         setupSearchTool(true, List.of("BRANCH", CATEGORY.GROUP_CUSTOMER, CATEGORY.PAYMENT_METHOD, CATEGORY.ORDER_STATUS, CATEGORY.SALES_CHANNEL, "DATE_FILTER"));
         return baseView(new ModelAndView(Pages.PRO_ORDER.getTemplate()));
+    }
+
+    @GetMapping("/returns")
+    @PreAuthorize("@vldModuleSales.readOrder(true)")
+    public ModelAndView returnsAndRefunds() {
+        List<OrderReturnDTO> lvOrders = mvOrderService.findReturnedOrders();
+
+        ModelAndView modelAndView = new ModelAndView(Pages.SLS_ORDER_RETURNS.getTemplate());
+        modelAndView.addObject("orders", lvOrders);
+        return baseView(modelAndView);
     }
 
     @GetMapping("/{id}")

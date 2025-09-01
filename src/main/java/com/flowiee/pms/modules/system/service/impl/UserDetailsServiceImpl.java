@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.system.service.impl;
 
 import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.common.utils.PasswordUtils;
 import com.flowiee.pms.modules.system.entity.SystemLog;
 import com.flowiee.pms.common.exception.*;
 import com.flowiee.pms.modules.staff.entity.Account;
@@ -27,15 +26,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 	private final RoleService mvRoleService;
 	private final AccountRepository mvAccountRepository;
-
-	@Value("${system.login.bypass}")
-	private boolean mvSystemByPass;
 
     public UserDetailsServiceImpl(@Lazy RoleService mvRoleService, @Lazy AccountRepository mvAccountRepository) {
         this.mvRoleService = mvRoleService;
@@ -72,10 +69,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		lvUserPrincipal.setEnabled(AccountStatus.N.name().equals(pAccount.getStatus()));
 		lvUserPrincipal.setIp("unknown");
 		lvUserPrincipal.setEntity(pAccount);
-
-		if (mvSystemByPass) {
-			lvUserPrincipal.setPassword(PasswordUtils.encodePassword(CommonUtils.defaultNewPassword));
-		}
 
 		Set<GrantedAuthority> lvGrantedAuthorities = new HashSet<>();
 		lvGrantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + pAccount.getRole()));

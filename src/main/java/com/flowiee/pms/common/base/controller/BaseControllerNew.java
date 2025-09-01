@@ -49,7 +49,7 @@ public abstract class BaseControllerNew<D> {
 
     protected AppResponse<List<D>> handleFindAll() {
         try {
-            return AppResponse.success(getService().find(new BaseParameter()));
+            return AppResponse.success(getService().find(BaseParameter.builder().build()));
         } catch (RuntimeException ex) {
             throw new AppException("Error fetching data", ex);
         }

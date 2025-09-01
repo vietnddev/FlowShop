@@ -9,7 +9,7 @@ import com.flowiee.pms.common.enumeration.MasterObject;
 import org.springframework.data.domain.Page;
 
 public interface SystemLogService {
-    Page<SystemLog> findAll(int pageSize, int pageNum);
+    Page<SystemLog> findAll(int pageSize, int pageNum, String pFromDate, String pToDate, Long pActor);
 
     SystemLog writeLogCreate(MODULE module, ACTION function, MasterObject object, String title, String content);
 

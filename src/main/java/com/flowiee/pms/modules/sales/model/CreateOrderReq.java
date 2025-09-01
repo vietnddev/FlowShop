@@ -15,6 +15,7 @@ public class CreateOrderReq {
     private Long salesAssistantId;
     private Long salesChannelId;
     private Long paymentMethodId;
+    private Long deliveryMethodId;
     private String orderStatus;
     private String note;
     private String customerNote;

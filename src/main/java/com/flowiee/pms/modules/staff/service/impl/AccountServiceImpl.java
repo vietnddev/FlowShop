@@ -65,6 +65,8 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
 
         account.setRole(Constants.ADMINISTRATOR.equals(lvRole) ? "ADMIN" : "USER");
         account.setPassword(PasswordUtils.encodePassword(lvPassword));
+        account.setFailLogonCount(0);
+        account.setStatus(AccountStatus.N.name());
         Account accountSaved = mvEntityRepository.save(account);
 
         mvSystemLogService.writeLogCreate(MODULE.SYSTEM, ACTION.SYS_ACC_C, MasterObject.Account, "Thêm mới account", username);
@@ -149,7 +151,7 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
 
     @Override
     public List<AccountDTO>find() {
-        return super.find(new BaseParameter()).stream()
+        return super.find(BaseParameter.builder().build()).stream()
                 .peek(a -> {
                     a.setPassword(null);
                     a.setAvatar("/media/default/user");

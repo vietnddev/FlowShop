@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Returns and Refunds</title>
+    <div th:replace="~{header :: stylesheets}"></div>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{header :: header}"></div>
+
+    <div th:replace="~{sidebar :: sidebar}"></div>
+
+    <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row justify-content-between">
+                            <div class="col-4" style="display: flex; align-items: center">
+                                <strong>RETURNED ORDERS</strong>
+                            </div>
+                            <div class="col-6 text-right">
+                                <a th:href="@{/api/v1/sls/order/export}" class="btn btn-info btn-sm">
+                                    <i class="fa-solid fa-cloud-arrow-down mr-2"></i>Export
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table id="example1" class="table table-bordered table-striped dataTable dtr-inline">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Code</th>
+                                    <th>Time</th>
+                                    <th>Order</th>
+                                    <th>Seller</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Total refund amount</th>
+                                    <th>Refunded to customer</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="i, index : ${orders}">
+                                    <td th:text="${index.index + 1}"></td>
+                                    <td th:text="${i.returnsCode}"></td>
+                                    <td th:text="${i.returnDate != null ? #temporals.format(i.returnDate, 'dd/MM/yyyy HH:mm:ss') : ''}"></td>
+                                    <td><a th:href="@{/sls/order/{orderId}(orderId=${i.orderId})}"
+                                           th:text="${i.orderCode}"></a></td>
+                                    <td th:text="${i.seller}"></td>
+                                    <td th:text="${i.customerName}"></td>
+                                    <td th:text="${#strings.concat(#lists.size(i.items), '/', i.originalItemQty)}"></td>
+                                    <td th:text="${i.refundAmount}"></td>
+                                    <td th:text="${i.isRefunded}"></td>
+                                    <td th:text="${i.status}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div th:replace="~{footer :: footer}"></div>
+
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+
+    <div th:replace="~{header :: scripts}"></div>
+
+    <script>
+        $(document).ready(function () {
+            //Search order by code, phone number, or scan qr code on the bill
+        });
+    </script>
+</div>
+</body>
+</html>

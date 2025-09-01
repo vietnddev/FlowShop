@@ -41,11 +41,15 @@ public class SystemLogController extends BaseController {
     ExportService exportService;
 
     @Operation(summary = "Find all log")
-    @GetMapping("/log/all")
+    @GetMapping("/log")
     @PreAuthorize("@vldModuleSystem.readLog(true)")
-    public AppResponse<List<SystemLog>> findLogs(@RequestParam("pageSize") int pageSize, @RequestParam("pageNum") int pageNum) {
+    public AppResponse<List<SystemLog>> findLogs(@RequestParam("pageSize") int pageSize,
+                                                 @RequestParam("pageNum") int pageNum,
+                                                 @RequestParam(value = "fromDate", required = false) String pFromDate,
+                                                 @RequestParam(value = "toDate", required = false) String pToDate,
+                                                 @RequestParam(value = "actor", required = false) Long pActorId) {
         try {
-            Page<SystemLog> logPage = logService.findAll(pageSize, pageNum - 1);
+            Page<SystemLog> logPage = logService.findAll(pageSize, pageNum - 1, pFromDate, pToDate, pActorId);
             return AppResponse.paged(logPage);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "system log"), ex);

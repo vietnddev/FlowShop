@@ -21,4 +21,6 @@ public interface LoyaltyProgramService extends ICurdService<LoyaltyProgramDTO> {
     void accumulatePoints(Order order, Long programId); // Tích điểm
 
     void redeemPoints(Long customerId, int pointsToRedeem); // Đổi điểm
+
+    void revokePoints(Order order, int points);
 }

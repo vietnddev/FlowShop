@@ -138,6 +138,10 @@ public class Category extends BaseEntity implements Serializable {
 	@OneToMany(mappedBy = "applicableCustomerGroup", fetch = FetchType.LAZY)
 	List<ProductPrice> productPriceList;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "deliveryMethod", fetch = FetchType.LAZY)
+	List<Order> deliveryMethodList;
+
 	@Transient
 	Integer totalSubRecords;
 

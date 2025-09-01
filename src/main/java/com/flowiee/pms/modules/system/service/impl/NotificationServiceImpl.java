@@ -24,7 +24,7 @@ public class NotificationServiceImpl extends BaseService<Notification, Notificat
 
     @Override
     public List<NotificationDTO>find() {
-        return super.find(new BaseParameter());
+        return super.find(BaseParameter.builder().build());
     }
 
     @Override

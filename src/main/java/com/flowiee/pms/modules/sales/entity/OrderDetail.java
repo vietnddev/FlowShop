@@ -71,6 +71,9 @@ public class OrderDetail extends BaseEntity implements java.io.Serializable {
 	@Column(name = "note", length = 500)
 	String note;
 
+	@Column(name = "is_returned")
+	Boolean isReturned;
+
 	@Column(name = "status", nullable = false)
 	boolean status;
 

@@ -132,11 +132,6 @@ public class Order extends BaseEntity implements Serializable {
 	@JoinColumn(name = "ticket_export_id")
 	TicketExport ticketExport;
 
-//	@JsonIgnore
-//	@ManyToOne
-//	@JoinColumn(name = "status", nullable = false)
-//	Category trangThaiDonHang;
-
 	@Column(name = "cancellation_date")
 	LocalDateTime cancellationDate;
 
@@ -149,8 +144,10 @@ public class Order extends BaseEntity implements Serializable {
 	@Column(name = "delivery_expected_time")
 	LocalDateTime deliveryExpectedTime;
 
-	@Column(name = "delivery_method")
-	String deliveryMethod;
+	@JsonIgnore
+	@ManyToOne
+	@JoinColumn(name = "delivery_method_id")
+	Category deliveryMethod;
 
 	@Column(name = "delivered_by")
 	String deliveredBy;
@@ -193,6 +190,10 @@ public class Order extends BaseEntity implements Serializable {
 	List<OrderHistory> listOrderHistory;
 
 	@JsonIgnore
+	@OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+	List<OrderReturn> orderReturnList;
+
+	@JsonIgnore
 	@OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	List<FileStorage> listImageQR;
 
@@ -202,17 +203,6 @@ public class Order extends BaseEntity implements Serializable {
 
 	public Order(long id) {
 		super.id = id;
-	}
-
-	public FileStorage getQRCode() {
-		if (getListImageQR() != null) {
-			for (FileStorage codeQR : getListImageQR()) {
-				if (codeQR.isActive())
-					return codeQR;
-			}
-			return null;
-		}
-		return null;
 	}
 
 	@Override

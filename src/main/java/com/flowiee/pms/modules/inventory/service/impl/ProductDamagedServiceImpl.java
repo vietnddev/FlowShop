@@ -40,7 +40,7 @@ public class ProductDamagedServiceImpl extends BaseService<ProductDamaged, Produ
 
     @Override
     public List<ProductDamagedDTO>find() {
-        return super.find(new BaseParameter());
+        return super.find(BaseParameter.builder().build());
     }
 
     @Override

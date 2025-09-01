@@ -6,7 +6,8 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,8 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -30,17 +29,14 @@ import java.io.IOException;
 @EnableMethodSecurity(prePostEnabled = true) // Thay thế @EnableGlobalMethodSecurity
 public class WebSecurityConfig {
 	private final UserDetailsServiceImpl userDetailsServiceImpl;
-	private final DevAuthBypassFilter devAuthBypassFilter;
 
-	public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl,
-							 @Autowired(required = false) DevAuthBypassFilter devAuthBypassFilter) {
+	public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl) {
 		this.userDetailsServiceImpl = userDetailsServiceImpl;
-		this.devAuthBypassFilter = devAuthBypassFilter;
 	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
+		return new CustomBCryptPasswordEncoder();
 	}
 
 	@Bean
@@ -81,10 +77,6 @@ public class WebSecurityConfig {
 				.exceptionHandling(exception -> exception
 						.accessDeniedPage("/error/403")
 				);
-
-		if (devAuthBypassFilter != null) {
-			httpSecurity.addFilterBefore(devAuthBypassFilter, UsernamePasswordAuthenticationFilter.class);
-		}
 
 		return httpSecurity.build();
 	}

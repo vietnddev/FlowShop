@@ -1,3 +1,9 @@
+const api = {
+    getOrder: (orderId) => `${mvHostURLCallApi}/sls/order/${orderId}`,
+    getOrders: () => `${mvHostURLCallApi}/sls/order/all`,
+    returnOrder: (orderId) => `${mvHostURLCallApi}/sls/order/${orderId}/returns`
+};
+
 function callApiDelete(apiURL, redirectTo) {
     $.ajax({
         url: apiURL,

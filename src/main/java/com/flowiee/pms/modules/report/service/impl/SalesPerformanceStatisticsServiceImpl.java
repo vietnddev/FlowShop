@@ -41,10 +41,8 @@ public class SalesPerformanceStatisticsServiceImpl implements SalesPerformanceSt
         List<SalesPerformanceStatisticsModel> returnList = new ArrayList<>();
         List<Account> employeeList = accountRepository.findAll();
         for (Account employee : employeeList) {
-            OrderReq lvOrderReq = OrderReq.builder().sellerId(employee.getId()).build();
-            lvOrderReq.setPageNum(-1);
-            lvOrderReq.setPageNum(-1);
-            List<OrderDTO> orderList = mvOrderService.find(lvOrderReq).getContent();
+            List<OrderDTO> orderList = mvOrderService.find(OrderReq.builder().sellerId(employee.getId()).build())
+                    .getContent();
 
             String lvEmployeeName = employee.getFullName();
             GroupAccount lvGroupEmployee = employee.getGroupAccount();

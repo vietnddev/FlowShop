@@ -59,7 +59,7 @@ public class ConfigServiceImpl extends BaseService<SystemConfig, SystemConfigDTO
 
     @Override
     public List<SystemConfigDTO>find() {
-        return super.find(new BaseParameter());
+        return super.find(BaseParameter.builder().build());
     }
 
     @Override

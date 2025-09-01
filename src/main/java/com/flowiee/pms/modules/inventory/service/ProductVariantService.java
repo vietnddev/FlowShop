@@ -22,5 +22,7 @@ public interface ProductVariantService extends ICurdService<ProductVariantDTO> {
 
     void updateStockQuantity(Long pProductVariantId, Integer pQuantity, String pUpdateType);
 
+    void updateDefectiveQuantity(Long pProductVariantId, Integer pQuantity, String pUpdateType);
+
     ProductDetail findEntById(Long pVariantId, boolean pThrowException);
 }

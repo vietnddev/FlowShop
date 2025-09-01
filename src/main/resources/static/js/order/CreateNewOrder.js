@@ -13,6 +13,7 @@ function createOrder() {
         let salesChannelId = $('#salesChannelField').val();
         let paymentMethodId = $('#paymentMethodField').val();
         let orderStatusId = $('#orderStatusField').val();
+        let deliveryMethodId = $('#deliveryTypeField').val();
         let note = $('#noteFieldCart').val();
         let customerNote = $('#customerNoteFieldCart').val();
         let cartId = mvCurrentCartId;
@@ -20,6 +21,7 @@ function createOrder() {
         let receivePhoneNumber = $('#receivePhoneNumberField').val();
         let receiveEmail = $('#receiveEmailField').val();
         let receiveAddress = $('#receiveAddressField').val();
+        let accumulateBonusPoints = $('#ckxAccumulatePoints').is(':checked');
 
         let apiURL = mvHostURLCallApi + '/sls/order/insert';
         let body = {
@@ -28,6 +30,7 @@ function createOrder() {
             salesChannelId: salesChannelId,
             paymentMethodId: paymentMethodId,
             orderStatus : orderStatusId,
+            deliveryMethodId: deliveryMethodId,
             note : note, //internal note
             customerNote : customerNote, //customer note
             orderTime : orderTime,
@@ -37,7 +40,8 @@ function createOrder() {
             recipientEmail : receiveEmail,
             shippingAddress : receiveAddress,
             couponCode : mvVoucherCode,
-            amountDiscount : mvAmountDiscount
+            amountDiscount : mvAmountDiscount,
+            accumulateBonusPoints: accumulateBonusPoints
         }
         $.ajax({
             url: apiURL,

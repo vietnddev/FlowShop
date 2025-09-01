@@ -8,6 +8,7 @@ import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.EntityNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.sales.model.OrderReq;
+import com.flowiee.pms.modules.sales.model.OrderReturnReq;
 import com.flowiee.pms.modules.system.model.EximResult;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.common.exception.AppException;
@@ -75,8 +76,7 @@ public class OrderController extends BaseController {
             if (!CoreUtils.isNullStr(pFromDate)) {
                 lvToDate = DateTimeUtil.convertStringToDateTime(pToDate, DateTimeUtil.FORMAT_DATE);
             }
-
-            OrderReq lvOrderReq = OrderReq.builder()
+            return AppResponse.paged(mvOrderService.find(OrderReq.builder()
                     .txtSearch(pTxtSearch)
                     .orderId(pOrderId)
                     .paymentMethodId(pPaymentMethodId)
@@ -89,11 +89,7 @@ public class OrderController extends BaseController {
                     .dateFilter(pDateFilter)
                     .fromDate(lvFromDate)
                     .toDate(lvToDate)
-                    .build();
-            lvOrderReq.setPageNum(pageNum - 1);
-            lvOrderReq.setPageSize(pageSize);
-            Page<OrderDTO> orderPage = mvOrderService.find(lvOrderReq);
-            return AppResponse.paged(orderPage);
+                    .pageNum(pageNum - 1).pageSize(pageSize).build()));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "order"), ex);
         }
@@ -161,23 +157,14 @@ public class OrderController extends BaseController {
         }
     }
 
-    @PostMapping("/process/{type}/{orderId}")
+    @PostMapping("/{orderId}/returns")
     @PreAuthorize("@vldModuleSales.updateOrder(true)")
-    public AppResponse<String> processOrder(@PathVariable("type") String pType, @PathVariable("orderId") Long pOrderId) {
-        OrderDTO lvOrder = mvOrderService.findDtoById(pOrderId, true);
-        switch (CoreUtils.trim(pType).toLowerCase()) {
-            case "cancel":
-                mvOrderService.doCancel(lvOrder, "");
-                break;
-            case "return":
-                mvOrderService.doReturn(lvOrder);
-                break;
-            case "complete":
-                mvOrderService.doComplete(lvOrder);
-                break;
-            default:
-                throw new BadRequestException("Process type is invalid!");
+    public AppResponse<String> returnOrder(@PathVariable("orderId") Long pOrderId, @RequestBody OrderReturnReq pRequest) {
+        try {
+            mvOrderService.doReturn(pRequest);
+            return AppResponse.success("Successfully!");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return AppResponse.success("Successfully!");
     }
 }

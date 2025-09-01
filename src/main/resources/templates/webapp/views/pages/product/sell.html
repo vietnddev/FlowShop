@@ -143,37 +143,10 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-5">
-                        <div class="card">
-                            <div class="card-body p-2">
-                                <label for="voucherCodeField">Coupon code</label>
-                                <div class="input-group w-100" style="width: 80%">
-                                    <input type="text" class="form-control" id="voucherCodeField">
-                                    <span class="input-group-append">
-                                        <button type="button" class="btn btn-sm btn-info btn-flat" id="btnCheckVoucherIsAvailable">Check</button>
-                                    </span>
-                                </div>
-                                <div id="ticketInfoBlock">
-                                    <span class="row col-12 mt-2" id="voucherTitleField"></span>
-                                    <span class="row col-12 mt-2" id="voucherStatusField"></span>
-                                    <span class="row col-12 mt-2" id="voucherPercentField"></span>
-                                    <span class="row col-12 mt-2" id="voucherMaxPriceField"></span>
-                                    <span class="row col-12 mt-2" id="voucherDoiTuongApDungField"></span>
-                                    <div class="row col-12 mt-2 form-group" id="isUseVoucherBlock">
-                                        <div class="custom-control custom-checkbox">
-                                            <input class="custom-control-input" type="checkbox" id="isUseVoucherField">
-                                            <label for="isUseVoucherField" class="custom-control-label">Apply</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="col-4">
                         <div class="card">
                             <div class="card-body p-2">
-                                <div class="row mt-2 align-items-center">
+                                <div class="row align-items-center">
                                     <label class="col-sm-4 col-form-label" for="customerField">Customer</label>
                                     <div class="col-sm-8 input-group w-100">
                                         <select class="custom-select" id="customerField" required></select>
@@ -206,6 +179,43 @@
                                     <label class="col-sm-4 col-form-label" for="receiveAddressField">Address</label>
                                     <div class="col-sm-8">
                                         <textarea class="form-control" id="receiveAddressField" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-5">
+                        <div class="card">
+                            <div class="card-body p-2">
+                                <div class="row align-items-center">
+                                    <label class="col-sm-4 col-form-label">Coupon code</label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group w-100" style="width: 80%">
+                                            <input type="text" class="form-control" id="voucherCodeField">
+                                            <span class="input-group-append">
+                                                <button type="button" class="btn btn-sm btn-info" id="btnCheckVoucherIsAvailable">Check</button>
+                                            </span>
+                                        </div>
+                                        <div id="ticketInfoBlock">
+                                            <span class="row col-12 mt-2" id="voucherTitleField"></span>
+                                            <span class="row col-12 mt-2" id="voucherStatusField"></span>
+                                            <span class="row col-12 mt-2" id="voucherPercentField"></span>
+                                            <span class="row col-12 mt-2" id="voucherMaxPriceField"></span>
+                                            <span class="row col-12 mt-2" id="voucherDoiTuongApDungField"></span>
+                                            <div class="row col-12 mt-2 form-group" id="isUseVoucherBlock">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input class="custom-control-input" type="checkbox" id="isUseVoucherField">
+                                                    <label for="isUseVoucherField" class="custom-control-label">Apply</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 align-items-center">
+                                    <label class="col-sm-4 col-form-label">Accumulate points</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-check" type="checkbox" id="ckxAccumulatePoints"/>
                                     </div>
                                 </div>
                             </div>
@@ -289,6 +299,7 @@
         ///sls/order/ban-hang/cart/{id}/reset(id=${cart.id})
 
         $(document).ready(function () {
+            init();
             createListener();
             loadCarts();
             loadCustomers();
@@ -296,6 +307,10 @@
             checkVoucherIsAvailable();
             useVoucher();
         });
+
+        function init() {
+            $('#ticketInfoBlock').hide();
+        }
 
         function createListener() {
             $("#btnNewCart").on("click", function () {

@@ -37,7 +37,7 @@ public interface CustomerRepository extends BaseRepository<Customer, Long> {
     List<Customer> findCustomerNewInMonth();
 
     @Modifying
-    @Query("update Customer c set c.bonusPoints = (c.bonusPoints + :bnsPoints) where c.id = :customerId")
+    @Query("update Customer c set c.bonusPoints = :bnsPoints where c.id = :customerId")
     void updateBonusPoint(@Param("customerId") Long customerId, @Param("bnsPoints") int bonusPoints);
 
     @Query("from Customer c where c.isVIP = true")

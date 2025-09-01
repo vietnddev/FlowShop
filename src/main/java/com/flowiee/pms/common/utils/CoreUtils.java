@@ -1,9 +1,5 @@
 package com.flowiee.pms.common.utils;
 
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
-
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,19 +83,6 @@ public class CoreUtils {
             return true;
         }
         return false;
-    }
-
-    public static boolean validatePhoneNumber(String phoneNumber, String countryCode) {
-        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-        try {
-            // Parse số điện thoại theo mã quốc gia
-            Phonenumber.PhoneNumber parsedNumber = phoneUtil.parse(phoneNumber, countryCode);
-            // Kiểm tra tính hợp lệ
-            return phoneUtil.isValidNumber(parsedNumber);
-        } catch (NumberParseException e) {
-            System.err.println("Invalid phone number: " + e.getMessage());
-            return false;
-        }
     }
 
     public static boolean isNumeric(String strNum) {

@@ -5,523 +5,598 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flowiee | Đơn hàng chi tiết</title>
     <th:block th:replace="~{header :: stylesheets}"></th:block>
-    <style rel="stylesheet">
-        .table td,
-        th {
-            vertical-align: middle;
-        }
-    </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
-    <div th:replace="~{header :: header}"></div>
+    <div class="wrapper">
+        <div th:replace="~{header :: header}"></div>
 
-    <div th:replace="~{sidebar :: sidebar}"></div>
+        <div th:replace="~{sidebar :: sidebar}"></div>
 
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
-        <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
-                <!-- Small boxes (Stat box) -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card card-light" style="min-height: 605px">
-                            <div class="card-header">
-                                <ul class="nav nav-tabs"
-                                    id="custom-tabs-one-tab"
-                                    role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active"
-                                           id="THONG_TIN_TAB" href="#THONG_TIN"
-                                           data-toggle="pill" role="tab" aria-selected="true"
-                                           style="font-weight: bold">Thông tin chung
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link"
-                                           id="THANH_TOAN_TAB" href="#THANH_TOAN_AND_XUAT_KHO"
-                                           data-toggle="pill" role="tab" aria-selected="true"
-                                           style="font-weight: bold">Thanh toán và xuất kho
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!--END CARD HEADER-->
-                            <!--START CARD BODY-->
-                            <div class="card-body">
-                                <div class="tab-content" id="tabContent">
-                                    <div class="tab-pane fade show active" id="THONG_TIN" role="tabpanel"
-                                         aria-labelledby="custom-tabs-one-home-tab">
-                                        <div class="row">
-                                            <div class="card-body table-responsive col-sm-12 p-0" style="height: 250px;">
-                                                <table class="table table-bordered table-head-fixed text-nowrap">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>STT</th>
-                                                            <th>Tên sản phẩm</th>
-                                                            <th>ĐVT</th>
-                                                            <th>Loại giá</th>
-                                                            <th>SL</th>
-                                                            <th>Giá gốc</th>
-                                                            <th>Giá khuyến mãi</th>
-                                                            <th>Giảm thêm</th>
-                                                            <th>Thành tiền</th>
-                                                            <th>Ghi chú</th>
-                                                            <th style="padding-right: 12px">
-                                                                <button th:if="${allowEditItem}" type="button" class="btn btn-sm btn-primary w-100" data-toggle="modal" data-target="#addProductModal" id="btnAddProduct">Thêm sản phẩm</button>
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr th:each="list, index : ${listOrderDetail}">
-                                                            <td th:text="${index.index + 1}" style="font-weight: bold"></td>
-                                                            <td>
-                                                                <a th:text="${list.productVariantDTO.variantName}"
-                                                                   th:href="@{/san-pham/variant/{id}(id=${list.productVariantDTO.id})}"></a>
-                                                            </td>
-                                                            <td th:text="${list.productVariantDTO.unitName}"></td>
-                                                            <td th:text="${list.priceType == 'L' ? 'Lẻ' : 'Sỉ'}"></td>
-                                                            <td th:text="${list.quantity}" class="text-right"></td>
-                                                            <td th:text="${list.priceOriginal != null} ? ${#numbers.formatDecimal (list.priceOriginal, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'" class="text-right"></td>
-                                                            <td th:text="${list.price != null} ? ${#numbers.formatDecimal (list.price, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'" class="text-right"></td>
-                                                            <td th:text="${#numbers.formatDecimal (list.extraDiscount, 0, 'COMMA', 0, 'NONE') + 'đ '}" class="text-right"></td>
-                                                            <td th:text="${list.price != null} ? ${#numbers.formatDecimal (list.price * list.quantity - list.extraDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'" class="text-right"></td>
-                                                            <td th:text="${list.note}"></td>
-                                                            <td>
-                                                                <button th:if="${allowEditItem}" type="button" class="btn btn-sm btn-success" data-toggle="modal" th:data-target="'#modalUpdateItems_' + ${list.id}">Cập nhật</button>
-                                                                <button th:if="${allowEditItem}" type="button" class="btn btn-sm btn-danger" data-toggle="modal" th:data-target="'#modalDeleteItems_' + ${list.id}">Xóa</button>
-                                                                <!--Modal update item-->
-                                                                <div th:replace="~{pages/sales/order/fragments/order-detail-fragments :: modalUpdateItem}"></div>
-                                                                <!--Modal delete item-->
-                                                                <div th:replace="~{pages/sales/order/fragments/order-detail-fragments :: modalDeleteItem}"></div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td colspan="8"></td>
-                                                            <td th:text="${orderDetail.totalAmountDiscount != null} ? ${#numbers.formatDecimal (orderDetail.totalAmountDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'" class="text-right font-weight-bold"></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="col-12">
-                                                <hr class="w-50 bg-info">
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <div class="card" style="height: 100%; display: flex; align-items: center; justify-content: center;">
-                                                    <div class="card-body p-0">
-                                                        <div class="text-center">
-                                                            <img th:src="@{'/' + ${orderDetail.qrCode}}" class="img-fluid" alt="Qr code"
-                                                                 style="width: 100%; border-radius: 5px; margin: auto">
-                                                        </div>
-                                                        <p class="text-muted text-center">Mã đơn</p>
-                                                        <p class="text-muted text-center" th:text="${orderDetail.code}"></p>
-                                                    </div>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Small boxes (Stat box) -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card card-light" style="min-height: 605px">
+                                <div class="card-header">
+                                    <ul class="nav nav-tabs"
+                                        id="custom-tabs-one-tab"
+                                        role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active"
+                                               id="THONG_TIN_TAB" href="#THONG_TIN"
+                                               data-toggle="pill" role="tab" aria-selected="true"
+                                               style="font-weight: bold">Thông tin chung
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link"
+                                               id="THANH_TOAN_TAB" href="#THANH_TOAN_AND_XUAT_KHO"
+                                               data-toggle="pill" role="tab" aria-selected="true"
+                                               style="font-weight: bold">Thanh toán và xuất kho
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!--END CARD HEADER-->
+                                <!--START CARD BODY-->
+                                <div class="card-body">
+                                    <div class="tab-content" id="tabContent">
+                                        <div class="tab-pane fade show active" id="THONG_TIN" role="tabpanel"
+                                             aria-labelledby="custom-tabs-one-home-tab">
+                                            <div class="row">
+                                                <div class="card-body table-responsive col-sm-12 p-0" style="height: 250px;">
+                                                    <table class="table table-bordered table-head-fixed text-nowrap">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>STT</th>
+                                                                <th>Tên sản phẩm</th>
+                                                                <th>ĐVT</th>
+                                                                <th>Loại giá</th>
+                                                                <th>SL</th>
+                                                                <th>Giá gốc</th>
+                                                                <th>Giá khuyến mãi</th>
+                                                                <th>Giảm thêm</th>
+                                                                <th>Thành tiền</th>
+                                                                <th>Ghi chú</th>
+                                                                <th style="padding-right: 12px">
+                                                                    <button th:if="${allowEditItem}" type="button" class="btn btn-sm btn-primary w-100" data-toggle="modal" data-target="#addProductModal" id="btnAddProduct">Thêm sản phẩm</button>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr th:each="list, index : ${listOrderDetail}">
+                                                                <td th:text="${index.index + 1}" style="font-weight: bold"></td>
+                                                                <td>
+                                                                    <a th:text="${list.productVariantDTO.variantName}"
+                                                                       th:href="@{/san-pham/variant/{id}(id=${list.productVariantDTO.id})}"></a>
+                                                                </td>
+                                                                <td th:text="${list.productVariantDTO.unitName}"></td>
+                                                                <td th:text="${list.priceType == 'L' ? 'Lẻ' : 'Sỉ'}"></td>
+                                                                <td th:text="${list.quantity}" class="text-right"></td>
+                                                                <td th:text="${list.priceOriginal != null} ? ${#numbers.formatDecimal (list.priceOriginal, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'" class="text-right"></td>
+                                                                <td th:text="${list.price != null} ? ${#numbers.formatDecimal (list.price, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'" class="text-right"></td>
+                                                                <td th:text="${#numbers.formatDecimal (list.extraDiscount, 0, 'COMMA', 0, 'NONE') + 'đ '}" class="text-right"></td>
+                                                                <td th:text="${list.price != null} ? ${#numbers.formatDecimal (list.price * list.quantity - list.extraDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'" class="text-right"></td>
+                                                                <td th:text="${list.note}"></td>
+                                                                <td>
+                                                                    <button th:if="${allowEditItem}" type="button" class="btn btn-sm btn-success" data-toggle="modal" th:data-target="'#modalUpdateItems_' + ${list.id}">Cập nhật</button>
+                                                                    <button th:if="${allowEditItem}" type="button" class="btn btn-sm btn-danger" data-toggle="modal" th:data-target="'#modalDeleteItems_' + ${list.id}">Xóa</button>
+                                                                    <!--Modal update item-->
+                                                                    <div th:replace="~{pages/sales/order/fragments/order-detail-fragments :: modalUpdateItem}"></div>
+                                                                    <!--Modal delete item-->
+                                                                    <div th:replace="~{pages/sales/order/fragments/order-detail-fragments :: modalDeleteItem}"></div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="8"></td>
+                                                                <td th:text="${orderDetail.totalAmountDiscount != null} ? ${#numbers.formatDecimal (orderDetail.totalAmountDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'" class="text-right font-weight-bold"></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
-                                            </div>
-                                            <div class="col-sm-6 pt-0 pr-3 pb-0 pl-3" style="border-bottom: 0">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <div class="row">
-                                                            <div class="col-12 row">
-                                                                <label class="col-3">Khách hàng</label>
-                                                                <span class="col-9 p-0" th:text="${orderDetail.receiverName}"></span>
+                                                <div class="col-12">
+                                                    <hr class="w-50 bg-info">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <div class="card" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                                                        <div class="card-body p-0">
+                                                            <div class="text-center">
+                                                                <img th:src="@{'/' + ${orderDetail.qrCode}}" class="img-fluid" alt="Qr code"
+                                                                     style="width: 100%; border-radius: 5px; margin: auto">
                                                             </div>
-                                                            <div class="col-12 row"><hr class="w-100"></div>
-                                                            <div class="col-6 row">
-                                                                <label class="col-6">Số điện thoại</label>
-                                                                <span class="col-6" th:text="${orderDetail.receiverPhone}"></span>
-                                                            </div>
-                                                            <div class="col-6 row">
-                                                                <label class="col-6">Email</label>
-                                                                <span class="col-6" th:text="${orderDetail.receiverEmail}"></span>
-                                                            </div>
-                                                            <div class="col-12 row"><hr class="w-100"></div>
-                                                            <div class="col-12 row">
-                                                                <label class="col-3">Địa chỉ</label>
-                                                                <span class="col-9 p-0" th:text="${orderDetail.receiverAddress}"></span>
-                                                            </div>
-                                                            <div class="col-12 row"><hr class="w-100"></div>
-                                                            <div class="col-6 row">
-                                                                <label class="col-6">Thời gian mua</label>
-                                                                <span class="col-6 p-0" id="orderTime"></span>
-                                                            </div>
-                                                            <div class="col-6 row">
-                                                                <label class="col-6">Kênh bán hàng</label>
-                                                                <span class="col-6 p-0" th:text="${orderDetail.salesChannelName}"></span>
-                                                            </div>
-                                                            <div class="col-12 row"><hr class="w-100"></div>
-                                                            <div class="col-12 row">
-                                                                <label class="col-3">Ghi chú</label>
-                                                                <textarea class="form-control col-9 p-0" required rows="3" id="noteField" th:text="${orderDetail.note}"></textarea>
-                                                            </div>
+                                                            <p class="text-muted text-center">Mã đơn</p>
+                                                            <p class="text-muted text-center" th:text="${orderDetail.code}"></p>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="card-footer col-sm-4 p-0">
-                                                <table class="table">
-                                                    <tbody>
-                                                        <tr>
-                                                            <th>Số lượng sản phẩm</th>
-                                                            <td th:text="${orderDetail.totalProduct}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>Coupon code</th>
-                                                            <td th:text="${orderDetail.couponCode}"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>Giảm giá</th>
-                                                            <td th:text="${orderDetail.amountDiscount != null} ? ${#numbers.formatDecimal (orderDetail.amountDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>Phí ship</th>
-                                                            <td>0</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>Tổng phải thu</th>
-                                                            <td th:text="${orderDetail.totalAmountDiscount != null} ? ${#numbers.formatDecimal (orderDetail.totalAmountDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>Trạng thái đơn hàng</th>
-                                                            <td class="form-group">
-                                                                <select class="custom-select" id="orderStatusField">
-                                                                    <option th:each="d : ${orderStatus}" th:value="${d.key}" th:text="${d.value}"></option>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="col-sm-12">
-                                                <hr>
-                                                <div class="row justify-content-between">
-                                                    <div class="col-4" style="display: flex; align-items: center"></div>
-                                                    <div class="col-4 text-right">
-                                                        <button th:if="${allowEditGeneral}" type="button" class="btn btn-success" id="btnUpdateOrder">Cập nhật</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!--END TAB THÔNG TIN ĐƠN HÀNG-->
-                                    <!--START TAB LỊCH SỬ THANH TOÁN-->
-                                    <div class="tab-pane fade" id="THANH_TOAN_AND_XUAT_KHO" role="tabpanel" aria-labelledby="custom-tabs-one-profile-tab">
-                                        <div class="row">
-                                            <div class="col-4">
-                                                <div class="row" style="height: 150px">
-                                                    <div class="col-12"><label class="mr-1">Thời gian thanh toán:</label><span id="paymentTimeField" th:if="${orderDetail.paymentTime != null}">[[${orderDetail.paymentTime}]]</span></div>
-                                                    <div class="col-12"><label class="mr-1">Hình thức thanh toán:</label> [[${orderDetail.paymentMethod.name}]]</div>
-                                                    <div class="col-12"><label class="mr-1">Số tiền thanh toán:</label> [[${orderDetail.paymentAmount != null} ? ${#numbers.formatDecimal (orderDetail.paymentAmount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '']]</div>
-                                                    <div class="col-12"><label class="mr-1">Ghi chú:</label> [[${orderDetail.paymentNote}]]</div>
-                                                    <div class="col-12"><label class="mr-1">Trạng thái thanh toán:</label> [[${orderDetail.paymentStatus ? 'Đã thanh toán' : 'Chưa thanh toán'}]]</div>
-                                                </div>
-                                                <hr>
-                                                <div class="row justify-content-between">
-                                                    <div class="col-2" style="display: flex; align-items: center"></div>
-                                                    <div class="col-10 text-right">
-                                                        <a class="btn btn-sm btn-info btn-print-invoice" th:orderId="${orderDetailId}"><i class="fa-solid fa-print"></i></a>
-                                                        <button class="btn btn-sm btn-success" th:if="${allowDoPay}" type="button" id="btnDoPay">
-                                                            <i class="fa-solid fa-check mr-1"></i> Confirm payment
-                                                        </button>
-
-                                                        <!--POPUP THANH TOÁN-->
-                                                        <div class="modal fade" id="modalThanhToan">
-                                                            <div class="modal-dialog">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <strong class="modal-title">Thanh toán đơn hàng</strong>
-                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                    </div>
-                                                                    <div class="modal-body text-left">
-                                                                        <div class="form-group row">
-                                                                            <span class="col-5" style="display: flex; align-items: center">Thời gian thanh toán</span>
-                                                                            <div class="input-group date col-7" id="reservationdatetime" data-target-input="nearest">
-                                                                                <input type="text" class="form-control datetimepicker-input" data-target="#reservationdatetime" id="paymentTimeField_DoPay" required/>
-                                                                                <div class="input-group-append" data-target="#reservationdatetime" data-toggle="datetimepicker">
-                                                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="form-group row">
-                                                                            <span class="col-5" style="display: flex; align-items: center">Hình thức thanh toán</span>
-                                                                            <select class="custom-select col-7" data-placeholder="Chọn hình thức thanh toán" id="paymentMethodField_DoPay" required>
-                                                                                <option th:each="payType : ${listPaymentMethod}"
-                                                                                        th:value="${payType.id}"
-                                                                                        th:text="${payType.name}">
-                                                                                </option>
-                                                                            </select>
-                                                                        </div>
-                                                                        <div class="form-group row">
-                                                                            <span class="col-5" style="display: flex; align-items: center">Số tiền thanh toán</span>
-                                                                            <input class="form-control col-7" id="paymentAmountField_DoPay" type="number">
-                                                                        </div>
-                                                                        <div class="form-group row">
-                                                                            <span class="col-5" style="display: flex; align-items: center">Ghi chú</span>
-                                                                            <textarea class="form-control col-7" id="paymentNoteField_doPay" rows="3"></textarea>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="modal-footer justify-content-end">
-                                                                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Hủy</button>
-                                                                        <button type="button" class="btn btn-sm btn-primary" id="btnDoPaySubmit" th:orderId="${orderDetail.id}">Đồng ý</button>
-                                                                    </div>
+                                                <div class="col-sm-6 pt-0 pr-3 pb-0 pl-3" style="border-bottom: 0">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="row">
+                                                                <div class="col-12 row">
+                                                                    <label class="col-3">Khách hàng</label>
+                                                                    <span class="col-9 p-0" th:text="${orderDetail.receiverName}"></span>
+                                                                </div>
+                                                                <div class="col-12 row"><hr class="w-100"></div>
+                                                                <div class="col-6 row">
+                                                                    <label class="col-6">Số điện thoại</label>
+                                                                    <span class="col-6" th:text="${orderDetail.receiverPhone}"></span>
+                                                                </div>
+                                                                <div class="col-6 row">
+                                                                    <label class="col-6">Email</label>
+                                                                    <span class="col-6" th:text="${orderDetail.receiverEmail}"></span>
+                                                                </div>
+                                                                <div class="col-12 row"><hr class="w-100"></div>
+                                                                <div class="col-12 row">
+                                                                    <label class="col-3">Địa chỉ</label>
+                                                                    <span class="col-9 p-0" th:text="${orderDetail.receiverAddress}"></span>
+                                                                </div>
+                                                                <div class="col-12 row"><hr class="w-100"></div>
+                                                                <div class="col-6 row">
+                                                                    <label class="col-6">Thời gian mua</label>
+                                                                    <span class="col-6 p-0" id="orderTime"></span>
+                                                                </div>
+                                                                <div class="col-6 row">
+                                                                    <label class="col-6">Kênh bán hàng</label>
+                                                                    <span class="col-6 p-0" th:text="${orderDetail.salesChannelName}"></span>
+                                                                </div>
+                                                                <div class="col-12 row"><hr class="w-100"></div>
+                                                                <div class="col-12 row">
+                                                                    <label class="col-3">Ghi chú</label>
+                                                                    <textarea class="form-control col-9 p-0" required rows="3" id="noteField" th:text="${orderDetail.note}"></textarea>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <!--END POPUP THANH TOÁN-->
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-1"></div>
-                                            <div class="col-7">
-                                                <div class="row">
-                                                    <div class="card-body table-responsive col-sm-12 p-0" style="height: 150px;">
-                                                        <table class="table table-head-fixed text-nowrap">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Tên</th>
-                                                                    <th>Người xuất</th>
-                                                                    <th>Thời gian xuất</th>
-                                                                    <th>Ghi chú</th>
-                                                                    <th>Trạng thái</th>
-                                                                    <th>Thao tác</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody id="tableContentTicket"></tbody>
-                                                        </table>
+                                                <div class="card-footer col-sm-4 p-0">
+                                                    <table class="table">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th>Số lượng sản phẩm</th>
+                                                                <td th:text="${orderDetail.totalProduct}"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Coupon code</th>
+                                                                <td th:text="${orderDetail.couponCode}"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Giảm giá</th>
+                                                                <td th:text="${orderDetail.amountDiscount != null} ? ${#numbers.formatDecimal (orderDetail.amountDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Phí ship</th>
+                                                                <td>0</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Tổng phải thu</th>
+                                                                <td th:text="${orderDetail.totalAmountDiscount != null} ? ${#numbers.formatDecimal (orderDetail.totalAmountDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '-'"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Trạng thái đơn hàng</th>
+                                                                <td class="form-group">
+                                                                    <select class="custom-select" id="orderStatusField">
+                                                                        <option th:each="d : ${orderStatus}" th:value="${d.key}" th:text="${d.value}"></option>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <hr>
+                                                    <div class="row justify-content-end">
+                                                        <button type="button" class="btn btn-sm btn-warning mr-2" data-toggle="modal" data-target="#mdlReturns">Returns</button>
+                                                        <button type="button" class="btn btn-sm btn-success" id="btnUpdateOrder" th:if="${allowEditGeneral}">Update</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        <!--END TAB THÔNG TIN ĐƠN HÀNG-->
+                                        <!--START TAB LỊCH SỬ THANH TOÁN-->
+                                        <div class="tab-pane fade" id="THANH_TOAN_AND_XUAT_KHO" role="tabpanel" aria-labelledby="custom-tabs-one-profile-tab">
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <div class="row" style="height: 150px">
+                                                        <div class="col-12"><label class="mr-1">Thời gian thanh toán:</label><span id="paymentTimeField" th:if="${orderDetail.paymentTime != null}">[[${orderDetail.paymentTime}]]</span></div>
+                                                        <div class="col-12"><label class="mr-1">Hình thức thanh toán:</label> [[${orderDetail.paymentMethod.name}]]</div>
+                                                        <div class="col-12"><label class="mr-1">Số tiền thanh toán:</label> [[${orderDetail.paymentAmount != null} ? ${#numbers.formatDecimal (orderDetail.paymentAmount, 0, 'COMMA', 0, 'NONE')} + ' đ' : '']]</div>
+                                                        <div class="col-12"><label class="mr-1">Ghi chú:</label> [[${orderDetail.paymentNote}]]</div>
+                                                        <div class="col-12"><label class="mr-1">Trạng thái thanh toán:</label> [[${orderDetail.paymentStatus ? 'Đã thanh toán' : 'Chưa thanh toán'}]]</div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="row justify-content-between">
+                                                        <div class="col-2" style="display: flex; align-items: center"></div>
+                                                        <div class="col-10 text-right">
+                                                            <a class="btn btn-sm btn-info btn-print-invoice" th:orderId="${orderDetailId}"><i class="fa-solid fa-print"></i></a>
+                                                            <button class="btn btn-sm btn-success" th:if="${allowDoPay}" type="button" id="btnDoPay">
+                                                                <i class="fa-solid fa-check mr-1"></i> Confirm payment
+                                                            </button>
+
+                                                            <!--POPUP THANH TOÁN-->
+                                                            <div class="modal fade" id="modalThanhToan">
+                                                                <div class="modal-dialog">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <strong class="modal-title">Thanh toán đơn hàng</strong>
+                                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                                        </div>
+                                                                        <div class="modal-body text-left">
+                                                                            <div class="form-group row">
+                                                                                <span class="col-5" style="display: flex; align-items: center">Thời gian thanh toán</span>
+                                                                                <div class="input-group date col-7" id="reservationdatetime" data-target-input="nearest">
+                                                                                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdatetime" id="paymentTimeField_DoPay" required/>
+                                                                                    <div class="input-group-append" data-target="#reservationdatetime" data-toggle="datetimepicker">
+                                                                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group row">
+                                                                                <span class="col-5" style="display: flex; align-items: center">Hình thức thanh toán</span>
+                                                                                <select class="custom-select col-7" data-placeholder="Chọn hình thức thanh toán" id="paymentMethodField_DoPay" required>
+                                                                                    <option th:each="payType : ${listPaymentMethod}"
+                                                                                            th:value="${payType.id}"
+                                                                                            th:text="${payType.name}">
+                                                                                    </option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="form-group row">
+                                                                                <span class="col-5" style="display: flex; align-items: center">Số tiền thanh toán</span>
+                                                                                <input class="form-control col-7" id="paymentAmountField_DoPay" type="number">
+                                                                            </div>
+                                                                            <div class="form-group row">
+                                                                                <span class="col-5" style="display: flex; align-items: center">Ghi chú</span>
+                                                                                <textarea class="form-control col-7" id="paymentNoteField_doPay" rows="3"></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="modal-footer justify-content-end">
+                                                                            <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Hủy</button>
+                                                                            <button type="button" class="btn btn-sm btn-primary" id="btnDoPaySubmit" th:orderId="${orderDetail.id}">Đồng ý</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!--END POPUP THANH TOÁN-->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-7">
+                                                    <div class="row">
+                                                        <div class="card-body table-responsive col-sm-12 p-0" style="height: 150px;">
+                                                            <table class="table table-head-fixed text-nowrap">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Tên</th>
+                                                                        <th>Người xuất</th>
+                                                                        <th>Thời gian xuất</th>
+                                                                        <th>Ghi chú</th>
+                                                                        <th>Trạng thái</th>
+                                                                        <th>Thao tác</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="tableContentTicket"></tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--END CARD BODY-->
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="addProductModal">
+                            <div class="modal-dialog">
+                                <form class="row mt-3" th:action="@{/sls/order/{orderId}/item/add(orderId=${orderDetailId})}" method="POST">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <strong class="modal-title">Thêm sản phẩm</strong>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label>Chọn sản phẩm</label>
+                                                        <select class="form-control select2" multiple="multiple" data-placeholder="Chọn sản phẩm" style="width: 100%;"
+                                                                id="selectedProductField" name="productVariantSelectedId"></select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer justify-content-end">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                                            <button type="submit" class="btn btn-primary">Lưu</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="mdlReturns">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <strong class="modal-title">Returns order</strong>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    </div>
+                                    <div class="modal-body table-responsive p-0" style="max-height: 350px">
+                                        <table class="table table-head-fixed text-nowrap" id="tblReturnsOrderSelecting">
+                                            <thead>
+                                                <tr>
+                                                    <th>No.</th>
+                                                    <th></th>
+                                                    <th>Item name</th>
+                                                    <th>Quantity</th>
+                                                    <th>Note</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="i, index : ${listOrderDetail}">
+                                                    <th:block th:if="${i.isReturned == false}">
+                                                        <td class="align-middle" th:text="${index.index + 1}"></td>
+                                                        <td class="align-middle"><input type="checkbox" th:itemId="${i.id}" name="isSelected"/></td>
+                                                        <td class="align-middle"><a th:text="${i.productVariantDTO.variantName}"></a></td>
+                                                        <td class="w-25"><input type="number" class="form-control" th:value="${i.quantity}" name="quantity"/></td>
+                                                        <td><input type="text" class="form-control" name="note"></td>
+                                                    </th:block>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer justify-content-end">
+                                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-sm btn-primary" id="btnConfirmReturnsOrder">Confirm</button>
                                     </div>
                                 </div>
                             </div>
-                            <!--END CARD BODY-->
-                        </div>
-                    </div>
-
-                    <div class="modal fade" id="addProductModal">
-                        <div class="modal-dialog">
-                            <form class="row mt-3" th:action="@{/sls/order/{orderId}/item/add(orderId=${orderDetailId})}" method="POST">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <strong class="modal-title">Thêm sản phẩm</strong>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="form-group">
-                                                    <label>Chọn sản phẩm</label>
-                                                    <select class="form-control select2" multiple="multiple" data-placeholder="Chọn sản phẩm" style="width: 100%;"
-                                                            id="selectedProductField" name="productVariantSelectedId"></select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer justify-content-end">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
-                                        <button type="submit" class="btn btn-primary">Lưu</button>
-                                    </div>
-                                </div>
-                            </form>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
 
-    <div th:replace="~{modal_fragments :: dialog_modal}"></div>
-    <div th:replace="~{modal_fragments :: confirm_modal}"></div>
+        <div th:replace="~{modal_fragments :: dialog_modal}"></div>
+        <div th:replace="~{modal_fragments :: confirm_modal}"></div>
 
-    <div th:replace="~{footer :: footer}"></div>
+        <div th:replace="~{footer :: footer}"></div>
 
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark"></aside>
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark"></aside>
 
-    <div th:replace="~{header :: scripts}"></div>
+        <div th:replace="~{header :: scripts}"></div>
 
-    <script>
-        $(function () {
-            //Date and time picker
-            $('#reservationdatetime').datetimepicker({icons: {time: 'far fa-clock'}});
-            //Timepicker
-            $('#timepicker').datetimepicker({
-                format: 'LT'
+        <script>
+            $(function () {
+                //Date and time picker
+                $('#reservationdatetime').datetimepicker({icons: {time: 'far fa-clock'}});
+                //Timepicker
+                $('#timepicker').datetimepicker({
+                    format: 'LT'
+                })
+
+                //Date range picker
+                $('#reservation').daterangepicker()
             })
+            let mvOrderId = [[${orderDetailId}]];
+            let mvOrderDetail = {};
+            let mvTicketExportTable= $("#tableContentTicket");
 
-            //Date range picker
-            $('#reservation').daterangepicker()
-        })
+            $(document).ready(function () {
+                setupSelectMultiple();
+                init();
+                loadOrderDetail();
+                doPay();
+                updateOrder();
+                loadTicketExportInfo();
+                loadItemsForSales();
 
-        let mvOrderDetail = {};
-        let mvTicketExportTable= $("#tableContentTicket");
-
-        $(document).ready(function () {
-            setupSelectMultiple();
-            init();
-            loadOrderDetail();
-            doPay();
-            updateOrder();
-            loadTicketExportInfo();
-            loadItemsForSales();
-
-            createListener();
-        });
-
-        function init() {
-            let rawPaymentTime = $('#paymentTimeField').text();
-            let formattedTime = moment(rawPaymentTime, "YYYY-MM-DD HH:mm:ss.S").format('DD/MM/YYYY HH:mm:ss');
-            $('#paymentTimeField').text(formattedTime);
-        }
-
-        function createListener() {
-            $(document).on("click", ".btn-print-invoice", function (e) {
-                e.preventDefault();
-                window.open(mvHostURL + "/sls/order/print-invoice/" + parseInt($(this).attr("orderId")), "_blank");
-            })
-        }
-
-        function loadOrderDetail() {
-            let apiURL = mvHostURLCallApi + "/sls/order/" + [[${orderDetailId}]];
-            $.get(apiURL, function (response) {
-                if (response.status === "OK") {
-                    mvOrderDetail = response.data;
-                    loadOrderInfoOnForm(mvOrderDetail);
-                }
-            }).fail(function () {
-                showErrorModal("Could not connect to the server");
+                createListener();
             });
-        }
 
-        function loadTicketExportInfo() {
-            $("#THANH_TOAN_TAB").on("click", function () {
-                if (mvOrderDetail.ticketExportId != null) {
-                    let apiURL = mvHostURLCallApi + "/stg/ticket-export/" + mvOrderDetail.ticketExportId;
-                    $.get(apiURL, function (response) {
-                        if (response.status === "OK") {
-                            setTicketExportTableValue(response.data);
-                        }
-                    }).fail(function (xhr) {
-                        showErrorModal($.parseJSON(xhr.responseText).message);
-                    });
-                }
-            })
-        }
+            function init() {
+                let rawPaymentTime = $('#paymentTimeField').text();
+                let formattedTime = moment(rawPaymentTime, "YYYY-MM-DD HH:mm:ss.S").format('DD/MM/YYYY HH:mm:ss');
+                $('#paymentTimeField').text(formattedTime);
+            }
 
-        function doPay() {
-            $("#btnDoPay").on("click", function () {
-                if (mvOrderDetail.paymentStatus === true) {
-                    showModalDialog("Thông báo", "Đơn hàng này đã được thanh toán!");
-                } else {
-                    $('#paymentAmountField_DoPay').val(mvOrderDetail.totalAmountDiscount);
-                    $("#modalThanhToan").modal();
-                }
-            })
+            function createListener() {
+                $(document).on("click", ".btn-print-invoice", function (e) {
+                    e.preventDefault();
+                    window.open(mvHostURL + "/sls/order/print-invoice/" + parseInt($(this).attr("orderId")), "_blank");
+                })
 
-            $("#btnDoPaySubmit").on("click", function(e) {
-                e.preventDefault();
-                let paymentTime = $('#paymentTimeField_DoPay').val();
-                let paymentMethod = $('#paymentMethodField_DoPay').val();
-                let paymentAmount= $('#paymentAmountField_DoPay').val();
-                let paymentNote = $('#paymentNoteField_doPay').val();
-                let apiURL = mvHostURLCallApi + "/sls/order/do-pay/" + $(this).attr("orderId");
-                let params = {paymentTime: paymentTime, paymentMethod: paymentMethod, paymentAmount:paymentAmount, paymentNote:paymentNote}
-                $.ajax({
-                    url: apiURL,
-                    type: 'PUT',
-                    data: params,
-                    success: function (response) {
-                        if (response.status === "OK") {
-                            alert("Payment success!")
-                            window.location.reload();
-                        }
-                    },
-                    error: function () {
-                        showErrorModal("Could not connect to the server");
-                    }
-                });
-            });
-        }
+                $("#btnConfirmReturnsOrder").on("click", function () {
+                    returnsOrder();
+                })
+            }
 
-        function updateOrder() {
-            $("#btnUpdateOrder").on("click", function () {
-                $(this).attr("actionType", "update");
-                $(this).attr("entityName", "order");
-                showConfirmModal($(this), "Cập nhật đơn hàng", "Bạn có chắc muốn cập nhật đơn hàng này?");
-                submitUpdate();
-            });
-        }
-
-        function submitUpdate() {
-            $("#yesButton").on("click", function () {
-                if ($(this).attr("actionType") === "update" && $(this).attr("entityName") === "order") {
-                    $.ajax({
-                        url: mvHostURLCallApi + "/sls/order/update/" + [[${orderDetailId}]],
-                        type: "PUT",
-                        contentType: "application/json",
-                        data: JSON.stringify(
-                            {
-                                note : $("#noteField").val(),
-                                orderStatus: $("#orderStatusField").val()
-                            }
-                        ),
-                        success: function (response, textStatus, jqXHR) {
-                            if (response.status === "OK") {
-                                alert("Cập nhật thành công!");
-                                window.location.reload();
-                            }
-                        },
-                        error: function (xhr, textStatus, errorThrown) {
-                            showErrorModal($.parseJSON(xhr.responseText).message);
-                        }
-                    });
-                    return
-                }
-            });
-        }
-
-        function setTicketExportTableValue(data) {
-            mvTicketExportTable.empty();
-            mvTicketExportTable.append(
-                '<tr>' +
-                    '<td><a href="/stg/ticket-export/' + data.id + '">' + data.title + '</a></td>' +
-                    '<td>' + data.exporter + '</td>' +
-                    '<td>' + data.exportTime + '</td>' +
-                    '<td>' + data.note + '</td>' +
-                    '<td>' + mvTicketExportStatus[data.status] + '</td>' +
-                    '<td></td>' +
-                '<tr>'
-            );
-        }
-
-        function loadOrderInfoOnForm(orderDetail) {
-            $("#orderTime").text(orderDetail.orderTime);
-        }
-
-        function loadItemsForSales() {
-            $('#btnAddProduct').on('click', function () {
-                let productVariantSelect = $('#selectedProductField');
-                productVariantSelect.empty();
-                $.get(mvHostURL + '/sls/order/cart/product/available-sales', function (response) {
+            function loadOrderDetail() {
+                let apiURL = api.getOrder([[${orderDetailId}]]);
+                $.get(apiURL, function (response) {
                     if (response.status === "OK") {
-                        $.each(response.data, function (index, d) {
-                            productVariantSelect.append(`<option value="${d.itemId}">${d.itemName}</option>`);
-                        });
+                        mvOrderDetail = response.data;
+                        loadOrderInfoOnForm(mvOrderDetail);
                     }
                 }).fail(function () {
                     showErrorModal("Could not connect to the server");
                 });
-            });
-        }
-    </script>
-</div>
+            }
 
+            function loadTicketExportInfo() {
+                $("#THANH_TOAN_TAB").on("click", function () {
+                    if (mvOrderDetail.ticketExportId != null) {
+                        let apiURL = mvHostURLCallApi + "/stg/ticket-export/" + mvOrderDetail.ticketExportId;
+                        $.get(apiURL, function (response) {
+                            if (response.status === "OK") {
+                                setTicketExportTableValue(response.data);
+                            }
+                        }).fail(function (xhr) {
+                            showErrorModal($.parseJSON(xhr.responseText).message);
+                        });
+                    }
+                })
+            }
+
+            function doPay() {
+                $("#btnDoPay").on("click", function () {
+                    if (mvOrderDetail.paymentStatus === true) {
+                        showModalDialog("Thông báo", "Đơn hàng này đã được thanh toán!");
+                    } else {
+                        $('#paymentAmountField_DoPay').val(mvOrderDetail.totalAmountDiscount);
+                        $("#modalThanhToan").modal();
+                    }
+                })
+
+                $("#btnDoPaySubmit").on("click", function(e) {
+                    e.preventDefault();
+                    let paymentTime = $('#paymentTimeField_DoPay').val();
+                    let paymentMethod = $('#paymentMethodField_DoPay').val();
+                    let paymentAmount= $('#paymentAmountField_DoPay').val();
+                    let paymentNote = $('#paymentNoteField_doPay').val();
+                    let apiURL = mvHostURLCallApi + "/sls/order/do-pay/" + $(this).attr("orderId");
+                    let params = {paymentTime: paymentTime, paymentMethod: paymentMethod, paymentAmount:paymentAmount, paymentNote:paymentNote}
+                    $.ajax({
+                        url: apiURL,
+                        type: 'PUT',
+                        data: params,
+                        success: function (response) {
+                            if (response.status === "OK") {
+                                alert("Payment success!")
+                                window.location.reload();
+                            }
+                        },
+                        error: function () {
+                            showErrorModal("Could not connect to the server");
+                        }
+                    });
+                });
+            }
+
+            function updateOrder() {
+                $("#btnUpdateOrder").on("click", function () {
+                    $(this).attr("actionType", "update");
+                    $(this).attr("entityName", "order");
+                    showConfirmModal($(this), "Cập nhật đơn hàng", "Bạn có chắc muốn cập nhật đơn hàng này?");
+                    submitUpdate();
+                });
+            }
+
+            function submitUpdate() {
+                $("#yesButton").on("click", function () {
+                    if ($(this).attr("actionType") === "update" && $(this).attr("entityName") === "order") {
+                        $.ajax({
+                            url: mvHostURLCallApi + "/sls/order/update/" + [[${orderDetailId}]],
+                            type: "PUT",
+                            contentType: "application/json",
+                            data: JSON.stringify(
+                                {
+                                    note : $("#noteField").val(),
+                                    orderStatus: $("#orderStatusField").val()
+                                }
+                            ),
+                            success: function (response, textStatus, jqXHR) {
+                                if (response.status === "OK") {
+                                    alert("Cập nhật thành công!");
+                                    window.location.reload();
+                                }
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+                                showErrorModal($.parseJSON(xhr.responseText).message);
+                            }
+                        });
+                    }
+                });
+            }
+
+            function setTicketExportTableValue(data) {
+                mvTicketExportTable.empty();
+                mvTicketExportTable.append(
+                    '<tr>' +
+                        '<td><a href="/stg/ticket-export/' + data.id + '">' + data.title + '</a></td>' +
+                        '<td>' + data.exporter + '</td>' +
+                        '<td>' + data.exportTime + '</td>' +
+                        '<td>' + data.note + '</td>' +
+                        '<td>' + mvTicketExportStatus[data.status] + '</td>' +
+                        '<td></td>' +
+                    '<tr>'
+                );
+            }
+
+            function loadOrderInfoOnForm(orderDetail) {
+                $("#orderTime").text(orderDetail.orderTime);
+            }
+
+            function loadItemsForSales() {
+                $('#btnAddProduct').on('click', function () {
+                    let productVariantSelect = $('#selectedProductField');
+                    productVariantSelect.empty();
+                    $.get(mvHostURL + '/sls/order/cart/product/available-sales', function (response) {
+                        if (response.status === "OK") {
+                            $.each(response.data, function (index, d) {
+                                productVariantSelect.append(`<option value="${d.itemId}">${d.itemName}</option>`);
+                            });
+                        }
+                    }).fail(function () {
+                        showErrorModal("Could not connect to the server");
+                    });
+                });
+            }
+
+            function returnsOrder() {
+                let selectedItems = [];
+                $("#tblReturnsOrderSelecting input[name='isSelected']:checked").each(function () {
+                    let row = $(this).closest("tr");
+                    selectedItems.push({
+                        itemId: $(this).attr("itemId"),
+                        quantity: row.find("input[name='quantity']").val(),
+                        reason: row.find("input[name='note']").val()
+                    });
+                });
+
+                if (selectedItems.length === 0) {
+                    alert("No item was selected!");
+                    return;
+                }
+
+                let apiURL = api.returnOrder(mvOrderId);
+                let body = {
+                    orderId: mvOrderId,
+                    //refundMethod: null,
+                    //refundAmount: null,
+                    //isRefunded: true,
+                    //status: false,
+                    //staffId,
+                    items: selectedItems
+                }
+                $.ajax({
+                    url: apiURL,
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(body),
+                    success: function (response) {
+                        if (response.status === "OK") {
+                            alert('Your order has been returned!')
+                            window.location.reload();
+                        }
+                    },
+                    error: function (xhr) {
+                        alert("Error: " + $.parseJSON(xhr.responseText).message);
+                    }
+                });
+            }
+        </script>
+    </div>
 </body>
-
 </html>

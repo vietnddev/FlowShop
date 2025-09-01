@@ -2,13 +2,13 @@ package com.flowiee.pms.modules.sales.model;
 
 import com.flowiee.pms.common.enumeration.OrderStatus;
 import com.flowiee.pms.common.model.BaseParameter;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 public class OrderReq extends BaseParameter {

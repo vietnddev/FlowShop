@@ -1,5 +1,5 @@
 function loadOrders(pageSize, pageNum) {
-    let apiURL = mvHostURLCallApi + '/sls/order/all';
+    let apiURL = api.getOrders();
     let params = {
         pageSize: pageSize,
         pageNum: pageNum,
@@ -45,8 +45,8 @@ function loadOrders(pageSize, pageNum) {
                         <td class="text-right">${formatCurrency(d.totalAmount)}</td>
                         <td class="text-right">${d.items.length} <i class="fa-solid fa-caret-down ml-1" data-widget="expandable-table"></i></td>
                         <td>${d.salesChannelName}</td>                        
-                        <td>-Paument status-</td>
-                        <td>-Delivery type-</td>
+                        <td>${d.paymentStatus === true ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
+                        <td>${d.deliveryMethod.name}</td>
                         <td>${d.orderStatusName}</td>
                         <td><a class="btn btn-sm btn-info btn-print-invoice" href="/sls/order/print-invoice/${d.id}" orderId="${d.id}"><i class="fa-solid fa-print"></i></a></td>
                     </tr>

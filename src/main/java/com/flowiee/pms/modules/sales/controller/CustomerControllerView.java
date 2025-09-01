@@ -66,8 +66,6 @@ public class CustomerControllerView extends BaseController {
         });
 
         OrderReq lvOrderReq = OrderReq.builder().customerId(customerId).build();
-        lvOrderReq.setPageNum(-1);
-        lvOrderReq.setPageSize(-1);
 
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_CUSTOMER_DETAIL.getTemplate());
         modelAndView.addObject("customerDetail", customerDTO);

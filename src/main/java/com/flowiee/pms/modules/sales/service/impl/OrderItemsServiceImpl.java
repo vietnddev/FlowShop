@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -185,5 +186,11 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         } catch (RuntimeException ex) {
             throw new AppException(ex);
         }
+    }
+
+    @Transactional
+    @Override
+    public void updateReturnsStatus(long pItemId, boolean pIsReturned) {
+        mvOrderDetailRepository.updateReturnsStatus(pItemId, pIsReturned);
     }
 }

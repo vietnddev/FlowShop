@@ -1,19 +1,18 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.modules.sales.dto.LoyaltyProgramDTO;
 import com.flowiee.pms.modules.sales.service.LoyaltyProgramService;
 import com.flowiee.pms.modules.sales.repository.LoyaltyProgramRepository;
 import com.flowiee.pms.modules.sales.repository.LoyaltyTransactionRepository;
 import com.flowiee.pms.modules.sales.entity.*;
-import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.modules.sales.repository.CustomerRepository;
 import com.flowiee.pms.common.utils.OrderUtils;
 import com.flowiee.pms.common.enumeration.LoyaltyTransactionType;
 import com.flowiee.pms.common.enumeration.MessageCode;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -121,22 +120,18 @@ public class LoyaltyProgramServiceImpl extends BaseService<LoyaltyProgram, Loyal
     @Transactional
     @Override
     public void accumulatePoints(Order pOrder, Long pProgramId) {
-        LoyaltyProgram lvLoyaltyProgram = getProgramForAccumulatePoints(pProgramId);
-        if (lvLoyaltyProgram == null)
-            throw new BadRequestException("No loyalty program applied!");
-
-        Optional<Customer> lvCustomerOpt = mvCustomerRepository.findById(pOrder.getCustomer().getId());
-        if (lvCustomerOpt.isEmpty())
-            throw new ResourceNotFoundException("Customer not found!");
+        LoyaltyProgram lvLoyaltyProgram = pProgramId != null ? getProgramForAccumulatePoints(pProgramId) : mvLoyaltyProgramRepository.findDefaultProgram();
+        if (lvLoyaltyProgram == null) {
+            throw new BadRequestException("No valid loyalty program!");
+        }
 
         BigDecimal lvTotalAmount = OrderUtils.calAmount(pOrder.getListOrderDetail(), pOrder.getAmountDiscount());
         int lvPoints = getPoints(lvTotalAmount, lvLoyaltyProgram);
-        if (lvPoints <= 0)
-            throw new BadRequestException("Points must be greater than zero!");
+        if (lvPoints < 0)
+            throw new BadRequestException("Points must not be less than zero!");
 
-        Customer lvCustomer = lvCustomerOpt.get();
-        lvCustomer.setBonusPoints(lvCustomer.getBonusPoints() + lvPoints);
-        mvCustomerRepository.save(lvCustomer);
+        Customer lvCustomer = pOrder.getCustomer();
+        mvCustomerRepository.updateBonusPoint(lvCustomer.getId(), lvCustomer.getBonusPoints() + lvPoints);
 
         LoyaltyTransaction transaction = new LoyaltyTransaction();
         transaction.setCustomer(lvCustomer);
@@ -153,15 +148,15 @@ public class LoyaltyProgramServiceImpl extends BaseService<LoyaltyProgram, Loyal
     }
 
     private int getPoints(BigDecimal orderValue, LoyaltyProgram program) {
-        BigDecimal lvMinApplyValue = program.getMinOrderValue();
+        BigDecimal lvMinApplyValue = CoreUtils.coalesce(program.getMinOrderValue(), BigDecimal.ZERO);
         BigDecimal lvMaxApplyValue = program.getMaxOrderValue();
         BigDecimal lvPointConversionRate = program.getPointConversionRate();
 
-//        if (orderValue.compareTo(lvMinApplyValue) >= 0 && (lvMaxApplyValue == null || orderValue.compareTo(lvMaxApplyValue) < 0)) {
-//            return orderValue.multiply(lvPointConversionRate).setScale(0, RoundingMode.HALF_UP).intValue();
-//        }
+        if (orderValue.compareTo(lvMinApplyValue) >= 0 && (lvMaxApplyValue == null || orderValue.compareTo(lvMaxApplyValue) < 0)) {
+            return orderValue.multiply(lvPointConversionRate).setScale(0, RoundingMode.HALF_UP).intValue();
+        }
 
-        return orderValue.multiply(lvPointConversionRate).setScale(0, RoundingMode.HALF_UP).intValue();
+        return 0;
     }
 
     @Transactional
@@ -185,5 +180,10 @@ public class LoyaltyProgramServiceImpl extends BaseService<LoyaltyProgram, Loyal
         // Deduct points
         lvCustomer.setBonusPoints(lvCustomer.getBonusPoints() - pointsToRedeem);
         mvCustomerRepository.save(lvCustomer);
+    }
+
+    @Override
+    public void revokePoints(Order order, int points) {
+
     }
 }

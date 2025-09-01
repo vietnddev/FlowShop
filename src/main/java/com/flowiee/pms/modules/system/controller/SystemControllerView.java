@@ -2,6 +2,8 @@ package com.flowiee.pms.modules.system.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
+import com.flowiee.pms.modules.staff.dto.AccountDTO;
+import com.flowiee.pms.modules.staff.service.AccountService;
 import com.flowiee.pms.modules.system.dto.SystemConfigDTO;
 import com.flowiee.pms.modules.system.service.ConfigService;
 import com.flowiee.pms.common.enumeration.Pages;
@@ -13,12 +15,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/sys")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class SystemControllerView extends BaseController {
     ConfigService configService;
+    AccountService accountService;
 
     @GetMapping("/notification")
     public ModelAndView getAllNotification() {
@@ -28,7 +33,10 @@ public class SystemControllerView extends BaseController {
     @GetMapping("/log")
     @PreAuthorize("@vldModuleSystem.readLog(true)")
     public ModelAndView showPageLog() {
-        return baseView(new ModelAndView(Pages.SYS_LOG.getTemplate()));
+        List<AccountDTO> lvAccounts = accountService.find();
+        ModelAndView modelAndView = new ModelAndView(Pages.SYS_LOG.getTemplate());
+        modelAndView.addObject("actors", lvAccounts);
+        return baseView(modelAndView);
     }
 
     @GetMapping("/config")

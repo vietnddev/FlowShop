@@ -139,7 +139,7 @@ public class ProductVariantController extends BaseController {
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public AppResponse<List<ProductVariantTempDTO>> getStorageHistoryOfProduct(@PathVariable("productVariantId") Long productVariantId) {
         try {
-            return AppResponse.success(mvProductVariantService.findStorageHistory(productVariantId));
+            return AppResponse.success(mvProductVariantService.findStorageHistoryByVariantId(productVariantId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product"), ex);
         }

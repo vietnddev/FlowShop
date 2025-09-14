@@ -115,6 +115,13 @@ function createListener() {
         let inputValue = formatUSCurrency($(this).val());
         $(this).val(inputValue);
     });
+
+    $(document).on('click', 'button[name="btnViewStorageHistory"]', function (e) {
+        e.preventDefault();
+        let productId = $(this).attr("productId");
+        loadStorageTransactionHistory(productId);
+        $("#storageHistoryModal").modal();
+    })
 }
 
 function addVariant() {
@@ -268,4 +275,29 @@ function postUpdatePrice(pVariantId, pPrice) {
     $("#pUP_CostPrice").text();
     $("#pUP_RetailPrice").text();
     $("#pUP_Confirm").attr("variantId", "0");
+}
+
+function loadStorageTransactionHistory(productId) {
+    let apiURL = mvHostURLCallApi + "/product/" + productId + "/storage-transaction";
+    let lvStorageTransactionTbl = $("#storageHistoryTbl");
+    lvStorageTransactionTbl.empty();
+    $.get(apiURL, function (response) {
+        if (response.status === "OK") {
+            $.each(response.data, function (index, d) {
+                lvStorageTransactionTbl.append(`
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${d.createdAt}</td>
+                        <td>${d.staff}</td>
+                        <td>${d.action}</td>
+                        <td>${d.variantCode}</td>
+                        <td>${d.changeQty}</td>
+                        <td>${d.storageQty}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                `);
+            });
+        }
+    });
 }

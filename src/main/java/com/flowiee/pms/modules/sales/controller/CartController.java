@@ -53,6 +53,13 @@ public class CartController extends BaseController {
         return AppResponse.success(mvCartService.delete(cartId));
     }
 
+    @PutMapping("/{cartId}/item/{itemId}")
+    @PreAuthorize("@vldModuleSales.insertOrder(true)")
+    public AppResponse<String> updateItem(@RequestBody ItemsDTO itemDto, @PathVariable("itemId") Long itemId) {
+        mvCartService.updateItemsOfCart(itemDto, itemId);
+        return AppResponse.success("Success");
+    }
+
     @DeleteMapping("/{cartId}/item/{itemId}")
     @PreAuthorize("@vldModuleSales.insertOrder(true)")
     public AppResponse<String> deleteItem(@PathVariable("cartId") Long cartId, @PathVariable("itemId") Long itemId) {

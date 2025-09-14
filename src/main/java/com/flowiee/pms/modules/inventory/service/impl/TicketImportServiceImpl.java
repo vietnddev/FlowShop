@@ -255,6 +255,7 @@ public class TicketImportServiceImpl implements TicketImportService {
                         .productVariant(lvProductDetail)
                         .quantity(defaultQuantity)
                         .storageQty(lvProductDetail.getStorageQty())
+                        .action(TicketImportAction.IMPORT_INTO_STORAGE.name())
                         .build());
                 listAdded.add(productVariantEximAdded);
             }

@@ -4,12 +4,13 @@ import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.security.UserSession;
-import com.flowiee.pms.modules.inventory.dto.StorageDTO;
-import com.flowiee.pms.modules.inventory.dto.TicketExportDTO;
+import com.flowiee.pms.modules.inventory.dto.*;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.ProductVariantExim;
+import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.modules.inventory.service.ProductHistoryService;
 import com.flowiee.pms.modules.inventory.service.ProductVariantService;
+import com.flowiee.pms.modules.inventory.service.StorageService;
 import com.flowiee.pms.modules.inventory.service.TicketExportService;
 import com.flowiee.pms.modules.sales.entity.OrderDetail;
 import com.flowiee.pms.common.exception.EntityNotFoundException;
@@ -17,7 +18,6 @@ import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.inventory.entity.TicketExport;
 import com.flowiee.pms.common.exception.BadRequestException;
-import com.flowiee.pms.modules.inventory.dto.ProductHistoryDTO;
 import com.flowiee.pms.modules.inventory.repository.ProductDetailTempRepository;
 import com.flowiee.pms.modules.sales.repository.OrderRepository;
 import com.flowiee.pms.modules.inventory.repository.TicketExportRepository;
@@ -52,13 +52,14 @@ public class TicketExportServiceImpl extends BaseService<TicketExport, TicketExp
     ProductDetailTempRepository mvProductVariantTempRepository;
     UserSession mvUserSession;
     SystemLogService systemLogService;
+    StorageService mvStorageService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     public TicketExportServiceImpl(TicketExportRepository pTicketExportRepository, OrderRepository pOrderRepository,
                                    OrderItemsService pOrderItemsService, ProductHistoryService pProductHistoryService,
                                    ProductVariantService pProductVariantService, ProductDetailTempRepository pProductVariantTempRepository,
-                                   UserSession pUserSession, SystemLogService pSystemLogService) {
+                                   UserSession pUserSession, SystemLogService pSystemLogService, StorageService pStorageService) {
         super(TicketExport.class, TicketExportDTO.class, pTicketExportRepository);
         this.mvOrderRepository = pOrderRepository;
         this.mvOrderItemsService = pOrderItemsService;
@@ -68,6 +69,7 @@ public class TicketExportServiceImpl extends BaseService<TicketExport, TicketExp
         this.mvProductVariantTempRepository = pProductVariantTempRepository;
         this.mvUserSession = pUserSession;
         this.systemLogService = pSystemLogService;
+        this.mvStorageService = pStorageService;
     }
 
     @Override
@@ -110,11 +112,11 @@ public class TicketExportServiceImpl extends BaseService<TicketExport, TicketExp
         ticketExportOpt.get().setTotalItems(lvTotalItems);
         ticketExportOpt.get().setExportTimeStr(ticketExportOpt.get().getExportTime().format(formatter));
 
-        return super.convertDTO(ticketExportOpt.get());
+        return TicketExportDTO.toDto(ticketExportOpt.get());
     }
 
     @Override
-    public TicketExportDTO save(TicketExportDTO ticket) {
+    public TicketExportDTO save(TicketExportDTO pDto) {
         //TicketExport ticketExportSaved = ticketExportRepository.save(ticket);
         //Code for order status
         //PR -> Preparing
@@ -125,7 +127,16 @@ public class TicketExportServiceImpl extends BaseService<TicketExport, TicketExp
 //        orderService.findOrderDetailsByOrderId(ticket.getOrderId()).forEach(d -> {
 //            productService.updateProductVariantQuantity(productService.findProductVariantById(d.getProductVariant().getId()).getSoLuongKho() - d.getSoLuong(), d.getProductVariant().getId());
 //        });
-        return super.save(ticket);
+
+        TicketExport lvTx = new TicketExport();
+        lvTx.setTitle(pDto.getTitle());
+        lvTx.setStorage(mvStorageService.findEntById(pDto.getStorage().getId(), true));
+        lvTx.setExporter(mvUserSession.getUserPrincipal().getUsername());
+        lvTx.setExportTime(LocalDateTime.now());
+        lvTx.setStatus(TicketExportStatus.DRAFT.name());
+        lvTx.setNote(pDto.getNote());
+
+        return TicketExportDTO.toDto(mvEntityRepository.save(lvTx));
     }
 
     @Transactional
@@ -181,6 +192,7 @@ public class TicketExportServiceImpl extends BaseService<TicketExport, TicketExp
                         .sellPrice(item.getPrice())
                         .quantity(item.getQuantity())
                         .note(item.getNote())
+                        .action(TicketExportAction.RELEASE_TO_CUSTOMER.name())
                         .build());
             }
         }
@@ -213,8 +225,8 @@ public class TicketExportServiceImpl extends BaseService<TicketExport, TicketExp
                 int storageQty = lvProductVariant.getStorageQty();
                 int soldQty = lvProductVariant.getSoldQty();
                 ProductHistoryDTO productHistory = ProductHistoryDTO.builder()
-                    .product(lvProductVariant.getProduct())
-                    .productDetail(lvProductVariant)
+                    .product(new ProductDTO(lvProductVariant.getProduct().getId()))
+                    .productDetail(new ProductVariantDTO(lvProductVariant.getId()))
                     .title("Cập nhật số lượng cho [" + lvProductVariant.getVariantName() + "] - " + pTicket.getTitle())
                     .field("Storage Qty | Sold Qty")
                     .oldValue(storageQty + " | " + soldQty)
@@ -223,7 +235,7 @@ public class TicketExportServiceImpl extends BaseService<TicketExport, TicketExp
                 mvProductHistoryService.save(productHistory);
             }
         }
-        return convertDTO(ticketExportUpdated);
+        return TicketExportDTO.toDto(ticketExportUpdated);
     }
 
     @Override

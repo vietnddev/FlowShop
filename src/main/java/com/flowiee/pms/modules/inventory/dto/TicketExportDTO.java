@@ -1,15 +1,12 @@
 package com.flowiee.pms.modules.inventory.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flowiee.pms.common.base.dto.BaseDTO;
 import com.flowiee.pms.modules.inventory.entity.ProductVariantExim;
-import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.modules.inventory.entity.TicketExport;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.modules.sales.entity.Order;
-import javax.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -46,7 +43,7 @@ public class TicketExportDTO extends BaseDTO implements Serializable {
     List<OrderDTO>           listOrderDTO;
     List<ProductVariantExim> listProductTemp;
 
-    public static TicketExportDTO fromTicketExport(TicketExport t) {
+    public static TicketExportDTO toDto(TicketExport t) {
         TicketExportDTO dto = new TicketExportDTO();
         dto.setId(t.getId());
         dto.setTitle(t.getTitle());
@@ -62,10 +59,10 @@ public class TicketExportDTO extends BaseDTO implements Serializable {
         return dto;
     }
 
-    public static List<TicketExportDTO> fromTickerExports(List<TicketExport> ts) {
+    public static List<TicketExportDTO> toDTOs(List<TicketExport> ts) {
         List<TicketExportDTO> list = new ArrayList<>();
         for (TicketExport t : ts) {
-            list.add(TicketExportDTO.fromTicketExport(t));
+            list.add(TicketExportDTO.toDto(t));
         }
         return list;
     }

@@ -10,6 +10,7 @@ function getStorageHistory(productVariantId) {
                         <td>${d.createdAt}</td>
                         <td>${d.staff}</td>
                         <td>${d.action}</td>
+                        <td>${d.variantCode}</td>
                         <td>${d.changeQty}</td>
                         <td>${d.storageQty}</td>
                         <td></td>

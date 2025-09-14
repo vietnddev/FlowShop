@@ -31,7 +31,7 @@ public interface CartService extends ICurdService<OrderCartDTO> {
 
     void addItemsToCart(CartReq cartReq);
 
-    void updateItemsOfCart(Items items, Long itemId);
+    void updateItemsOfCart(ItemsDTO items, Long itemId);
 
     List<ItemsDTO> findItems(Long pCartId);
 

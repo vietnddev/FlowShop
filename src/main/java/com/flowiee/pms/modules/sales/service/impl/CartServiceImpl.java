@@ -284,7 +284,7 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
     }
 
     @Override
-    public void updateItemsOfCart(Items pItemToUpdate, Long itemId) {
+    public void updateItemsOfCart(ItemsDTO pItemToUpdate, Long itemId) {
         Items lvItem = mvCartItemsService.findEntById(itemId, true);
         if (pItemToUpdate.getQuantity() <= 0) {
             mvCartItemsService.delete(lvItem.getId());
@@ -293,33 +293,38 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
             if (pItemToUpdate.getQuantity() > productVariant.getAvailableSalesQty()) {
                 throw new AppException(ErrorCode.ProductOutOfStock, new Object[]{productVariant.getVariantName()}, null, getClass(), null);
             }
-            //ProductPrice productVariantPrice = productVariant.getVariantPrice();
-            ProductPrice productVariantPrice = mvProductPriceRepository.findPricePresent(productVariant.getId());
-            String lvPriceType = pItemToUpdate.getPriceType();
-            BigDecimal lvRetailPrice = productVariantPrice.getAppliedValue();
-            BigDecimal lvRetailPriceDiscount = productVariantPrice.getPriceValue();
-            BigDecimal lvWholesalePrice = productVariantPrice.getAppliedValue();
-            BigDecimal lvWholesalePriceDiscount = productVariantPrice.getPriceValue();
+
+            List<ProductPrice> productVariantPrice = mvProductPriceRepository.findPresentPrices(productVariant.getId());
+            if (productVariantPrice == null) {
+                throw new AppException(String.format("Sản phẩm %s chưa được thiết lập giá bán!", productVariant.getVariantName()));
+            }
+            BigDecimal lvRetailPrice = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
+            BigDecimal lvRetailPriceDiscount = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
+            BigDecimal lvWholesalePrice = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.WHO);
+            BigDecimal lvWholesalePriceDiscount = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.WHO);
+
+            //String lvPriceType = pItemToUpdate.getPriceType();
+            String lvPriceType = PriceType.L.name();
 
             lvItem.setNote(pItemToUpdate.getNote());
             lvItem.setQuantity(pItemToUpdate.getQuantity());
-            if (lvPriceType != null && (!lvItem.getPriceType().equals(lvPriceType))) {
+            if (!lvItem.getPriceType().equals(lvPriceType)) {
                 if (lvPriceType.equals(PriceType.L.name())) {
                     lvItem.setPrice(lvRetailPriceDiscount);
                     lvItem.setPriceOriginal(lvRetailPrice);
-                    lvItem.setPriceType(PriceType.L.name());
+                    //lvItem.setPriceType(PriceType.L.name());
                 }
                 if (lvPriceType.equals(PriceType.S.name())) {
                     lvItem.setPrice(lvWholesalePriceDiscount);
                     lvItem.setPriceOriginal(lvWholesalePrice);
-                    lvItem.setPriceType(PriceType.S.name());
+                    //lvItem.setPriceType(PriceType.S.name());
                 }
             }
             if (pItemToUpdate.getExtraDiscount() != null) {
                 lvItem.setExtraDiscount(pItemToUpdate.getExtraDiscount());
             }
 
-            mvCartItemsService.update(mvModelMapper.map(lvItem, ItemsDTO.class), lvItem.getId());
+            mvCartItemsRepository.save(lvItem);
         }
     }
 

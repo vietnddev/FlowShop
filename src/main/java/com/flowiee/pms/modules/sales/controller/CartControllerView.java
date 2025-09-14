@@ -65,18 +65,6 @@ public class CartControllerView extends BaseController {
         return AppResponse.success(mvCartItemsService.findAllItemsForSales());
     }
 
-    @PostMapping("/ban-hang/cart/item/update/{itemId}")
-    @PreAuthorize("@vldModuleSales.insertOrder(true)")
-    public ModelAndView updateItemsOfCart(@RequestParam("cartId") Long cartId,
-                                          @ModelAttribute("items") Items items,
-                                          @PathVariable("itemId") Long itemId) {
-        if (mvCartService.findById(cartId, true) == null) {
-            throw new ResourceNotFoundException("Cart not found!");
-        }
-        mvCartService.updateItemsOfCart(items, itemId);
-        return new ModelAndView("redirect:/sls/order/ban-hang");
-    }
-
     @PostMapping("/ban-hang/cart/{cartId}/reset")
     @PreAuthorize("@vldModuleSales.insertOrder(true)")
     public ModelAndView resetCart(@PathVariable("cartId") Long cartId) {

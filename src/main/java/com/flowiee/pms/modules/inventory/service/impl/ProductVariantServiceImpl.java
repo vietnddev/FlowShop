@@ -127,7 +127,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
 
         Map<Long, FileStorage> lvImageActiveList = mvProductImageService.getImageActiveOfProductVariants(lvProductVariantIds);
 
-        OrderCart currentCart = pRequest.getCheckInAnyCart() ? getCurrentCart() : null;
+        OrderCart currentCart = Boolean.TRUE.equals(pRequest.getCheckInAnyCart()) ? getCurrentCart() : null;
         List<Items> lvCartItems = currentCart != null ? mvCartService.getItems(currentCart.getId(), lvProductVariantIds) : List.of();
         List<Long> lvCartItemIds = lvCartItems.isEmpty() ? List.of() : lvCartItems.stream().map(a -> a.getProductDetail().getId()).toList();
 
@@ -375,7 +375,49 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     }
 
     @Override
-    public List<ProductVariantTempDTO> findStorageHistory(Long productVariantId) {
+    public List<ProductVariantTempDTO> findStorageHistoryByProductId(Long productId) {
+        List<ProductVariantExim> storageHistory = mvProductVariantTempRepository.findByProductId(productId);
+        List<ProductVariantTempDTO> storageHistoryDTOs = ProductVariantTempDTO.convertToDTOs(storageHistory);
+        if (ObjectUtils.isEmpty(storageHistoryDTOs)) {
+            return List.of();
+        }
+        for (ProductVariantTempDTO tempDTO : storageHistoryDTOs) {
+            String staff = "";
+            String actionLabel = "";
+            String changeQty = "";
+            String branchName = "";
+            if (tempDTO.getQuantity() > 0) {
+                changeQty = "+/- " + tempDTO.getQuantity();
+            }
+            if (tempDTO.getTicketImport() != null) {
+                staff = tempDTO.getTicketImport().getImporter();
+                for (TicketImportAction importAction : TicketImportAction.values()) {
+                    if (importAction.name().equals(tempDTO.getAction()) ) {
+                        actionLabel = importAction.getLabel();
+                        break;
+                    }
+                }
+            }
+            if (tempDTO.getTicketExport() != null) {
+                staff = tempDTO.getTicketExport().getExporter();
+                for (TicketExportAction exportAction : TicketExportAction.values()) {
+                    if (exportAction.name().equals(tempDTO.getAction()) ) {
+                        actionLabel = exportAction.getLabel();
+                        break;
+                    }
+                }
+            }
+            tempDTO.setStaff(staff);
+            tempDTO.setAction(actionLabel);
+            tempDTO.setChangeQty(changeQty);
+            tempDTO.setStorageQty(tempDTO.getStorageQty());
+            tempDTO.setBranchName(branchName);
+        }
+        return storageHistoryDTOs;
+    }
+
+    @Override
+    public List<ProductVariantTempDTO> findStorageHistoryByVariantId(Long productVariantId) {
         List<ProductVariantExim> storageHistory = mvProductVariantTempRepository.findByProductVariantId(productVariantId);
         List<ProductVariantTempDTO> storageHistoryDTOs = ProductVariantTempDTO.convertToDTOs(storageHistory);
         if (ObjectUtils.isEmpty(storageHistoryDTOs)) {
@@ -387,7 +429,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             String changeQty = "";
             String branchName = "";
             if (tempDTO.getQuantity() > 0) {
-                changeQty = "+ " + tempDTO.getQuantity();
+                changeQty = "+/- " + tempDTO.getQuantity();
             }
             if (tempDTO.getTicketImport() != null) {
                 staff = tempDTO.getTicketImport().getImporter();

@@ -19,6 +19,7 @@ public class ProductVariantTempDTO extends ProductVariantExim implements Seriali
     @Serial
     static final long serialVersionUID = 1L;
 
+    String variantCode;
     Long ticketImportId;
     Long ticketExportId;
     Long productVariantId;
@@ -40,6 +41,7 @@ public class ProductVariantTempDTO extends ProductVariantExim implements Seriali
         outputDTO.setProductVariantId(inputEntity.getProductVariant().getId());
         outputDTO.setProductVariantName(inputEntity.getProductVariant().getVariantName());
         if (outputDTO.getProductVariant() != null) {
+            outputDTO.setVariantCode(outputDTO.getProductVariant().getVariantCode());
             outputDTO.setProductVariantId(outputDTO.getProductVariant().getId());
             outputDTO.setProductVariantName(outputDTO.getProductVariant().getVariantName());
         }

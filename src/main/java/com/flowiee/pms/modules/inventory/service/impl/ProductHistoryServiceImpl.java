@@ -37,8 +37,15 @@ public class ProductHistoryServiceImpl extends BaseService<ProductHistory, Produ
     }
 
     @Override
-    public ProductHistoryDTO save(ProductHistoryDTO productHistory) {
-        return super.save(productHistory);
+    public ProductHistoryDTO save(ProductHistoryDTO pDto) {
+        return ProductHistoryDTO.toDto(mvEntityRepository.save(ProductHistory.builder()
+                .product(new Product(pDto.getProduct().getId()))
+                .productDetail(new ProductDetail(pDto.getProductDetail().getId()))
+                .title(pDto.getTitle())
+                .field(pDto.getField())
+                .oldValue(pDto.getOldValue())
+                .newValue(pDto.getNewValue())
+                .build()));
     }
 
     @Override

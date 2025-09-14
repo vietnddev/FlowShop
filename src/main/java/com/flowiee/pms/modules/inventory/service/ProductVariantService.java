@@ -16,7 +16,9 @@ public interface ProductVariantService extends ICurdService<ProductVariantDTO> {
 
     boolean checkVariantExisted(long productId, long colorId, long sizeId, long fabricTypeId);
 
-    List<ProductVariantTempDTO> findStorageHistory(Long productVariantId);
+    List<ProductVariantTempDTO> findStorageHistoryByProductId(Long productId);
+
+    List<ProductVariantTempDTO> findStorageHistoryByVariantId(Long productVariantId);
 
     void updateLowStockThreshold(Long productId, int threshold);
 

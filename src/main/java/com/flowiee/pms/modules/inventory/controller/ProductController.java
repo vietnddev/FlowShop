@@ -2,10 +2,12 @@ package com.flowiee.pms.modules.inventory.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.constants.Constants;
+import com.flowiee.pms.modules.inventory.dto.ProductVariantTempDTO;
 import com.flowiee.pms.modules.inventory.entity.ProductHistory;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.model.ProductSearchRequest;
+import com.flowiee.pms.modules.inventory.service.ProductVariantService;
 import com.flowiee.pms.modules.system.model.EximResult;
 import com.flowiee.pms.modules.inventory.dto.ProductDTO;
 import com.flowiee.pms.common.exception.AppException;
@@ -52,6 +54,7 @@ public class ProductController extends BaseController {
     ProductInfoService mvProductInfoService;
     ProductHistoryService mvProductHistoryService;
     ProductRelatedService mvProductRelatedService;
+    ProductVariantService mvProductVariantService;
 
     @Operation(summary = "Find all products")
     @GetMapping("/all")
@@ -182,5 +185,16 @@ public class ProductController extends BaseController {
         EximResult result = mvExportService.exportToExcel(TemplateExport.IE_LIST_OF_PRODUCTS, condition, false);
 
         return ResponseEntity.ok().headers(result.getHttpHeaders()).body(result.getContent());
+    }
+
+    @Operation(summary = "Get storage history transaction")
+    @GetMapping("/{productId}/storage-transaction")
+    @PreAuthorize("@vldModuleProduct.readProduct(true)")
+    public AppResponse<List<ProductVariantTempDTO>> getStorageHistoryTransaction(@PathVariable("productId") Long productId) {
+        try {
+            return AppResponse.success(mvProductVariantService.findStorageHistoryByProductId(productId));
+        } catch (RuntimeException ex) {
+            throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product"), ex);
+        }
     }
 }

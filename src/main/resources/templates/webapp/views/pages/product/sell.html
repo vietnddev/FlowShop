@@ -268,6 +268,7 @@
         </div>
         <div th:replace="~{modal_fragments :: confirm_modal}"></div>
         <div th:replace="~{pages/product/fragments/product-fragments :: searchProductModal}"></div>
+        <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalUpdateItem}"></div>
         <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalDeleteItem}"></div>
         <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalSearchCustomer}"></div>
 
@@ -295,8 +296,6 @@
         let mvAmountDiscount = 0;// $("#amountDiscountField");
         let mvTotalAmountDiscount = [[${totalAmountWithoutDiscount}]];//$("#totalAmountDiscountField");
         $('#isUseVoucherBlock').hide();
-
-        ///sls/order/ban-hang/cart/{id}/reset(id=${cart.id})
 
         $(document).ready(function () {
             init();
@@ -340,6 +339,22 @@
             $("#btnSubmitProductOnSearchModal").on("click", function () {
                 submitProductOnSearchModal("createOrder");
                 //$("#searchProductModal").modal("hide");
+            });
+
+            $(document).on('click', '.btnUpdateItem', function () {
+                let itemId = $(this).attr("itemId");
+                let itemName = $(this).attr("itemName");
+                let itemQuantity = $(this).attr("itemQuantity");
+                let itemExtraDiscount = $(this).attr("itemExtraDiscount");
+                let itemNote = $(this).attr("itemNote");
+                let itemInfo = {
+                    id: itemId,
+                    name: itemName,
+                    quantity: itemQuantity,
+                    extraDiscount: itemExtraDiscount,
+                    note: itemNote
+                }
+                updateItem(itemInfo);
             });
 
             $(document).on('click', '.btnDeleteItem', function () {
@@ -528,17 +543,53 @@
                     </td>
                     <td class="col-item-subTotal">${formatCurrency(pItem.subTotal)}</td>
                     <td>
-                        <button type="button" class="btn btn-sm btn-primary btnUpdateItem" data-toggle="modal" data-target="#modalUpdateItem"
-                                itemId="${pItem.itemId}" itemName="${pItem.itemName}">
+                        <button type="button" class="btn btn-sm btn-primary btnUpdateItem"
+                                itemId="${pItem.itemId}" itemName="${pItem.itemName}" itemQuantity="${pItem.quantity}" itemExtraDiscount="${pItem.extraDiscount}" itemNote="${pItem.note}">
                             <i class="fa-solid fa-pencil"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-danger btnDeleteItem" data-toggle="modal" data-target="#modalDeleteItems"
+                        <button type="button" class="btn btn-sm btn-danger btnDeleteItem"
                                 itemId="${pItem.itemId}" itemName="${pItem.itemName}">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
                 </tr>
             `);
+        }
+
+        function updateItem(pItem) {
+            $("#modalUpdateItem").modal("show");
+
+            $("#mdlUItem_itemName").val(pItem.name);
+            $("#mdlUItem_itemQuantity").val(pItem.quantity);
+            $("#mdlUItem_itemExtraDiscount").val(formatUSCurrency(pItem.extraDiscount));
+            $("#mdlUItem_itemNote").val(pItem.note);
+
+            $("#mdlUItem_submit").on("click", function () {
+                if ($("#mdlUItem_itemQuantity").val() === 0) {
+                    alert("Quantity is zero, item will be removed!");
+                    return;
+                }
+
+                let apiURL = mvHostURLCallApi + `/sls/cart/${mvCurrentCartId}/item/${pItem.id}`;
+                let body = {
+                    extraDiscount: parseNumbericPrice($("#mdlUItem_itemExtraDiscount").val()),
+                    quantity: $("#mdlUItem_itemQuantity").val(),
+                    note: $("#mdlUItem_itemNote").val(),
+                }
+                $.ajax({
+                    url: apiURL,
+                    type: 'PUT',
+                    contentType: "application/json",
+                    data: JSON.stringify(body),
+                    success: function(result) {
+                        alert(result.message);
+                        $("#modalUpdateItem").modal("hide");
+                    },
+                    error: function(xhr, status, error) {
+                        alert(status + ': ' + JSON.stringify(xhr.responseJSON.message));
+                    }
+                });
+            });
         }
 
         function deleteItem(itemId, itemName) {

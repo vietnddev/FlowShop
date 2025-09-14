@@ -23,6 +23,16 @@ function createOrder() {
         let receiveAddress = $('#receiveAddressField').val();
         let accumulateBonusPoints = $('#ckxAccumulatePoints').is(':checked');
 
+        //Validate
+        if (customerId === "-1") {
+            if (accumulateBonusPoints) {
+                alert("No customer to accumulate bonus points!");
+            } else {
+                alert("No customer is selected!");
+            }
+            return;
+        }
+
         let apiURL = mvHostURLCallApi + '/sls/order/insert';
         let body = {
             customerId: customerId,
@@ -43,6 +53,7 @@ function createOrder() {
             amountDiscount : mvAmountDiscount,
             accumulateBonusPoints: accumulateBonusPoints
         }
+
         $.ajax({
             url: apiURL,
             type: "POST",

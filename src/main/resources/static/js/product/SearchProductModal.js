@@ -44,7 +44,7 @@ function getListOfProductsOnSearchModal(pageSize, pageNum) {
                 let bgRowColor = d.currentInCart ? "lightcyan" : "none";
                 contentTable.append(`
                     <tr style="background-color: ${bgRowColor}">
-                        <td>${index + 1}</td>
+                        <td>${(((pagination.pageNum - 1) * pagination.pageSize + 1) + index)}</td>
                         <td>
                             <input type="checkbox" class="cbxChooseProduct" style="width: 25px; height: 25px" productVariantId="${d.id}">
                         </td>
@@ -63,7 +63,7 @@ function getListOfProductsOnSearchModal(pageSize, pageNum) {
                         <td>${d.fabricTypeName}</td>
                         <td>${d.availableSalesQty}</td>
                         <td>
-                            <span class="btn-view-price-history" productDetailId="${d.id}" style="color: #007bff; cursor: pointer">${formatCurrency(d.price.retailPriceDiscount)}</span>
+                            <span class="btn-view-price-history" productDetailId="${d.id}" style="color: #007bff; cursor: pointer">${formatUSCurrency(d.price.retailPrice)}</span>
                         </td>
                         <td></td>
                     </tr>

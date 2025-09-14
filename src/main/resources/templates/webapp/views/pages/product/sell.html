@@ -355,13 +355,13 @@
             let response = await fetch(apiURL)
             if (response.ok) {
                 let data = (await response.json()).data;
-                selectElement.append('<option>Chọn khách hàng</option>');
+                selectElement.append('<option value="-1">Chọn khách hàng</option>');
                 $.each(data, function (index, d) {
-                    selectElement.append('<option value=' + d.id + '>' + d.customerName + '</option>');
+                    selectElement.append(`<option value="${d.id}">${d.customerName}</option>`);
                     mvCustomers[d.id] = d; //Tương tự map trong Java, d.id là key, d là value
                 });
             } else {
-                alert('Call API fail!')
+                alert('Load customer fail!')
             }
         }
 

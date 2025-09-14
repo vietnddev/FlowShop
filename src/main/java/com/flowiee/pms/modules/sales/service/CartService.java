@@ -29,8 +29,6 @@ public interface CartService extends ICurdService<OrderCartDTO> {
 
     void resetCart(Long cartId);
 
-    void addItemsToCart(Long cartId, String[] productVariantIds);
-
     void addItemsToCart(CartReq cartReq);
 
     void updateItemsOfCart(Items items, Long itemId);

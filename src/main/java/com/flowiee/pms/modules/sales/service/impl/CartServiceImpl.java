@@ -223,44 +223,6 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
         mvCartItemsRepository.deleteAllItems(cart.getId());
     }
 
-    @Override
-    public void addItemsToCart(Long cartId, String[] productVariantIds) {
-        List<String> listProductVariantId = Arrays.stream(productVariantIds).toList();
-        for (String productVariantId : listProductVariantId) {
-            ProductVariantDTO productVariant = mvProductVariantService.findById(Long.parseLong(productVariantId), false);
-            if (productVariant == null) {
-                continue;
-            }
-            if (productVariant.getAvailableSalesQty() == 0) {
-                throw new AppException(ErrorCode.ProductOutOfStock, new Object[]{productVariant.getVariantName()}, null, getClass(), null);
-            }
-            if (this.isItemExistsInCart(cartId, productVariant.getId())) {
-                Items items = mvCartItemsService.findItemByCartAndProductVariant(cartId, productVariant.getId());
-                mvCartItemsService.increaseItemQtyInCart(items.getId(), items.getQuantity() + 1);
-            } else {
-                //ProductPrice productVariantPrice = productVariant.getVariantPrice();//mvProductPriceRepository.findPricePresent(null, Long.parseLong(productVariantId));
-                ProductPrice productVariantPrice = mvProductPriceRepository.findPricePresent(Long.parseLong(productVariantId));
-                if (productVariantPrice == null) {
-                    throw new AppException(String.format("Sản phẩm %s chưa được thiết lập giá bán!", productVariant.getVariantName()));
-                }
-                BigDecimal lvRetailPrice = productVariantPrice.getPriceValue();
-                BigDecimal lvRetailPriceDiscount = productVariantPrice.getAppliedValue();
-                ItemsDTO itemsDto = mvModelMapper.map(Items.builder()
-                        .orderCart(new OrderCart(cartId))
-                        .productDetail(new ProductDetail(Integer.parseInt(productVariantId)))
-                        .priceType(PriceType.L.name())
-                        .price(lvRetailPriceDiscount != null ? lvRetailPriceDiscount : lvRetailPrice)
-                        .priceOriginal(lvRetailPrice)
-                        .extraDiscount(BigDecimal.ZERO)
-                        .quantity(1)
-                        .note("")
-                        .build(),
-                        ItemsDTO.class);
-                mvCartItemsService.save(itemsDto);
-            }
-        }
-    }
-
     @Transactional
     @Override
     public void addItemsToCart(CartReq cartReq) {
@@ -284,22 +246,32 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
             if (lvProductVariant.getAvailableSalesQty() == 0 || lvProductVariant.getAvailableSalesQty() < lvItemQty) {
                 throw new AppException(ErrorCode.ProductOutOfStock, new Object[]{lvProductVariant.getVariantName()}, null, getClass(), null);
             }
+
+            List<ProductPrice> productVariantPrice = mvProductPriceRepository.findPresentPrices(lvProductVariant.getId());
+            if (productVariantPrice == null) {
+                throw new AppException(String.format("Sản phẩm %s chưa được thiết lập giá bán!", lvProductVariant.getVariantName()));
+            }
+            BigDecimal lvRetailPrice = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
+            BigDecimal lvRetailPriceDiscount = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
+
+            BigDecimal lvItemPrice = lvRetailPriceDiscount != null ? lvRetailPriceDiscount : lvRetailPrice;
+            BigDecimal lvItemOriginalPrice = lvRetailPrice;
+
             if (this.isItemExistsInCart(lvCartId, lvProductVariant.getId())) {
                 Items items = mvCartItemsService.findItemByCartAndProductVariant(lvCartId, lvProductVariant.getId());
-                mvCartItemsService.increaseItemQtyInCart(items.getId(), items.getQuantity() + 1);
+                //mvCartItemsService.increaseItemQtyInCart(items.getId(), items.getQuantity() + 1);
+                items.setQuantity(items.getQuantity() + lvItemQty);
+                items.setPriceType(PriceType.L.name());
+                items.setPrice(lvItemPrice);
+                items.setPriceOriginal(lvItemOriginalPrice);
+                mvCartItemsRepository.save(items);
             } else {
-                List<ProductPrice> productVariantPrice = mvProductPriceRepository.findPresentPrices(lvProductVariant.getId());
-                if (productVariantPrice == null) {
-                    throw new AppException(String.format("Sản phẩm %s chưa được thiết lập giá bán!", lvProductVariant.getVariantName()));
-                }
-                BigDecimal lvRetailPrice = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
-                BigDecimal lvRetailPriceDiscount = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
                 ItemsDTO itemsDto = mvModelMapper.map(Items.builder()
                         .orderCart(orderCart)
                         .productDetail(new ProductDetail(lvProductVariant.getId()))
                         .priceType(PriceType.L.name())
-                        .price(lvRetailPriceDiscount != null ? lvRetailPriceDiscount : lvRetailPrice)
-                        .priceOriginal(lvRetailPrice)
+                        .price(lvItemPrice)
+                        .priceOriginal(lvItemOriginalPrice)
                         .extraDiscount(BigDecimal.ZERO)
                         .quantity(lvItemQty)
                         .note("")

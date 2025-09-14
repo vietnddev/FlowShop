@@ -62,8 +62,8 @@ public class CartController extends BaseController {
     @PutMapping("/{cartId}/item/{itemId}/update-quantity")
     @PreAuthorize("@vldModuleSales.insertOrder(true)")
     public AppResponse<ItemsDTO> updateItemQuantity(@PathVariable("cartId") Long cartId,
-                                            @PathVariable("itemId") Long itemId,
-                                            @RequestBody CartItemsReq req) {
+                                                    @PathVariable("itemId") Long itemId,
+                                                    @RequestBody CartItemsReq req) {
         return AppResponse.success(mvCartService.updateItemQuantity(cartId, itemId, req.getQuantity()));
     }
 

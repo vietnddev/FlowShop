@@ -177,6 +177,10 @@ public class Order extends BaseEntity implements Serializable {
 	@Column(name = "total_weight")
 	BigDecimal totalWeight;
 
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "loyalty_transaction_id", referencedColumnName = "id")
+	LoyaltyTransaction loyaltyTransaction;
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "order_status", length = 10)
 	OrderStatus orderStatus;

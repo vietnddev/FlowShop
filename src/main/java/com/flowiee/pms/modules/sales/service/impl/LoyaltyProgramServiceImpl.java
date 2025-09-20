@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.modules.sales.dto.LoyaltyProgramDTO;
 import com.flowiee.pms.modules.sales.service.LoyaltyProgramService;
@@ -14,10 +15,11 @@ import com.flowiee.pms.common.utils.OrderUtils;
 import com.flowiee.pms.common.enumeration.LoyaltyTransactionType;
 import com.flowiee.pms.common.enumeration.MessageCode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +30,9 @@ public class LoyaltyProgramServiceImpl extends BaseService<LoyaltyProgram, Loyal
     private final LoyaltyTransactionRepository mvLoyaltyTransactionRepository;
     private final LoyaltyProgramRepository mvLoyaltyProgramRepository;
     private final CustomerRepository mvCustomerRepository;
+
+    private DecimalFormat mvDecimalFormatValue = new DecimalFormat("#,###.00");
+    private DecimalFormat mvDecimalFormatPoint = new DecimalFormat("#,###");
 
     public LoyaltyProgramServiceImpl(LoyaltyProgramRepository pLoyaltyProgramRepository, LoyaltyTransactionRepository pLoyaltyTransactionRepository, CustomerRepository pCustomerRepository) {
         super(LoyaltyProgram.class, LoyaltyProgramDTO.class, pLoyaltyProgramRepository);
@@ -119,28 +124,31 @@ public class LoyaltyProgramServiceImpl extends BaseService<LoyaltyProgram, Loyal
 
     @Transactional
     @Override
-    public void accumulatePoints(Order pOrder, Long pProgramId) {
+    public LoyaltyTransaction accumulatePoints(Order pOrder, Long pProgramId) {
         LoyaltyProgram lvLoyaltyProgram = pProgramId != null ? getProgramForAccumulatePoints(pProgramId) : mvLoyaltyProgramRepository.findDefaultProgram();
         if (lvLoyaltyProgram == null) {
             throw new BadRequestException("No valid loyalty program!");
         }
 
-        BigDecimal lvTotalAmount = OrderUtils.calAmount(pOrder.getListOrderDetail(), pOrder.getAmountDiscount());
-        int lvPoints = getPoints(lvTotalAmount, lvLoyaltyProgram);
+        BigDecimal lvOrderValue = OrderUtils.calAmount(pOrder.getListOrderDetail(), pOrder.getAmountDiscount());
+        int lvPoints = getPoints(lvOrderValue, lvLoyaltyProgram);
         if (lvPoints < 0)
             throw new BadRequestException("Points must not be less than zero!");
 
         Customer lvCustomer = pOrder.getCustomer();
         mvCustomerRepository.updateBonusPoint(lvCustomer.getId(), lvCustomer.getBonusPoints() + lvPoints);
 
-        LoyaltyTransaction transaction = new LoyaltyTransaction();
-        transaction.setCustomer(lvCustomer);
-        transaction.setLoyaltyProgram(lvLoyaltyProgram);
-        transaction.setTransactionType(LoyaltyTransactionType.ACCUMULATE);
-        transaction.setPoints(lvPoints);
-        transaction.setTransactionDate(LocalDateTime.now());
-        transaction.setRemark(String.format("Accumulate %s points from order %s", lvPoints, pOrder.getCode()));
-        mvLoyaltyTransactionRepository.save(transaction);
+        return mvLoyaltyTransactionRepository.save(LoyaltyTransaction.builder()
+                .customer(lvCustomer)
+                .loyaltyProgram(lvLoyaltyProgram)
+                .transactionType(LoyaltyTransactionType.ACCUMULATE)
+                .points(lvPoints)
+                .transactionDate(LocalDateTime.now())
+                .remark(String.format("Accumulate %s points from order %s with value %s",
+                        mvDecimalFormatPoint.format(lvPoints),
+                        pOrder.getCode(),
+                        mvDecimalFormatValue.format(lvOrderValue)))
+                .build());
     }
 
     private LoyaltyProgram getProgramForAccumulatePoints(Long pProgramId) {
@@ -159,8 +167,8 @@ public class LoyaltyProgramServiceImpl extends BaseService<LoyaltyProgram, Loyal
         return 0;
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void redeemPoints(Long pCustomerId, int pointsToRedeem) {
         Optional<Customer> lvCustomerOpt = mvCustomerRepository.findById(pCustomerId);
         if (lvCustomerOpt.isEmpty())
@@ -170,12 +178,12 @@ public class LoyaltyProgramServiceImpl extends BaseService<LoyaltyProgram, Loyal
         if (lvCustomer.getBonusPoints() < pointsToRedeem)
             throw new RuntimeException("Insufficient points");
 
-        LoyaltyTransaction transaction = new LoyaltyTransaction();
-        transaction.setCustomer(lvCustomer);
-        transaction.setTransactionType(LoyaltyTransactionType.REDEEM);
-        transaction.setPoints(pointsToRedeem);
-        transaction.setTransactionDate(LocalDateTime.now());
-        mvLoyaltyTransactionRepository.save(transaction);
+        mvLoyaltyTransactionRepository.save(LoyaltyTransaction.builder()
+                .customer(lvCustomer)
+                .transactionType(LoyaltyTransactionType.REDEEM)
+                .points(pointsToRedeem)
+                .transactionDate(LocalDateTime.now())
+                .build());
 
         // Deduct points
         lvCustomer.setBonusPoints(lvCustomer.getBonusPoints() - pointsToRedeem);
@@ -183,7 +191,26 @@ public class LoyaltyProgramServiceImpl extends BaseService<LoyaltyProgram, Loyal
     }
 
     @Override
-    public void revokePoints(Order order, int points) {
+    @Transactional
+    public LoyaltyTransaction revokePoints(Order pOrder) {
+        LoyaltyTransaction lvLoyaltyTransaction = pOrder.getLoyaltyTransaction();
+        if (lvLoyaltyTransaction == null) {
+            throw new AppException(String.format("Order %s does not have an associated LoyaltyTransaction", pOrder.getCode()));
+        }
 
+        Customer lvCustomer = lvLoyaltyTransaction.getCustomer();
+        lvCustomer.setBonusPoints(lvCustomer.getBonusPoints() - lvLoyaltyTransaction.getPoints());
+        mvCustomerRepository.save(lvCustomer);
+
+        return mvLoyaltyTransactionRepository.save(LoyaltyTransaction.builder()
+                .customer(lvCustomer)
+                .loyaltyProgram(lvLoyaltyTransaction.getLoyaltyProgram())
+                .transactionType(LoyaltyTransactionType.REVOKE)
+                .points(lvLoyaltyTransaction.getPoints())
+                .transactionDate(LocalDateTime.now())
+                .remark(String.format("Revoke %s points, related accumulate_id is %s",
+                        mvDecimalFormatPoint.format(lvLoyaltyTransaction.getPoints()),
+                        lvLoyaltyTransaction.getId()))
+                .build());
     }
 }

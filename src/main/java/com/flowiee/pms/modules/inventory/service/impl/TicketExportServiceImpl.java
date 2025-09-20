@@ -146,13 +146,13 @@ public class TicketExportServiceImpl extends BaseService<TicketExport, TicketExp
             throw new BadRequestException("Đơn hàng không tồn tại");
         }
 
-        TicketExportDTO lvTx = new TicketExportDTO();
-        lvTx.setTitle("Xuất hàng cho đơn " + orderDTO.getCode());
-        lvTx.setExporter(mvUserSession.getUserPrincipal().getUsername());
-        lvTx.setExportTime(LocalDateTime.now());
-        lvTx.setStatus(TicketExportStatus.DRAFT.name());
+        TicketExportDTO ticketExportSaved = this.save(TicketExportDTO.builder()
+                .title("Xuất hàng cho đơn " + orderDTO.getCode())
+                .exporter(mvUserSession.getUserPrincipal().getUsername())
+                .exportTime(LocalDateTime.now())
+                .status(TicketExportStatus.DRAFT.name())
+                .build());
 
-        TicketExportDTO ticketExportSaved = this.save(lvTx);
         mvOrderRepository.updateTicketExportInfo(orderDTO.getId(), ticketExportSaved.getId());
         //return ticketExportSaved;
         return new TicketExport();
@@ -173,14 +173,14 @@ public class TicketExportServiceImpl extends BaseService<TicketExport, TicketExp
             }
         }
 
-        TicketExportDTO lvTx = new TicketExportDTO();
-        lvTx.setTitle(title);
-        lvTx.setStorage(new StorageDTO(storageId));
-        lvTx.setExporter(mvUserSession.getUserPrincipal().getUsername());
-        lvTx.setExportTime(LocalDateTime.now());
-        lvTx.setStatus(TicketExportStatus.DRAFT.name());
-        lvTx.setNote(order != null ? "Phiếu xuất hàng cho đơn " + order.getCode() : "");
-        TicketExportDTO ticketExportSaved = this.save(lvTx);
+        TicketExportDTO ticketExportSaved = this.save(TicketExportDTO.builder()
+                .title(title)
+                .storage(new StorageDTO(storageId))
+                .exporter(mvUserSession.getUserPrincipal().getUsername())
+                .exportTime(LocalDateTime.now())
+                .status(TicketExportStatus.DRAFT.name())
+                .note(order != null ? "Phiếu xuất hàng cho đơn " + order.getCode() : "")
+                .build());
 
         if (order != null) {
             mvOrderRepository.updateTicketExportInfo(order.getId(), ticketExportSaved.getId());

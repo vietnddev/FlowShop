@@ -50,24 +50,19 @@ import java.util.stream.Collectors;
 public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, ProductRepository> implements ProductInfoService {
     private final ProductDescriptionRepository mvProductDescriptionRepository;
     private final ProductAttributeService mvProductAttributeService;
+    private final ProductDetailRepository mvProductDetailRepository;
+    private final ProductPriceRepository mvProductPriceRepository;
+    private final FileStorageRepository mvFileStorageRepository;
     private final ProductVariantService mvProductVariantService;
     private final ProductHistoryService mvProductHistoryService;
+    private final ProductPriceService mvProductPriceService;
+    private final SystemLogService mvSystemLogService;
     private final OrderRepository mvOrderRepository;
     private final CategoryService mvCategoryService;
-    private final FileStorageRepository mvFileStorageRepository;
-    private final ProductDetailRepository mvProductDetailRepository;
-    private final SystemLogService mvSystemLogService;
-    private final ProductPriceService mvProductPriceService;
-    private final ProductPriceRepository mvProductPriceRepository;
 
     private final Logger mvLogger = LoggerFactory.getLogger(getClass());
 
-    public ProductInfoServiceImpl(ProductRepository pProductRepository, ProductDescriptionRepository pProductDescriptionRepository,
-                                  ProductVariantService pProductVariantService, ProductHistoryService pProductHistoryService,
-                                  OrderRepository pOrderRepository, CategoryService pCategoryService,
-                                  FileStorageRepository pFileStorageRepository, ProductDetailRepository pProductDetailRepository,
-                                  SystemLogService pSystemLogService, ProductPriceService pProductPriceService,
-                                  ProductPriceRepository pProductPriceRepository, ProductAttributeService pProductAttributeService) {
+    public ProductInfoServiceImpl(ProductRepository pProductRepository, ProductDescriptionRepository pProductDescriptionRepository, ProductAttributeService pProductAttributeService, ProductDetailRepository pProductDetailRepository, ProductPriceRepository pProductPriceRepository, ProductVariantService pProductVariantService, ProductHistoryService pProductHistoryService, FileStorageRepository pFileStorageRepository, ProductPriceService pProductPriceService, SystemLogService pSystemLogService, OrderRepository pOrderRepository, CategoryService pCategoryService) {
         super(Product.class, ProductDTO.class, pProductRepository);
         this.mvProductDescriptionRepository = pProductDescriptionRepository;
         this.mvProductAttributeService = pProductAttributeService;
@@ -106,12 +101,11 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
     }
 
     private QueryBuilder<Product> buildSearchQuery(ProductSearchRequest pRequest) {
-        QueryBuilder<Product> lvQueryBuilder = createQueryBuilder(Product.class)
+        return createQueryBuilder(Product.class)
                 .addLike("productName", pRequest.getTxtSearch())
                 .addEqual("brand.id", pRequest.getBrandId())
                 .addEqual("productType.id", pRequest.getProductTypeId())
                 .addOrder("createdAt", false);
-        return lvQueryBuilder;
     }
 
     private EntityGraph<Product> buildEntityGraph() {

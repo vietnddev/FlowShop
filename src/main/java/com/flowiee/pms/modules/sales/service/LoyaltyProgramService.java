@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.sales.service;
 
 import com.flowiee.pms.modules.sales.dto.LoyaltyProgramDTO;
 import com.flowiee.pms.modules.sales.entity.LoyaltyProgram;
+import com.flowiee.pms.modules.sales.entity.LoyaltyTransaction;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.common.base.service.ICurdService;
 
@@ -18,9 +19,9 @@ public interface LoyaltyProgramService extends ICurdService<LoyaltyProgramDTO> {
 
     LoyaltyProgram disableProgram(Long programId);
 
-    void accumulatePoints(Order order, Long programId); // Tích điểm
+    LoyaltyTransaction accumulatePoints(Order order, Long programId); // Tích điểm
 
     void redeemPoints(Long customerId, int pointsToRedeem); // Đổi điểm
 
-    void revokePoints(Order order, int points);
+    LoyaltyTransaction revokePoints(Order order);
 }

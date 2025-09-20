@@ -226,18 +226,25 @@ function addAttribute() {
 }
 
 function showProductDetailOnPopup(pProductInfo) {
-    let pfProductDetailTitle = $("#pfProductDetailTitle");
-    let pfProductName = $("#pfProductName");
-    let pfProductType = $("#pfProductType");
-    let pfUnit = $("#pfUnit");
-    let pfBrand = $("#pfBrand");
+    let lvPopupTitle = $("#pfProductDetailTitle");
+    let lvProductNameTxtField = $("#pfProductName");
+    let lvProductTypeTxtField = $("#pfProductType");
+    let lvUnitTxtField = $("#pfUnit");
+    let lvBrandTxtField = $("#pfBrand");
+    let lvProductType = pProductInfo.productType;
+    let lvUnit = pProductInfo.unit;
+    let lvBrand = pProductInfo.brand;
 
-    pfProductDetailTitle.text(pProductInfo.productName);
-    pfProductName.val(pProductInfo.productName);
+    lvPopupTitle.text(pProductInfo.productName);
+    lvProductNameTxtField.val(pProductInfo.productName);
 
-    downloadSelectionCategory(pfProductType, null, "product-type");
-    downloadSelectionCategory(pfUnit, null, "unit");
-    downloadSelectionCategory(pfBrand, null, "brand");
+    downloadSelectionCategory(lvProductTypeTxtField, null, "product-type");
+    downloadSelectionCategory(lvUnitTxtField, null, "unit");
+    downloadSelectionCategory(lvBrandTxtField, null, "brand");
+
+    lvProductTypeTxtField.append(`<option value="${lvProductType.id}" selected>${lvProductType.name}</option>`);
+    lvUnitTxtField.append(`<option value="${lvUnit.id}" selected>${lvUnit.name}</option>`);
+    lvBrandTxtField.append(`<option value="${lvBrand.id}" selected>${lvBrand.name}</option>`);
 }
 
 function updatePrice() {

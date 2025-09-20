@@ -57,26 +57,25 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductVariantServiceImpl extends BaseService<ProductDetail, ProductVariantDTO, ProductDetailRepository> implements ProductVariantService {
     private final SendOperatorNotificationService mvSendOperatorNotificationService;
+    private final ProductGenerateQRCodeService mvProductGenerateQRCodeService;
     private final ProductDetailTempRepository mvProductVariantTempRepository;
     private final ProductPriceRepository mvProductPriceRepository;
-    private final ProductGenerateQRCodeService mvProductGenerateQRCodeService;
+    private final GenerateBarcodeService mvGenerateBarcodeService;
     private final ProductHistoryService mvProductHistoryService;
     private final TicketImportService mvTicketImportService;
     private final TicketExportService mvTicketExportService;
+    private final ProductPriceService mvProductPriceService;
+    private final ProductImageService mvProductImageService;
+    private final ProductInfoService mvProductInfoService;
+    private final OrderCartRepository mvCartRepository;
+    private final SystemLogService mvSystemLogService;
     private final CategoryService mvCategoryService;
     private final StorageService mvStorageService;
-    private final OrderCartRepository mvCartRepository;
-    private final GenerateBarcodeService mvGenerateBarcodeService;
-    private final ProductPriceService mvProductPriceService;
-    private final SystemLogService mvSystemLogService;
-    private final ProductInfoService mvProductInfoService;
     private final CartService mvCartService;
-    private final ProductImageService mvProductImageService;
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
 
@@ -91,20 +90,20 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         super(ProductDetail.class, ProductVariantDTO.class, pEntityRepository);
         this.mvSendOperatorNotificationService = pSendOperatorNotificationService;
         this.mvProductVariantTempRepository = pProductVariantTempRepository;
-        this.mvProductPriceRepository = pProductPriceRepository;
         this.mvProductGenerateQRCodeService = pProductGenerateQRCodeService;
+        this.mvProductPriceRepository = pProductPriceRepository;
+        this.mvGenerateBarcodeService = pGenerateBarcodeService;
         this.mvProductHistoryService = pProductHistoryService;
         this.mvTicketImportService = pTicketImportService;
         this.mvTicketExportService = pTicketExportService;
+        this.mvProductImageService = pProductImageService;
+        this.mvProductPriceService = pProductPriceService;
+        this.mvProductInfoService = pProductInfoService;
+        this.mvSystemLogService = pSystemLogService;
+        this.mvCategoryService = pCategoryService;
         this.mvStorageService = pStorageService;
         this.mvCartRepository = pCartRepository;
-        this.mvGenerateBarcodeService = pGenerateBarcodeService;
-        this.mvProductPriceService = pProductPriceService;
-        this.mvSystemLogService = pSystemLogService;
-        this.mvProductInfoService = pProductInfoService;
-        this.mvCategoryService = pCategoryService;
         this.mvCartService = pCartService;
-        this.mvProductImageService = pProductImageService;
     }
 
     @Override
@@ -308,14 +307,14 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         Storage lvStorage = mvStorageService.findEntById(pDto.getStorageIdInitStorageQty(), true);
         String initMessage = "Initialize storage quantity when create new products";
 
-        TicketExportDTO lvTicketExport = new TicketExportDTO();
-        lvTicketExport.setTitle("Initialize storage");
-        lvTicketExport.setExporter(getUserPrincipal().getUsername());
-        lvTicketExport.setExportTime(LocalDateTime.now());
-        lvTicketExport.setNote(initMessage);
-        lvTicketExport.setStatus(TicketExportStatus.COMPLETED.name());
-        lvTicketExport.setStorage(new StorageDTO(lvStorage.getId()));
-        TicketExportDTO ticketExportSaved = mvTicketExportService.save(lvTicketExport);
+        TicketExportDTO ticketExportSaved = mvTicketExportService.save(TicketExportDTO.builder()
+                .title("Initialize storage")
+                .exporter(getUserPrincipal().getUsername())
+                .exportTime(LocalDateTime.now())
+                .note(initMessage)
+                .status(TicketExportStatus.COMPLETED.name())
+                .storage(new StorageDTO(lvStorage.getId()))
+                .build());
 
         mvProductVariantTempRepository.save(ProductVariantExim.builder()
                 .ticketExport(new TicketExport(ticketExportSaved.getId()))

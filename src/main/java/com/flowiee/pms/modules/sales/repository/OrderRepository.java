@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.sales.repository;
 
 import com.flowiee.pms.common.base.repository.BaseRepository;
+import com.flowiee.pms.modules.sales.entity.LoyaltyTransaction;
 import com.flowiee.pms.modules.sales.entity.Order;
 
 import com.flowiee.pms.common.enumeration.OrderStatus;
@@ -92,4 +93,8 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
     List<Order> countBySalesChannel(@Param("salesChannelCode") String salesChannelCode);
 
     boolean existsByTrackingCode(String trackingCode);
+
+    @Modifying
+    @Query("update Order o set o.loyaltyTransaction = :loyaltyTransaction where o.id = :orderId")
+    void updateLoyaltyTransaction(@Param("orderId") Long orderId, @Param("loyaltyTransaction") LoyaltyTransaction loyaltyTransaction);
 }

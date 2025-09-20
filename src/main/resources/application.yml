@@ -30,22 +30,8 @@ spring:
   #banner
   banner:
     location: classpath:banner.txt
-  banner-mode: off
   # Database
   jpa:
-    hibernate:
-      ddl-auto: none
-#      temp:
-#        use_jdbc_metadata_defaults: false
-#      jdbc:
-#        lob.non_contextual_creation: true
-#      generate_statistics: false
-      hbm2ddl.auto: none
-#    naming:
-#      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-#    properties:
-#      hibernate:
-#        format_sql: false
     properties:
       hibernate:
         query:

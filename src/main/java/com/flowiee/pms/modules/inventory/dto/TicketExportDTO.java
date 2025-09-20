@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor
+@Builder
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -44,7 +44,7 @@ public class TicketExportDTO extends BaseDTO implements Serializable {
     List<ProductVariantExim> listProductTemp;
 
     public static TicketExportDTO toDto(TicketExport t) {
-        TicketExportDTO dto = new TicketExportDTO();
+        TicketExportDTO dto = TicketExportDTO.builder().build();
         dto.setId(t.getId());
         dto.setTitle(t.getTitle());
         dto.setExporter(t.getExporter());

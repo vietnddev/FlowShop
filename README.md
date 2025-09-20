@@ -75,7 +75,7 @@ The system currently manages **over 50 entities**, ensuring comprehensive data o
 
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/8054af8b-dda6-4838-92a9-711076eebedb" alt="Login Page" width="600"/>
+  <img src="https://github.com/user-attachments/assets/96fcfecb-3de3-4ef3-87c5-fd50a3420d84" alt="Login Page" width="600"/>
   <br>
   <i>Product List</strong>
 </p>

@@ -20,6 +20,9 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LoyaltyTransaction extends BaseEntity implements Serializable {
+    @OneToOne(mappedBy = "loyaltyTransaction")
+    Order order;
+
     @ManyToOne
     @JoinColumn(name = "customer_Id", nullable = false)
     Customer customer;

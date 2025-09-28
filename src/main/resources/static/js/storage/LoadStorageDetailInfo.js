@@ -71,7 +71,7 @@ function loadStorageDetailInfo() {
 }
 
 function loadStorageImportHistory(pageSize, pageNum) {
-    let apiURL = mvHostURLCallApi + "/stg/ticket-import/all";
+    let apiURL = mvHostURLCallApi + "/stg/transaction-goods/import";
     let params = {pageSize: pageSize, pageNum: pageNum, storageId: mvStorageId}
     $.get(apiURL, params, function (response) {
         if (response.status === "OK") {
@@ -85,11 +85,11 @@ function loadStorageImportHistory(pageSize, pageNum) {
                 contentTable.append(`
                     <tr>
                         <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>
-                        <td><a href="/stg/ticket-import/${d.id}">${d.title}</td>
-                        <td>${d.importer}</td>
-                        <td>${d.importTime}</td>
-                        <td>${d.note}</td>
-                        <td>${mvTicketImportStatus[d.status]}</td>
+                        <td><a href="/stg/transaction-goods/import/${d.id}">${d.title}</td>
+                        <td>${d.createdBy}</td>
+                        <td>${d.createdTime}</td>
+                        <td>${d.description}</td>
+                        <td>-</td>
                     </tr>
                 `);
             });

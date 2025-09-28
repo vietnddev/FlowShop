@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.inventory.dto;
 
 import com.flowiee.pms.modules.inventory.enums.TransactionGoodsType;
+import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.modules.inventory.entity.TransactionGoodsItem;
@@ -15,11 +16,14 @@ import java.util.List;
 public class TransactionGoodsDTO {
     private Long id;
     private String code;
+    private String title;
     private String source;
     private TransactionGoodsType transactionType;
     private String transactionStatus;
     private String description;
     private LocalDateTime transactionTime;
+    private String createdBy;
+    private LocalDateTime createdTime;
     private String confirmedBy;
     private LocalDateTime confirmedTime;
     private String approvedBy;
@@ -30,7 +34,7 @@ public class TransactionGoodsDTO {
     private String requestNote;
     private String purpose;
     private String sourceType;
-    private Order order;
-    private Storage warehouse;
-    private List<TransactionGoodsItem> items;
+    private OrderDTO order;
+    private StorageDTO warehouse;
+    private List<TransactionGoodsItemDTO> items;
 }

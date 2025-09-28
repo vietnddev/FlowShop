@@ -55,27 +55,6 @@ public class TicketImportController extends BaseController {
         return AppResponse.success(TicketImportDTO.fromTicketImport(ticketImport));
     }
 
-    @Operation(summary = "Thêm mới phiếu nhập hàng")
-    @PostMapping("/create-draft")
-    @PreAuthorize("@vldModuleSales.importGoods(true)")
-    public AppResponse<TicketImport> createDraftImport(@RequestBody TicketImportDTO ticketImport) {
-        try {
-            return AppResponse.success(mvTicketImportService.createDraftTicketImport(ticketImport));
-        } catch (RuntimeException ex) {
-            throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "ticket import"), ex);
-        }
-    }
-
-    @Operation(summary = "Thêm mới phiếu nhập hàng")
-    @PostMapping("/create")
-    @PreAuthorize("@vldModuleSales.importGoods(true)")
-    public AppResponse<TicketImport> createTicket(@RequestParam("storageId") Long pStorageId, @RequestBody String pTitle) {
-        TicketImportDTO dto = new TicketImportDTO();
-        dto.setTitle(pTitle);
-        dto.setStorageId(pStorageId);
-        return AppResponse.success(mvTicketImportService.createDraftTicketImport(dto));
-    }
-
     @Operation(summary = "Cập nhật phiếu nhập hàng")
     @PutMapping("/update/{id}")
     @PreAuthorize("@vldModuleSales.importGoods(true)")

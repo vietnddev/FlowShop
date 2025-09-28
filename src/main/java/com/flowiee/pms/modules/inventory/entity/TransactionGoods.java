@@ -22,6 +22,9 @@ public class TransactionGoods extends BaseEntity implements Serializable {
     @Column(name = "transaction_code", nullable = false, length = 30)
     private String code;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "transaction_source", length = 30)
     private String source;
 
@@ -74,7 +77,7 @@ public class TransactionGoods extends BaseEntity implements Serializable {
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "warehouse_id")
+    @JoinColumn(name = "warehouse_id", nullable = false)
     private Storage warehouse;
 
     @OneToMany(mappedBy = "transactionGoods", fetch = FetchType.LAZY)

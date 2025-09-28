@@ -1,17 +1,23 @@
 package com.flowiee.pms.modules.inventory.model;
 
+import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.modules.inventory.dto.StorageDTO;
+import com.flowiee.pms.modules.inventory.dto.TransactionGoodsItemDTO;
+import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.modules.inventory.entity.TransactionGoodsItem;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@SuperBuilder
 @Getter
 @Setter
-public class TransactionGoodsReq {
+public class TransactionGoodsReq extends BaseParameter {
     private String code;
     private String source;
     private String type;
@@ -28,7 +34,7 @@ public class TransactionGoodsReq {
     private String requestNote;
     private String purpose;
     private String sourceType;
-    private Order order;
-    private Storage warehouse;
-    private List<TransactionGoodsItem> items;
+    private OrderDTO order;
+    private StorageDTO warehouse;
+    private List<TransactionGoodsItemDTO> items;
 }

@@ -27,16 +27,6 @@ public class ProductVariantExim extends BaseEntity implements Serializable {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "goods_import_id")
-    TicketImport ticketImport;
-
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "goods_export_id")
-    TicketExport ticketExport;
-
-    @JsonIgnore
-    @ManyToOne
 	@JoinColumn(name = "product_variant_id", nullable = false)
 	ProductDetail productVariant;
 

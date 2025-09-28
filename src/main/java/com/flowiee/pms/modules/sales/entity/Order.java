@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.modules.inventory.entity.TransactionGoods;
 import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.inventory.entity.TicketExport;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.common.enumeration.OrderStatus;
@@ -127,11 +127,6 @@ public class Order extends BaseEntity implements Serializable {
 	@Column(name = "cod_fee")
 	BigDecimal codFee;
 
-	@JsonIgnore
-	@ManyToOne
-	@JoinColumn(name = "ticket_export_id")
-	TicketExport ticketExport;
-
 	@Column(name = "cancellation_date")
 	LocalDateTime cancellationDate;
 
@@ -204,6 +199,10 @@ public class Order extends BaseEntity implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	List<CustomerDebt> customerDebtList;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+	List<TransactionGoods> transactionGoodsList;
 
 	public Order(long id) {
 		super.id = id;

@@ -5,6 +5,8 @@ import com.flowiee.pms.common.constants.JpaHints;
 import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.modules.inventory.dto.*;
+import com.flowiee.pms.modules.inventory.entity.*;
+import com.flowiee.pms.modules.inventory.enums.TransactionGoodsStatus;
 import com.flowiee.pms.modules.inventory.service.*;
 import com.flowiee.pms.modules.inventory.service.ProductGenerateQRCodeService;
 import com.flowiee.pms.modules.inventory.service.ProductVariantService;
@@ -12,15 +14,8 @@ import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.system.service.CategoryService;
 import com.flowiee.pms.modules.system.service.SendOperatorNotificationService;
 import com.flowiee.pms.modules.system.service.SystemLogService;
-import com.flowiee.pms.modules.inventory.entity.Product;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
-import com.flowiee.pms.modules.inventory.entity.ProductPrice;
-import com.flowiee.pms.modules.inventory.entity.ProductVariantExim;
 import com.flowiee.pms.modules.sales.entity.Items;
 import com.flowiee.pms.modules.sales.entity.OrderCart;
-import com.flowiee.pms.modules.inventory.entity.TicketExport;
-import com.flowiee.pms.modules.inventory.entity.TicketImport;
-import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.common.exception.*;
 import com.flowiee.pms.modules.inventory.model.ProductVariantSearchRequest;
@@ -63,11 +58,10 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     private final SendOperatorNotificationService mvSendOperatorNotificationService;
     private final ProductGenerateQRCodeService mvProductGenerateQRCodeService;
     private final ProductDetailTempRepository mvProductVariantTempRepository;
+    private final TransactionGoodsService mvTransactionGoodsService;
     private final ProductPriceRepository mvProductPriceRepository;
     private final GenerateBarcodeService mvGenerateBarcodeService;
     private final ProductHistoryService mvProductHistoryService;
-    private final TicketImportService mvTicketImportService;
-    private final TicketExportService mvTicketExportService;
     private final ProductPriceService mvProductPriceService;
     private final ProductImageService mvProductImageService;
     private final ProductInfoService mvProductInfoService;
@@ -81,8 +75,8 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
 
     public ProductVariantServiceImpl(ProductDetailRepository pEntityRepository, ProductDetailTempRepository pProductVariantTempRepository,
                                      ProductPriceRepository pProductPriceRepository, ProductGenerateQRCodeService pProductGenerateQRCodeService,
-                                     ProductHistoryService pProductHistoryService, @Lazy TicketImportService pTicketImportService,
-                                     @Lazy TicketExportService pTicketExportService, CategoryService pCategoryService,
+                                     ProductHistoryService pProductHistoryService,
+                                     TransactionGoodsService pTransactionGoodsService, CategoryService pCategoryService,
                                      StorageService pStorageService, OrderCartRepository pCartRepository,
                                      GenerateBarcodeService pGenerateBarcodeService, ProductPriceService pProductPriceService,
                                      SystemLogService pSystemLogService, SendOperatorNotificationService pSendOperatorNotificationService,
@@ -91,11 +85,10 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         this.mvSendOperatorNotificationService = pSendOperatorNotificationService;
         this.mvProductVariantTempRepository = pProductVariantTempRepository;
         this.mvProductGenerateQRCodeService = pProductGenerateQRCodeService;
+        this.mvTransactionGoodsService = pTransactionGoodsService;
         this.mvProductPriceRepository = pProductPriceRepository;
         this.mvGenerateBarcodeService = pGenerateBarcodeService;
         this.mvProductHistoryService = pProductHistoryService;
-        this.mvTicketImportService = pTicketImportService;
-        this.mvTicketExportService = pTicketExportService;
         this.mvProductImageService = pProductImageService;
         this.mvProductPriceService = pProductPriceService;
         this.mvProductInfoService = pProductInfoService;
@@ -286,17 +279,16 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         Storage lvStorage = mvStorageService.findEntById(pDto.getStorageIdInitStorageQty(), true);
         String initMessage = "Initialize storage quantity when create new products";
 
-        TicketImport ticketImportSaved = mvTicketImportService.save(TicketImport.builder()
+        TransactionGoodsDTO lvTransactionGoodsDto = mvTransactionGoodsService.createExportTransaction(TransactionGoodsDTO.builder()
                 .title("Initialize storage")
-                .importer(getUserPrincipal().getUsername())
-                .importTime(LocalDateTime.now())
-                .note(initMessage)
-                .status(TicketImportStatus.COMPLETED.name())
-                .storage(lvStorage)
+                .transactionType(com.flowiee.pms.modules.inventory.enums.TransactionGoodsType.EXPORT)
+                .warehouse(new StorageDTO(lvStorage.getId()))
+                .transactionStatus(TransactionGoodsStatus.APPROVED)
+                .description(initMessage)
                 .build());
 
         mvProductVariantTempRepository.save(ProductVariantExim.builder()
-                .ticketImport(ticketImportSaved)
+                //.ticketImport(new TicketImport(lvTransactionGoodsDto.getId()))
                 .productVariant(pProductVariantSaved)
                 .quantity(pProductVariantSaved.getStorageQty())
                 .note(initMessage)
@@ -307,17 +299,16 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         Storage lvStorage = mvStorageService.findEntById(pDto.getStorageIdInitStorageQty(), true);
         String initMessage = "Initialize storage quantity when create new products";
 
-        TicketExportDTO ticketExportSaved = mvTicketExportService.save(TicketExportDTO.builder()
+        TransactionGoodsDTO lvTransactionGoodsDto = mvTransactionGoodsService.createExportTransaction(TransactionGoodsDTO.builder()
                 .title("Initialize storage")
-                .exporter(getUserPrincipal().getUsername())
-                .exportTime(LocalDateTime.now())
-                .note(initMessage)
-                .status(TicketExportStatus.COMPLETED.name())
-                .storage(new StorageDTO(lvStorage.getId()))
+                .transactionType(com.flowiee.pms.modules.inventory.enums.TransactionGoodsType.EXPORT)
+                .warehouse(new StorageDTO(lvStorage.getId()))
+                .transactionStatus(TransactionGoodsStatus.APPROVED)
+                .description(initMessage)
                 .build());
 
         mvProductVariantTempRepository.save(ProductVariantExim.builder()
-                .ticketExport(new TicketExport(ticketExportSaved.getId()))
+                //.ticketExport(new TicketExport(lvTransactionGoodsDto.getId()))
                 .productVariant(pProductVariantSaved)
                 .quantity(pProductVariantSaved.getStorageQty())
                 .note(initMessage)
@@ -388,24 +379,24 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             if (tempDTO.getQuantity() > 0) {
                 changeQty = "+/- " + tempDTO.getQuantity();
             }
-            if (tempDTO.getTicketImport() != null) {
-                staff = tempDTO.getTicketImport().getImporter();
-                for (TicketImportAction importAction : TicketImportAction.values()) {
-                    if (importAction.name().equals(tempDTO.getAction()) ) {
-                        actionLabel = importAction.getLabel();
-                        break;
-                    }
-                }
-            }
-            if (tempDTO.getTicketExport() != null) {
-                staff = tempDTO.getTicketExport().getExporter();
-                for (TicketExportAction exportAction : TicketExportAction.values()) {
-                    if (exportAction.name().equals(tempDTO.getAction()) ) {
-                        actionLabel = exportAction.getLabel();
-                        break;
-                    }
-                }
-            }
+//            if (tempDTO.getTicketImport() != null) {
+//                staff = tempDTO.getTicketImport().getImporter();
+//                for (TicketImportAction importAction : TicketImportAction.values()) {
+//                    if (importAction.name().equals(tempDTO.getAction()) ) {
+//                        actionLabel = importAction.getLabel();
+//                        break;
+//                    }
+//                }
+//            }
+//            if (tempDTO.getTicketExport() != null) {
+//                staff = tempDTO.getTicketExport().getExporter();
+//                for (TicketExportAction exportAction : TicketExportAction.values()) {
+//                    if (exportAction.name().equals(tempDTO.getAction()) ) {
+//                        actionLabel = exportAction.getLabel();
+//                        break;
+//                    }
+//                }
+//            }
             tempDTO.setStaff(staff);
             tempDTO.setAction(actionLabel);
             tempDTO.setChangeQty(changeQty);
@@ -430,24 +421,24 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             if (tempDTO.getQuantity() > 0) {
                 changeQty = "+/- " + tempDTO.getQuantity();
             }
-            if (tempDTO.getTicketImport() != null) {
-                staff = tempDTO.getTicketImport().getImporter();
-                for (TicketImportAction importAction : TicketImportAction.values()) {
-                    if (importAction.name().equals(tempDTO.getAction()) ) {
-                        actionLabel = importAction.getLabel();
-                        break;
-                    }
-                }
-            }
-            if (tempDTO.getTicketExport() != null) {
-                staff = tempDTO.getTicketExport().getExporter();
-                for (TicketExportAction exportAction : TicketExportAction.values()) {
-                    if (exportAction.name().equals(tempDTO.getAction()) ) {
-                        actionLabel = exportAction.getLabel();
-                        break;
-                    }
-                }
-            }
+//            if (tempDTO.getTicketImport() != null) {
+//                staff = tempDTO.getTicketImport().getImporter();
+//                for (TicketImportAction importAction : TicketImportAction.values()) {
+//                    if (importAction.name().equals(tempDTO.getAction()) ) {
+//                        actionLabel = importAction.getLabel();
+//                        break;
+//                    }
+//                }
+//            }
+//            if (tempDTO.getTicketExport() != null) {
+//                staff = tempDTO.getTicketExport().getExporter();
+//                for (TicketExportAction exportAction : TicketExportAction.values()) {
+//                    if (exportAction.name().equals(tempDTO.getAction()) ) {
+//                        actionLabel = exportAction.getLabel();
+//                        break;
+//                    }
+//                }
+//            }
             tempDTO.setStaff(staff);
             tempDTO.setAction(actionLabel);
             tempDTO.setChangeQty(changeQty);

@@ -1,27 +1,22 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
+import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.modules.inventory.model.StorageItems;
 import com.flowiee.pms.modules.inventory.dto.StorageDTO;
 import com.flowiee.pms.common.base.service.BaseExportService;
 import com.flowiee.pms.modules.inventory.service.StorageService;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class StorageExportServiceImpl extends BaseExportService {
-    StorageService mvStorageService;
-
-    private DateTimeFormatter DF_DDMMYYYY = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final StorageService mvStorageService;
 
     @Override
     protected void prepareData(Object pCondition, boolean pTemplateOnly) {
@@ -52,8 +47,8 @@ public class StorageExportServiceImpl extends BaseExportService {
             row.createCell(3).setCellValue(storageItems.getItemBrand());
             row.createCell(4).setCellValue(storageItems.getItemSalesAvailableQty());
             row.createCell(5).setCellValue(storageItems.getItemStorageQty());
-            row.createCell(6).setCellValue(storageItems.getLastImportTime().format(DF_DDMMYYYY));
-            row.createCell(7).setCellValue(storageItems.getFirstImportTime().format(DF_DDMMYYYY));
+            row.createCell(6).setCellValue(DateTimeUtil.format(storageItems.getLastImportTime(), DateTimeUtil.FORMAT_DATE));
+            row.createCell(7).setCellValue(DateTimeUtil.format(storageItems.getFirstImportTime(), DateTimeUtil.FORMAT_DATE));
 
             setBorderCell(row, 0, 7);
         }

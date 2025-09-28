@@ -140,8 +140,13 @@ function submitProductOnSearchModal(functionId) {
                 addCartItems(mvProductSearchModalListSelected);
                 break;
             case "goodsImport":
-                addGoodsImportItems(mvProductSearchModalListSelected);
+                addTransactionGoodsItems(mvProductSearchModalListSelected);
                 break;
         }
     });
 }
+
+// ItemModel = {
+//     productVariantId: (long) ...,
+//     quantity: (int) ...
+// }

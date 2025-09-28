@@ -3,8 +3,9 @@ package com.flowiee.pms.modules.sales.service.impl;
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.utils.*;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
+import com.flowiee.pms.modules.inventory.entity.TransactionGoods;
 import com.flowiee.pms.modules.inventory.service.ProductVariantService;
-import com.flowiee.pms.modules.inventory.service.TicketImportService;
+import com.flowiee.pms.modules.inventory.service.TransactionGoodsService;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.sales.dto.OrderReturnDTO;
 import com.flowiee.pms.modules.sales.dto.OrderReturnItemDTO;
@@ -61,12 +62,12 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     private final SendCustomerNotificationService mvSendCustomerNotificationService;
     private final OrderGenerateQRCodeService mvOrderGenerateQRCodeService;
     private final OrderReturnItemRepository mvOrderReturnItemRepository;
+    private final TransactionGoodsService mvTransactionGoodsService;
     private final OrderReturnRepository mvOrderReturnRepository;
     private final ProductVariantService mvProductVariantService;
     private final LoyaltyProgramService mvLoyaltyProgramService;
     private final VoucherTicketService mvVoucherTicketService;
     private final OrderHistoryService mvOrderHistoryService;
-    private final TicketImportService mvTicketImportService;
     private final OrderItemsService mvOrderItemsService;
     private final AccountRepository mvAccountRepository;
     private final ConfigRepository mvConfigRepository;
@@ -76,17 +77,17 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     private final CartService mvCartService;
     private final ModelMapper mvModelMapper;
 
-    public OrderServiceImpl(OrderRepository pOrderRepository, SendCustomerNotificationService pSendCustomerNotificationService, CartService pCartService, ConfigRepository pConfigRepository, OrderItemsService pOrderItemsService, OrderGenerateQRCodeService pOrderGenerateQRCodeService, OrderHistoryService pOrderHistoryService, TicketImportService pTicketImportService, VoucherTicketService pVoucherTicketService, LoyaltyProgramService pLoyaltyProgramService, CategoryService pCategoryService, CustomerService pCustomerService, AccountRepository pAccountRepository, SystemLogService pSystemLogService, OrderReturnRepository pOrderReturnRepository, OrderReturnItemRepository pOrderReturnItemRepository, ProductVariantService pProductVariantService, ModelMapper pModelMapper) {
+    public OrderServiceImpl(OrderRepository pOrderRepository, SendCustomerNotificationService pSendCustomerNotificationService, CartService pCartService, ConfigRepository pConfigRepository, OrderItemsService pOrderItemsService, OrderGenerateQRCodeService pOrderGenerateQRCodeService, OrderHistoryService pOrderHistoryService, VoucherTicketService pVoucherTicketService, LoyaltyProgramService pLoyaltyProgramService, CategoryService pCategoryService, CustomerService pCustomerService, AccountRepository pAccountRepository, SystemLogService pSystemLogService, OrderReturnRepository pOrderReturnRepository, OrderReturnItemRepository pOrderReturnItemRepository, ProductVariantService pProductVariantService, ModelMapper pModelMapper, TransactionGoodsService pTransactionGoodsService) {
         super(Order.class, OrderDTO.class, pOrderRepository);
         this.mvSendCustomerNotificationService = pSendCustomerNotificationService;
         this.mvOrderGenerateQRCodeService = pOrderGenerateQRCodeService;
         this.mvOrderReturnItemRepository = pOrderReturnItemRepository;
+        this.mvTransactionGoodsService = pTransactionGoodsService;
         this.mvProductVariantService = pProductVariantService;
         this.mvLoyaltyProgramService = pLoyaltyProgramService;
         this.mvOrderReturnRepository = pOrderReturnRepository;
         this.mvVoucherTicketService = pVoucherTicketService;
         this.mvOrderHistoryService = pOrderHistoryService;
-        this.mvTicketImportService = pTicketImportService;
         this.mvOrderItemsService = pOrderItemsService;
         this.mvAccountRepository = pAccountRepository;
         this.mvConfigRepository = pConfigRepository;
@@ -132,7 +133,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
 
         List<OrderDTO> lvDTOs = new ArrayList<>();
         for (Order lvOrder : lvResultList) {
-            OrderDTO lvDto = OrderDTO.fromOrder(lvOrder);
+            OrderDTO lvDto = OrderDTO.toDto(lvOrder);
             lvDto.setItems(lvDto.getListOrderDetail());
             lvDto.setTotalAmount(OrderUtils.calAmount(lvOrder));
 
@@ -278,7 +279,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_ORD_C, MasterObject.Order, "Thêm mới đơn hàng", lvOrderSaved.getCode());
         LOG.info("Insert new order success! insertBy={}", getUserPrincipal().getUsername());
 
-        return OrderDTO.fromOrder(lvOrderSaved);
+        return OrderDTO.toDto(lvOrderSaved);
     }
 
     private LocalDateTime getOrderTime(String pOrderTime) {
@@ -352,8 +353,10 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
                     }
                     break;
                 case RTND:
-                    Long lvStorageId = lvUpdatedOrder.getTicketExport().getStorage().getId();
-                    mvTicketImportService.restockReturnedItems(lvStorageId, lvUpdatedOrder.getCode());
+                    for (TransactionGoods lvTransactionGoods : lvUpdatedOrder.getTransactionGoodsList()) {
+                        Long lvStorageId = lvTransactionGoods.getWarehouse().getId();
+                        mvTransactionGoodsService.restockReturnedItems(lvStorageId, lvUpdatedOrder.getCode());
+                    }
                     boolean isNeedRefund = false;
                     if (isNeedRefund) {
                         //create ledger transaction record for export
@@ -375,7 +378,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         mvSystemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_ORD_U, MasterObject.Order, "Cập nhật đơn hàng", changeLog);
         LOG.info("Cập nhật đơn hàng {}", lvUpdatedOrder.toString());
 
-        return OrderDTO.fromOrder(lvUpdatedOrder);
+        return OrderDTO.toDto(lvUpdatedOrder);
     }
 
     @Override

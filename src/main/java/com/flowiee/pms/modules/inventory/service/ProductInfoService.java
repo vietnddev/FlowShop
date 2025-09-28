@@ -1,6 +1,5 @@
 package com.flowiee.pms.modules.inventory.service;
 
-import com.flowiee.pms.modules.inventory.dto.ProductAttributeDTO;
 import com.flowiee.pms.modules.inventory.entity.ProductDescription;
 import com.flowiee.pms.modules.inventory.model.ProductHeld;
 import com.flowiee.pms.common.base.service.ICurdService;

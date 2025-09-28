@@ -158,6 +158,9 @@ public class CrawlerService {
             }
         }
 
+        productCrawlerRepository.deleteAll();
+        imageCrawlerRepository.deleteAll();
+
         systemLogService.writeLogCreate(MODULE.SYSTEM, ACTION.SYS_DATA_MERGE, MasterObject.Master, "Merge data temp into system", SystemLog.EMPTY);
         logger.info("Merge temp data: finish");
     }

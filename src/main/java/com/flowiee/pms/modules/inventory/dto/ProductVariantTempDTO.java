@@ -33,8 +33,8 @@ public class ProductVariantTempDTO extends ProductVariantExim implements Seriali
         ProductVariantTempDTO outputDTO = new ProductVariantTempDTO();
         outputDTO.setId(inputEntity.getId());
         outputDTO.setProductVariant(inputEntity.getProductVariant());
-        outputDTO.setTicketImport(inputEntity.getTicketImport());
-        outputDTO.setTicketExport(inputEntity.getTicketExport());
+        //outputDTO.setTicketImport(inputEntity.getTicketImport());
+        //outputDTO.setTicketExport(inputEntity.getTicketExport());
         outputDTO.setPurchasePrice(inputEntity.getPurchasePrice());
         outputDTO.setQuantity(inputEntity.getQuantity());
         outputDTO.setNote(inputEntity.getNote());
@@ -45,12 +45,12 @@ public class ProductVariantTempDTO extends ProductVariantExim implements Seriali
             outputDTO.setProductVariantId(outputDTO.getProductVariant().getId());
             outputDTO.setProductVariantName(outputDTO.getProductVariant().getVariantName());
         }
-        if (outputDTO.getTicketImport() != null) {
-            outputDTO.setTicketImportId(inputEntity.getTicketImport().getId());
-        }
-        if (outputDTO.getTicketExport() != null) {
-            outputDTO.setTicketExportId(inputEntity.getTicketExport().getId());
-        }
+//        if (outputDTO.getTicketImport() != null) {
+//            outputDTO.setTicketImportId(inputEntity.getTicketImport().getId());
+//        }
+//        if (outputDTO.getTicketExport() != null) {
+//            outputDTO.setTicketExportId(inputEntity.getTicketExport().getId());
+//        }
         outputDTO.setStorageQty(inputEntity.getStorageQty());
         outputDTO.setCreatedAt(inputEntity.getCreatedAt());
         outputDTO.setAction(inputEntity.getAction());

@@ -1,33 +1,23 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.StartUp;
-import com.flowiee.pms.modules.inventory.dto.TicketExportDTO;
-import com.flowiee.pms.modules.inventory.entity.ProductCombo;
-import com.flowiee.pms.modules.inventory.entity.ProductDamaged;
-import com.flowiee.pms.modules.inventory.entity.TicketExport;
-import com.flowiee.pms.modules.inventory.entity.TicketImport;
+import com.flowiee.pms.modules.inventory.entity.*;
+import com.flowiee.pms.modules.inventory.service.*;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.modules.inventory.dto.ProductComboDTO;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.repository.ProductDamagedRepository;
 import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.modules.media.service.FileStorageService;
 import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.media.repository.FileStorageRepository;
-import com.flowiee.pms.modules.inventory.service.TicketExportService;
-import com.flowiee.pms.modules.inventory.service.TicketImportService;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.FileUtils;
-import com.flowiee.pms.modules.inventory.service.ProductComboService;
-import com.flowiee.pms.modules.inventory.service.ProductImageService;
-import com.flowiee.pms.modules.inventory.service.ProductVariantService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,9 +38,8 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class ProductImageServiceImpl implements ProductImageService {
+    TransactionGoodsService mvTransactionGoodsService;
     FileStorageService mvFileStorageService;
-    TicketExportService mvTicketExportService;
-    TicketImportService mvTicketImportService;
     ProductComboService mvProductComboService;
     ProductVariantService mvProductVariantService;
     FileStorageRepository mvFileStorageRepository;
@@ -124,25 +113,11 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Override
-    public FileStorage saveImageTicketImport(MultipartFile fileUpload, long ticketImportId) throws IOException {
-        TicketImport ticketImport = mvTicketImportService.findById(ticketImportId, true);
+    public FileStorage saveImageTransactionGoods(MultipartFile fileUpload, long ticketImportId) throws IOException {
+        TransactionGoods lvTransactionGoods = mvTransactionGoodsService.findEntById(ticketImportId, true);
 
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.STORAGE.name(), null);
-        fileInfo.setTicketImport(ticketImport);
-        FileStorage imageSaved = mvFileStorageService.save(fileInfo);
-
-        Path path = Paths.get(CommonUtils.getPathDirectory(MODULE.STORAGE) + "/" + imageSaved.getStorageName());
-        fileUpload.transferTo(path);
-
-        return imageSaved;
-    }
-
-    @Override
-    public FileStorage saveImageTicketExport(MultipartFile fileUpload, long ticketExportId) throws IOException {
-        TicketExportDTO ticketExport = mvTicketExportService.findById(ticketExportId, true);
-
-        FileStorage fileInfo = new FileStorage(fileUpload, MODULE.STORAGE.name(), null);
-        fileInfo.setTicketExport(new TicketExport(ticketExport.getId()));
+        fileInfo.setTransactionGoods(lvTransactionGoods);
         FileStorage imageSaved = mvFileStorageService.save(fileInfo);
 
         Path path = Paths.get(CommonUtils.getPathDirectory(MODULE.STORAGE) + "/" + imageSaved.getStorageName());

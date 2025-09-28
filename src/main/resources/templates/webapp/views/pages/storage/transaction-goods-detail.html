@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<div th:replace="~{header :: stylesheets(title='Flowiee System | Phiếu nhập hàng')}"></div>
+
+<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
+    <div class="wrapper">
+        <div th:replace="~{header :: header}"></div>
+
+        <div th:replace="~{sidebar :: sidebar}"></div>
+
+        <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px">
+            <!-- Section title -->
+            <div class="col-12" style="padding-left: 15px; padding-right: 8px; padding-bottom: 0px; margin-bottom: 0px">
+                <section class="card">
+                    <div class="form-group row justify-content-between d-flex align-items-center p-3 mb-0">
+                        <div class="col-9">
+                            <div class="row">
+                                <input class="col-9 form-control form-control-sm" type="text" id="titleField" placeholder="Name" th:value="${thTransactionGoods.title}"/>
+                            </div>
+                        </div>
+                        <div class="col-3 row justify-content-end">
+                            <div class="col-6">
+                                <button class="btn btn-sm btn-info w-100" type="button" id="btnUpdateTransactionGoods"><i class="fa-solid fa-check mr-1"></i>Cập nhật</button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-sm btn-success w-100" type="button" data-toggle="modal" data-target="#modalUploadFile"><i class="fa-solid fa-upload"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!-- End section title -->
+
+            <div class="row" style="padding-left: 7px; padding-right: 7px">
+                <div class="col-9" style="padding-right: 0">
+                    <section class="col-12">
+                        <div class="card p-3" style="max-height: 450px; overflow: auto">
+                            <div class="row">
+                                <table class="table table-head-fixed text-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <button class="btn btn-sm btn-primary w-auto" id="btnAddItems">
+                                                    <i class="fa-solid fa-plus"></i>
+                                                </button>
+                                            </th>
+                                            <th>Item name</th>
+                                            <th>Price</th>
+                                            <th>Qty</th>
+                                            <th>Amount</th>
+                                            <th>Note</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblItems"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- End section items -->
+
+                    <!-- Section image -->
+                    <section class="col-12">
+                        <div class="card p-3" style="min-height: 366px; max-height: 366px; overflow: auto">
+                            <div class="row" id="gridUploadedImages"></div>
+                        </div>
+                    </section>
+                    <!-- End section image -->
+                </div>
+
+                <!-- Section form thông tin -->
+                <div class="col-3">
+                    <section class="col-12 card p-3">
+                        <div class="form-group row" th:if="${thTransactionGoods.transactionType.name() == 'EXPORT'}">
+                            <input class="col-8 form-control" id="orderCodeField" placeholder="Order code"/>
+                            <button class="col-4 btn btn-sm btn-primary" id="btnGenerateItems">Generate</button>
+                        </div>
+                        <div class="form-group row">
+                            <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Nhà cung cấp</span>
+                            <select class="custom-select col-7" id="supplierField">
+                                <option th:each="i : ${thSuppliers}" th:value="${i.id}" th:text="${i.name}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group row">
+                            <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Thời gian tạo</span>
+                            <input class="col-7 form-control" type="datetime-local" id="importTimeField" th:value="${thTransactionGoods.createdAt}" disabled/>
+                        </div>
+                        <div class="form-group row">
+                            <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Created by staff</span>
+                            <input class="col-7 form-control" th:value="${thTransactionGoods.createdStaff}" disabled/>
+                        </div>
+                        <div class="form-group row">
+                            <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Processing Staff</span>
+                            <input class="col-7 form-control" th:value="${thTransactionGoods.processingStaff}" disabled/>
+                        </div>
+                        <div class="form-group row">
+                            <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Tổng giá trị</span>
+                            <input class="col-7 form-control" id="totalValueField" disabled/>
+                        </div>
+                        <div class="form-group">
+                            <label for="noteField">Ghi chú</label>
+                            <textarea class="form-control" rows="5" id="noteField" th:text="${thTransactionGoods.description}"></textarea>
+                        </div>
+                        <div class="form-group row">
+                            <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Trạng thái</span>
+                            <select class="custom-select col-7" id="statusField">
+                                <option th:value="${thTransactionGoods.transactionStatus}" th:text="${thTransactionGoods.transactionStatus}" selected></option>
+                                <option th:each="i : ${thStatus}" th:value="${i}" th:text="${i}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group row mb-0 mt-3">
+                            <button class="btn btn-sm btn-danger w-100" id="btnDeleteTransactionGoods">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+                <!-- End section form thông tin -->
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{footer :: footer}"></div>
+
+    <div th:replace="~{modal_fragments :: confirm_modal}"></div>
+    <div th:replace="~{fragments :: uploadFileModal}"></div>
+    <div th:replace="~{pages/product/fragments/product-fragments :: searchProductModal}"></div>
+
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+
+    <div th:replace="~{header :: scripts}"></div>
+
+    <script th:src="@{/js/product/SearchProductModal.js}"></script>
+    <script th:src="@{/js/storage/TransactionGoods.js}"></script>
+
+    <script th:inline="javascript">
+        let mvOrderCodeField = $("#orderCodeField");
+        let mvDescription = $("#noteField");
+        let mvStatus = $("#statusField");
+        let mvTransactionGoodsId = [[${thTransactionGoods.id}]];
+        let mvTransactionType = [[${thTransactionGoods.transactionType}]];
+    </script>
+
+    <script> // Upload file
+    // DropzoneJS Demo Code Start
+    Dropzone.autoDiscover = true
+
+    // Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
+    var previewNode = document.querySelector("#template")
+    previewNode.id = ""
+    var previewTemplate = previewNode.parentNode.innerHTML
+    previewNode.parentNode.removeChild(previewNode)
+
+    var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
+        url: "/uploads/transaction-goods/[[${thTransactionGoods.id}]]", // Gọi tới API trong spring để xử lý file
+        thumbnailWidth: 80,
+        thumbnailHeight: 80,
+        parallelUploads: 20,
+        previewTemplate: previewTemplate,
+        autoQueue: false, // Make sure the files aren't queued until manually added
+        previewsContainer: "#previews", // Define the container to display the previews
+        clickable: ".fileinput-button", // Define the element that should be used as click trigger to select files.
+    })
+
+    myDropzone.on("addedfile", function (file) {
+        // Hookup the start button
+        file.previewElement.querySelector(".start").onclick = function () {
+            myDropzone.enqueueFile(file)
+        }
+    })
+
+    // Update the total progress bar
+    myDropzone.on("totaluploadprogress", function (progress) {
+        document.querySelector("#total-progress .progress-bar").style.width = progress + "%"
+    })
+
+    myDropzone.on("sending", function (file) {
+        // Show the total progress bar when upload starts
+        document.querySelector("#total-progress").style.opacity = "1"
+        // And disable the start button
+        file.previewElement.querySelector(".start").setAttribute("disabled", "disabled")
+    })
+
+    // Hide the total progress bar when nothing's uploading anymore
+    myDropzone.on("queuecomplete", function (progress) {
+        document.querySelector("#total-progress").style.opacity = "0"
+    })
+
+    // Setup the buttons for all transfers
+    // The "add files" button doesn't need to be setup because the config
+    // `clickable` has already been specified.
+    document.querySelector("#actions .start").onclick = function () {
+        myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED))
+    }
+    document.querySelector("#actions .cancel").onclick = function () {
+        myDropzone.removeAllFiles(true)
+    }
+    // DropzoneJS Demo Code End
+
+    </script>
+</body>
+</html>

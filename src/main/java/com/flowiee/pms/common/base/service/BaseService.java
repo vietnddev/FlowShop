@@ -62,18 +62,31 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
     }
 
     public E findEntById(Long pId, boolean throwException) {
-        return mvEntityRepository.findById(pId)
-                .orElseThrow(() -> throwException ?
-                        new EntityNotFoundException(new Object[]{String.format("%s with Id %s", mvEntityClass.getSimpleName(), pId)}, null, null) :
-                        null);
+        Optional<E> optional = mvEntityRepository.findById(pId);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        if (throwException) {
+            throw new EntityNotFoundException(
+                    new Object[]{String.format("%s with Id %s", mvEntityClass.getSimpleName(), pId)},
+                    null, null
+            );
+        }
+        return null;
     }
 
     public D findDtoById(Long pId, boolean throwException) {
-        return mvEntityRepository.findById(pId)
-                .map(entity -> mvModelMapper.map(entity, mvDtoClass))
-                .orElseThrow(() -> throwException ?
-                        new EntityNotFoundException(new Object[]{String.format("%s with Id %s", mvEntityClass.getSimpleName(), pId)}, null, null) :
-                        null);
+        Optional<E> optional = mvEntityRepository.findById(pId);
+        if (optional.isPresent()) {
+            return mvModelMapper.map(optional.get(), mvDtoClass);
+        }
+        if (throwException) {
+            throw new EntityNotFoundException(
+                    new Object[]{String.format("%s with Id %s", mvEntityClass.getSimpleName(), pId)},
+                    null, null
+            );
+        }
+        return null;
     }
 
     public List<E> findByIds(List<Long> pIds) {

@@ -10,7 +10,7 @@ function showModalDialog(title, message) {
 
 function showConfirmModal(linkObject, title, text) {
     let entity = linkObject.attr("entity");
-    let entityId = linkObject.attr("entityId");//link là 1 đối tượng JQuery -->lấy ra giá trị của thuộc tính entityId
+    let entityId = linkObject.attr("entityId");
     let entityName = linkObject.attr("entityName");
     let actionType = linkObject.attr("actionType");
 
@@ -19,10 +19,6 @@ function showConfirmModal(linkObject, title, text) {
     $("#yesButton").attr("entityName", linkObject.attr("entityName"));
     $("#yesButton").attr("actionType", linkObject.attr("actionType"));
 
-    if (actionType === 'create' || actionType === 'update') {
-        $("#confirmTitle").text(title);
-        $("#confirmText").text(text);
-    }
     if (actionType === 'delete') {
         if (title === null) {
             $("#confirmTitle").text("Xác nhận xóa");
@@ -34,6 +30,10 @@ function showConfirmModal(linkObject, title, text) {
         } else {
             $("#confirmText").text(text);
         }
+    } else {
+        $("#confirmTitle").text(title);
+        $("#confirmText").text(text);
     }
+
     $("#confirmModal").modal();//hiển thị modal
 }

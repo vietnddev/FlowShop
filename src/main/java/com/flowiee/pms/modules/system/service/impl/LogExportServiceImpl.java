@@ -1,25 +1,20 @@
 package com.flowiee.pms.modules.system.service.impl;
 
+import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.modules.system.service.SystemLogService;
 import com.flowiee.pms.modules.system.entity.SystemLog;
 import com.flowiee.pms.common.base.service.BaseExportService;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class LogExportServiceImpl extends BaseExportService {
-    SystemLogService mvSystemLogService;
-
-    private DateTimeFormatter mvDateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    private final SystemLogService mvSystemLogService;
 
     @Override
     protected void prepareData(Object pCondition, boolean pTemplateOnly) {
@@ -40,7 +35,7 @@ public class LogExportServiceImpl extends BaseExportService {
             row.createCell(2).setCellValue(systemLog.getTitle());
             row.createCell(3).setCellValue(systemLog.getContent());
             row.createCell(4).setCellValue(systemLog.getContentChange());
-            row.createCell(5).setCellValue(systemLog.getCreatedAt().format(mvDateTimeFormatter));
+            row.createCell(5).setCellValue(DateTimeUtil.format(systemLog.getCreatedAt(), DateTimeUtil.FORMAT_DATE_TIME));
             row.createCell(6).setCellValue(systemLog.getIp());
 
             setBorderCell(row, 0, 6);

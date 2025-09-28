@@ -32,9 +32,8 @@ import java.nio.file.Paths;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class FileController extends BaseController {
-    FileStorageService    fileService;
-    TicketImportService   ticketImportService;
-    TicketExportService   ticketExportService;
+    FileStorageService fileService;
+    TransactionGoodsService transactionGoodsService;
     ProductInfoService productInfoService;
     ProductImageService productImageService;
     ProductComboService productComboService;
@@ -80,29 +79,16 @@ public class FileController extends BaseController {
         return refreshPage(request);
     }
 
-    @PostMapping("/uploads/ticket-import/{id}")
+    @PostMapping("/uploads/transaction-goods/{id}")
     @PreAuthorize("@vldModuleProduct.updateImage(true)")
-    public ModelAndView uploadImageOfTicketImport(@RequestParam("file") MultipartFile file, HttpServletRequest request, @PathVariable("id") Long ticketImportId) throws Exception {
-        if (ticketImportId <= 0 || ticketImportService.findById(ticketImportId, true) == null) {
-            throw new ResourceNotFoundException("Ticket import not found!");
+    public ModelAndView uploadImageForTransactionGoodsImport(@RequestParam("file") MultipartFile file, HttpServletRequest request, @PathVariable("id") Long ticketImportId) throws Exception {
+        if (ticketImportId <= 0 || transactionGoodsService.findEntById(ticketImportId, true) == null) {
+            throw new ResourceNotFoundException("Transaction goods invalid!");
         }
         if (file.isEmpty()) {
             throw new ResourceNotFoundException("File attach not found!");
         }
-        productImageService.saveImageTicketImport(file, ticketImportId);
-        return refreshPage(request);
-    }
-
-    @PostMapping("/uploads/ticket-export/{id}")
-    @PreAuthorize("@vldModuleProduct.updateImage(true)")
-    public ModelAndView uploadImageOfTicketExport(@RequestParam("file") MultipartFile file, HttpServletRequest request, @PathVariable("id") Long ticketExportId) throws Exception {
-        if (ticketExportId <= 0 || ticketExportService.findById(ticketExportId, true) == null) {
-            throw new ResourceNotFoundException("Ticket export not found!");
-        }
-        if (file.isEmpty()) {
-            throw new ResourceNotFoundException("File attach not found!");
-        }
-        productImageService.saveImageTicketExport(file, ticketExportId);
+        productImageService.saveImageTransactionGoods(file, ticketImportId);
         return refreshPage(request);
     }
 

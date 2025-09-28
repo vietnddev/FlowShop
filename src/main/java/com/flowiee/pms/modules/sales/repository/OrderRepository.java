@@ -46,13 +46,6 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
 //           "where extract(year from o.thoiGianDatHang) = extract(year from current_date)")
 //    List<Object[]> findRevenueEachMonthOfYear();
 
-    @Modifying
-    @Query("update Order set ticketExport.id=:ticketExportId where id=:orderId")
-    void updateTicketExportInfo(@Param("orderId") Long orderId, @Param("ticketExportId") Long ticketExportId);
-
-    @Query("from Order where ticketExport.id=:ticketExportId")
-    Order findByTicketExport(@Param("ticketExportId") Long ticketExportId);
-
     @Query("from Order where trackingCode = :trackingCode")
     Order findByTrackingCode(@Param("trackingCode") String trackingCode);
 

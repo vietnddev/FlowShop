@@ -25,10 +25,6 @@ public class MaterialTemp extends BaseEntity implements Serializable {
 	static final long serialVersionUID = 1L;
 
     @ManyToOne
-    @JoinColumn(name = "goods_import_id", nullable = false)
-    TicketImport ticketImport;
-
-    @ManyToOne
 	@JoinColumn(name = "material_id", nullable = false)
 	Material material;
 

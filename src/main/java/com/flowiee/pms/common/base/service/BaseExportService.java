@@ -6,10 +6,12 @@ import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.modules.system.model.EximResult;
 import com.flowiee.pms.modules.system.service.ExportService;
 import com.flowiee.pms.common.enumeration.TemplateExport;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,7 +19,9 @@ import org.springframework.http.MediaType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalTime;
 import java.util.List;
@@ -42,7 +46,8 @@ public abstract class BaseExportService implements ExportService {
     public EximResult exportToExcel(TemplateExport templateExport, Object pCondition, boolean templateOnly) {
         try {
             mvEximResult = new EximResult(templateExport);
-            mvWorkbook = new XSSFWorkbook(Files.copy(mvEximResult.getPathSource(), mvEximResult.getPathTarget(), StandardCopyOption.REPLACE_EXISTING).toFile());
+
+            mvWorkbook = getWorkbook(templateExport);
 
             mvDataSheet = mvWorkbook.getSheet(mvDataSheetName) == null
                     ? mvWorkbook.createSheet(mvDataSheetName)
@@ -77,6 +82,24 @@ public abstract class BaseExportService implements ExportService {
                 logger.error("Error when export data!", e);
             }
         }
+    }
+
+    private XSSFWorkbook getWorkbook(TemplateExport pTemplateExport) throws IOException, InvalidFormatException {
+        Path lvPathSource = mvEximResult.getPathSource();
+        Path lvPathTarget = mvEximResult.getPathTarget();
+
+        //Docker environment
+        if (!Files.exists(lvPathSource)) {
+            try (InputStream in = new ClassPathResource(
+                    "static/templates/excel/" + pTemplateExport.getTemplateName()
+            ).getInputStream()) {
+                Files.copy(in, lvPathTarget, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } else {
+            Files.copy(lvPathSource, lvPathTarget, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return new XSSFWorkbook(lvPathTarget.toFile());
     }
 
     private void setHttpHeaders() {

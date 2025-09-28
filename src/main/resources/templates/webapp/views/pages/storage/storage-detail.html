@@ -1,12 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thông tin Kho</title>
-    <th:block th:replace="~{header :: stylesheets}"></th:block>
-</head>
+<div th:replace="~{header :: stylesheets(title='Warehouse detail')}"></div>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -29,28 +24,29 @@
 
                         <div class="card" style="font-size: 14px">
                             <div class="card-header row justify-content-between ml-0 mr-0" style="font-weight: bold; font-size: 16px">
-                                <ul class="col-7 nav nav-pills">
+                                <ul class="col-8 nav nav-pills">
                                     <li class="nav-item"><a class="nav-link active" href="#STORAGE_ITEM_TAB" id="storageItemTabLabel" data-toggle="tab">Inventory</a></li>
                                     <li class="nav-item"><a class="nav-link" href="#STORAGE_INFO_TAB" id="storageInfoTabLabel" data-toggle="tab">Storage info</a></li>
                                     <li class="nav-item"><a class="nav-link" href="#IMPORT_HISTORY_TAB" id="storageImportHistoryTabLabel" data-toggle="tab">Import history</a></li>
                                     <li class="nav-item"><a class="nav-link" href="#EXPORT_HISTORY_TAB" id="storageExportHistoryTabLabel" data-toggle="tab">Export history</a></li>
                                 </ul>
-                                <div class="col-5 text-right">
-                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#createTicketImportModal">
-                                        <i class="fa-solid"></i>Tạo phiếu nhập
-                                    </button>
-                                    <a class="btn btn-sm btn-primary" th:href="@{/stg/transaction-goods/import/create}">
-                                        <i class="fa-solid"></i>Tạo phiếu nhập 2
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#createTicketExportModal">
-                                        <i class="fa-solid"></i>Tạo phiếu xuất
-                                    </button>
+                                <div class="col-4 text-right">
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-default">Export</button>
-                                        <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown" aria-expanded="false">
+                                        <button type="button" class="btn btn-sm btn-default">Create transaction</button>
+                                        <button type="button" class="btn btn-sm btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown" aria-expanded="false">
                                             <span class="sr-only">Toggle Dropdown</span>
                                         </button>
-                                        <div class="dropdown-menu" role="menu" style="">
+                                        <div class="dropdown-menu" role="menu">
+                                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#mdlCreateTicketImport">Import transaction</a>
+                                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#mdlCreateTicketExport">Export transaction</a>
+                                        </div>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-default">Export</button>
+                                        <button type="button" class="btn btn-sm btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown" aria-expanded="false">
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <div class="dropdown-menu" role="menu">
                                             <a class="dropdown-item" href="#" onclick="doExport(this)" th:attr="data-src='inventory'"> Inventory items</a>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" href="#" onclick="doExport(this)" th:attr="data-src='inbound'"> Import history</a>
@@ -138,6 +134,7 @@
                                                             <tr>
                                                                 <th>STT</th>
                                                                 <th>Nội dung</th>
+                                                                <th>Qty</th>
                                                                 <th>Người nhập</th>
                                                                 <th>Thời gian nhập</th>
                                                                 <th>Ghi chú</th>
@@ -148,7 +145,7 @@
                                                     </table>
                                                 </div>
                                                 <div class="card-footer">
-                                                    <div th:replace="~{fragments :: pagination}"></div>
+                                                    <div th:replace="~{fragments :: pagination2}"></div>
                                                 </div>
                                             </div>
 
@@ -159,6 +156,7 @@
                                                         <tr>
                                                             <th>STT</th>
                                                             <th>Nội dung</th>
+                                                            <th>Qty</th>
                                                             <th>Người xuất</th>
                                                             <th>Thời gian xuất</th>
                                                             <th>Ghi chú</th>
@@ -169,7 +167,7 @@
                                                     </table>
                                                 </div>
                                                 <div class="card-footer">
-                                                    <div th:replace="~{fragments :: pagination}"></div>
+                                                    <div th:replace="~{fragments :: pagination3}"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -241,53 +239,55 @@
 
         function createNewTicketImport() {
             $("#btnCreateTicketImportSubmit").on("click", function () {
-                let title = $("#titleTicketImportField").val();
-                if (title === null || title.trim() === "") {
-                    alert("Title is can not allow null value");
-                } else {
-                    let apiURL = mvHostURLCallApi + "/stg/ticket-import/create?storageId=" + mvStorageId;
-                    $.ajax({
-                        url: apiURL,
-                        type: "POST",
-                        contentType: "application/json",
-                        data: title,
-                        success: function (response) {
-                            if (response.status === "OK") {
-                                alert("Create successfully");
-                                window.location.reload();
-                            }
-                        },
-                        error: function (xhr) {
-                            alert("Error: " + $.parseJSON(xhr.responseText).message);
+                let apiURL = `${mvHostURLCallApi}/stg/transaction-goods/import/create`;
+                let body = {
+                    warehouse: {
+                        id: mvStorageId
+                    }
+                };
+                $.ajax({
+                    url: apiURL,
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(body),
+                    success: function (response) {
+                        if (response.status === "OK") {
+                            alert("Create successfully");
+                            $("#mdlCreateTicketImport").modal("hide");
+                            loadStorageImportHistory(getPageSize(), getPageNum());
                         }
-                    });
-                }
+                    },
+                    error: function (xhr) {
+                        alert("Error: " + $.parseJSON(xhr.responseText).message);
+                    }
+                });
             })
         }
 
         function createNewTicketExport() {
             $("#btnCreateTicketExportSubmit").on("click", function () {
-                let title = $("#titleTicketExportField").val();
-                if (title === null || title.trim() === "") {
-                    alert("Title is can not allow null value");
-                } else {
-                    let apiURL = mvHostURLCallApi + "/stg/ticket-export/create?storageId=" + mvStorageId;
-                    $.ajax({
-                        url: apiURL,
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify({title: title, orderCode: $("#orderCodeField").val()}),
-                        success: function (response) {
-                            if (response.status === "OK") {
-                                alert("Create successfully");
-                                window.location.reload();
-                            }
-                        },
-                        error: function (xhr) {
-                            alert("Error: " + $.parseJSON(xhr.responseText).message);
+                let apiURL = `${mvHostURLCallApi}/stg/transaction-goods/export/create`;
+                let body = {
+                    warehouse: {
+                        id: mvStorageId
+                    }
+                };
+                $.ajax({
+                    url: apiURL,
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(body),
+                    success: function (response) {
+                        if (response.status === "OK") {
+                            alert("Create successfully");
+                            $("#mdlCreateTicketExport").modal("hide");
+                            loadStorageExportHistory(getPageSize(), getPageNum());
                         }
-                    });
-                }
+                    },
+                    error: function (xhr) {
+                        alert("Error: " + $.parseJSON(xhr.responseText).message);
+                    }
+                });
             })
         }
 
@@ -327,8 +327,15 @@
 
         function doExport(el) {
             const src = el.getAttribute("data-src");
-            if (src === "inventory") {
-                window.location.href = `/api/v1/storage/export/${mvStorageId}?src=${src}`;
+            switch (src) {
+                case "inventory":
+                    window.location.href = `/api/v1/storage/export/${mvStorageId}?src=${src}`;
+                    break;
+                case "inbound":
+                    window.location.href = `/api/v1/storage/export/${mvStorageId}?src=${src}`;
+                    break;
+                case "outbound":
+                    window.location.href = `/api/v1/storage/export/${mvStorageId}?src=${src}`;
             }
         }
 

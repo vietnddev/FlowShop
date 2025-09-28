@@ -106,12 +106,8 @@ public class FileStorage extends BaseEntity implements Serializable {
     Account uploadBy;
 
     @ManyToOne
-    @JoinColumn(name = "ticket_import_id")
-    TicketImport ticketImport;
-
-    @ManyToOne
-    @JoinColumn(name = "ticket_export_id")
-    TicketExport ticketExport;
+    @JoinColumn(name = "transaction_goods_id")
+    TransactionGoods transactionGoods;
 
     @ManyToOne
     @JoinColumn(name = "product_combo_id")

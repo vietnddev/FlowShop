@@ -12,6 +12,7 @@ public enum Pages {
     SYS_LOG("log",                                      MODULE.SYSTEM),
     SYS_ROLE("role",                                    MODULE.SYSTEM),
     SYS_CONFIG("config",                                MODULE.SYSTEM),
+    SYS_LANGUAGE("language",                           MODULE.SYSTEM),
     SYS_NOTIFICATION("notification",                    MODULE.SYSTEM),
     SYS_PROFILE("profile",                              MODULE.SYSTEM),
     SYS_UNAUTHORIZED("unauthorized",                    MODULE.SYSTEM),
@@ -48,13 +49,12 @@ public enum Pages {
     SLS_LOYALTY_PROGRAM_DETAIL("loyalty-program/loyalty-program-detail", MODULE.SALES),
 
     STG_MATERIAL("material",                            MODULE.STORAGE),
-    STG_TICKET_IMPORT("ticket-import",                  MODULE.STORAGE),
-    STG_TICKET_IMPORT_DETAIL("ticket-import-detail",    MODULE.STORAGE),
-    STG_TICKET_EXPORT("ticket-export",                  MODULE.STORAGE),
-    STG_TICKET_EXPORT_DETAIL("ticket-export-detail",    MODULE.STORAGE),
+    STG_TRANS_GOODS("transaction-goods",               MODULE.STORAGE),
+    STG_TRANS_GOODS_DETAIL("transaction-goods-detail", MODULE.STORAGE),
+    STG_TRANS_EXPORT("transaction-goods",               MODULE.STORAGE),
+    STG_TRANS_EXPORT_DETAIL("transaction-goods-detail", MODULE.STORAGE),
     STG_STORAGE("storage",                              MODULE.STORAGE),
-    STG_STORAGE_DETAIL("storage-detail",                MODULE.STORAGE),
-    STG_GOODS_IMPORT_CREATION("ticket-import-detail",   MODULE.STORAGE);
+    STG_STORAGE_DETAIL("storage-detail",                MODULE.STORAGE);
 
     private final String template;
     private final MODULE module;

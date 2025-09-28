@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flowiee.pms.common.base.entity.BaseEntity;
 
-import com.flowiee.pms.modules.inventory.entity.TicketImport;
 import com.flowiee.pms.modules.inventory.entity.Material;
 import com.flowiee.pms.modules.inventory.entity.Product;
 import lombok.*;
@@ -63,10 +62,6 @@ public class Supplier extends BaseEntity implements Serializable {
 
     @Column(name = "status")
     String status;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY)
-    List<TicketImport> listTicketImportGoods;
 
     @JsonIgnore
     @OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY)

@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.inventory.dto;
 
 import com.flowiee.pms.common.base.dto.BaseDTO;
-import com.flowiee.pms.modules.inventory.model.ProductSummaryInfoModel;
 import com.flowiee.pms.modules.system.dto.CategoryDTO;
 import com.flowiee.pms.modules.sales.dto.VoucherInfoDTO;
 import com.flowiee.pms.modules.sales.dto.GarmentFactoryDTO;
@@ -12,10 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @NoArgsConstructor
@@ -23,7 +20,6 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDTO extends BaseDTO implements Serializable {
-    @Serial
     static final long serialVersionUID = 1L;
 
     String productCategory;

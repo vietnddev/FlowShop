@@ -2,22 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
     <div th:fragment="createTicketImportGooodsModal">
-        <div class="modal fade" id="createTicketImportModal">
+        <div class="modal fade" id="mdlCreateTicketImport">
             <div class="modal-dialog">
                 <div class="modal-content text-left">
                     <div class="modal-header">
-                        <strong class="modal-title">Thêm mới phiếu nhập hàng</strong>
+                        <strong class="modal-title">Confirmation</strong>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label>Tên phiếu nhập</label>
-                                    <input type="text" class="form-control" id="titleTicketImportField" required/>
-                                </div>
-                            </div>
-                        </div>
+                        Do you want to create a goods receipt?
                     </div>
                     <div class="modal-footer justify-content-end">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
@@ -29,28 +22,15 @@
     </div>
 
     <div th:fragment="createTicketExportGooodsModal">
-        <div class="modal fade" id="createTicketExportModal">
+        <div class="modal fade" id="mdlCreateTicketExport">
             <div class="modal-dialog">
                 <div class="modal-content text-left">
                     <div class="modal-header">
-                        <strong class="modal-title">Thêm mới phiếu xuất hàng</strong>
+                        <strong class="modal-title">Confirmation</strong>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label>Tên phiếu xuất</label>
-                                    <input type="text" class="form-control" id="titleTicketExportField" required/>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label>Mã đơn hàng</label>
-                                    <input type="text" class="form-control" id="orderCodeField"/>
-                                </div>
-                            </div>
-                        </div>
+                        Do you want to create a goods issue?
                     </div>
                     <div class="modal-footer justify-content-end">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>

@@ -2,10 +2,10 @@ package com.flowiee.pms.modules.sales.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.flowiee.pms.common.enumeration.PriorityLevel;
+import com.flowiee.pms.modules.inventory.dto.TransactionGoodsDTO;
 import com.flowiee.pms.modules.sales.entity.Customer;
 import com.flowiee.pms.modules.system.dto.CategoryDTO;
 import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.inventory.entity.TicketExport;
 import com.flowiee.pms.modules.sales.entity.CustomerDebt;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.sales.entity.OrderHistory;
@@ -62,7 +62,7 @@ public class OrderDTO implements Serializable {
 	private Account nhanVienBanHang;
 	private Category salesChannel;
 	private Category paymentMethod;
-	private TicketExport ticketExport;
+	private TransactionGoodsDTO transactionGoodsExport;
 	private LocalDateTime cancellationDate;
 	private Long cancellationReason;
 	private LocalDateTime deliverySuccessTime;
@@ -114,13 +114,12 @@ public class OrderDTO implements Serializable {
 		setOrderStatus(orderStatus);
 	}
 
-	public static OrderDTO fromOrder(Order pOrder) {
+	public static OrderDTO toDto(Order pOrder) {
         Category lvDeliveryMethod = pOrder.getDeliveryMethod();
         Category lvSalesChannel = pOrder.getSalesChannel();
         Category lvPaymentMethod = pOrder.getPaymentMethod();
         Customer lvCustomer = pOrder.getCustomer();
         Account lvCashier = pOrder.getNhanVienBanHang();
-        TicketExport lvTicketExport = pOrder.getTicketExport();
         BigDecimal lvAmountDiscount = pOrder.getAmountDiscount();
 
 		OrderDTO dto = new OrderDTO();
@@ -144,7 +143,6 @@ public class OrderDTO implements Serializable {
 		dto.setDeliveryMethod(lvDeliveryMethod != null ? new CategoryDTO(lvDeliveryMethod.getId(), lvDeliveryMethod.getName()) : new CategoryDTO());
 		dto.setCashierId(lvCashier.getId());
 		dto.setCashierName(lvCashier.getFullName());
-		dto.setTicketExportId(lvTicketExport != null ? lvTicketExport.getId() : null);
 		dto.setShippingCost(pOrder.getShippingCost());
 		dto.setCodFee(pOrder.getCodFee());
 		dto.setAmountDiscount(lvAmountDiscount != null ? lvAmountDiscount : new BigDecimal(0));
@@ -164,7 +162,7 @@ public class OrderDTO implements Serializable {
 			return new ArrayList<>();
 		}
 		return pOrders.stream()
-				.map(OrderDTO::fromOrder)
+				.map(OrderDTO::toDto)
 				.toList();
 	}
 }

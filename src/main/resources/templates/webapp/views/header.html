@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Flowiee Official | Dashboard</title>
-  <th:block th:fragment="stylesheets">
+<th:block th:fragment="stylesheets(title)">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title}">Flowiee System</title>
+
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
@@ -45,8 +46,8 @@
     <link rel="stylesheet" th:href="@{/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
     <!-- Bootstrap4 Duallistbox -->
     <link rel="stylesheet" th:href="@{/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css}">
-  </th:block>
-</head>
+  </head>
+</th:block>
 
 <body class="hold-transition sidebar-mini layout-fixed">
   <div th:fragment="header">
@@ -163,11 +164,6 @@
 
   </div>
   <div th:fragment="scripts">
-    <!--Js customize-->
-    <script th:src="@{/js/Common.js}"></script>
-    <script th:src="@{/js/APIHelper.js}"></script>
-    <script th:src="@{/js/Modal.js}"></script>
-    <script th:src="@{/js/Utils.js}"></script>
     <!--Lib support format time-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <!-- jQuery -->
@@ -254,6 +250,12 @@
         });
       });
     </script>
+
+    <!--Js customize-->
+    <script th:src="@{/js/Common.js}"></script>
+    <script th:src="@{/js/APIHelper.js}"></script>
+    <script th:src="@{/js/Modal.js}"></script>
+    <script th:src="@{/js/Utils.js}"></script>
   </div>
 </body>
 </html>

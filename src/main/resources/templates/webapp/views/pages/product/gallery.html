@@ -1,28 +1,25 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Flowiee Official | Thư viện ảnh</title>
-    <th:block th:replace="~{header :: stylesheets}"></th:block>
-    <style>
-        .row {
-            margin-left: 0px;
-            margin-right: 0px;
-        }
 
-        img {
-            border-radius: 5px;
-        }
+<div th:replace="~{header :: stylesheets(title='Thư viên ảnh')}"></div>
 
-        .product-image-thumb {
-            border: none;
-            box-shadow: none;
-            max-width: 6.5rem;
-            margin-right: 0rem;
-        }
-    </style>
-</head>
+<style>
+    .row {
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+
+    img {
+        border-radius: 5px;
+    }
+
+    .product-image-thumb {
+        border: none;
+        box-shadow: none;
+        max-width: 6.5rem;
+        margin-right: 0rem;
+    }
+</style>
 
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">

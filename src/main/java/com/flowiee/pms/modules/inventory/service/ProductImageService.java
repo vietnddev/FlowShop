@@ -20,9 +20,7 @@ public interface ProductImageService {
 
     FileStorage saveImageProductDamaged(MultipartFile fileUpload, long productDamagedId) throws IOException;
 
-    FileStorage saveImageTicketImport(MultipartFile fileUpload, long ticketImportId) throws IOException;
-
-    FileStorage saveImageTicketExport(MultipartFile fileUpload, long ticketExportId) throws IOException;
+    FileStorage saveImageTransactionGoods(MultipartFile fileUpload, long ticketImportId) throws IOException;
 
     FileStorage setImageActiveOfProduct(Long pProductId, Long pImageId);
 

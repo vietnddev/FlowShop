@@ -1,18 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Quản lý phiếu xuất hàng</title>
-    <div th:replace="~{header :: stylesheets}"></div>
-
-    <style>
-        .table td.vertical-center {
-            vertical-align: middle;
-        }
-    </style>
-</head>
+<div th:replace="~{header :: stylesheets(title='Transaction import goods')}"></div>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -32,11 +21,9 @@
                                 <div class="card-header">
                                     <div class="row justify-content-between">
                                         <div class="col-4" style="display: flex; align-items: center">
-                                            <h3 class="card-title"><strong>XUẤT HÀNG HÓA</strong></h3>
+                                            <h3 class="card-title"><strong>NHẬP HÀNG HÓA</strong></h3>
                                         </div>
-                                        <div class="col-4 text-right">
-                                            <!---<a class="btn btn-success" th:href="@{/storage/ticket-import/create}">Thêm mới</a>-->
-                                        </div>
+                                        <div class="col-4 text-right"></div>
                                     </div>
                                 </div>
                                 <div class="card-body p-0">
@@ -47,11 +34,11 @@
                                                 <th>Kho</th>
                                                 <th>Tiêu đề</th>
                                                 <th>Số lượng</th>
-                                                <th>Người xuất</th>
-                                                <th>Thời gian xuất</th>
+                                                <th>Giá trị</th>
+                                                <th>Người nhập</th>
+                                                <th>Thời gian nhập</th>
                                                 <th>Ghi chú</th>
                                                 <th>Trạng thái</th>
-                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody id="contentTable"></tbody>
@@ -73,16 +60,19 @@
         <aside class="control-sidebar control-sidebar-dark"></aside>
 
         <div th:replace="~{header :: scripts}"></div>
+
     </div>
 
-    <script>
+    <script th:inline="javascript">
+        let mvTransactionType = '' + [[${thTransactionType}]] + '';
+
         $(document).ready(function () {
-            loadTicketExport(getPageSize(), getPageNum());
-            updateTableContentWhenOnClickPagination(loadTicketExport)
+            loadTransactions(getPageSize(), getPageNum());
+            updateTableContentWhenOnClickPagination(loadTransactions);
         });
 
-        function loadTicketExport(pageSize, pageNum) {
-            let apiURL = mvHostURLCallApi + '/stg/ticket-export/all';
+        function loadTransactions(pageSize, pageNum) {
+            let apiURL = `${mvHostURLCallApi}/stg/transaction-goods/${mvTransactionType}`;
             let params = {pageSize: pageSize, pageNum: pageNum}
             $.get(apiURL, params, function (response) {
                 if (response.status === "OK") {
@@ -97,14 +87,14 @@
                         contentTable.append(`
                             <tr>
                                 <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>
-                                <td>${d.storageName}</td>
-                                <td><a href="/stg/ticket-export/${d.id}">${d.title}</a></td>
+                                <td>${d.warehouse.name}</td>
+                                <td><a href="/stg/transaction-goods/${mvTransactionType}/${d.id}">${d.title}</td>
                                 <td>${d.totalItems}</td>
-                                <td>${d.exporter}</td>
-                                <td>${d.exportTime}</td>
-                                <td>${d.note}</td>
-                                <td>${mvTicketExportStatus[d.status]}</td>
-                                <td>In</td>
+                                <td>${formatCurrency(0)}</td>
+                                <td>${d.createdStaff}</td>
+                                <td>${d.createdAt}</td>
+                                <td>${d.description}</td>
+                                <td>${d.transactionStatus}</td>
                             </tr>
                         `);
                     });
@@ -115,4 +105,5 @@
         }
     </script>
 </body>
+
 </html>

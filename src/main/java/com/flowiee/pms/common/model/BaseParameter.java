@@ -1,12 +1,12 @@
 package com.flowiee.pms.common.model;
 
-import com.flowiee.pms.common.constants.Constants;
-import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
+@NoArgsConstructor
 @Getter
 @Setter
 public class BaseParameter {

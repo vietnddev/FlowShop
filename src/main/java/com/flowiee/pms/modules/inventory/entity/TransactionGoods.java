@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flowiee.pms.common.base.entity.BaseEntity;
 import com.flowiee.pms.modules.inventory.enums.TransactionGoodsStatus;
 import com.flowiee.pms.modules.inventory.enums.TransactionGoodsType;
@@ -21,6 +22,9 @@ import java.util.List;
 public class TransactionGoods extends BaseEntity implements Serializable {
     @Column(name = "transaction_code", nullable = false, length = 30)
     private String code;
+
+    @Column(name = "title")
+    private String title;
 
     @Column(name = "transaction_source", length = 30)
     private String source;
@@ -74,9 +78,10 @@ public class TransactionGoods extends BaseEntity implements Serializable {
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "warehouse_id")
+    @JoinColumn(name = "warehouse_id", nullable = false)
     private Storage warehouse;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "transactionGoods", fetch = FetchType.LAZY)
     private List<TransactionGoodsItem> items;
 }

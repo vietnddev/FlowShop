@@ -11,7 +11,7 @@
         }
     </style>
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
     <div class="wrapper">
         <div th:replace="~{header :: header}"></div>
 
@@ -41,48 +41,27 @@
             <!-- End section title -->
 
             <div class="row" style="padding-left: 7px; padding-right: 7px">
-                <div class="col-8" style="padding-right: 0">
+                <div class="col-9" style="padding-right: 0">
                     <section class="col-12">
                         <div class="card p-3" style="max-height: 350px; overflow: auto">
-                            <div class="row justify-content-between">
-                                <div class="col" style="display: flex; align-items: center">
-                                    <h3 class="card-title"><strong class="text-uppercase">Items</strong></h3>
-                                </div>
-                                <div class="col text-right">
-                                    <button class="btn btn-sm btn-default w-auto" id="btnAddItems">
-                                        <i class="fa-solid fa-plus mr-2"></i> Pick items
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <table class="table text-nowrap align-items-center">
+                            <div class="row">
+                                <table class="table table-head-fixed text-nowrap">
                                     <thead>
                                         <tr>
-                                            <th>No.</th>
-                                            <th></th>
-                                            <th>Item name</th>
+                                            <th>
+                                                <button class="btn btn-sm btn-primary w-auto" id="btnAddItems">
+                                                    <i class="fa-solid fa-plus"></i>
+                                                </button>
+                                            </th>
                                             <th>Item type</th>
-                                            <th>Cost price</th>
-                                            <th>Quantity</th>
+                                            <th>Item name</th>
+                                            <th>Price</th>
+                                            <th>Qty</th>
                                             <th>Amount</th>
                                             <th>Note</th>
                                             <th></th>
                                         </tr>
                                     </thead>
-                                    <!--<tbody>
-                                        <tr th:each="list, index : ${ticketImportDetail.listProductVariantTemps}">
-                                            <td th:text="${index.index + 1}"></td>
-                                            <td th:text="${list.productVariant.variantName}"></td>
-                                            <td th:text="${list.purchasePrice}"></td>
-                                            <td th:text="${list.quantity}"></td>
-                                            <td th:text="${list.purchasePrice != null ? list.purchasePrice * list.quantity : ''}"></td>
-                                            <td th:text="${list.note}"></td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="'#modalUpdateItems_' + ${list.id}">Cập nhật</button>
-                                                <button type="button" class="btn btn-sm btn-danger"  data-toggle="modal" data-target="'#modalDeleteItems_' + ${list.id}">Xóa</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>-->
                                     <tbody id="tblItems"></tbody>
                                 </table>
                             </div>
@@ -112,7 +91,7 @@
                 </div>
 
                 <!-- Section form thông tin -->
-                <div class="col-4" style="padding-left: 0">
+                <div class="col-3" style="padding-left: 0">
                     <section class="col-12 card p-3" style="height: 716px">
                         <div class="form-group row" style="padding-right: 8px">
                             <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Nhà cung cấp</span>
@@ -164,7 +143,7 @@
     <script th:src="@{/js/product/SearchProductModal.js}"></script>
     <script th:src="@{/js/storage/GoodsImport.js}"></script>
 
-    <script>
+    <script th:inline="javascript">
         let mvTicketImportDetail = {};
         let mvProductVariantSelected = {};
         let mvMaterialSelected = {};
@@ -174,50 +153,11 @@
         let mvImporter = $("#importerField");
         let mvSupplier = $("#supplierField");
 
+        let mvTransactionGoodsImportId = [[${thTransactionGoods.id}]];
+
         $(document).ready(function () {
-            init();
-            addProduct();
-            addMaterial();
             updateInfo();
         });
-
-        function init() {
-            findTickImportDetail();
-            loadPaymentMethods();
-            loadPaymentStatuses();
-        }
-
-        function findTickImportDetail() {
-            let apiURL = mvHostURLCallApi + "/stg/ticket-import/" + [[${ticketImportId}]];
-            $.get(apiURL, function (response) {
-                if (response.status === "OK") {
-                    mvTicketImportDetail = response.data;
-                    mvProductVariantSelected = mvTicketImportDetail.listProductVariantTemp;
-                    mvMaterialSelected = mvTicketImportDetail.listMaterialTemp;
-
-                    //setProductSelectedTableInfo(mvProductVariantSelected);
-                    //setMaterialSelectedTableInfo(mvMaterialSelected);
-
-                    let importTimeStr = mvTicketImportDetail.importTime;
-                    let parts = importTimeStr.split(' ')[0].split('/');//Chuyển đổi từ 'DD/MM/YYYY' sang 'YYYY-MM-DD'
-                    let formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-                    mvImportTime.val(formattedDate);
-                    mvTitle.val(mvTicketImportDetail.title);
-                    mvImporter.val(mvTicketImportDetail.importer);
-                    mvNote.val(mvTicketImportDetail.note);
-
-                    if (mvTicketImportDetail.status === "COMPLETED") {
-                        $("#statusField").append(`<option value="COMPLETED">Hoàn thành</option>`);
-                    } else if (mvTicketImportDetail.status === "CANCEL") {
-                        $("#statusField").append(`<option value="CANCEL">Hủy</option>`);
-                    } else {
-                        $("#statusField").append(`<option value="DRAFT">Nháp</option><option value="COMPLETED">Hoàn thành</option><option value="CANCEL">Hủy</option>`);
-                    }
-                }
-            }).fail(function () {
-                showErrorModal("Could not connect to the server");
-            });
-        }
 
         function loadPaymentMethods() {
             let apiURL = mvHostURLCallApi + "/category/payment-method";
@@ -245,100 +185,6 @@
             }).fail(function () {
                 showErrorModal("Could not connect to the server");
             });
-        }
-
-        /*function setProductSelectedTableInfo(productDetails) {
-            $.each(productDetails, function (index, d) {
-                console.log("4")
-                $("#productContentTable").append(`
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td className="text-left text-wrap" style="max-width: 200px">
-                            <a href="/san-pham/variant/${d.id}">${d.id}</a>
-                        </td>
-                        <td>${d.quantity}</td>
-                        <td></td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="'#modalUpdateItems_' + ${d.id}">Cập nhật</button>
-                            <button type="button" class="btn btn-sm btn-danger"  data-toggle="modal" data-target="'#modalDeleteItems_' + ${d.id}">Xóa</button>
-                        </td>
-                    </tr>
-                `);
-            });
-        }*/
-
-        /*function setMaterialSelectedTableInfo(materials) {
-            $.each(materials, function (index, d) {
-                $("#materialContentTable").append(`
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td className="text-left">
-                            <input type="hidden" id="bienTheSanPhamId" th:value="${d.id}"/>
-                            <a href="/san-pham/variant/${d.id}">${d.name}</a>
-                        </td>
-                        <td>${d.quantity}</td>
-                        <td></td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="'#modalUpdateItems_' + ${d.id}">Cập nhật</button>
-                            <button type="button" class="btn btn-sm btn-danger"  data-toggle="modal" data-target="'#modalDeleteItems_' + ${d.id}">Xóa</button>
-                        </td>
-                    </tr>
-                `);
-            });
-        }*/
-        
-        function addProduct() {
-            $("#btnAddProduct").on("click", function () {
-                let productVariantIds = $("#productVariantField").val();
-                if ($.isEmptyObject(productVariantIds)) {
-                    alert("Vui lòng chọn sản phẩm!");
-                } else {
-                    let apiURL = mvHostURLCallApi + "/stg/ticket-import/" + mvTicketImportDetail.id + "/add-product";
-                    $.ajax({
-                        url: apiURL,
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify(productVariantIds),
-                        success: function (response, textStatus, jqXHR) {
-                            if (response.status === "OK") {
-                                alert('Added successfully!')
-                                window.location.reload();
-                            }
-                        },
-                        error: function (xhr, textStatus, errorThrown) {
-                            //showErrorModal("Could not connect to the server");
-                            showErrorModal($.parseJSON(xhr.responseText).message);
-                        }
-                    });
-                }
-            })
-        }
-
-        function addMaterial() {
-            $("#btnAddMaterial").on("click", function () {
-                let materialIds = $("#materialField").val();
-                if ($.isEmptyObject(materialIds)) {
-                    alert("Vui lòng chọn nguyên vật liệu!");
-                } else {
-                    let apiURL = mvHostURLCallApi + "/stg/ticket-import/" + mvTicketImportDetail.id + "/add-material";
-                    $.ajax({
-                        url: apiURL,
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify(materialIds),
-                        success: function (response, textStatus, jqXHR) {
-                            if (response.status === "OK") {
-                                alert('Added successfully!')
-                                window.location.reload();
-                            }
-                        },
-                        error: function (xhr, textStatus, errorThrown) {
-                            //showErrorModal("Could not connect to the server");
-                            showErrorModal($.parseJSON(xhr.responseText).message);
-                        }
-                    });
-                }
-            })
         }
 
         function updateInfo() {

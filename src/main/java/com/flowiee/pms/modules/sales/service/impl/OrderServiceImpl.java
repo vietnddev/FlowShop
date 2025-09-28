@@ -132,7 +132,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
 
         List<OrderDTO> lvDTOs = new ArrayList<>();
         for (Order lvOrder : lvResultList) {
-            OrderDTO lvDto = OrderDTO.fromOrder(lvOrder);
+            OrderDTO lvDto = OrderDTO.toDto(lvOrder);
             lvDto.setItems(lvDto.getListOrderDetail());
             lvDto.setTotalAmount(OrderUtils.calAmount(lvOrder));
 
@@ -278,7 +278,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_ORD_C, MasterObject.Order, "Thêm mới đơn hàng", lvOrderSaved.getCode());
         LOG.info("Insert new order success! insertBy={}", getUserPrincipal().getUsername());
 
-        return OrderDTO.fromOrder(lvOrderSaved);
+        return OrderDTO.toDto(lvOrderSaved);
     }
 
     private LocalDateTime getOrderTime(String pOrderTime) {
@@ -375,7 +375,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         mvSystemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_ORD_U, MasterObject.Order, "Cập nhật đơn hàng", changeLog);
         LOG.info("Cập nhật đơn hàng {}", lvUpdatedOrder.toString());
 
-        return OrderDTO.fromOrder(lvUpdatedOrder);
+        return OrderDTO.toDto(lvUpdatedOrder);
     }
 
     @Override

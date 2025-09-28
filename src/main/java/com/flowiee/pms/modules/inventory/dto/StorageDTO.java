@@ -43,7 +43,7 @@ public class StorageDTO implements Serializable {
         this.id = id;
     }
 
-    public static StorageDTO convertToDTO(Storage inputEntity) {
+    public static StorageDTO toDto(Storage inputEntity) {
         if (inputEntity == null) {
             return null;
         }
@@ -65,7 +65,7 @@ public class StorageDTO implements Serializable {
         List<StorageDTO> outputDTOs = new ArrayList<>();
         if (ObjectUtils.isNotEmpty(inputEntities)) {
             for (Storage s : inputEntities) {
-                outputDTOs.add(StorageDTO.convertToDTO(s));
+                outputDTOs.add(StorageDTO.toDto(s));
             }
         }
         return outputDTOs;

@@ -145,3 +145,8 @@ function submitProductOnSearchModal(functionId) {
         }
     });
 }
+
+// ItemModel = {
+//     productVariantId: (long) ...,
+//     quantity: (int) ...
+// }

@@ -114,7 +114,7 @@ public class OrderDTO implements Serializable {
 		setOrderStatus(orderStatus);
 	}
 
-	public static OrderDTO fromOrder(Order pOrder) {
+	public static OrderDTO toDto(Order pOrder) {
         Category lvDeliveryMethod = pOrder.getDeliveryMethod();
         Category lvSalesChannel = pOrder.getSalesChannel();
         Category lvPaymentMethod = pOrder.getPaymentMethod();
@@ -164,7 +164,7 @@ public class OrderDTO implements Serializable {
 			return new ArrayList<>();
 		}
 		return pOrders.stream()
-				.map(OrderDTO::fromOrder)
+				.map(OrderDTO::toDto)
 				.toList();
 	}
 }

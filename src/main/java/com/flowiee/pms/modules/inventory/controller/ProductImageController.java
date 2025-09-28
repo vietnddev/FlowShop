@@ -141,7 +141,7 @@ public class ProductImageController extends BaseController {
     public AppResponse<List<FileDTO>> getImagesOfProduct(@PathVariable("productId") Long productId) {
         try {
             List<FileStorage> images = mvProductImageService.getImageOfProduct(productId);
-            return AppResponse.success(FileDTO.fromFileStorages(images), 1, 0, 1, images.size());
+            return AppResponse.success(FileDTO.toDTOs(images), 1, 0, 1, images.size());
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "gallery"), ex);
         }

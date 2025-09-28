@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Flowiee Offical | Dashboard</title>
-    <div th:replace="~{header :: stylesheets}"></div>
-    <!--Chart JS-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-</head>
+
+<div th:replace="~{header :: stylesheets(title='Flowiee System | Dashboard')}"></div>
+
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
     <div th:replace="~{header :: header}"></div>

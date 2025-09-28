@@ -1,13 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kho tài liệu</title>
-    <th:block th:replace="~{header :: stylesheets}"></th:block>
-    <!--<link rel="stylesheet" type="text/css" th:href="@{/plugins/pdf-js/web/viewer.css}">-->
-</head>
+<div th:replace="~{header :: stylesheets(title='Document')}"></div>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">

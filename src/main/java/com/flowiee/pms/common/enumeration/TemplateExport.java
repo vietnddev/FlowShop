@@ -11,6 +11,7 @@ public enum TemplateExport {
     IM_LIST_OF_CATEGORIES("Template_IE_DM_Category.xlsx", "I", MODULE.CATEGORY, ""),
     EX_LIST_OF_CATEGORIES("Template_IE_DM_Category.xlsx", "E", MODULE.CATEGORY, ""),
     EX_STORAGE_ITEMS("Template_E_Storage.xlsx", "E", MODULE.STORAGE, ""),
+    EX_STORAGE_TRANS_GOODS("Template_E_Trans_Goods.xlsx", "E", MODULE.STORAGE, ""),
     EX_LEDGER_TRANSACTIONS("Template_E_GeneralLedger.xlsx", "E", MODULE.STORAGE, ""),
     EX_LIST_OF_LOGS("Template_E_Log.xlsx", "E", MODULE.SYSTEM, "");
 

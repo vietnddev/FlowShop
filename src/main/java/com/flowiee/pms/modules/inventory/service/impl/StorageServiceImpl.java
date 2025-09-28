@@ -1,6 +1,5 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
-import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
@@ -88,7 +87,7 @@ public class StorageServiceImpl extends BaseService<Storage, StorageDTO, Storage
         Optional<Storage> storageOptional = super.findById(storageId);
         if (storageOptional.isPresent()) {
             List<StorageItems> storageItemsList = this.findStorageItems(-1, -1, storageId, null).getContent();
-            StorageDTO storage = StorageDTO.convertToDTO(storageOptional.get());
+            StorageDTO storage = StorageDTO.toDto(storageOptional.get());
             storage.setListStorageItems(storageItemsList);
             storage.setTotalItems(storageItemsList.size());
             storage.setTotalInventoryValue(BigDecimal.ZERO);
@@ -133,7 +132,7 @@ public class StorageServiceImpl extends BaseService<Storage, StorageDTO, Storage
 
         systemLogService.writeLogUpdate(MODULE.STORAGE, ACTION.STG_STG_U, MasterObject.Storage, "Cập nhật Kho", changeLog);
 
-        return StorageDTO.convertToDTO(storageUpdated);
+        return StorageDTO.toDto(storageUpdated);
     }
 
     @Override

@@ -1,16 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Danh sách đơn hàng</title>
-    <div th:replace="~{header :: stylesheets}"></div>
-    <style rel="stylesheet">
-        .table td, th {
-            vertical-align: middle;
-        }
-    </style>
-</head>
+
+<div th:replace="~{header :: stylesheets(title='Danh sách đơn hàng')}"></div>
+
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         <div th:replace="~{header :: header}"></div>

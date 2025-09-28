@@ -24,7 +24,7 @@ public class GalleryControllerView extends BaseController {
     @PreAuthorize("@vldModuleProduct.readGallery(true)")
     public ModelAndView viewGallery() {
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_GALLERY.getTemplate());
-        modelAndView.addObject("listImages", FileDTO.fromFileStorages(mvProductImageService.getImageOfProduct(null)));
+        modelAndView.addObject("listImages", FileDTO.toDTOs(mvProductImageService.getImageOfProduct(null)));
         modelAndView.addObject("listProducts", mvProductInfoService.findProductsIdAndProductName());
         return baseView(modelAndView);
     }

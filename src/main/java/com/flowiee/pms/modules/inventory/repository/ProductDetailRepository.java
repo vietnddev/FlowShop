@@ -23,8 +23,8 @@ public interface ProductDetailRepository extends BaseRepository<ProductDetail, L
     Integer findTotalQtySell(@Param("productId") Long productId);
 
     @Modifying
-    @Query("update ProductDetail p set p.storageQty = (p.storageQty + :soldQty) where p.id=:productVariantId")
-    void updateQuantityIncrease(@Param("soldQty") Integer soldQty, @Param("productVariantId") Long productVariantId);
+    @Query("update ProductDetail p set p.storageQty = (p.storageQty + :quantity) where p.id=:productVariantId")
+    void updateQuantityIncrease(@Param("quantity") Integer quantity, @Param("productVariantId") Long productVariantId);
 
     @Modifying
     @Query("update ProductDetail p set p.storageQty = (p.storageQty - :soldQty), p.soldQty = (p.soldQty + :soldQty) where p.id=:productVariantId")

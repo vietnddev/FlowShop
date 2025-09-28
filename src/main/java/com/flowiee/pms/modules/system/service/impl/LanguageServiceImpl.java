@@ -8,57 +8,48 @@ import java.util.*;
 
 import com.flowiee.pms.common.base.service.BaseService;
 import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.system.dto.LanguageDTO;
 import com.flowiee.pms.modules.system.service.LanguageService;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.flowiee.pms.modules.system.entity.Language;
-import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.modules.system.repository.LanguagesRepository;
 
 @Service
 public class LanguageServiceImpl extends BaseService<Language, LanguageDTO, LanguagesRepository> implements LanguageService {
-	public LanguageServiceImpl(LanguagesRepository pEntityRepository) {
+	private final ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource;
+
+	public LanguageServiceImpl(LanguagesRepository pEntityRepository, ReloadableResourceBundleMessageSource pReloadableResourceBundleMessageSource) {
 		super(Language.class, LanguageDTO.class, pEntityRepository);
+		this.reloadableResourceBundleMessageSource = pReloadableResourceBundleMessageSource;
 	}
 
 	@Override
-	public List<LanguageDTO>find(BaseParameter pParam) {
-		return super.find(pParam);
+	public Page<LanguageDTO> findAll(int pageNum, int pageSize, String locale) {
+		Pageable pageable = getPageable(pageNum, pageSize);
+		Page<Language> languagePage = mvEntityRepository.findAll(locale, pageable);
+		return new PageImpl<>(convertDTOs(languagePage.getContent()), pageable, languagePage.getTotalElements());
 	}
 
 	@Override
-	public LanguageDTO findById(Long langId, boolean pThrowException) {
-		return super.findDtoById(langId, pThrowException);
-	}
-
-	@Override
-	public LanguageDTO save(LanguageDTO entity) {
-		throw new AppException("System does not support this function!");
-	}
-
-	@Override
-	public Map<String, String> findAllLanguageMessages(String langCode) {
-		List<Language> languageList = mvEntityRepository.findByCode(langCode);
+	public Map<String, String> findAllLanguageMessages(String pLocale) {
+		List<Language> languageList = mvEntityRepository.findByLocale(pLocale);
         Map<String, String> languageMessages = new HashMap<>();
         for (Language language : languageList) {
-            languageMessages.put(language.getKey(), language.getValue());
+            languageMessages.put(language.getMessageKey(), language.getMessageValue());
         }
         return languageMessages;
 	}
 
 	@Override
 	public LanguageDTO update(LanguageDTO pLanguage, Long pLangId) {
-		if (pLangId == null || pLangId <= 0) {
-			throw new BadRequestException();
-		}
-		return super.update(pLanguage, pLangId);
-	}
-
-	@Override
-	public String delete(Long entityId) {
-		throw new AppException("System does not support this function!");
+		Language lvLanguage = super.findEntById(pLangId, true);
+		lvLanguage.setMessageValue(pLanguage.getMessageValue());
+		return convertDTO(mvEntityRepository.save(lvLanguage));
 	}
 
 	@Override
@@ -66,19 +57,21 @@ public class LanguageServiceImpl extends BaseService<Language, LanguageDTO, Lang
 		try {
 			Map<String, String> enMessages = this.findAllLanguageMessages(langCode);
 			Properties properties = new Properties();
-			//Begin hot fix (temp)
-			String outputFolder = System.getProperty("user.dir") + "/language";
+
+			String outputFolder = System.getProperty("user.dir") + "/languages";
 			File folder = new File(outputFolder);
 			if (!folder.exists()) {
 				folder.mkdirs();
 			}
-			//OutputStream outputStream = new FileOutputStream(String.format("src/main/resources/language/messages_%s.properties", langCode));
+
 			OutputStream outputStream = new FileOutputStream(String.format("%s/messages_%s.properties", outputFolder, langCode));
-			//End hot fix
+
 			for (Map.Entry<String, String> entry : enMessages.entrySet()) {
 				properties.setProperty(entry.getKey(), entry.getValue());
 			}
 			properties.store(outputStream, String.format("%s Messages", langCode));
+
+			reloadableResourceBundleMessageSource.clearCache();
 		} catch (IOException e) {
 			throw new AppException(e);
 		}

@@ -1,46 +1,42 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Flowiee Official | Quản lý sản phẩm</title>
-    <th:block th:replace="~{header :: stylesheets}"></th:block>
-    <style>
-        .row {
-            margin-left: 0px;
-            margin-right: 0px;
-        }
+<div th:replace="~{header :: stylesheets(title='Product variants')}"></div>
 
-        img {
-            border-radius: 5px;
-        }
+<style>
+    .row {
+        margin-left: 0px;
+        margin-right: 0px;
+    }
 
-        .product-image-thumb {
-            border: none;
-            box-shadow: none;
-            max-width: 7rem;
-            margin-right: 0rem;
-        }
+    img {
+        border-radius: 5px;
+    }
 
-        /* Ẩn mũi tên tăng giảm trên trình duyệt Safari và Chrome */
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+    .product-image-thumb {
+        border: none;
+        box-shadow: none;
+        max-width: 7rem;
+        margin-right: 0rem;
+    }
 
-        /* Ẩn mũi tên tăng giảm trên trình duyệt Firefox */
-        input[type="number"]::-moz-number-spinners {
-            display: none;
-        }
+    /* Ẩn mũi tên tăng giảm trên trình duyệt Safari và Chrome */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 
-        /* Ẩn nút xóa giá trị đầu vào trên trình duyệt Edge */
-        input[type="number"]::-ms-clear {
-            display: none;
-        }
-    </style>
-</head>
+    /* Ẩn mũi tên tăng giảm trên trình duyệt Firefox */
+    input[type="number"]::-moz-number-spinners {
+        display: none;
+    }
+
+    /* Ẩn nút xóa giá trị đầu vào trên trình duyệt Edge */
+    input[type="number"]::-ms-clear {
+        display: none;
+    }
+</style>
 
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->

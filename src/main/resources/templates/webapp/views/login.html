@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Flowiee Official | Đăng nhập hệ thống</title>
-        <div th:replace="~{header :: stylesheets}"></div>
-    </head>
+    <div th:replace="~{header :: stylesheets(title='Flowiee System | Đăng nhập hệ thống')}"></div>
 
     <body class="hold-transition login-page"
           th:style="'background-image: url(\'' + @{/dist/img/login/bg.jpg} + '\'); background-size: cover; background-position: center; background-repeat: no-repeat;'">

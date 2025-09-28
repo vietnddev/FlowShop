@@ -54,4 +54,14 @@ public interface FileStorageRepository extends JpaRepository<FileStorage, Long> 
 
     @Query("from FileStorage f where f.order.id=:orderId")
     FileStorage findQRCodeOfOrder(@Param("orderId") Long orderId);
+
+    @Query("from FileStorage f " +
+            "where f.transactionGoodsImport.id = :tranId " +
+            "order by f.createdAt")
+    List<FileStorage> findByTransactionGoodsImportId(@Param("tranId") Long pTransactionImportId);
+
+    @Query("from FileStorage f " +
+            "where f.transactionGoodsExport.id = :tranId " +
+            "order by f.createdAt")
+    List<FileStorage> findByTransactionGoodsExportId(@Param("tranId") Long pTransactionExportId);
 }

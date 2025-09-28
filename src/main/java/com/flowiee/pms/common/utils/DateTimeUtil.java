@@ -1,8 +1,6 @@
 package com.flowiee.pms.common.utils;
 
 import com.flowiee.pms.common.enumeration.FilterDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,8 +10,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class DateTimeUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(DateTimeUtil.class);
-
     public static final String FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss";
     public static final String FORMAT_DATE = "dd/MM/yyyy";
     public static final String START_TIME = "00:00:00";
@@ -148,5 +144,9 @@ public class DateTimeUtil {
     public static LocalDate parseToLocalDate(String input, String pattern) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return LocalDate.parse(input, formatter);
+    }
+
+    public static String format(LocalDateTime pDate, String pPattern) {
+        return pDate.format(DateTimeFormatter.ofPattern(pPattern));
     }
 }

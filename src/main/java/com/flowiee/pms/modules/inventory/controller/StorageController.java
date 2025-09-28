@@ -4,6 +4,8 @@ import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
+import com.flowiee.pms.modules.inventory.dto.TransactionGoodsDTO;
+import com.flowiee.pms.modules.inventory.enums.TransactionGoodsType;
 import com.flowiee.pms.modules.system.model.EximResult;
 import com.flowiee.pms.modules.inventory.model.StorageItems;
 import com.flowiee.pms.modules.inventory.dto.StorageDTO;
@@ -32,7 +34,10 @@ public class StorageController extends BaseController {
     private final StorageService mvStorageService;
     @Autowired
     @Qualifier("storageExportServiceImpl")
-    private ExportService mvExportService;
+    private ExportService mvStorageExportService;
+    @Autowired
+    @Qualifier("transactionGoodsExportServiceImpl")
+    private ExportService mvTransactionGoodsExportService;
 
     @Operation(summary = "Find all storages")
     @GetMapping("/all")
@@ -111,11 +116,23 @@ public class StorageController extends BaseController {
         EximResult model = null;
         switch (lvSrc) {
             case "inventory":
-                model = mvExportService.exportToExcel(TemplateExport.EX_STORAGE_ITEMS, new StorageDTO(storageId), false);
+                model = mvStorageExportService.exportToExcel(TemplateExport.EX_STORAGE_ITEMS, new StorageDTO(storageId), false);
                 break;
             case "inbound":
+                model = mvTransactionGoodsExportService.exportToExcel(TemplateExport.EX_STORAGE_TRANS_GOODS,
+                        TransactionGoodsDTO.builder()
+                                .warehouse(new StorageDTO(storageId))
+                                .transactionType(TransactionGoodsType.IMPORT)
+                                .build(),
+                        false);
                 break;
             case "outbound":
+                model = mvTransactionGoodsExportService.exportToExcel(TemplateExport.EX_STORAGE_TRANS_GOODS,
+                        TransactionGoodsDTO.builder()
+                                .warehouse(new StorageDTO(storageId))
+                                .transactionType(TransactionGoodsType.EXPORT)
+                                .build(),
+                        false);
                 break;
             default:
                 return ResponseEntity.ok(null);

@@ -1,17 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Quản lý phiếu nhập hàng</title>
-    <th:block th:replace="~{header :: stylesheets}"></th:block>
-    <style>
-        .table td.vertical-center {
-            vertical-align: middle;
-        }
-    </style>
-</head>
+<div th:replace="~{header :: stylesheets(title='Transaction import goods')}"></div>
 
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -82,7 +72,7 @@
     function init() {}
 
     function loadTickImports(pageSize, pageNum) {
-        let apiURL = mvHostURLCallApi + "/stg/ticket-import/all";
+        let apiURL = mvHostURLCallApi + "/stg/transaction-goods/import";
         let params = {pageSize: pageSize, pageNum: pageNum}
         $.get(apiURL, params, function (response) {
             if (response.status === "OK") {
@@ -97,14 +87,14 @@
                     contentTable.append(`
                         <tr>
                             <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>
-                            <td>${d.storageName}</td>
-                            <td><a href="/stg/ticket-import/${d.id}">${d.title}</td>
+                            <td>${d.warehouse.name}</td>
+                            <td><a href="/stg/transaction-goods/import/${d.id}">${d.title}</td>
                             <td>${d.totalItems}</td>
-                            <td>${formatCurrency(d.totalValue)}</td>
-                            <td>${d.importer}</td>
-                            <td>${d.importTime}</td>
-                            <td>${d.note}</td>
-                            <td>${mvTicketImportStatus[d.status]}</td>
+                            <td>${formatCurrency(0)}</td>
+                            <td>${d.createdStaff}</td>
+                            <td>${d.createdAt}</td>
+                            <td>${d.description}</td>
+                            <td>${d.transactionStatus}</td>
                         </tr>
                     `);
                 });

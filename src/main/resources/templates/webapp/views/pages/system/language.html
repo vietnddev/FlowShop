@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<div th:replace="~{header :: stylesheets(title='Đa ngôn ngữ')}"></div>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <!-- Navbar (header) -->
+        <div th:replace="~{header :: header}"></div>
+        <!-- /.navbar (header)-->
+
+        <!-- Main Sidebar Container -->
+        <div th:replace="~{sidebar :: sidebar}"></div>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Small boxes (Stat box) -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row justify-content-between">
+                                        <div class="col-4" style="display: flex; align-items: center">
+                                            <h3 class="card-title"><strong>MESSAGES</strong></h3>
+                                        </div>
+                                        <div class="col-4 text-right"></div>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Message code</th>
+                                                <th>Message value</th>
+                                                <th>Page</th>
+                                                <th>Component</th>
+                                                <th>Language</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="contentTable"></tbody>
+                                    </table>
+                                </div>
+                                <div class="modal fade" id="modalUpdate">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <strong class="modal-title">Update message</strong>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="form-group">
+                                                            <label for="messageKeyField">Message code</label>
+                                                            <input type="text" class="form-control" placeholder="Code" id="messageKeyField" disabled>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="messageValueField">Message value</label>
+                                                            <input type="text" class="form-control" placeholder="Name" id="messageValueField">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer justify-content-end">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                                <button type="button" class="btn btn-primary" id="btnUpdateSubmit">Save</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+
+        <div th:replace="~{header :: scripts}"></div>
+    </div>
+
+    <script type="text/javascript">
+        let mvMessages = [];
+        let mvMessageId;
+        let mvMessageKey = $("#messageKeyField");
+        let mvMessageValue = $("#messageValueField");
+
+        $(document).ready(function() {
+            createListener();
+            loadMessages(getPageSize(), getPageNum());
+            updateMessage();
+        });
+
+        function createListener() {}
+
+        function updateMessage() {
+            $(document).on("click", ".btn-update", function () {
+                let lvMessage = mvMessages[$(this).attr("messageId")];
+                mvMessageId = lvMessage.id;
+                mvMessageKey.val(lvMessage.messageKey);
+                mvMessageValue.val(lvMessage.messageValue);
+                $("#modalUpdate").modal();
+            })
+
+            $("#btnUpdateSubmit").on("click", function () {
+                let apiURL = mvHostURLCallApi + "/sys/language/update/" + mvMessageId;
+                let body = {
+                    id : mvMessageId,
+                    messageKey : mvMessageKey.val(),
+                    messageValue : mvMessageValue.val(),
+                };
+                $.ajax({
+                    url: apiURL,
+                    type: 'PUT',
+                    contentType: "application/json",
+                    data: JSON.stringify(body),
+                    success: function(response) {
+                        if (response.status === "OK") {
+                            alert(response.message);
+                            window.location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Error: " + $.parseJSON(xhr.responseText).message);
+                    }
+                })
+            })
+        }
+
+        function loadMessages(pageSize, pageNum) {
+            let apiURL = mvHostURLCallApi + '/sys/language';
+            let params = {pageSize: pageSize, pageNum: pageNum}
+            $.get(apiURL, params, function (response) {
+                if (response.status === "OK") {
+                    let data = response.data;
+                    let contentTable = $('#contentTable');
+                    contentTable.empty();
+                    $.each(data, function (index, d) {
+                        mvMessages[d.id] = d;
+                        contentTable.append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${d.messageKey}</td>
+                                <td>${d.messageValue}</td>
+                                <td>${d.page}</td>
+                                <td>${d.componentType}</td>
+                                <td>${d.locale}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-info btn-update" messageId="${d.id}">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+            }).fail(function () {
+                showErrorModal("Could not connect to the server");
+            });
+        }
+    </script>
+</body>
+</html>

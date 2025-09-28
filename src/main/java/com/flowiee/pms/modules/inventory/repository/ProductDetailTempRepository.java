@@ -13,12 +13,6 @@ import java.util.List;
 
 @Repository
 public interface ProductDetailTempRepository extends JpaRepository <ProductVariantExim, Long>{
-    @Query("from ProductVariantExim b where b.ticketImport.id=:importId")
-    List<ProductVariantExim> findByImportId(@Param("importId") Long importId);
-    
-    @Query("from ProductVariantExim p where p.ticketImport.id=:importId and p.productVariant.id=:productVariantId")
-    ProductVariantExim findProductVariantInGoodsImport(@Param("importId") Long importId, @Param("productVariantId") Long productVariantId);
-
     @Transactional
     @Modifying
     @Query("update ProductVariantExim p set p.quantity = (p.quantity + :quantity) where p.id =:productVariantTempId")

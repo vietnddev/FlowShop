@@ -1,17 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Quản lý khách hàng</title>
-    <th:block th:replace="~{header :: stylesheets}"></th:block>
-    <style>
-        .table td.vertical-center {
-            vertical-align: middle;
-        }
-    </style>
-</head>
+<div th:replace="~{header :: stylesheets(title='Quản lý khách hàng')}"></div>
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">

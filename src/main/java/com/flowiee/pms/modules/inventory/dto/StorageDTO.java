@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StorageDTO implements Serializable {
-	@Serial
 	static final long serialVersionUID = 1L;
 
 	Long id;
@@ -34,7 +32,7 @@ public class StorageDTO implements Serializable {
 
 	Integer totalItems;
     BigDecimal totalInventoryValue;
-    List<TicketImportDTO> listTicketImportDTO;
+    List<TransactionGoodsDTO> transactionGoodsImportList;
     List<ProductVariantDTO> listProductVariantDTO;
     List<MaterialDTO> listMaterialDTO;
     List<StorageItems> listStorageItems;
@@ -43,7 +41,7 @@ public class StorageDTO implements Serializable {
         this.id = id;
     }
 
-    public static StorageDTO convertToDTO(Storage inputEntity) {
+    public static StorageDTO toDto(Storage inputEntity) {
         if (inputEntity == null) {
             return null;
         }
@@ -65,7 +63,7 @@ public class StorageDTO implements Serializable {
         List<StorageDTO> outputDTOs = new ArrayList<>();
         if (ObjectUtils.isNotEmpty(inputEntities)) {
             for (Storage s : inputEntities) {
-                outputDTOs.add(StorageDTO.convertToDTO(s));
+                outputDTOs.add(StorageDTO.toDto(s));
             }
         }
         return outputDTOs;

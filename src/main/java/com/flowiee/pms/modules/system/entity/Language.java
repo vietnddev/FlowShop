@@ -20,21 +20,23 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Language extends BaseEntity implements Serializable {
-    @Serial
-	static final long serialVersionUID = 1L;
+    static final long serialVersionUID = 1L;
 
-    @Column(name = "module")
+    @Column(name = "message_key", nullable = false)
+    String messageKey;
+
+    @Column(name = "message_value", nullable = false)
+    String messageValue;
+
+    @Column(name = "module", nullable = false)
     String module;
 
-    @Column(name = "screen")
-    String screen;
+    @Column(name = "page", nullable = false)
+    String page;
 
-	@Column(name = "code", nullable = false)
-    String code;
+	@Column(name = "component_type")
+    String componentType;
     
-    @Column(name = "property_key", nullable = false)
-    String key;
-    
-    @Column(name = "value", nullable = false)
-    String value;
+    @Column(name = "locale ", nullable = false)
+    String locale;
 }

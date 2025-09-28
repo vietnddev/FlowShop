@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flowiee.pms.common.base.entity.BaseEntity;
 import lombok.*;
 
@@ -15,14 +16,17 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class TransactionGoodsItem extends BaseEntity implements Serializable {
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "transaction_goods_id", nullable = false)
     private TransactionGoods transactionGoods;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "product_variant_id")
     private ProductDetail productVariant;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "material_id")
     private Material material;

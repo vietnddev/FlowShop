@@ -33,7 +33,7 @@ public class FileDTO extends FileStorage implements Serializable{
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     LocalDateTime uploadAt;
 
-    public static FileDTO fromFileStorage(FileStorage fileStorage) {
+    public static FileDTO toDto(FileStorage fileStorage) {
         FileDTO dto = new FileDTO();
         if (ObjectUtils.isNotEmpty(fileStorage)) {
             dto.setId(fileStorage.getId());
@@ -65,11 +65,11 @@ public class FileDTO extends FileStorage implements Serializable{
         return dto;
     }
 
-    public static List<FileDTO> fromFileStorages(List<FileStorage> fileStorages) {
+    public static List<FileDTO> toDTOs(List<FileStorage> fileStorages) {
         List<FileDTO> list = new ArrayList<>();
         if (ObjectUtils.isNotEmpty(fileStorages)) {
             for (FileStorage f : fileStorages) {
-                list.add(FileDTO.fromFileStorage(f));
+                list.add(FileDTO.toDto(f));
             }
         }
         return list;

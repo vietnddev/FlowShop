@@ -52,12 +52,12 @@ public class Storage extends BaseEntity implements Serializable {
     String status;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "storage", fetch = FetchType.LAZY)
-    List<TicketImport> listTicketImports;
+    @OneToMany(mappedBy = "warehouse", fetch = FetchType.LAZY)
+    List<TransactionGoods> transactionGoodsListImport;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "storage", fetch = FetchType.LAZY)
-    List<TicketExport> listTicketExports;
+    @OneToMany(mappedBy = "warehouse", fetch = FetchType.LAZY)
+    List<TransactionGoods> transactionGoodsListExport;
 
     public Storage(Long id) {
         this.id = id;

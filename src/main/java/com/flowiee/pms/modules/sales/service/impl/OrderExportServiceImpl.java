@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
+import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.common.base.service.BaseExportService;
 import com.flowiee.pms.modules.sales.model.OrderReq;
@@ -9,15 +10,12 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class OrderExportServiceImpl extends BaseExportService {
     private final OrderService mvOrderService;
-
-    private DateTimeFormatter DF_DDMMYYYY = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Override
     protected void prepareData(Object pCondition, boolean pTemplateOnly) {
@@ -35,7 +33,7 @@ public class OrderExportServiceImpl extends BaseExportService {
             XSSFRow row = sheet.createRow(i + 4);
             row.createCell(0).setCellValue(i + 1);
             row.createCell(1).setCellValue(orderDTO.getCode());
-            row.createCell(2).setCellValue(orderDTO.getOrderTime().format(DF_DDMMYYYY));
+            row.createCell(2).setCellValue(DateTimeUtil.format(orderDTO.getOrderTime(), DateTimeUtil.FORMAT_DATE));
             row.createCell(3).setCellValue(orderDTO.getSalesChannelName());
             row.createCell(4).setCellValue(String.valueOf(orderDTO.getTotalAmountDiscount()));
             row.createCell(5).setCellValue(orderDTO.getPayMethodName());

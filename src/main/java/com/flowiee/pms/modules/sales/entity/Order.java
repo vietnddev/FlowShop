@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.modules.inventory.entity.TransactionGoods;
 import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.inventory.entity.TicketExport;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.common.enumeration.OrderStatus;
@@ -129,8 +129,8 @@ public class Order extends BaseEntity implements Serializable {
 
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "ticket_export_id")
-	TicketExport ticketExport;
+	@JoinColumn(name = "transaction_goods_export_id")
+	TransactionGoods transactionGoodsExport;
 
 	@Column(name = "cancellation_date")
 	LocalDateTime cancellationDate;

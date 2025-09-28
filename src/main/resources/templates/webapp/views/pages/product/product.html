@@ -1,17 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Danh sách sản phẩm</title>
-    <th:block th:replace="~{header :: stylesheets}"></th:block>
-    <style rel="stylesheet">
-        .table td,
-        th {
-            vertical-align: middle;
-        }
-    </style>
-</head>
+
+<div th:replace="~{header :: stylesheets(title='Products')}"></div>
+
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         <div th:replace="~{header :: header}"></div>
@@ -46,7 +37,7 @@
                                             <tr class="align-self-center">
                                                 <th>STT</th>
                                                 <th></th>
-                                                <th>Product name</th>
+                                                <th th:text="#{inventory.product.list.table.header.product_name}">Product name</th>
                                                 <th>Brand</th>
                                                 <th>Type</th>
                                                 <th>Variants</th>

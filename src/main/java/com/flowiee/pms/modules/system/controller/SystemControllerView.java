@@ -7,6 +7,7 @@ import com.flowiee.pms.modules.staff.service.AccountService;
 import com.flowiee.pms.modules.system.dto.SystemConfigDTO;
 import com.flowiee.pms.modules.system.service.ConfigService;
 import com.flowiee.pms.common.enumeration.Pages;
+import com.flowiee.pms.modules.system.service.LanguageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +25,7 @@ import java.util.List;
 public class SystemControllerView extends BaseController {
     ConfigService configService;
     AccountService accountService;
+    LanguageService languageService;
 
     @GetMapping("/notification")
     public ModelAndView getAllNotification() {
@@ -55,6 +57,14 @@ public class SystemControllerView extends BaseController {
         }
         configService.update(config, configId);
         return new ModelAndView("redirect:/he-thong/config");
+    }
+
+    @GetMapping("/language")
+    @PreAuthorize("@vldModuleSystem.readConfig(true)")
+    public ModelAndView showLanguages() {
+        ModelAndView modelAndView = new ModelAndView(Pages.SYS_LANGUAGE.getTemplate());
+        modelAndView.addObject("thLanguages", languageService.findAll(0, 10, null));
+        return baseView(modelAndView);
     }
 
     @GetMapping("/data-temp")

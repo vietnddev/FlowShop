@@ -9,7 +9,6 @@ import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.common.exception.BadRequestException;
-import com.flowiee.pms.modules.sales.model.OrderReq;
 import com.flowiee.pms.modules.sales.service.OrderItemsService;
 import com.flowiee.pms.modules.sales.service.OrderPrintInvoiceService;
 import com.flowiee.pms.modules.sales.service.OrderService;
@@ -21,13 +20,11 @@ import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.common.enumeration.OrderStatus;
 import com.flowiee.pms.common.enumeration.Pages;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -116,7 +113,7 @@ public class OrderControllerView extends BaseController {
         }
         ModelAndView modelAndView = new ModelAndView(Pages.SLS_ORDER_TRACKING.getTemplate());
         modelAndView.addObject("orderCode", lvOrder.getCode());
-        modelAndView.addObject("orderTime", lvOrder.getOrderTime().format(DateTimeFormatter.ofPattern(DateTimeUtil.FORMAT_DATE_TIME)));
+        modelAndView.addObject("orderTime", DateTimeUtil.format(lvOrder.getOrderTime(), DateTimeUtil.FORMAT_DATE_TIME));
         modelAndView.addObject("orderStatus", lvOrder.getOrderStatus());
         modelAndView.addObject("orderItems", lvOrder.getListOrderDetail());
         modelAndView.addObject("receiverName", lvOrder.getReceiverName());

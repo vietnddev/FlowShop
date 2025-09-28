@@ -1,10 +1,14 @@
 package com.flowiee.pms.modules.inventory.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flowiee.pms.common.base.entity.BaseEntity;
 import com.flowiee.pms.modules.inventory.enums.TransactionGoodsStatus;
 import com.flowiee.pms.modules.inventory.enums.TransactionGoodsType;
+import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.sales.entity.Order;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,15 +26,18 @@ public class TransactionGoods extends BaseEntity implements Serializable {
     @Column(name = "transaction_code", nullable = false, length = 30)
     private String code;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "transaction_source", length = 30)
     private String source;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "transaction_type", length = 20)
+    @Column(name = "transaction_type", length = 20, nullable = false)
     private TransactionGoodsType transactionType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "transaction_status", length = 30)
+    @Column(name = "transaction_status", length = 30, nullable = false)
     private TransactionGoodsStatus transactionStatus;
 
     @Column(name = "description")
@@ -74,9 +81,23 @@ public class TransactionGoods extends BaseEntity implements Serializable {
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "warehouse_id")
+    @JoinColumn(name = "warehouse_id", nullable = false)
     private Storage warehouse;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "transactionGoods", fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<TransactionGoodsItem> items;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "transactionGoodsExport", fetch = FetchType.LAZY)
+    private List<Order> orderListExport;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "transactionGoodsImport", fetch = FetchType.LAZY)
+    List<FileStorage> uploadedImagesImportList;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "transactionGoodsExport", fetch = FetchType.LAZY)
+    List<FileStorage> uploadedImagesExportList;
 }

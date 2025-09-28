@@ -32,6 +32,29 @@ const mvStorageStatusInit = {};
 mvStorageStatusInit["Y"] = "Đang sử dụng";
 mvStorageStatusInit["N"] = "Không sử dụng";
 
+$(document).ready(function () {
+    commonListener();
+});
+
+function commonListener() {
+    $("#langOptionVi").click(function () {
+        mvLang = "vi";
+        window.location.replace("?lang=vi");
+    });
+
+    $("#langOptionEn").click(function () {
+        mvLang = "en";
+        window.location.replace("?lang=en");
+    });
+
+    $(document).on('click', '[data-toggle="lightbox"]', function (event) {
+        event.preventDefault();
+        $(this).ekkoLightbox({
+            alwaysShowClose: true
+        });
+    });
+}
+
 //Pagination
 const mvPageSizeDefault = 10;
 let getPageSize = () => getPageParams().pageSize;

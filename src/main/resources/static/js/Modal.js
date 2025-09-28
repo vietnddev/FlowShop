@@ -10,7 +10,7 @@ function showModalDialog(title, message) {
 
 function showConfirmModal(linkObject, title, text) {
     let entity = linkObject.attr("entity");
-    let entityId = linkObject.attr("entityId");//link là 1 đối tượng JQuery -->lấy ra giá trị của thuộc tính entityId
+    let entityId = linkObject.attr("entityId");
     let entityName = linkObject.attr("entityName");
     let actionType = linkObject.attr("actionType");
 

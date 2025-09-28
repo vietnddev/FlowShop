@@ -67,10 +67,6 @@ public class Category extends BaseEntity implements Serializable {
 	Boolean status;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "paymentMethod", fetch = FetchType.LAZY)
-	List<TicketImport> listPaymentMethod;
-
-	@JsonIgnore
 	@OneToMany(mappedBy = "salesChannel", fetch = FetchType.LAZY)
 	List<Order> listKenhBanHang;
 

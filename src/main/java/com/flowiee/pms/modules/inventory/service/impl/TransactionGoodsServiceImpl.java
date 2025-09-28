@@ -82,10 +82,9 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
             }
             transaction.setItems(lstItems);
 
-            TransactionGoods result = switch (TransactionGoodsType.get(transactionGoodsDto.getType())) {
-                case RECEIPT -> createTransactionGoodsWithTypeReceipt(transaction);
-                case ISSUE -> createTransactionGoodsWithTypeIssue(transaction);
-                default -> throw new AppException("Please input transaction type!");
+            TransactionGoods result = switch (transactionGoodsDto.getTransactionType()) {
+                case IMPORT -> createTransactionGoodsWithTypeReceipt(transaction);
+                case EXPORT -> createTransactionGoodsWithTypeIssue(transaction);
             };
 
             // Return dto after create transaction successful

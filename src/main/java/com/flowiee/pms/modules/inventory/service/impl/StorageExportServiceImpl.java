@@ -1,6 +1,5 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
-import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.modules.inventory.model.StorageItems;
 import com.flowiee.pms.modules.inventory.dto.StorageDTO;
 import com.flowiee.pms.common.base.service.BaseExportService;
@@ -31,7 +30,7 @@ public class StorageExportServiceImpl extends BaseExportService {
 
     @Override
     protected void writeData(Object pCondition) {
-        Storage lvCondition = (Storage) pCondition;
+        StorageDTO lvCondition = (StorageDTO) pCondition;
 
         StorageDTO storage = mvStorageService.findById(lvCondition.getId(), false);
         if (storage == null)

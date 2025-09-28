@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.dto;
 
+import com.flowiee.pms.modules.inventory.enums.TransactionGoodsType;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.modules.inventory.entity.TransactionGoodsItem;
@@ -15,8 +16,8 @@ public class TransactionGoodsDTO {
     private Long id;
     private String code;
     private String source;
-    private String type;
-    private String status;
+    private TransactionGoodsType transactionType;
+    private String transactionStatus;
     private String description;
     private LocalDateTime transactionTime;
     private String confirmedBy;

@@ -169,3 +169,27 @@ function fillCustomerInfoOntoForm(pCustomer) {
     $('#receiveEmailField').val(pCustomer.emailDefault);
     $('#receiveAddressField').val(pCustomer.addressDefault);
 }
+
+function addCartItems(pItems) {
+    let apiURL = mvHostURLCallApi + '/sls/cart/add-items';
+    let body = {
+        cartId: mvCurrentCartId,
+        items: pItems
+    }
+    $.ajax({
+        url: apiURL,
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(body),
+        success: function (response) {
+            if (response.status === "OK") {
+                alert(response.message)
+                viewCartInfo(mvCurrentCartId);
+                $("#searchProductModal").modal("hide");
+            }
+        },
+        error: function (xhr) {
+            alert("Error: " + $.parseJSON(xhr.responseText).message);
+        }
+    });
+}

@@ -305,6 +305,8 @@
             createOrder();
             checkVoucherIsAvailable();
             useVoucher();
+
+            submitProductOnSearchModal("createOrder");
         });
 
         function init() {
@@ -334,11 +336,6 @@
                 }
                 $("#searchProductModal").modal();
                 setupSearchModalInCreateOrderPage();
-            });
-
-            $("#btnSubmitProductOnSearchModal").on("click", function () {
-                submitProductOnSearchModal("createOrder");
-                //$("#searchProductModal").modal("hide");
             });
 
             $(document).on('click', '.btnUpdateItem', function () {

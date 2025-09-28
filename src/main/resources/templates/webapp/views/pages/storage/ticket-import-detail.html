@@ -24,8 +24,7 @@
                     <div class="form-group row justify-content-between p-3">
                         <div class="col-9">
                             <div class="row">
-                                <label class="col-2 font-weight-bold" for="titleField" style="display: flex; align-items: center">Tên phiếu</label>
-                                <input class="col-10 form-control" type="text" id="titleField"/>
+                                <input class="col-9 form-control" type="text" id="titleField" placeholder="Name"/>
                             </div>
                         </div>
                         <div class="col-3 row justify-content-end">
@@ -45,30 +44,32 @@
                 <div class="col-8" style="padding-right: 0">
                     <section class="col-12">
                         <div class="card p-3" style="max-height: 350px; overflow: auto">
-                            <div class="row">
-                                <div class="col-sm-10 form-group">
-                                    <select class="form-control select2" multiple="multiple" data-placeholder="Chọn sản phẩm" style="width: 100%;" id="productVariantField" required>
-                                        <option th:each="list : ${listProductVariant}" th:value="${list.id}" th:text="${list.variantName + ' - hiện còn: ' + list.storageQty}"></option>
-                                    </select>
+                            <div class="row justify-content-between">
+                                <div class="col" style="display: flex; align-items: center">
+                                    <h3 class="card-title"><strong class="text-uppercase">Items</strong></h3>
                                 </div>
-                                <div class="col-sm-2 form-group">
-                                    <button type="submit" class="btn btn-sm btn-primary w-100" style="height: 38px; font-weight: bold" id="btnAddProduct">Thêm</button>
+                                <div class="col text-right">
+                                    <button class="btn btn-sm btn-default w-auto" id="btnAddItems">
+                                        <i class="fa-solid fa-plus mr-2"></i> Pick items
+                                    </button>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row mt-3">
                                 <table class="table text-nowrap align-items-center">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th class="text-left">Tên sản phẩm</th>
-                                            <th>Giá nhập</th>
-                                            <th>Số lượng</th>
-                                            <th>Thành tiền</th>
-                                            <th>Ghi chú</th>
+                                            <th>No.</th>
+                                            <th></th>
+                                            <th>Item name</th>
+                                            <th>Item type</th>
+                                            <th>Cost price</th>
+                                            <th>Quantity</th>
+                                            <th>Amount</th>
+                                            <th>Note</th>
                                             <th></th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <!--<tbody>
                                         <tr th:each="list, index : ${ticketImportDetail.listProductVariantTemps}">
                                             <td th:text="${index.index + 1}"></td>
                                             <td th:text="${list.productVariant.variantName}"></td>
@@ -81,66 +82,19 @@
                                                 <button type="button" class="btn btn-sm btn-danger"  data-toggle="modal" data-target="'#modalDeleteItems_' + ${list.id}">Xóa</button>
                                             </td>
                                         </tr>
-                                    </tbody>
-                                    <!--<tbody id="productContentTable"></tbody>-->
+                                    </tbody>-->
+                                    <tbody id="tblItems"></tbody>
                                 </table>
                             </div>
                         </div>
                     </section>
-                    <!-- End section sản phẩm -->
-
-                    <!-- Section nguyên vật liệu -->
-                    <section class="col-12">
-                        <div class="card p-3" style="min-height: 366px; max-height: 366px; overflow: auto">
-                            <div class="row">
-                                <div class="col-sm-10 form-group">
-                                    <select class="form-control select2" multiple="multiple" data-placeholder="Chọn nguyên vật liệu" style="width: 100%;" id="materialField" required>
-                                        <option th:each="list : ${listMaterial}" th:value="${list.id}" th:text="${list.name + ' - hiện còn: ' + list.quantity}"></option>
-                                    </select>
-                                </div>
-                                <div class="col-sm-2 form-group">
-                                    <button type="submit" class="btn btn-sm btn-primary w-100" style="height: 38px; font-weight: bold" id="btnAddMaterial">Thêm</button>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <table class="table text-nowrap align-items-center">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th class="text-left">Tên nguyên vật liệu</th>
-                                            <th>Giá nhập</th>
-                                            <th>Số lượng</th>
-                                            <th>Thành tiền</th>
-                                            <th>Ghi chú</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="list, index : ${ticketImportDetail.listMaterialTemps}">
-                                            <td th:text="${index.index + 1}"></td>
-                                            <td th:text="${list.material.name}"></td>
-                                            <td th:text="${list.purchasePrice}"></td>
-                                            <td th:text="${list.quantity}"></td>
-                                            <td th:text="${list.purchasePrice != null ? list.purchasePrice * list.quantity : ''}"></td>
-                                            <td th:text="${list.note}"></td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="'#modalUpdateItems_' + ${list.id}">Cập nhật</button>
-                                                <button type="button" class="btn btn-sm btn-danger"  data-toggle="modal" data-target="'#modalDeleteItems_' + ${list.id}">Xóa</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    <!--<tbody id="materialContentTable"></tbody>-->
-                                </table>
-                            </div>
-                        </div>
-                    </section>
-                    <!-- End section nguyên vật liệu -->
+                    <!-- End section items -->
 
                     <!-- Section image -->
                     <section class="col-12">
                         <div class="card p-3" style="min-height: 366px; max-height: 366px; overflow: auto">
                             <div class="row">
-                                <div class="col-2 mb-2" th:each="list : ${ticketImportDetail.listImages}">
+                                <!--<div class="col-2 mb-2" th:each="list : ${ticketImportDetail.listImages}">
                                     <div class="card border" style="height: 186px">
                                         <div class="card-body product-image-thumb" style="margin: auto; border: none">
                                             <img th:src="@{'/' + ${list.directoryPath} + '/' + ${list.storageName}}"
@@ -150,7 +104,7 @@
                                             <i style="cursor: pointer" th:imageId="${list.id}" class="fa-solid fa-trash text-danger col btn-delete-image"></i>
                                         </div>
                                     </div>
-                                </div>
+                                </div>-->
                             </div>
                         </div>
                     </section>
@@ -163,7 +117,7 @@
                         <div class="form-group row" style="padding-right: 8px">
                             <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Nhà cung cấp</span>
                             <select class="custom-select col-7" id="supplierField">
-                                <option th:each="list : ${listSupplier}" th:value="${list.id}" th:text="${list.name}"></option>
+                                <option th:each="i : ${thSuppliers}" th:value="${i.id}" th:text="${i.name}"></option>
                             </select>
                         </div>
                         <div class="form-group row" style="padding-right: 8px">
@@ -171,12 +125,14 @@
                             <input class="col-7 form-control" type="date" id="importTimeField"/>
                         </div>
                         <div class="form-group row" style="padding-right: 8px">
-                            <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Người nhận hàng</span>
-                            <input class="col-7 form-control" id="importerField" disabled/>
+                            <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Processing Staff</span>
+                            <select class="custom-select col-7" id="importerField">
+                                <option th:each="i : ${thStaffs}" th:value="${i.id}" th:text="${i.fullName}"></option>
+                            </select>
                         </div>
                         <div class="form-group row" style="padding-right: 8px">
                             <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Tổng giá trị</span>
-                            <input class="col-7 form-control" id="totalValueField" th:value="${ticketImportDetail.totalValue}" disabled/>
+                            <input class="col-7 form-control" id="totalValueField" disabled/>
                         </div>
                         <div class="form-group">
                             <label for="noteField">Ghi chú</label>
@@ -184,7 +140,9 @@
                         </div>
                         <div class="form-group row" style="padding-right: 8px">
                             <span class="col-5" style="display: flex; align-items: center; font-weight: bold">Trạng thái</span>
-                            <select class="custom-select col-7" id="statusField"></select>
+                            <select class="custom-select col-7" id="statusField">
+                                <option th:each="i : ${thStatus}" th:value="${i}" th:text="${i}"></option>
+                            </select>
                         </div>
                     </section>
                 </div>
@@ -197,10 +155,14 @@
 
     <div th:replace="~{modal_fragments :: confirm_modal}"></div>
     <div th:replace="~{fragments :: uploadFileModal}"></div>
+    <div th:replace="~{pages/product/fragments/product-fragments :: searchProductModal}"></div>
 
     <aside class="control-sidebar control-sidebar-dark"></aside>
 
     <div th:replace="~{header :: scripts}"></div>
+
+    <script th:src="@{/js/product/SearchProductModal.js}"></script>
+    <script th:src="@{/js/storage/GoodsImport.js}"></script>
 
     <script>
         let mvTicketImportDetail = {};

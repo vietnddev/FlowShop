@@ -1,6 +1,8 @@
 package com.flowiee.pms.modules.inventory.entity;
 
 import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.modules.inventory.enums.TransactionGoodsStatus;
+import com.flowiee.pms.modules.inventory.enums.TransactionGoodsType;
 import com.flowiee.pms.modules.sales.entity.Order;
 import lombok.*;
 
@@ -23,11 +25,13 @@ public class TransactionGoods extends BaseEntity implements Serializable {
     @Column(name = "transaction_source", length = 30)
     private String source;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", length = 20)
-    private String type;
+    private TransactionGoodsType transactionType;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_status", length = 30)
-    private String status;
+    private TransactionGoodsStatus transactionStatus;
 
     @Column(name = "description")
     private String description;

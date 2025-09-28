@@ -29,22 +29,35 @@
 
                         <div class="card" style="font-size: 14px">
                             <div class="card-header row justify-content-between ml-0 mr-0" style="font-weight: bold; font-size: 16px">
-                                <ul class="col-8 nav nav-pills">
-                                    <li class="nav-item"><a class="nav-link active" href="#STORAGE_ITEM_TAB" id="storageItemTabLabel" data-toggle="tab">Hàng tồn kho</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="#STORAGE_INFO_TAB" id="storageInfoTabLabel" data-toggle="tab">Thông tin kho</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="#IMPORT_HISTORY_TAB" id="storageImportHistoryTabLabel" data-toggle="tab">Lịch sử nhập hàng</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="#EXPORT_HISTORY_TAB" id="storageExportHistoryTabLabel" data-toggle="tab">Lịch sử xuất hàng</a></li>
+                                <ul class="col-7 nav nav-pills">
+                                    <li class="nav-item"><a class="nav-link active" href="#STORAGE_ITEM_TAB" id="storageItemTabLabel" data-toggle="tab">Inventory</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#STORAGE_INFO_TAB" id="storageInfoTabLabel" data-toggle="tab">Storage info</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#IMPORT_HISTORY_TAB" id="storageImportHistoryTabLabel" data-toggle="tab">Import history</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="#EXPORT_HISTORY_TAB" id="storageExportHistoryTabLabel" data-toggle="tab">Export history</a></li>
                                 </ul>
-                                <div class="col-4 text-right">
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createTicketImportModal">
+                                <div class="col-5 text-right">
+                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#createTicketImportModal">
                                         <i class="fa-solid"></i>Tạo phiếu nhập
                                     </button>
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createTicketExportModal">
+                                    <a class="btn btn-sm btn-primary" th:href="@{/stg/transaction-goods/import/create}">
+                                        <i class="fa-solid"></i>Tạo phiếu nhập 2
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#createTicketExportModal">
                                         <i class="fa-solid"></i>Tạo phiếu xuất
                                     </button>
-                                    <a th:href="@{/api/v1/storage/export/{storageId}(storageId=${storageId})}" class="btn btn-info">
-                                        <i class="fa-solid fa-cloud-arrow-down mr-2"></i>Export items
-                                    </a>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-default">Export</button>
+                                        <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown" aria-expanded="false">
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <div class="dropdown-menu" role="menu" style="">
+                                            <a class="dropdown-item" href="#" onclick="doExport(this)" th:attr="data-src='inventory'"> Inventory items</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#" onclick="doExport(this)" th:attr="data-src='inbound'"> Import history</a>
+                                            <a class="dropdown-item" href="#" onclick="doExport(this)" th:attr="data-src='outbound'"> Export history</a>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                             <!-- /.card-header -->
@@ -199,22 +212,27 @@
             loadStorageItems(getPageSize(), getPageNum());
             $("#storageItemTabLabel").on("click", function () {
                 loadStorageItems(getPageSize(), getPageNum());
-            })
+            });
+
             $("#storageInfoTabLabel").on("click", function () {
                 loadStorageDetailInfo();
-            })
+            });
+
             $("#storageImportHistoryTabLabel").on("click", function () {
                 loadStorageImportHistory(getPageSize(), getPageNum());
-            })
+            });
+
             $("#storageExportHistoryTabLabel").on("click", function () {
                 loadStorageExportHistory(getPageSize(), getPageNum());
-            })
+            });
+
             updateTableContentWhenOnClickPagination(loadStorageItems);
             updateTableContentWhenOnClickPagination2(loadStorageImportHistory);
             updateTableContentWhenOnClickPagination3(loadStorageExportHistory);
+
             $("#btnSearch").on("click", function () {
                 loadStorageItems($('#paginationInfo').attr("pageSize"), 1);
-            })
+            });
 
             createNewTicketImport();
             createNewTicketExport();
@@ -305,6 +323,13 @@
                     })
                 }
             })
+        }
+
+        function doExport(el) {
+            const src = el.getAttribute("data-src");
+            if (src === "inventory") {
+                window.location.href = `/api/v1/storage/export/${mvStorageId}?src=${src}`;
+            }
         }
 
         let validatePreUpdate = () => {

@@ -53,7 +53,8 @@ public enum Pages {
     STG_TICKET_EXPORT("ticket-export",                  MODULE.STORAGE),
     STG_TICKET_EXPORT_DETAIL("ticket-export-detail",    MODULE.STORAGE),
     STG_STORAGE("storage",                              MODULE.STORAGE),
-    STG_STORAGE_DETAIL("storage-detail",                MODULE.STORAGE);
+    STG_STORAGE_DETAIL("storage-detail",                MODULE.STORAGE),
+    STG_GOODS_IMPORT_CREATION("ticket-import-detail",   MODULE.STORAGE);
 
     private final String template;
     private final MODULE module;

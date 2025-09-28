@@ -82,7 +82,7 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
             }
             transaction.setItems(lstItems);
 
-            TransactionGoods result = switch (TransactionGoodsType.get(transactionGoodsDto.getType())) {
+            TransactionGoods result = switch (TransactionGoodsType.get(transactionGoodsDto.getTransactionType())) {
                 case RECEIPT -> createTransactionGoodsWithTypeReceipt(transaction);
                 case ISSUE -> createTransactionGoodsWithTypeIssue(transaction);
                 default -> throw new AppException("Please input transaction type!");

@@ -90,7 +90,6 @@ function chooseProductOnSearchModal() {
         let isChecked = $(this).is(':checked');
         let productModel = {
             productVariantId: productVariantId,
-            //productVariantName: getItemName(productVariantId),
             quantity: getItemQuantity(productVariantId)
         }
 
@@ -111,7 +110,6 @@ function chooseProductOnSearchModal() {
             let productVariantId = $(this).attr("productVariantId");
             let productModel = {
                 productVariantId: productVariantId,
-                //productVariantName: getItemName(productVariantId),
                 quantity: getItemQuantity(productVariantId)
             }
             if (isChecked) {
@@ -126,38 +124,24 @@ function chooseProductOnSearchModal() {
 }
 
 function submitProductOnSearchModal(functionId) {
-    if (mvProductSearchModalListSelected.length === 0) {
-        alert("Vui lòng chọn sản phẩm!");
-        return;
-    }
-
-    $.each(mvProductSearchModalListSelected, function (index, d) {
-        let lvProductVariantId = d.productVariantId;
-        //d.productVariantName = getItemName(lvProductVariantId);
-        d.quantity = parseInt(getItemQuantity(lvProductVariantId));
-    });
-
-    if (functionId === "createOrder") {
-        let apiURL = mvHostURLCallApi + '/sls/cart/add-items';
-        let body = {
-            cartId: mvCurrentCartId,
-            items: mvProductSearchModalListSelected
+    $("#btnSubmitProductOnSearchModal").on("click", function () {
+        if (mvProductSearchModalListSelected.length === 0) {
+            alert("Vui lòng chọn sản phẩm!");
+            return;
         }
-        $.ajax({
-            url: apiURL,
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(body),
-            success: function (response) {
-                if (response.status === "OK") {
-                    alert(response.message)
-                    viewCartInfo(mvCurrentCartId);
-                    $("#searchProductModal").modal("hide");
-                }
-            },
-            error: function (xhr) {
-                alert("Error: " + $.parseJSON(xhr.responseText).message);
-            }
+
+        $.each(mvProductSearchModalListSelected, function (index, d) {
+            let lvProductVariantId = d.productVariantId;
+            d.quantity = parseInt(getItemQuantity(lvProductVariantId));
         });
-    }
+
+        switch (functionId) {
+            case "createOrder":
+                addCartItems(mvProductSearchModalListSelected);
+                break;
+            case "goodsImport":
+                addGoodsImportItems(mvProductSearchModalListSelected);
+                break;
+        }
+    });
 }

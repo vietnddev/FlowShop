@@ -45,6 +45,8 @@ public class SystemLogServiceImpl implements SystemLogService {
         for (SystemLog systemLog : logs.getContent()) {
             systemLog.setAccountName(systemLog.getAccount() != null ? systemLog.getAccount().getFullName() : "");
             systemLog.setContentChange(systemLog.getContentChange() != null ? systemLog.getContentChange() : "");
+            String lvLocation = systemLog.getLocation();
+            systemLog.setLocation(CoreUtils.isNullStr(lvLocation) ? "" : lvLocation);
         }
         return logs;
     }
@@ -90,6 +92,7 @@ public class SystemLogServiceImpl implements SystemLogService {
                 .content(lvContent)
                 .contentChange(lvContentChange)
                 .ip(userSession.getUserPrincipal().getIp())
+                .location(userSession.getUserPrincipal().getLocation())
                 .account(new Account(userSession.getUserPrincipal().getId()))
                 .build());
     }

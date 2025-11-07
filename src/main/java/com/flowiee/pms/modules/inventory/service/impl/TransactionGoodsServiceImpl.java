@@ -175,6 +175,7 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
         return TransactionGoodsDTO.toDto(lvRecordedTransactionGoods);
     }
 
+    @Transactional
     @Override
     public TransactionGoodsDTO updateExportTransaction(TransactionGoodsDTO pTransactionGoodsDto, Long pTranId) {
         TransactionGoods lvTransactionGoods = super.findEntById(pTranId, true);

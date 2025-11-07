@@ -47,7 +47,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-body p-0">
+                                <div class="card-body table-responsive p-0">
                                     <table class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
@@ -120,6 +120,8 @@
                     let contentTable = $('#contentTable');
                     contentTable.empty();
                     $.each(data, function (index, d) {
+                        let location = d.location !== "" ? '<br>' + d.location : '';
+
                         contentTable.append(
                             '<tr>' +
                                 '<td>' + (((pageNum - 1) * pageSize + 1) + index) + '</td>' +
@@ -128,7 +130,7 @@
                                 '<td style="max-width: 300px">' + d.content + '</td>' +
                                 '<td style="max-width: 300px">' + d.contentChange + '</td>' +
                                 '<td>' + d.createdAt + '</td>' +
-                                '<td>' + d.ip + '</td>' +
+                                '<td>' + d.ip + location + '</td>' +
                             '</tr>'
                         );
                     });

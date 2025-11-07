@@ -22,6 +22,7 @@ public class UserPrincipal implements UserDetails {
     private String email;
     private Long branchId;
     private String ip;
+    private String location;
     private boolean isAccountNonExpired;
     private boolean isAccountNonLocked;
     private boolean isCredentialsNonExpired;

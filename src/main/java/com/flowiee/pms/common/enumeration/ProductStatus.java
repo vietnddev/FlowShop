@@ -4,10 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum ProductStatus {
-    ACT("Đang kinh doanh"),
-    INA("Ngừng kinh doanh"),
-    DIS("Ngừng kinh doanh"),
-    OOS("Hết hàng");
+    ACT("Available for sale"),
+    INA("Inactive"),
+    DIS("Discontinued (no longer sold)"),
+    OOS("Out of stock");
 
     private String label;
 

@@ -1,7 +1,8 @@
 package com.flowiee.pms.modules.media.service.impl;
 
+import com.flowiee.pms.common.base.FlwSys;
 import com.flowiee.pms.common.base.StartUp;
-import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.common.enumeration.SystemDir;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.media.service.FileStorageService;
@@ -9,7 +10,6 @@ import com.flowiee.pms.modules.system.entity.SystemConfig;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.EntityNotFoundException;
-import com.flowiee.pms.modules.system.repository.ConfigRepository;
 import com.flowiee.pms.modules.media.repository.FileStorageRepository;
 
 import com.flowiee.pms.common.utils.CommonUtils;
@@ -17,26 +17,25 @@ import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.common.enumeration.ConfigCode;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import com.flowiee.pms.common.enumeration.MessageCode;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+@Slf4j
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class FileStorageServiceImpl implements FileStorageService {
-    FileStorageRepository mvFileRepository;
-    ConfigRepository mvConfigRepository;
+    private final FileStorageRepository mvFileRepository;
 
     @Override
     public FileStorage findById(Long fileId, boolean pThrowException) {
@@ -50,30 +49,25 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Transactional
     @Override
     public FileStorage save(FileStorage fileStorage) {
-        FileUtils.isAllowUpload(fileStorage.getExtension(), true, null);
-        vldResourceUploadPath(true);
-        FileStorage fileStorageSaved = mvFileRepository.save(fileStorage);
-        Path pathDest = Paths.get(CommonUtils.getPathDirectory(fileStorageSaved.getModule().toUpperCase()) + File.separator + fileStorageSaved.getStorageName());
+        FileStorage fileStorageSaved;
         try {
-            saveFileAttach(fileStorage.getFileAttach(), pathDest);
-        } catch (IOException ex) {
-            throw new AppException("An error occurred while saving the attachment!", ex);
-        }
+            vldAttachedFile(fileStorage.getFileAttach());
+            vldResourceUploadPath(true);
 
+            fileStorageSaved = mvFileRepository.save(fileStorage);
+            Path pathDest = Paths.get(CommonUtils.getPathDirectory(fileStorageSaved.getModule().toUpperCase()) + File.separator + fileStorageSaved.getStorageName());
+
+            saveFileAttach(fileStorage.getFileAttach(), pathDest);
+            log.info("Uploaded 1 file: " + pathDest.toRealPath());
+        } catch (IOException e) {
+            throw new AppException(e);
+        }
         return fileStorageSaved;
     }
 
     @Override
     public FileStorage update(FileStorage entity, Long entityId) {
         throw new AppException("Method does not support!");
-    }
-
-    @Override
-    public String saveFileOfImport(MultipartFile fileImport, FileStorage fileInfo) throws IOException {
-        mvFileRepository.save(fileInfo);
-        Path dest = Paths.get(CommonUtils.getPathDirectory(fileInfo.getModule()) + "/" + "I_" + fileInfo.getStorageName());
-        saveFileAttach(fileImport, dest);
-        return "OK";
     }
 
     @Override
@@ -97,9 +91,56 @@ public class FileStorageServiceImpl implements FileStorageService {
         return String.format(ErrorCode.DELETE_ERROR_OCCURRED.getDescription(), "file");
     }
 
+    @Override
+    public List<LinkedHashMap<String, String>> getSystemVolumes() {
+        List<LinkedHashMap<String, String>> lvVolumeMapList = new ArrayList<>();
+
+        for (SystemDir lvSystemDir : SystemDir.values()) {
+            LinkedHashMap<String, String> lvSysFolder = new LinkedHashMap<>();
+            lvSysFolder.put("folder", lvSystemDir.getName());
+            lvSysFolder.put("numberOfFiles", String.valueOf(lvSystemDir.getNumberOfFiles()));
+            lvSysFolder.put("usedSpace", String.valueOf(lvSystemDir.getUsedSpace() / (1024 * 1024))); //MB
+            lvSysFolder.put("note", "N/A");
+            lvVolumeMapList.add(lvSysFolder);
+        }
+
+        return lvVolumeMapList;
+    }
+
+    private void vldAttachedFile(MultipartFile pUploadedFile) throws IOException {
+        FileUtils.isAllowUpload(FileUtils.getFileExtension(pUploadedFile.getOriginalFilename()), true, null);
+
+        SystemConfig lvFileSizeUploadCnf = FlwSys.getSystemConfigs().get(ConfigCode.maxSizeFileUpload);
+        BigDecimal lvMaximumSizeMBAllowToUpload = SysConfigUtils.isValid(lvFileSizeUploadCnf) ?
+                new BigDecimal(lvFileSizeUploadCnf.getIntValue()) : new BigDecimal(2);
+
+        SystemConfig lvVolumeConfig = FlwSys.getSystemConfigs().get(ConfigCode.resourceVolume);
+        if (SysConfigUtils.isValid(lvVolumeConfig)) {
+            BigDecimal lvMaximumVolumeMB = BigDecimal.valueOf(SysConfigUtils.getIntValue(lvVolumeConfig))
+                    .setScale(2, RoundingMode.HALF_UP);
+            BigDecimal lvSizeAttachedMB = BigDecimal.valueOf(pUploadedFile.getSize()).divide(new BigDecimal((1024 * 1024)))
+                    .setScale(2, RoundingMode.HALF_UP);
+            BigDecimal lvSystemDirByteSize = BigDecimal.valueOf(Arrays.stream(SystemDir.values())
+                    .mapToDouble(SystemDir::getUsedSpace)
+                    .sum()).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal lvSystemDirMBSize = lvSystemDirByteSize.divide(new BigDecimal(1024 * 1024))
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            if (lvSizeAttachedMB.compareTo(lvMaximumSizeMBAllowToUpload) >= 0) {
+                throw new IOException("Upload failed: File's size is over the configuration, " + lvMaximumSizeMBAllowToUpload.toPlainString());
+            }
+
+            if (lvSystemDirMBSize.add(lvSizeAttachedMB).compareTo(lvMaximumVolumeMB)  >= 0) {
+                log.error("Maximum volume: {}MB; system space used: {}MB; uploaded file's size: {}MB",
+                        lvMaximumVolumeMB, lvSystemDirMBSize, lvSizeAttachedMB);
+                throw new IOException("Upload failed: server storage is full. Please try again later or remove unnecessary files.");
+            }
+        }
+    }
+
     private boolean vldResourceUploadPath(boolean throwException) {
         if (StartUp.getResourceUploadPath() == null) {
-            SystemConfig resourceUploadPathConfig = mvConfigRepository.findByCode(ConfigCode.resourceUploadPath.name());
+            SystemConfig resourceUploadPathConfig = FlwSys.getSystemConfigs().get(ConfigCode.resourceUploadPath);
             if (SysConfigUtils.isValid(resourceUploadPathConfig)) {
                 StartUp.mvResourceUploadPath = resourceUploadPathConfig.getValue();
                 return true;

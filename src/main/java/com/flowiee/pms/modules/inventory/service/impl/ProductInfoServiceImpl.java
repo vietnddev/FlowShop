@@ -251,6 +251,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
                             .wholesalePrice(lvPrice.getWholesalePrice())
                             .costPrice(lvPrice.getCostPrice())
                             .build());
+                    lvVariant.setStatus(ProductStatus.INA);
 
                     mvProductVariantService.save(lvVariant);
                 }
@@ -276,10 +277,10 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
 
     @Transactional
     @Override
-    public ProductDTO update(ProductDTO productDTO, Long productId) {
-        Long lvProductTypeId = productDTO.getProductTypeId();
-        Long lvBrandId = productDTO.getBrandId();
-        Long lvUnitId = productDTO.getUnitId();
+    public ProductDTO update(ProductDTO pProductDTO, Long productId) {
+        Long lvProductTypeId = pProductDTO.getProductTypeId();
+        Long lvBrandId = pProductDTO.getBrandId();
+        Long lvUnitId = pProductDTO.getUnitId();
 
         Category lvProductType = mvCategoryService.findEntById(lvProductTypeId, true);
         Category lvBrand = mvCategoryService.findEntById(lvBrandId, true);
@@ -288,7 +289,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
         Product lvProduct = super.findEntById(productId, true);
         ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(lvProduct));
 
-        lvProduct.setProductName(productDTO.getProductName());
+        lvProduct.setProductName(pProductDTO.getProductName());
         lvProduct.setProductType(lvProductType);
         lvProduct.setBrand(lvBrand);
         lvProduct.setUnit(lvUnit);
@@ -296,11 +297,11 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
 
         ProductDescription productDescription = findDescription(lvProduct.getId());
         if (productDescription != null) {
-            productDescription.setDescription(productDTO.getDescription());
+            productDescription.setDescription(pProductDTO.getDescription());
         } else {
             productDescription = ProductDescription.builder()
                 .productId(lvProduct.getId())
-                .description(productDTO.getDescription()).build();
+                .description(pProductDTO.getDescription()).build();
         }
         ProductDescription productDescriptionUpdated = mvProductDescriptionRepository.save(productDescription);
 

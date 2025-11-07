@@ -100,7 +100,7 @@ public class SalesPerformanceStatisticsServiceImpl implements SalesPerformanceSt
             BigDecimal lvValueOfOrders = new BigDecimal(CoreUtils.trim(obj[3]));
             List<Order> lvOrderListBySalesChannel = orderRepository.countBySalesChannel(lvSalesChannelId);
             Integer lvNumberOfOrders = lvOrderListBySalesChannel.size();
-            Integer lvNumberOfProducts = OrderUtils.countItemsListOrder_(lvOrderListBySalesChannel);
+            Integer lvNumberOfProducts = OrderUtils.countItems(lvOrderListBySalesChannel);
 
             lvReturnData.add(OrderSalesChannelStatisticsModel.builder()
                     .salesChannelName(lvSalesChannelName)

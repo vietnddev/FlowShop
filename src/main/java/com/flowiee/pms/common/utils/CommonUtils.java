@@ -1,6 +1,7 @@
 package com.flowiee.pms.common.utils;
 
 import com.flowiee.pms.common.enumeration.MODULE;
+import com.flowiee.pms.common.enumeration.SystemDir;
 import com.flowiee.pms.modules.system.model.ServerInfo;
 import com.flowiee.pms.modules.system.model.ShopInfo;
 import com.flowiee.pms.common.security.UserPrincipal;
@@ -71,45 +72,13 @@ public class CommonUtils {
         return map.get(key);
     }
 
-    public static String getPathDirectory(MODULE systemModule) {
-        try {
-            StringBuilder path = new StringBuilder(FileUtils.getFileUploadPath());
-            switch (systemModule) {
-                case PRODUCT:
-                    path.append("product");
-                    break;
-                case CATEGORY:
-                    path.append("category");
-                    break;
-                case STORAGE:
-                    path.append("storage");
-                    break;
-                case SALES:
-                    path.append("sales");
-                    break;
-                default:
-                	path.append("system");
-                	break;
-            }
-            path.append("/" + LocalDateTime.now().getYear());
-            path.append("/" + LocalDateTime.now().getMonth().getValue());
-            path.append("/" + LocalDateTime.now().getDayOfMonth());
-            File folder = new File(path.toString());
-            if (!folder.exists()) {
-                if (folder.mkdirs()) {
-                    System.out.println("mkdirs OK " + folder.getAbsolutePath());
-                }
-            }
-            return path.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
+    public static String getPathDirectory(MODULE pModule) {
+        return getPathDirectory(pModule.name());
     }
 
     public static String getPathDirectory(String systemModule) {
         try {
-            StringBuilder path = new StringBuilder(FileUtils.getFileUploadPath());
+            StringBuilder path = new StringBuilder(FileUtils.getSystemDir(SystemDir.UPLOAD));
             if (MODULE.PRODUCT.name().equals(systemModule)) {
                 path.append("product");
             } else if (MODULE.CATEGORY.name().equals(systemModule)) {
@@ -118,12 +87,14 @@ public class CommonUtils {
                 path.append("storage");
             } else if (MODULE.SALES.name().equals(systemModule)) {
                 path.append("sales");
+            } else if (MODULE.SYSTEM.name().equals(systemModule)) {
+                path.append("system");
             } else if ("data-temp".equals(systemModule)) {
                 path.append("data-temp");
             }
-            path.append("/" + LocalDateTime.now().getYear());
-            path.append("/" + LocalDateTime.now().getMonth().getValue());
-            path.append("/" + LocalDateTime.now().getDayOfMonth());
+            path.append(File.separator).append(LocalDateTime.now().getYear());
+            path.append(File.separator).append(LocalDateTime.now().getMonth().getValue());
+            path.append(File.separator).append(LocalDateTime.now().getDayOfMonth());
             File folder = new File(path.toString());
             if (!folder.exists()) {
                 if (folder.mkdirs()) {

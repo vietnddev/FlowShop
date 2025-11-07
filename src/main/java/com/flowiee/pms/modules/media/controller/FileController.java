@@ -1,20 +1,26 @@
 package com.flowiee.pms.modules.media.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.common.enumeration.SystemDir;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.service.*;
 import com.flowiee.pms.modules.media.service.FileStorageService;
 
 import com.flowiee.pms.common.utils.FileUtils;
+import com.flowiee.pms.modules.system.service.FileBackupService;
+import com.flowiee.pms.modules.system.service.FileRestoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +29,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,6 +47,8 @@ public class FileController extends BaseController {
     ProductComboService productComboService;
     ProductVariantService productVariantService;
     ProductDamagedService productDamagedService;
+    FileBackupService fileBackupService;
+    FileRestoreService fileRestoreService;
 
     @PostMapping("/uploads/san-pham/{id}")
     @PreAuthorize("@vldModuleProduct.updateImage(true)")
@@ -124,7 +134,7 @@ public class FileController extends BaseController {
         //product/2024/10/3/83cbb1e4-37e9-41f1-8892-1d470ceb0f7c.jpg
         String pathToFile = extractPathFromPattern(request);
         //D:\Image\ uploads \ product\2024\10\3\83cbb1e4-37e9-41f1-8892-1d470ceb0f7c.jpg
-        Path filePath = Paths.get(FileUtils.getFileUploadPath() + File.separator + pathToFile);
+        Path filePath = Paths.get(FileUtils.getSystemDir(SystemDir.UPLOAD) + File.separator + pathToFile);
         //URL [file:/D:/Image/uploads/product/2024/10/3/83cbb1e4-37e9-41f1-8892-1d470ceb0f7c.jpg]
         Resource resource = new UrlResource(filePath.toUri());
 
@@ -149,5 +159,27 @@ public class FileController extends BaseController {
     @PreAuthorize("@vldModuleProduct.updateImage(true)")
     public AppResponse<String> delete(@PathVariable("id") Long fileId) {
         return AppResponse.success(fileService.delete(fileId));
+    }
+
+    @GetMapping("/file/backup")
+    public ResponseEntity<Resource> backup() throws IOException {
+        File zipFile = fileBackupService.createBackupZip();
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(zipFile));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipFile.getName())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentLength(zipFile.length())
+                .body(resource);
+    }
+
+    @PostMapping("/file/restore")
+    public ResponseEntity<String> restore(@RequestParam("backupZip") MultipartFile backupZip) {
+        try {
+            fileRestoreService.restoreBackup(backupZip);
+            return ResponseEntity.ok("Restore successful");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Restore failed: " + e.getMessage());
+        }
     }
 }

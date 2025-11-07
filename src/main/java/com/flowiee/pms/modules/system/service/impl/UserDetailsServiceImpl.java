@@ -1,29 +1,18 @@
 package com.flowiee.pms.modules.system.service.impl;
 
-import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.modules.system.entity.SystemLog;
 import com.flowiee.pms.common.exception.*;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.staff.entity.AccountRole;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.common.security.UserPrincipal;
 import com.flowiee.pms.modules.staff.repository.AccountRepository;
-import com.flowiee.pms.modules.system.repository.SystemLogRepository;
 import com.flowiee.pms.modules.staff.service.RoleService;
-
-import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -67,7 +56,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		lvUserPrincipal.setAccountNonLocked(true);
 		lvUserPrincipal.setCredentialsNonExpired(true);
 		lvUserPrincipal.setEnabled(AccountStatus.N.name().equals(pAccount.getStatus()));
-		lvUserPrincipal.setIp("unknown");
 		lvUserPrincipal.setEntity(pAccount);
 
 		Set<GrantedAuthority> lvGrantedAuthorities = new HashSet<>();
@@ -84,14 +72,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		}
 
 		lvUserPrincipal.setAuthorities(lvGrantedAuthorities);
-
-		Authentication lvAuthentication = SecurityContextHolder.getContext().getAuthentication();
-		if (lvAuthentication != null) {
-			Object lvAuthDetails = lvAuthentication.getDetails();
-			if (lvAuthDetails instanceof WebAuthenticationDetails lvWebAuthenticationDetails) {
-				lvUserPrincipal.setIp(lvWebAuthenticationDetails.getRemoteAddress());
-			}
-		}
 
 		return lvUserPrincipal;
 	}

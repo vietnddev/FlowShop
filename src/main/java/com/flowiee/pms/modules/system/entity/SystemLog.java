@@ -3,7 +3,6 @@ package com.flowiee.pms.modules.system.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flowiee.pms.common.base.entity.BaseEntity;
-import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.modules.staff.entity.Account;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -61,15 +60,6 @@ public class SystemLog extends BaseEntity implements java.io.Serializable {
 
 	@Transient
 	String accountName;
-
-	@PreUpdate
-	public void updateAudit() {
-		if (ip == null) {
-			ip = CommonUtils.getUserPrincipal().getIp();
-		} else {
-			ip = "unknown";
-		}
-	}
 
 	@Override
 	public String toString() {

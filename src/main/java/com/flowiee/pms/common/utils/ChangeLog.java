@@ -1,6 +1,7 @@
 package com.flowiee.pms.common.utils;
 
 import com.flowiee.pms.modules.system.entity.Category;
+import com.flowiee.pms.modules.system.entity.SystemConfig;
 import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
@@ -53,16 +54,20 @@ public class ChangeLog {
                 Object oldValue = field.get(oldObject);
                 Object newValue = field.get(newObject);
 
+                String extraSystemConfigInfo = "";
+
                 if (oldValue instanceof Category) {
                     oldValue = ((Category) oldValue).getName();
                     newValue = ((Category) newValue).getName();
+                } else if (oldObject instanceof SystemConfig) {
+                    extraSystemConfigInfo = ((SystemConfig) oldObject).getCode() + " - ";
                 }
 
                 if (!Objects.equals(oldValue, newValue)) {
                     changes.put(field.getName(), new Object[] {oldValue, newValue});
 
-                    oldValueBuilder.append(field.getName()).append(" (").append(ObjectUtils.isNotEmpty(oldValue) ? oldValue.toString() : " ").append("); ");
-                    newValueBuilder.append(field.getName()).append(" (").append(ObjectUtils.isNotEmpty(newValue) ? newValue.toString() : " ").append("); ");
+                    oldValueBuilder.append(extraSystemConfigInfo).append(field.getName()).append(" (").append(ObjectUtils.isNotEmpty(oldValue) ? oldValue.toString() : " ").append("); ");
+                    newValueBuilder.append(extraSystemConfigInfo).append(field.getName()).append(" (").append(ObjectUtils.isNotEmpty(newValue) ? newValue.toString() : " ").append("); ");
                 }
             } catch (IllegalAccessException e) {
                 logger.error("Error checking changed entity fields {}", oldObject.getClass().getName(), e);

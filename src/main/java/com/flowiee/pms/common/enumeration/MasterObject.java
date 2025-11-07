@@ -25,5 +25,6 @@ public enum MasterObject {
     AccountRole,
     GroupAccount,
     SystemConfig,
-    Category
+    Category,
+    FileStorage
 }

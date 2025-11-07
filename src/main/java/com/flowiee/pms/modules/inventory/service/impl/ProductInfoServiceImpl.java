@@ -34,6 +34,8 @@ import com.flowiee.pms.modules.inventory.dto.ProductDTO;
 import com.flowiee.pms.modules.inventory.repository.ProductRepository;
 import com.flowiee.pms.modules.inventory.util.ProductConvert;
 import javax.persistence.EntityGraph;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
@@ -43,9 +45,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, ProductRepository> implements ProductInfoService {
     private final ProductDescriptionRepository mvProductDescriptionRepository;
@@ -59,8 +61,6 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
     private final SystemLogService mvSystemLogService;
     private final OrderRepository mvOrderRepository;
     private final CategoryService mvCategoryService;
-
-    private final Logger mvLogger = LoggerFactory.getLogger(getClass());
 
     public ProductInfoServiceImpl(ProductRepository pProductRepository, ProductDescriptionRepository pProductDescriptionRepository, ProductAttributeService pProductAttributeService, ProductDetailRepository pProductDetailRepository, ProductPriceRepository pProductPriceRepository, ProductVariantService pProductVariantService, ProductHistoryService pProductHistoryService, FileStorageRepository pFileStorageRepository, ProductPriceService pProductPriceService, SystemLogService pSystemLogService, OrderRepository pOrderRepository, CategoryService pCategoryService) {
         super(Product.class, ProductDTO.class, pProductRepository);
@@ -251,6 +251,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
                             .wholesalePrice(lvPrice.getWholesalePrice())
                             .costPrice(lvPrice.getCostPrice())
                             .build());
+                    lvVariant.setStatus(ProductStatus.INA);
 
                     mvProductVariantService.save(lvVariant);
                 }
@@ -267,7 +268,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
             }
 
             mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_C, MasterObject.Product, "Thêm mới sản phẩm", lvProductSaved.getProductName());
-            mvLogger.info("Insert product success! {}", lvProductSaved);
+            log.info("Insert product success! {}", lvProductSaved);
             return ProductConvert.toDto(lvProductSaved);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "product"), ex);
@@ -276,10 +277,10 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
 
     @Transactional
     @Override
-    public ProductDTO update(ProductDTO productDTO, Long productId) {
-        Long lvProductTypeId = productDTO.getProductTypeId();
-        Long lvBrandId = productDTO.getBrandId();
-        Long lvUnitId = productDTO.getUnitId();
+    public ProductDTO update(ProductDTO pProductDTO, Long productId) {
+        Long lvProductTypeId = pProductDTO.getProductTypeId();
+        Long lvBrandId = pProductDTO.getBrandId();
+        Long lvUnitId = pProductDTO.getUnitId();
 
         Category lvProductType = mvCategoryService.findEntById(lvProductTypeId, true);
         Category lvBrand = mvCategoryService.findEntById(lvBrandId, true);
@@ -288,7 +289,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
         Product lvProduct = super.findEntById(productId, true);
         ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(lvProduct));
 
-        lvProduct.setProductName(productDTO.getProductName());
+        lvProduct.setProductName(pProductDTO.getProductName());
         lvProduct.setProductType(lvProductType);
         lvProduct.setBrand(lvBrand);
         lvProduct.setUnit(lvUnit);
@@ -296,11 +297,11 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
 
         ProductDescription productDescription = findDescription(lvProduct.getId());
         if (productDescription != null) {
-            productDescription.setDescription(productDTO.getDescription());
+            productDescription.setDescription(pProductDTO.getDescription());
         } else {
             productDescription = ProductDescription.builder()
                 .productId(lvProduct.getId())
-                .description(productDTO.getDescription()).build();
+                .description(pProductDTO.getDescription()).build();
         }
         ProductDescription productDescriptionUpdated = mvProductDescriptionRepository.save(productDescription);
 
@@ -314,7 +315,8 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
 
         mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, productUpdated.getId(), null, null);
         mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.Product, logTitle, changeLog);
-        mvLogger.info("Update product success! productId={}", productId);
+        log.info("Update product success! productId={}", productId);
+
         return ProductConvert.toDto(productUpdated);
     }
 
@@ -328,7 +330,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
             }
             mvEntityRepository.deleteById(productToDelete.getId());
             mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_D, MasterObject.Product, "Xóa sản phẩm", productToDelete.getProductName());
-            mvLogger.info("Delete product success! productId={}", id);
+            log.info("Delete product success! productId={}", id);
             return MessageCode.DELETE_SUCCESS.getDescription();
         } catch (RuntimeException ex) {
             throw new AppException("Delete product fail! productId=" + id, ex);

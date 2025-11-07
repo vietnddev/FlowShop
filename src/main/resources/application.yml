@@ -56,8 +56,8 @@ spring:
             mode: none
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 100MB
+      max-file-size: 500MB
+      max-request-size: 500MB
   security:
     filter:
       dispatcher-types: REQUEST
@@ -67,3 +67,8 @@ logging:
     org.hibernate.SQL: off  #Log câu SQL
     #org.hibernate.type.descriptor.sql.BasicBinder: TRACE  #Log tham số truyền vào
   config: classpath:logback-spring.xml
+system:
+  admin:
+    username: ${SA_USERNAME:}
+IPWho:
+  apiKey: ${IPWho_apiKey:}

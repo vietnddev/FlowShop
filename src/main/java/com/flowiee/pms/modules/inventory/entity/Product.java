@@ -88,10 +88,6 @@ public class Product extends BaseEntity implements Serializable {
     @JoinColumn(name = "supplier_id")
     Supplier supplier;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "status", nullable = false, length = 10)
-//    ProductStatus status;
-
     @JsonIgnore
     @JsonIgnoreProperties("product")
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)

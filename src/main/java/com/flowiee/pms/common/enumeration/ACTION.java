@@ -81,6 +81,7 @@ public enum ACTION {
     SYS_ACC_C("Create account",                 MODULE.SYSTEM.name()),
     SYS_ACC_U("Update account",                 MODULE.SYSTEM.name()),
     SYS_ACC_D("Delete account",                 MODULE.SYSTEM.name()),
+    SYS_ACC_CH_PWD("Change password",           MODULE.SYSTEM.name()),
     SYS_ACC_RS_PWD("Reset password",            MODULE.SYSTEM.name()),
     SYS_ACC_SHARE_ROLE("Grant permissions",     MODULE.SYSTEM.name()),
     SYS_GR_ACC_R("View list of account groups", MODULE.SYSTEM.name()),
@@ -100,7 +101,9 @@ public enum ACTION {
 
     SYS_DATA_CRAWLER("Crawler temp data",       MODULE.SYSTEM.name()),
     SYS_DATA_MERGE("Merge temp data",           MODULE.SYSTEM.name()),
-    SYS_REFRESH_APP("Refresh application",      MODULE.SYSTEM.name());
+    SYS_REFRESH_APP("Refresh application",      MODULE.SYSTEM.name()),
+    SYS_DATA_BACKUP("Backup uploaded data",     MODULE.SYSTEM.name()),
+    SYS_DATA_RESTORE("Restore data",            MODULE.SYSTEM.name());
 
     private final String label;
     private final String module;

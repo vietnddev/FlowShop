@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.service;
 
+import com.flowiee.pms.common.enumeration.ProductStatus;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.model.ProductVariantSearchRequest;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantTempDTO;
@@ -14,6 +15,8 @@ public interface ProductVariantService extends ICurdService<ProductVariantDTO> {
 
     Page<ProductVariantDTO> getProductsOutOfStock(int pageSize, int pageNum);
 
+    ProductDetail findEntById(Long pVariantId, boolean pThrowException);
+
     boolean checkVariantExisted(long productId, long colorId, long sizeId, long fabricTypeId);
 
     List<ProductVariantTempDTO> findStorageHistoryByProductId(Long productId);
@@ -26,5 +29,5 @@ public interface ProductVariantService extends ICurdService<ProductVariantDTO> {
 
     void updateDefectiveQuantity(Long pProductVariantId, Integer pQuantity, String pUpdateType);
 
-    ProductDetail findEntById(Long pVariantId, boolean pThrowException);
+    void updateStatus(Long pProductVariantId, ProductStatus pStatus);
 }

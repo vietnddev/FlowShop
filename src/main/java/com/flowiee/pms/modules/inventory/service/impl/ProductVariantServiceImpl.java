@@ -496,6 +496,13 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     }
 
     @Override
+    public void updateStatus(Long pProductVariantId, ProductStatus pStatus) {
+        ProductDetail lvProductVariant = super.findEntById(pProductVariantId, true);
+        lvProductVariant.setStatus(pStatus);
+        mvEntityRepository.save(lvProductVariant);
+    }
+
+    @Override
     public Page<ProductVariantDTO> getProductsOutOfStock(int pageSize, int pageNum) {
         Pageable pageable = getPageable(pageNum, pageSize);
         Page<ProductDetail> productVariants = mvEntityRepository.findProductsOutOfStock(pageable);

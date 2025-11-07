@@ -73,12 +73,8 @@ public class ProductImageServiceImpl implements ProductImageService {
 
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), productDetail.getProductId());
         fileInfo.setProductDetail(new ProductDetail(productDetail.getId()));
-        FileStorage imageSaved = mvFileStorageService.save(fileInfo);
 
-        Path path = Paths.get(CommonUtils.getPathDirectory(MODULE.PRODUCT) + "/" + imageSaved.getStorageName());
-        fileUpload.transferTo(path);
-
-        return imageSaved;
+        return mvFileStorageService.save(fileInfo);
     }
 
     @Override
@@ -87,12 +83,8 @@ public class ProductImageServiceImpl implements ProductImageService {
 
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), null);
         fileInfo.setProductCombo(new ProductCombo(productCombo.getId()));
-        FileStorage imageSaved = mvFileStorageService.save(fileInfo);
 
-        Path path = Paths.get(CommonUtils.getPathDirectory(MODULE.PRODUCT) + "/" + imageSaved.getStorageName());
-        fileUpload.transferTo(path);
-
-        return imageSaved;
+        return mvFileStorageService.save(fileInfo);
     }
 
     @Override
@@ -104,12 +96,8 @@ public class ProductImageServiceImpl implements ProductImageService {
 
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), null);
         fileInfo.setProductDamaged(productDamaged.get());
-        FileStorage imageSaved = mvFileStorageService.save(fileInfo);
 
-        Path path = Paths.get(CommonUtils.getPathDirectory(MODULE.PRODUCT) + "/" + imageSaved.getStorageName());
-        fileUpload.transferTo(path);
-
-        return imageSaved;
+        return mvFileStorageService.save(fileInfo);
     }
 
     @Override
@@ -118,12 +106,8 @@ public class ProductImageServiceImpl implements ProductImageService {
 
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.STORAGE.name(), null);
         fileInfo.setTransactionGoods(lvTransactionGoods);
-        FileStorage imageSaved = mvFileStorageService.save(fileInfo);
 
-        Path path = Paths.get(CommonUtils.getPathDirectory(MODULE.STORAGE) + "/" + imageSaved.getStorageName());
-        fileUpload.transferTo(path);
-
-        return imageSaved;
+        return mvFileStorageService.save(fileInfo);
     }
 
     @Override

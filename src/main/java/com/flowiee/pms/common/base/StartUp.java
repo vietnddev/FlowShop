@@ -10,7 +10,6 @@ import com.flowiee.pms.modules.system.entity.Branch;
 import com.flowiee.pms.modules.system.entity.SystemConfig;
 import com.flowiee.pms.modules.system.repository.BranchRepository;
 import com.flowiee.pms.modules.system.service.ConfigService;
-import com.flowiee.pms.modules.system.service.LanguageService;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.staff.entity.GroupAccount;
 import com.flowiee.pms.modules.system.model.ServerInfo;
@@ -43,6 +42,7 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -57,9 +57,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class StartUp {
@@ -68,15 +68,18 @@ public class StartUp {
 	private final ConfigRepository mvConfigRepository;
 	private final BranchRepository mvBranchRepository;
 	private final AccountRepository mvAccountRepository;
-	private final CustomerRepository     mvCustomerRepository;
-	private final CategoryRepository     mvCategoryRepository;
+	private final CustomerRepository mvCustomerRepository;
+	private final CategoryRepository mvCategoryRepository;
 	private final GroupAccountRepository mvGroupAccountRepository;
 	private final ConfigService mvConfigService;
-	private final TemplateSendEmail      mvTemplateSendEmail;
+	private final TemplateSendEmail mvTemplateSendEmail;
 	private final ScheduleRepository mvScheduleRepository;
 
 	public static LocalDateTime     START_APP_TIME;
 	public static String            mvResourceUploadPath      = null;
+	public static String            mvResourceBackupPath      = null;
+	public static String            mvResourceRestorePath     = null;
+	public static String            mvResourceArchivePath     = null;
 	private static final ConfigCode mvConfigInitData          = ConfigCode.initData;
 
 	private static final int CATEGORY_TYPE_COL_INDEX = 0;
@@ -138,8 +141,6 @@ public class StartUp {
 				FlwSys.getEmailTemplateConfigs().put(lvNotificationType, lvTemplate);
 			});
 			logger.info("Email template has been loaded.");
-
-			//expireAllSessions();
 
 			START_APP_TIME = LocalDateTime.now();
         };
@@ -211,6 +212,15 @@ public class StartUp {
 		}
 
 		mvResourceUploadPath = FlwSys.getSystemConfigs().get(ConfigCode.resourceUploadPath).getValue();
+		mvResourceBackupPath = FlwSys.getSystemConfigs().get(ConfigCode.resourceBackupPath).getValue();
+		mvResourceRestorePath = FlwSys.getSystemConfigs().get(ConfigCode.resourceRestorePath).getValue();
+		mvResourceArchivePath = FlwSys.getSystemConfigs().get(ConfigCode.resourceArchivePath).getValue();
+
+		initFolder(mvResourceUploadPath, "upload");
+		initFolder(mvResourceBackupPath, "backup");
+		initFolder(mvResourceRestorePath, "restore");
+		initFolder(mvResourceArchivePath, "archive");
+
 		CommonUtils.defaultNewPassword = FlwSys.getSystemConfigs().get(ConfigCode.generateNewPasswordDefault).getValue();
 	}
 
@@ -258,7 +268,7 @@ public class StartUp {
 		}
 
 		try {
-			String[] lvSheets = new String[]{"BRANCH", "GROUP_ACCOUNT", "ACCOUNT", "CUSTOMER", "SCHEDULE"};
+			String[] lvSheets = new String[]{"BRANCH", "GROUP_ACCOUNT", "ACCOUNT", "CUSTOMER", "SCHEDULE", "SERIAL"};
 
             Resource resource = new ClassPathResource("static/data/excel/SystemDataInit.xlsx");
             InputStream inputStream = resource.getInputStream();
@@ -352,6 +362,8 @@ public class StartUp {
 							} catch (DataIntegrityViolationException ex) {}
 						}
 						break;
+					case "SERIAL":
+						break;
 				}
 			}
 			lvWorkbook.close();
@@ -383,6 +395,18 @@ public class StartUp {
 		return mvResourceUploadPath;
 	}
 
+	public static String getResourceBackupPath() {
+		return mvResourceBackupPath;
+	}
+
+	public static String getResourceRestorePath() {
+		return mvResourceRestorePath;
+	}
+
+	public static String getResourceArchivePath() {
+		return mvResourceArchivePath;
+	}
+
 	private void initNewConfigIfDatabaseNotDefined(List<SystemConfig> pInitCnfList) {
 		//Current configs
 		List<SystemConfig> lvSystemConfigList = mvConfigRepository.findByCode(pInitCnfList.stream().
@@ -401,6 +425,16 @@ public class StartUp {
 
 	private String getValue(XSSFRow pRow, int pIndex) {
     	return CoreUtils.trim(pRow.getCell(pIndex).toString());
+	}
+
+	public static void initFolder(String path, String purpose) {
+    	if (CoreUtils.isNullStr(path)) {
+    		return;
+		}
+		File folder = new File(path);
+		if (!folder.exists() && folder.mkdirs()) {
+			log.info("Init {} dir: {}", purpose, folder.getAbsolutePath());
+		}
 	}
 
 //	private final List<BaseScheduleStartUp> schedules;

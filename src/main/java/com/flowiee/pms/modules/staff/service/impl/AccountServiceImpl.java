@@ -19,7 +19,10 @@ import com.flowiee.pms.modules.system.service.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -161,5 +164,20 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
     @Override
     public Account findByUsername(String username) {
         return mvEntityRepository.findByUsername(username);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    @Override
+    public void changePassword(Long pAccountId, String pOldPassword, String pNewPassword) {
+        Account lvAccount = findEntById(pAccountId, true);
+
+        BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
+        if (!bCrypt.matches(pOldPassword, lvAccount.getPassword())) {
+            throw new AppException("Old password is not correct!");
+        }
+
+        mvEntityRepository.updatePassword(lvAccount.getId(), bCrypt.encode(pNewPassword));
+
+        mvSystemLogService.writeLogUpdate(MODULE.SYSTEM, ACTION.SYS_ACC_CH_PWD, MasterObject.Account, "Change password", "Change password");
     }
 }

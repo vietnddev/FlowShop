@@ -7,9 +7,11 @@ import com.flowiee.pms.modules.media.entity.FileStorage;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public interface FileStorageService extends ICurdService<FileStorage> {
-    String saveFileOfImport(MultipartFile fileImport, FileStorage fileInfo) throws IOException;
-
     void saveFileAttach(MultipartFile multipartFile, Path dest) throws IOException;
+
+    List<LinkedHashMap<String, String>> getSystemVolumes();
 }

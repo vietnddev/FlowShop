@@ -23,4 +23,6 @@ public interface AccountService {
     String delete(Long pAccountId);
 
     AccountDTO getMyProfile();
+
+    void changePassword(Long pAccountId, String pOldPassword, String pNewPassword);
 }

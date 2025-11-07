@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.staff.repository;
 
 import com.flowiee.pms.common.base.repository.BaseRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -21,4 +22,8 @@ public interface AccountRepository extends BaseRepository<Account, Long> {
     Account findByEmail(String email);
 
     Account findByResetTokens(String token);
+
+    @Modifying
+    @Query("update Account set password = :newPassword where id = :accountId")
+    void updatePassword(@Param("accountId") Long accountId, @Param("newPassword") String newPassword);
 }

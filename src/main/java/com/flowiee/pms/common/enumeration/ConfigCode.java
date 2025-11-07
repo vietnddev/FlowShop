@@ -9,7 +9,9 @@ public enum ConfigCode {//props.put("mail.smtp.auth", mailConfig.getAuth());prop
     allowDuplicateCustomerPhoneNumber(MODULE.SALES, "Cho phép trùng số điện thoại của khách hàng", "N"),
     daySendNotifyBeforeProductExpiry(MODULE.PRODUCT, "Thời gian gửi thông báo trước khi sản phẩm hết hạn sử dụng", "10"),
     dayDeleteSystemLog(MODULE.SYSTEM, "Thời gian xóa nhật ký hệ thống, các nhật ký có thời gian tạo từ >= ? ngày sẽ được xóa tự động", "100"),
+    dayDeleteBackupFile(MODULE.SYSTEM, "Thời gian xóa uploaded file backup, các nhật ký có thời gian tạo từ >= ? ngày sẽ được xóa tự động", "30"),
     deleteSystemLog(MODULE.SYSTEM, "Xóa nhật ký hệ thống tự động", "N"),
+    deleteBackupFile(MODULE.SYSTEM, "Xóa uploaed file backup tự động", "Y"),
     emailHost(MODULE.SYSTEM, "Email host", "smtp.gmail.com"),
     emailPort(MODULE.SYSTEM, "Email port", "587"),
     emailUser(MODULE.SYSTEM, "Email username", "vietnd.stg008@gmail.com"),
@@ -21,8 +23,12 @@ public enum ConfigCode {//props.put("mail.smtp.auth", mailConfig.getAuth());prop
     forceApplyAccountRightsNoNeedReLogin(MODULE.SYSTEM, "Áp dụng phân quyền mới không cần đăng nhập lại", "N"),
     initData(MODULE.SYSTEM, "Initialize initial data for the system", "Y"),
     lowStockAlert(MODULE.PRODUCT, "Thông báo cảnh báo hàng tồn kho thấp", "N"),
-    maxSizeFileUpload(MODULE.SYSTEM, "Dung lượng file tối đa cho phép upload", null),
+    maxSizeFileUpload(MODULE.SYSTEM, "Dung lượng file tối đa cho phép upload (MB)", "2"),
+    resourceVolume(MODULE.SYSTEM, "Resource volume (MB)", "400"),
     resourceUploadPath(MODULE.SYSTEM, "Thư mực chứa tệp upload", null),
+    resourceBackupPath(MODULE.SYSTEM, "Thư mực chứa tệp backup", null),
+    resourceRestorePath(MODULE.SYSTEM, "Thư mực chứa tệp tải lên để restore", null),
+    resourceArchivePath(MODULE.SYSTEM, "Thư mực lưu trữ tệp cũ sau khi restore tệp mới xong", null),
     returnPeriodDays(MODULE.SALES, "Thời gian cho phép đổi trả hàng", "7"),
     sendEmailReportDaily(MODULE.SALES, "Gửi mail báo cáo hoạt động kinh doanh hàng ngày", "N"),
     sendNotifyCustomerOnOrderConfirmation(MODULE.SALES, "Gửi email thông báo đến khách hàng khi đơn hàng đã được xác nhận", "N"),
@@ -34,13 +40,14 @@ public enum ConfigCode {//props.put("mail.smtp.auth", mailConfig.getAuth());prop
     shopPhoneNumber(MODULE.SYSTEM, "Số điện thoại", "(+84) 706 820 684"),
     sysTimeOut(MODULE.SYSTEM, "Thời gian timeout", "3600"),
     tokenResetPasswordValidityPeriod(MODULE.SYSTEM, "Thông gian hiệu lực của token đổi mật khẩu (phút)", "60"),
+    trackRequestLocation(MODULE.SYSTEM, "Track request location", "Y"),
     generateNewPasswordDefault(MODULE.SYSTEM, "Mật khẩu mặc định", "123456"),
     passwordLength(MODULE.SYSTEM, "Độ dài mật khẩu", "8"),
     passwordValidityPeriod(MODULE.SYSTEM, "Thời gian hiệu lực của mật khẩu (ngày)", "30");
 
-    private MODULE module;
-    private String description;
-    private String defaultValue;
+    private final MODULE module;
+    private final String description;
+    private final String defaultValue;
 
     ConfigCode(MODULE module, String description, String defaultValue) {
         this.module = module;

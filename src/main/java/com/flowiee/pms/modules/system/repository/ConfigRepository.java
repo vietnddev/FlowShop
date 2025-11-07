@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface ConfigRepository extends BaseRepository<SystemConfig, Long> {
-    @Query("from SystemConfig order by sort")
+    @Query("from SystemConfig order by code")
     List<SystemConfig> findAll();
 
     SystemConfig findByCode(String code);

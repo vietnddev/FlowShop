@@ -23,12 +23,33 @@
                             <div class="card">
                                 <div class="card-header">
                                     <div class="row justify-content-between">
-                                        <div class="col-4" style="display: flex; align-items: center">
-                                            <h3 class="card-title"><strong>CẤU HÌNH HỆ THỐNG</strong></h3>
+                                        <ul class="col-6 nav nav-pills">
+                                            <li class="nav-item"><a class="nav-link text-bold active" href="#CONFIGURATION_TAB" id="configurationTabLbl" data-toggle="tab">Configuration</a></li>
+                                            <li class="nav-item"><a class="nav-link text-bold" href="#SCHEDULE_TAB" id="scheduleTabLbl" data-toggle="tab">Schedule</a></li>
+                                            <li class="nav-item"><a class="nav-link text-bold" href="#VOLUME_TAB" id="volumeTabLbl" data-toggle="tab">Volume</a></li>
+                                        </ul>
+                                        <div class="col-6 text-right">
+                                            <button type="button" class="btn btn-sm btn-info" id="btnBackupData">Backup data</button>
+                                            <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#modalRestoreData">Restore data</button>
+                                            <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#modalCrawlerData">Crawler data</button>
+                                            <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#modalRefreshApp">Refresh app</button>
                                         </div>
-                                        <div class="col-4 text-right">
-                                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalCrawlerData">Crawler data</button>
-                                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalRefreshApp">Refresh app</button>
+                                        <div class="modal fade" id="modalRestoreData">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <strong class="modal-title">Do you want to restore data!</strong>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <input class="form-control-sm" type="file" name="file" id="backupFileAttached"/>
+                                                    </div>
+                                                    <div class="modal-footer justify-content-end">
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                                                        <button type="button" class="btn btn-primary" id="btnRestoreData">Yes</button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="modal fade" id="modalCrawlerData">
                                             <div class="modal-dialog">
@@ -67,19 +88,65 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-body p-0">
-                                    <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>STT</th>
-                                                <th>Name</th>
-                                                <th>Value</th>
-                                                <th>Sort</th>
-                                                <th>Thao tác</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="contentTable"></tbody>
-                                    </table>
+                                <div class="card-body table-responsive p-0">
+                                    <div class="tab-content">
+                                        <div class="active tab-pane" id="CONFIGURATION_TAB">
+                                            <div class="card-body p-0">
+                                                <table class="table table-head-fixed table-bordered table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>STT</th>
+                                                            <th>Name</th>
+                                                            <th>Value</th>
+                                                            <th>Sort</th>
+                                                            <th>Thao tác</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="configurationTbl"></tbody>
+                                                </table>
+                                            </div>
+                                            <div class="card-footer">
+                                                <div th:replace="~{fragments :: pagination}"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane" id="SCHEDULE_TAB">
+                                            <div class="card-body p-0">
+                                                <table class="table table-head-fixed table-bordered table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No.</th>
+                                                            <th>Task ID</th>
+                                                            <th>Task name</th>
+                                                            <th>Execution Time</th>
+                                                            <th>Last run</th>
+                                                            <th>Note</th>
+                                                            <th>Status</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="scheduleTbl"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane" id="VOLUME_TAB">
+                                            <div class="card-body p-0">
+                                                <table class="table table-head-fixed table-bordered table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No.</th>
+                                                            <th>Folder</th>
+                                                            <th>Number of files</th>
+                                                            <th>Used space (MB)</th>
+                                                            <th>Notes</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="volumeTbl"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="modal fade" id="modalUpdate">
                                     <div class="modal-dialog">
@@ -147,6 +214,8 @@
             loadConfigs();
             updateConfig();
             refreshApp();
+            sendRequestBackupData();
+            sendRequestRestoreData();
         });
 
         function createListener() {
@@ -154,7 +223,19 @@
                 crawlerData();
                 $(this).prop('disabled', true);
                 alert("System is crawling data.");
-            })
+            });
+
+            $("#configurationTabLbl").on("click", function () {
+                loadConfigs();
+            });
+
+            $("#scheduleTabLbl").on("click", function () {
+                loadSchedules();
+            });
+
+            $("#volumeTabLbl").on("click", function () {
+                loadUsedSpace();
+            });
         }
 
         function refreshApp() {
@@ -214,7 +295,7 @@
             $.get(apiURL, function (response) {
                 if (response.status === "OK") {
                     let data = response.data;
-                    let contentTable = $('#contentTable');
+                    let contentTable = $('#configurationTbl');
                     contentTable.empty();
                     $.each(data, function (index, d) {
                         mvConfigs[d.id] = d;
@@ -246,6 +327,141 @@
                 }
             }).fail(function (xhr) {
                 showErrorModal($.parseJSON(xhr.responseText).message);
+            });
+        }
+
+        function sendRequestBackupData() {
+            $('#btnBackupData').click(function () {
+                // Disable button trong lúc chờ
+                $('#btnBackupData').prop('disabled', true).text('Backing up...');
+
+                $.ajax({
+                    url: '/file/backup',
+                    type: 'GET',
+                    data: {},
+                    xhrFields: {
+                        responseType: 'blob' // để nhận file nhị phân
+                    },
+                    success: function (data, status, xhr) {
+                        // Lấy tên file từ header nếu có
+                        const disposition = xhr.getResponseHeader('Content-Disposition');
+                        let filename = 'backup_' + new Date().toISOString().replace(/[:.]/g, '_') + '.zip';
+                        if (disposition && disposition.indexOf('filename=') !== -1) {
+                            filename = disposition.split('filename=')[1].replace(/"/g, '');
+                        }
+
+                        // Tạo link download tạm và kích hoạt
+                        const url = window.URL.createObjectURL(data);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        a.remove();
+
+                        alert('Backup completed successfully!');
+                    },
+                    error: function (xhr) {
+                        const msg = xhr.responseJSON?.message || xhr.responseText || 'Backup failed';
+                        alert('Error: ' + msg);
+                    },
+                    complete: function () {
+                        $('#btnBackupData').prop('disabled', false).text('Backup data');
+                    }
+                });
+            });
+        }
+
+        function sendRequestRestoreData() {
+            $('#btnRestoreData').click(function () {
+                const fileInput = $('#backupFileAttached')[0];
+                if (fileInput.files.length === 0) {
+                    alert('Please select a backup file to restore.');
+                    return;
+                }
+
+                const file = fileInput.files[0];
+
+                const formData = new FormData();
+                formData.append('backupZip', file);
+
+                // Gửi request POST tới backend
+                $.ajax({
+                    url: '/file/restore',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,  // Không xử lý data (vì là FormData)
+                    contentType: false,  // Để browser tự set Content-Type: multipart/form-data
+                    beforeSend: function () {
+                        $('#btnRestoreData').prop('disabled', true).text('Restoring...');
+                    },
+                    success: function (response) {
+                        alert(response);
+                        $('#modalRestoreData').modal('hide');
+                    },
+                    error: function (xhr) {
+                        const msg = xhr.responseJSON?.message || xhr.responseText || 'Restore failed';
+                        alert('Error: ' + msg);
+                    },
+                    complete: function () {
+                        $('#btnRestoreData').prop('disabled', false).text('Yes');
+                        $('#backupFileAttached').val('');
+                    }
+                });
+            });
+        }
+
+        function loadSchedules() {
+            let apiURL = mvHostURLCallApi + "/sys/schedule";
+            let params = {}
+            $.get(apiURL, params, function (response) {
+                if (response.status === "OK") {
+                    let data = response.data;
+                    let contentTable = $('#scheduleTbl');
+                    contentTable.empty();
+                    $.each(data, function (index, d) {
+                        contentTable.append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${d.taskId}</td>
+                                <td>${d.taskName}</td>
+                                <td>${d.executionTime}</td>
+                                <td>${d.lastRun}</td>
+                                <td>${d.note}</td>
+                                <td>${d.status}</td>
+                                <td></td>
+                            </tr>
+                        `);
+                    });
+                }
+            }).fail(function () {
+                showErrorModal("Could not connect to the server");
+            });
+        }
+
+        function loadUsedSpace() {
+            let apiURL = mvHostURLCallApi + "/sys/volume";
+            let params = {}
+            $.get(apiURL, params, function (response) {
+                if (response.status === "OK") {
+                    let data = response.data;
+                    let contentTable = $('#volumeTbl');
+                    contentTable.empty();
+                    $.each(data, function (index, d) {
+                        contentTable.append(`
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${d.folder}</td>
+                                <td>${d.numberOfFiles}</td>
+                                <td>${d.usedSpace}</td>
+                                <td>${d.note}</td>
+                            </tr>
+                        `);
+                    });
+                }
+            }).fail(function () {
+                showErrorModal("Could not connect to the server");
             });
         }
     </script>

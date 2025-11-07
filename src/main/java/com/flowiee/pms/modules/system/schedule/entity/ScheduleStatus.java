@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "schedule_status")
+@Table(name = "schedule_status",
+       indexes = {@Index(name = "idx_ScheduleStatus_scheduleId", columnList = "schedule_id")})
 @NoArgsConstructor
 @Getter
 @Setter

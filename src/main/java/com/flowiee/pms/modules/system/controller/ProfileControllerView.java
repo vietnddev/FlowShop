@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.system.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.modules.staff.service.AccountService;
@@ -10,7 +11,6 @@ import com.flowiee.pms.modules.staff.entity.Account;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,26 +52,20 @@ public class ProfileControllerView extends BaseController {
 	public ModelAndView changePassword(HttpServletRequest request,
 									   @ModelAttribute("account") Account accountEntity,
 									   RedirectAttributes redirectAttributes) {
-		String password_old = request.getParameter("password_old");
-		String password_new = request.getParameter("password_new");
-		String password_renew = request.getParameter("password_renew");
+		String lvOldPassword = request.getParameter("oldPassword");
+		String lvNewPassword = request.getParameter("newPassword");
+		String lvRenewPassword = request.getParameter("renewPassword");
 
-		Account profile = accountService.findEntById(mvUserSession.getUserPrincipal().getId(), true);
+		if (CoreUtils.trim(lvNewPassword).equals(CoreUtils.trim(lvRenewPassword))) {
+			accountService.changePassword(mvUserSession.getUserPrincipal().getId(), lvOldPassword, lvNewPassword);
 
-		BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
-		if (bCrypt.matches(password_old, accountService.findByUsername(profile.getUsername()).getPassword())) {
-			if (password_new.equals(password_renew)) {
-				profile.setPassword(bCrypt.encode(password_new));
-				accountService.save(accountEntity);
-
-				redirectAttributes.addAttribute("message", "Cập nhật thành công!");
-				RedirectView redirectView = new RedirectView();
-				redirectView.setUrl("/profile");
-				return new ModelAndView(redirectView);
-			}
-			redirectAttributes.addAttribute("message", "Mật khẩu nhập lại chưa khớp!");
+			redirectAttributes.addAttribute("message", "Cập nhật thành công!");
+			RedirectView redirectView = new RedirectView();
+			redirectView.setUrl("/sys/profile");
+			return new ModelAndView(redirectView);
 		}
-		redirectAttributes.addAttribute("message", "Sai mật khẩu hiện tại!");
+
+		redirectAttributes.addAttribute("message", "Updated failingly!");
 
 		return new ModelAndView("redirect:/sys/profile");
 	}

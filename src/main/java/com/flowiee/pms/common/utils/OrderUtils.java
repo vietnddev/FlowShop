@@ -2,7 +2,6 @@ package com.flowiee.pms.common.utils;
 
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.sales.entity.OrderDetail;
-import com.flowiee.pms.modules.sales.dto.OrderDTO;
 import com.flowiee.pms.modules.sales.dto.OrderDetailDTO;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -11,7 +10,6 @@ import java.util.List;
 
 public class OrderUtils {
     private static final BigDecimal ZERO = BigDecimal.ZERO;
-    private static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
     private static final BigDecimal INITIAL_ORDER_VALUE = BigDecimal.ZERO;
 
     public static BigDecimal calTotalAmount(List<OrderDetailDTO> orderDetails, BigDecimal amountDiscount) {
@@ -92,32 +90,5 @@ public class OrderUtils {
             totalItems += d.getQuantity();
         }
         return totalItems;
-    }
-
-    public static int countItemsListOrder_(List<Order> pOrders) {
-        if (pOrders == null || pOrders.isEmpty()) {
-            return 0;
-        }
-        int totalItems = 0;
-        for (Order lvOrder : pOrders) {
-            totalItems += countItemsEachOrder_(lvOrder.getListOrderDetail());
-        }
-        return totalItems;
-    }
-
-    public static int countItemsEachOrder_(List<OrderDetail> orderItems) {
-        if (orderItems == null || orderItems.isEmpty()) {
-            return 0;
-        }
-        int totalItems = 0;
-        for (OrderDetail d : orderItems) {
-            totalItems += d.getQuantity();
-        }
-        return totalItems;
-    }
-
-    public static int calBonusPoints(BigDecimal totalAmount) {
-        BigDecimal bonusPoints = totalAmount.divide(ONE_HUNDRED).setScale(0, BigDecimal.ROUND_DOWN);
-        return bonusPoints.intValue();
     }
 }

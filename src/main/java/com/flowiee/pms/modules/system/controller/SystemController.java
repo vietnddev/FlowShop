@@ -1,13 +1,17 @@
 package com.flowiee.pms.modules.system.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.modules.inventory.entity.ProductCrawled;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.ForbiddenException;
 import com.flowiee.pms.common.model.AppResponse;
+import com.flowiee.pms.modules.media.service.FileStorageService;
 import com.flowiee.pms.modules.system.dto.SystemConfigDTO;
 import com.flowiee.pms.modules.inventory.repository.ProductCrawlerRepository;
 import com.flowiee.pms.modules.inventory.service.CrawlerService;
+import com.flowiee.pms.modules.system.repository.ScheduleRepository;
+import com.flowiee.pms.modules.system.schedule.entity.Schedule;
 import com.flowiee.pms.modules.system.service.ConfigService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +24,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @RestController
@@ -28,9 +35,11 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class SystemController extends BaseController {
-    ConfigService    configService;
-    CrawlerService   crawlerService;
+    ConfigService configService;
+    CrawlerService crawlerService;
     ProductCrawlerRepository productCrawlerRepository;
+    ScheduleRepository scheduleRepository;
+    FileStorageService fileStorageService;
 
     private static boolean mvSystemCrawlingData = false;
     private static boolean mvSystemMergingData = false;
@@ -100,5 +109,34 @@ public class SystemController extends BaseController {
         } finally {
             mvSystemMergingData = false;
         }
+    }
+
+
+    @GetMapping("/schedule")
+    @PreAuthorize("@vldModuleSystem.readConfig(true)")
+    public AppResponse<List<LinkedHashMap<String, String>>> getSchedules() {
+        List<LinkedHashMap<String, String>> lvScheduleMapList = new ArrayList<>();
+        try {
+            List<Schedule> lvSchedules = scheduleRepository.findAll();
+            for (Schedule lvSchedule : lvSchedules) {
+                LinkedHashMap<String, String> lvScheduleMap = new LinkedHashMap<>();
+                lvScheduleMap.put("taskId", lvSchedule.getScheduleId());
+                lvScheduleMap.put("taskName", lvSchedule.getScheduleName());
+                lvScheduleMap.put("executionTime", "N/A");
+                lvScheduleMap.put("lastRun", "N/A");
+                lvScheduleMap.put("note", "N/A");
+                lvScheduleMap.put("status", lvSchedule.isEnable() ? "Enable" : "Disable");
+                lvScheduleMapList.add(lvScheduleMap);
+            }
+            return AppResponse.success(lvScheduleMapList);
+        } catch (RuntimeException ex) {
+            throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "schedule"), ex);
+        }
+    }
+
+    @GetMapping("/volume")
+    @PreAuthorize("@vldModuleSystem.readConfig(true)")
+    public AppResponse<List<LinkedHashMap<String, String>>> getVolume() {
+        return AppResponse.success(fileStorageService.getSystemVolumes());
     }
 }

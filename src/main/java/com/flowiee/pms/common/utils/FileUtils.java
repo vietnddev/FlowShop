@@ -1,6 +1,7 @@
 package com.flowiee.pms.common.utils;
 
 import com.flowiee.pms.common.base.StartUp;
+import com.flowiee.pms.common.enumeration.SystemDir;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.enumeration.ErrorCode;
@@ -10,7 +11,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
-//import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -21,13 +21,17 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class FileUtils {
     public static String resourceStaticPath = "src/main/resources/static";
-    public static String fileUploadPath = StartUp.getResourceUploadPath() + "/uploads/";
     public static String initCsvDataPath = resourceStaticPath + "/data/csv";
     public static String initXlsxDataPath = resourceStaticPath + "/data/excel";
     public static String reportTemplatePath = resourceStaticPath + "/report";
@@ -89,11 +93,11 @@ public class FileUtils {
     }
 
     public static File getFileDataCategoryInit() {
-        return Paths.get(initCsvDataPath + "/Category.csv").toFile();
+        return Paths.get(initCsvDataPath + File.pathSeparator + "Category.csv").toFile();
     }
 
     public static File getFileDataSystemInit() {
-        return Paths.get(initXlsxDataPath + "/SystemDataInit.xlsx").toFile();
+        return Paths.get(initXlsxDataPath + File.pathSeparator + "SystemDataInit.xlsx").toFile();
     }
 
     public static String getFileExtension(String fileName) {
@@ -111,18 +115,20 @@ public class FileUtils {
         return UUID.randomUUID().toString();
     }
 
-    public static String getFileUploadPath() {
-        if (StartUp.getResourceUploadPath() == null) {
-            throw new AppException("The uploaded file saving directory is not configured, please try again later!");
-        }
-        return StartUp.getResourceUploadPath() + "/uploads/";
-    }
-
     public static String getImageTempPath() {
         if (StartUp.getResourceUploadPath() == null) {
             throw new AppException("The uploaded file saving directory is not configured, please try again later!");
         }
-        return StartUp.getResourceUploadPath() + "/data-temp/";
+        return StartUp.getResourceUploadPath() + File.pathSeparator + "data-temp" + File.pathSeparator;
+    }
+
+    public static String getSystemDir(SystemDir pSystemDir) {
+        return switch (pSystemDir) {
+            case UPLOAD: yield StartUp.getResourceUploadPath();
+            case BACKUP: yield StartUp.getResourceBackupPath();
+            case RESTORE: yield StartUp.getResourceRestorePath();
+            case ARCHIVE: yield StartUp.getResourceArchivePath();
+        };
     }
 
     public static boolean isAllowUpload(String fileExtension, boolean throwException, String message) {
@@ -143,8 +149,8 @@ public class FileUtils {
         if (imageModel == null) {
             return null;
         }
-        String imageUrl = imageModel.getDirectoryPath() + "/" + imageModel.getStorageName();
-        return addLeadingSlash ? "/" + imageUrl : imageUrl;
+        String imageUrl = imageModel.getDirectoryPath() + File.separator + imageModel.getStorageName();
+        return addLeadingSlash ? File.separator + imageUrl : imageUrl;
     }
 
     public static MultipartFile convertFileToMultipartFile(File file) throws IOException {
@@ -165,9 +171,68 @@ public class FileUtils {
         return new CustomMultipartFile(fileContent, file.getName(), contentType);
     }
 
-    public static File getFileUploaded(FileStorage fileModel) {
-        Path path = Paths.get(getFileUploadPath() + File.separator + fileModel.getDirectoryPath() + File.separator + fileModel.getStorageName());
-        return new File(path.toUri());
+    public static void zipDirectory(Path sourceDirPath, Path zipPath) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(zipPath.toFile());
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+            Files.walk(sourceDirPath)
+                    .filter(path -> !Files.isDirectory(path))
+                    .forEach(path -> {
+                        ZipEntry zipEntry = new ZipEntry(sourceDirPath.relativize(path).toString());
+                        try (InputStream fis = Files.newInputStream(path)) {
+                            zos.putNextEntry(zipEntry);
+                            fis.transferTo(zos);
+                            zos.closeEntry();
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+        }
+    }
+
+    public static void unzipFile(Path zipFilePath, Path targetDir) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipFilePath))) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                Path newFile = targetDir.resolve(entry.getName());
+                if (entry.isDirectory()) {
+                    Files.createDirectories(newFile);
+                } else {
+                    Files.createDirectories(newFile.getParent());
+                    try (OutputStream os = Files.newOutputStream(newFile)) {
+                        zis.transferTo(os);
+                    }
+                }
+                zis.closeEntry();
+            }
+        }
+    }
+
+    public static void deleteDirectory(Path path) throws IOException {
+        if (Files.exists(path)) {
+            Files.walk(path)
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(p -> {
+                        try { Files.delete(p); } catch (IOException ignored) {}
+                    });
+        }
+    }
+
+    public static void renameDirectory(Path source, Path target) throws IOException {
+        if (Files.exists(source)) {
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    public static long sizeOfDirectory(String pDirPath) {
+        return org.apache.commons.io.FileUtils.sizeOfDirectory(new File(pDirPath));
+    }
+
+    public static int fileOfDirectory(String pDirPath) {
+        String[] extension = null; // null = tất cả extension
+        return org.apache.commons.io.FileUtils.listFiles(
+                new File(pDirPath), extension,
+                true   // true = đệ quy vào subfolder
+        ).size();
     }
 
     public static class CustomMultipartFile implements MultipartFile {

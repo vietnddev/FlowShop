@@ -100,7 +100,9 @@ public enum ACTION {
 
     SYS_DATA_CRAWLER("Crawler temp data",       MODULE.SYSTEM.name()),
     SYS_DATA_MERGE("Merge temp data",           MODULE.SYSTEM.name()),
-    SYS_REFRESH_APP("Refresh application",      MODULE.SYSTEM.name());
+    SYS_REFRESH_APP("Refresh application",      MODULE.SYSTEM.name()),
+    SYS_DATA_BACKUP("Backup uploaded data",     MODULE.SYSTEM.name()),
+    SYS_DATA_RESTORE("Restore data",            MODULE.SYSTEM.name());
 
     private final String label;
     private final String module;

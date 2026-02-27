@@ -18,9 +18,6 @@ public class Serial {
     @Column(name = "prefix", nullable = false)
     private String prefix;
 
-    @Column(name = "init_value", nullable = false)
-    private Integer initValue;
-
     @Column(name = "current_value", nullable = false)
     private Integer currentValue;
 }

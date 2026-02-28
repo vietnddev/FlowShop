@@ -13,7 +13,7 @@ import java.util.List;
 public interface ProductVariantService extends ICurdService<ProductVariantDTO> {
     Page<ProductVariantDTO> findAll(ProductVariantSearchRequest pRequest);
 
-    Page<ProductVariantDTO> getProductsOutOfStock(int pageSize, int pageNum);
+    List<ProductVariantDTO> getProductsOutOfStock();
 
     ProductDetail findEntById(Long pVariantId, boolean pThrowException);
 
@@ -30,4 +30,6 @@ public interface ProductVariantService extends ICurdService<ProductVariantDTO> {
     void updateDefectiveQuantity(Long pProductVariantId, Integer pQuantity, String pUpdateType);
 
     void updateStatus(Long pProductVariantId, ProductStatus pStatus);
+
+    List<ProductVariantDTO> save(Long pProductId, List<ProductVariantDTO> pVariantDTOs);
 }

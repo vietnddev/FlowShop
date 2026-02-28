@@ -3,7 +3,7 @@
 
 <div th:replace="~{header :: stylesheets(title='Products')}"></div>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
     <div class="wrapper">
         <div th:replace="~{header :: header}"></div>
 
@@ -44,7 +44,6 @@
                                                 <th>Unit</th>
                                                 <th>Inventory qty</th>
                                                 <th>Sold qty</th>
-                                                <th>Min-max stock</th>
                                                 <th>Status</th>
                                                 <th></th>
                                             </tr>
@@ -168,6 +167,8 @@
                     <div th:replace="~{pages/product/fragments/product-fragments :: createProductOriginal}"></div>
                     <!--Modal view storage history-->
                     <div th:replace="~{pages/product/fragments/product-fragments :: storageHistoryModal}"></div>
+                    <!--Modal view product variant-->
+                    <div th:replace="~{pages/product/fragments/product-fragments :: viewProductVariantModal}"></div>
                 </div>
             </section>
         </div>
@@ -234,9 +235,9 @@
                         let variantsBlock = '';
                         $.each(p.variants, function (variantIndex, variantInfo) {
                             variantsBlock +=
-                                `<tr variantId="${variantInfo.id}">
+                                `<tr class="row-variant-item" variantId="${variantInfo.id}">
                                     <td>${variantIndex + 1}</td>
-                                    <td name="variantCode">${variantInfo.variantCode}</td>
+                                    <td name="variantCode" style="color: #007bff; cursor: pointer">${variantInfo.variantCode}</td>
                                     <td>${variantInfo.fabricType.name}</td>
                                     <td>${variantInfo.color.name}</td>
                                     <td>${variantInfo.size.name}</td>
@@ -247,6 +248,22 @@
                                     <td>
                                         <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#popUpdatePrice" name="btnUpdatePrice" productId="${p.id}" productVariantId="${variantInfo.id}">
                                             <i class="fa-solid fa-dollar-sign"></i>
+                                        </button>
+                                    </td>
+                                </tr>`;
+                        });
+
+                        let attributesBlock = '';
+                        $.each(p.attributes, function (attributeIndex, attributeInfo) {
+                            attributesBlock +=
+                                `<tr class="row-attribute-item" attributeId="${attributeInfo.id}">
+                                    <td>${attributeIndex + 1}</td>
+                                    <td><input class="form-control" type="text" name="colAttributeName" value="${attributeInfo.attributeName}"/></td>
+                                    <td><input class="form-control" type="text" name="colAttributeValue" value="${attributeInfo.attributeValue}"/></td>
+                                    <td><input class="form-control" type="text" name="colSort" value="${attributeInfo.sort}"/></td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-info" name="btn-update-product-attribute" productId="${p.id}" productAttributeId="${attributeInfo.id}">
+                                            <i class="fa-solid fa-pencil"></i>
                                         </button>
                                     </td>
                                 </tr>`;
@@ -271,8 +288,7 @@
                                 <td>${p.unitName}</td>
                                 <td class="text-right">${p.totalStorageQty}</td>
                                 <td class="text-right">${p.totalSoldQty}</td>
-                                <td class="text-center"></td>
-                                <td>${mvProductStatus[p.status]}</td>
+                                <td>${p.statusCode === 'ACT' ? `<span class="badge badge-primary">${p.statusName}</span>` : `${p.statusName}`}</td>
                                 <td>
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popProductDetail"  name="btnViewDetail"         productId="${p.id}">
                                         <i class="fa-solid fa-circle-info"></i></i>
@@ -286,17 +302,53 @@
                                 </td>
                             </tr>
                             <tr class="expandable-body d-none">
-                                <td colspan="12">
-                                    <table class="table table-bordered" style="display: none; margin: 6px auto">
-                                        <thead>
-                                            <tr>
-                                                <th>No.</th><th>Code</th><th>Fabric</th><th>Color</th><th>Size</th><th>Retail price</th><th>Cost price</th><th>Inventory Qty</th><th>Sold Qty</th><th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${variantsBlock}
-                                        </tbody>
-                                    </table>
+                                <td colspan="11">
+                                    <div class="card-header p-0 pt-1 border-bottom-0" style="margin-left: 6px">
+                                        <ul class="nav nav-tabs" id="custom-tabs-${p.id}" role="tablist">
+                                            <li class="nav-item">
+                                                <a class="nav-link font-weight-bold active" id="custom-tabs-variant-tab-${p.id}"
+                                                 data-toggle="pill" href="#custom-tabs-variant-${p.id}" role="tab" aria-controls="custom-tabs-variant-${p.id}" aria-selected="true">Variants</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link font-weight-bold" id="custom-tabs-attribute-tab-${p.id}"
+                                                 data-toggle="pill" href="#custom-tabs-attribute-${p.id}" role="tab" aria-controls="custom-tabs-attribute-${p.id}" aria-selected="true">Attributes</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="tab-content" id="custom-tabs-tabContent-${p.id}">
+                                            <div class="tab-pane fade active show" id="custom-tabs-variant-${p.id}" role="tabpanel" aria-labelledby="custom-tabs-variant-tab-${p.id}">
+                                                <table class="table table-bordered" style="margin: 6px auto">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No.</th><th>Code</th><th>Fabric</th><th>Color</th><th>Size</th><th>Retail price</th><th>Cost price</th><th>Inventory Qty</th><th>Sold Qty</th>
+                                                            <th>
+                                                                <button type="button" class="btn btn-sm btn-success" name="btn-create-product-variant" productId="${p.id}"><i class="fa-solid fa-circle-plus"></i></button>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        ${variantsBlock}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="tab-pane fade" id="custom-tabs-attribute-${p.id}" role="tabpanel" aria-labelledby="custom-tabs-attribute-tab-${p.id}">
+                                                <table class="table table-bordered" style="margin: 6px auto">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No.</th><th>Attribute name</th><th>Value</th><th>Order displayed</th>
+                                                            <th>
+                                                                <button type="button" class="btn btn-sm btn-success" name="btn-create-product-attribute" productId="${p.id}"><i class="fa-solid fa-circle-plus"></i></button>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        ${attributesBlock}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         `);
@@ -324,6 +376,8 @@
         }
 
         function createProduct() {
+            let creationType = $('#createProductSubmit').attr('creationType');
+
             let apiURL = mvHostURLCallApi + "/product/create";
             let productTypeId = parseInt($("#productTypeField").val());
             let brandId = parseInt($("#brandField").val());
@@ -387,6 +441,22 @@
                 attributes: mvAttributeAddedList
             };
 
+            if (creationType === 'variantOnly') {
+                let productId = Number($('#createProductSubmit').attr('productId'));
+                apiURL = `${mvHostURLCallApi}/product/${productId}/variant/create`;
+                body = {
+                    productId: productId,
+                    variants: mvVariantAddedList
+                };
+            } else if (creationType === 'attributeOnly') {
+                let productId = Number($('#createProductSubmit').attr('productId'));
+                apiURL = `${mvHostURLCallApi}/product/${productId}/attribute/create`;
+                body = {
+                    productId: productId,
+                    attributes: mvAttributeAddedList
+                };
+            }
+
             $.ajax({
                 url: apiURL,
                 type: "POST",
@@ -412,7 +482,7 @@
                     alwaysShowClose: true
                 });
             });
-        })
+        });
     </script>
 </body>
 </html>

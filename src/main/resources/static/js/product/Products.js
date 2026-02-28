@@ -4,6 +4,9 @@ $(document).ready(function () {
 
 function createListener() {
     $('#createProduct').on('click', function () {
+        showCreateProductModalSection('#mdl_createProduct_generalInfoSection',
+            '#mdl_createProduct_variantSection', '#mdl_createProduct_attributeSection');
+        $('#createProductSubmit').attr('creationType', 'newProduct');
         loadCategory();
     });
 
@@ -59,6 +62,22 @@ function createListener() {
         createProduct();
     });
 
+    $(document).on('click', 'button[name="btn-create-product-variant"]', function () {
+        $("#insert").modal();
+        $('#createProductSubmit').attr('creationType', 'variantOnly');
+        $('#createProductSubmit').attr('productId', $(this).attr('productId'));
+        showCreateProductModalSection('#mdl_createProduct_variantSection');
+        loadCategory();
+    });
+
+    $(document).on('click', 'button[name="btn-create-product-attribute"]', function () {
+        $("#insert").modal();
+        $('#createProductSubmit').attr('creationType', 'attributeOnly');
+        $('#createProductSubmit').attr('productId', $(this).attr('productId'));
+        showCreateProductModalSection('#mdl_createProduct_attributeSection');
+        loadCategory();
+    });
+
     $(document).on('click', 'button[name="btnViewDetail"]', function () {
         let lvProductInfo = mvProductList[$(this).attr("productId")];
         showProductDetailOnPopup(lvProductInfo);
@@ -76,6 +95,39 @@ function createListener() {
         $("#pUP_RetailPrice").val(retailPrice);
         $("#pUP_Confirm").attr("variantId", productVariantId);
         $("#popUpdatePrice").modal("show");
+    });
+
+    $(document).on('click', `button[name="btn-update-product-attribute"]`, function () {
+        let productId = $(this).attr("productId");
+        let productAttributeId = $(this).attr("productAttributeId");
+        if (confirm('Do you want to update this attribute?')) {
+            let rowInfo = $(this).closest('tr');
+            let attributeName = rowInfo.find('td input[name="colAttributeName"]').val();
+            let attributeValue = rowInfo.find('td input[name="colAttributeValue"]').val();
+            let sort = rowInfo.find('td input[name="colSort"]').val();
+
+            let body = {
+                productId: productId,
+                attributeName: attributeName,
+                attributeValue: attributeValue,
+                sort: sort
+            };
+
+            $.ajax({
+                url: `${mvHostURLCallApi}/product/${productId}/attribute/update/${productAttributeId}`,
+                type: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(body),
+                success: function (response, textStatus, jqXHR) {
+                    if (response.status === "OK") {
+                        alert("Updated successfully");
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    showErrorModal($.parseJSON(xhr.responseText).message);
+                }
+            });
+        }
     });
 
     $(document).on('click', '#pUP_Confirm', function () {
@@ -122,6 +174,37 @@ function createListener() {
         loadStorageTransactionHistory(productId);
         $("#storageHistoryModal").modal();
     })
+
+    //View product variant on popup
+    $(document).on('click', 'tr.row-variant-item td[name="variantCode"]', function () {
+        let variantCode = $(this).text();
+        let row = $(this).closest('tr');
+        let variantId = Number(row.attr('variantId'));
+
+        $("#mdl_pv_name").text("");
+        $("#mdl_pv_productType").text("");
+        $("#mdl_pv_unit").text("");
+        $("#mdl_pv_size").text("");
+        $("#mdl_pv_color").text("");
+        $("#mdl_pv_retailPrice").text("");
+        $("#mdl_pv_costPrice").text("");
+        $("#viewProductVariantModal").modal();
+
+        $.get(`${mvHostURLCallApi}/product/variant/${variantId} `, function (response) {
+            if (response.status === "OK") {
+                let lvVariantInfo = response.data;
+                $("#mdl_pv_name").text(lvVariantInfo.variantName);
+                $("#mdl_pv_productType").text(lvVariantInfo.product.productType.name);
+                $("#mdl_pv_unit").text(lvVariantInfo.product.unit.name);
+                $("#mdl_pv_size").text(lvVariantInfo.size.name);
+                $("#mdl_pv_color").text(lvVariantInfo.color.name);
+                $("#mdl_pv_retailPrice").text(lvVariantInfo.price.retailPrice);
+                $("#mdl_pv_costPrice").text(lvVariantInfo.price.costPrice);
+            }
+        }).fail(function (xhr) {
+            alert("Error: " + $.parseJSON(xhr.responseText).message);
+        });
+    });
 }
 
 function addVariant() {
@@ -307,4 +390,9 @@ function loadStorageTransactionHistory(productId) {
             });
         }
     });
+}
+
+function showCreateProductModalSection(...visibleSections) {
+    $('.product-creation-section').hide();
+    visibleSections.forEach(s => $(s).show());
 }

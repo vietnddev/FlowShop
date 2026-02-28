@@ -31,6 +31,7 @@ public class ProductVariantConvert {
         dto.setVariantName(pInput.getVariantName());
         dto.setStorageQty(pInput.getStorageQty());
         dto.setSoldQty(pInput.getSoldQty());
+        dto.setLowStockThreshold(pInput.getLowStockThreshold());
         dto.setStatus(pInput.getStatus());
 
         Product lvProduct = pInput.getProduct();

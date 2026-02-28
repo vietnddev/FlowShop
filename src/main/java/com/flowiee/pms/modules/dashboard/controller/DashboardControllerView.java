@@ -64,6 +64,9 @@ public class DashboardControllerView extends BaseController {
         //modelAndView.addObject("topSanPhamx_listTenSanPham", dashboardModel.getProductsTopSellRevenue().keySet());
         //modelAndView.addObject("topSanPhamx_listSoLuong", dashboardModel.getProductsTopSellRevenue().values());
 
+        //Cảnh báo sắp hết hàng
+        modelAndView.addObject("thLowStockProducts", dashboardModel.getLowStockProducts());
+
         return baseView(modelAndView);
     }
 }

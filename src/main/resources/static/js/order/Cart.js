@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    reCalCartValue(mvCurrentCartId);
+
     //Click btn decrease item quantity
     $(document).on('click', '.btn-minus', function () {
         const lvQuantityInput = $(this).closest('.item-quantity-input').find('.itemQuantity');
@@ -10,6 +12,9 @@ $(document).ready(function () {
             updateItemQuantity(itemId, newValue, function(success) {
                 if (success) {
                     lvQuantityInput.val(newValue);
+                    if (parseInt(lvQuantityInput.val()) === 1) {
+                        $(`tr.row-item[itemId="${itemId}"] .btn-minus`).prop('disabled', true);
+                    }
                 }
             });
         }
@@ -24,6 +29,14 @@ $(document).ready(function () {
                 $(this).val(value);
             }
         });
+
+        if (parseInt($(this).val()) === 1) {
+            $(`tr.row-item[itemId="${itemId}"] .btn-minus`).prop('disabled', true);
+        } else {
+            $(`tr.row-item[itemId="${itemId}"] .btn-minus`).prop('disabled', false);
+        }
+
+        $(this).blur();
     });
 
     //Click btn increase item quantity
@@ -38,6 +51,10 @@ $(document).ready(function () {
                 lvQuantityInput.val(newValue);
             }
         });
+
+        if (parseInt(lvQuantityInput.val()) === 1) {
+            $(`tr.row-item[itemId="${itemId}"] .btn-minus`).prop('disabled', false);
+        }
     });
 
     $("#btnSearchCustomer").on("click", function () {
@@ -111,29 +128,26 @@ function postUpdateItemQuantity(itemDTO) {
     colItemSubTotal.empty();
     colItemSubTotal.text(formatCurrency(itemDTO.subTotal));
 
-    reCalCartValue(mvCurrentCartId, function(cartValue) {
-        if (cartValue !== null) {
-            $("#mTotalAmountPreDiscount").text(formatUSCurrency(cartValue));
-            $("#totalAmountDiscountField").text(formatUSCurrency(cartValue));
-            $("#amountReceivedField").val(formatUSCurrency(cartValue));
-            $("#amountReturnField").val(formatUSCurrency(cartValue - cartValue));
-        }
-    });
+    reCalCartValue(mvCurrentCartId);
 
     //Update total amount for whole cart
     //...
 }
 
-function reCalCartValue(pCartId, callback) {
+function reCalCartValue(pCartId) {
     let apiURL = mvHostURLCallApi + `/sls/cart/${pCartId}/value`;
     $.get(apiURL, function (response) {
         if (response.status === "OK") {
             let cartValue = response.data;
-            if (callback) callback(cartValue); // Trả về giá trị cartValue qua callback
+            if (cartValue !== null) {
+                $("#mTotalAmountPreDiscount").text(formatUSCurrency(cartValue));
+                $("#totalAmountDiscountField").text(formatUSCurrency(cartValue));
+                $("#amountReceivedField").val(formatUSCurrency(cartValue));``
+                $("#amountReturnField").val(formatUSCurrency(cartValue - cartValue));
+            }
         }
     }).fail(function (xhr) {
         alert("Error: " + $.parseJSON(xhr.responseText).message);
-        if (callback) callback(0.00); // Trả về null nếu lỗi
     });
 }
 

@@ -4,6 +4,9 @@ import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.dto.ProductAttributeDTO;
+import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
+import com.flowiee.pms.modules.inventory.model.CreateProductAttributeReq;
+import com.flowiee.pms.modules.inventory.model.CreateProductVariantReq;
 import com.flowiee.pms.modules.inventory.service.ProductAttributeService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("${app.api.prefix}/product")
@@ -33,10 +38,24 @@ public class ProductAttributeController extends BaseController {
         }
     }
 
+    //Added 2026/03/06
+    @PostMapping("/{productId}/attribute/create")
+    @PreAuthorize("@vldModuleProduct.insertProduct(true)")
+    public AppResponse<List<ProductAttributeDTO>> createProductAttribute(@PathVariable("productId") Long pProductId,
+                                                                        @RequestBody CreateProductAttributeReq pBody) {
+        try {
+            return AppResponse.success(mvProductAttributeService.saveAll(pProductId, pBody.getAttributes()));
+        } catch (RuntimeException ex) {
+            throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "productVariant") + ex.getMessage(), ex);
+        }
+    }
+
     @Operation(summary = "Update product attribute")
-    @PutMapping("/attribute/update/{id}")
+    @PutMapping("/{productId}/attribute/update/{id}")
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
-    public AppResponse<ProductAttributeDTO> updateProductAttribute(@RequestBody ProductAttributeDTO productAttribute, @PathVariable("id") Long productAttributeId) {
+    public AppResponse<ProductAttributeDTO> updateProductAttribute(@PathVariable("productId") Long productId,
+                                                                   @PathVariable("id") Long productAttributeId,
+                                                                   @RequestBody ProductAttributeDTO productAttribute) {
         try {
             return AppResponse.success(mvProductAttributeService.update(productAttribute, productAttributeId));
         } catch (RuntimeException ex) {

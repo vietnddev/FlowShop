@@ -36,6 +36,7 @@ import com.flowiee.pms.modules.inventory.util.ProductConvert;
 import javax.persistence.EntityGraph;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.util.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
     private final OrderRepository mvOrderRepository;
     private final CategoryService mvCategoryService;
 
-    public ProductInfoServiceImpl(ProductRepository pProductRepository, ProductDescriptionRepository pProductDescriptionRepository, ProductAttributeService pProductAttributeService, ProductDetailRepository pProductDetailRepository, ProductPriceRepository pProductPriceRepository, ProductVariantService pProductVariantService, ProductHistoryService pProductHistoryService, FileStorageRepository pFileStorageRepository, ProductPriceService pProductPriceService, SystemLogService pSystemLogService, OrderRepository pOrderRepository, CategoryService pCategoryService) {
+    public ProductInfoServiceImpl(ProductRepository pProductRepository, ProductDescriptionRepository pProductDescriptionRepository, ProductAttributeService pProductAttributeService, ProductDetailRepository pProductDetailRepository, ProductPriceRepository pProductPriceRepository, @Lazy ProductVariantService pProductVariantService, ProductHistoryService pProductHistoryService, FileStorageRepository pFileStorageRepository, ProductPriceService pProductPriceService, SystemLogService pSystemLogService, OrderRepository pOrderRepository, CategoryService pCategoryService) {
         super(Product.class, ProductDTO.class, pProductRepository);
         this.mvProductDescriptionRepository = pProductDescriptionRepository;
         this.mvProductAttributeService = pProductAttributeService;
@@ -93,7 +94,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
         List<ProductDTO> lvResultListDto = super.convertDTOs(lvResultList);
         Long lvTotalRecords = lvQueryBuilder.buildCount();
 
-        if (pFullInformation) {
+        if (pFullInformation) {// Default is true for list of products page
             enrichExtraInfo(lvResultListDto);
         }
 
@@ -166,7 +167,9 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
 
             long lvStorageQuantity = 0;
             long lvSoldQuantity = 0;
+            ProductStatus lvProductStatus = ProductStatus.INA;
             List<ProductVariantDTO> lvVariantList = new ArrayList<>();
+            List<ProductAttributeDTO> lvAttributeList = mvProductAttributeService.findAll(-1, -1, lvProduct.getId()).getContent();
 
             for (ProductSummaryInfoModel v : lvVariants) {
                 lvStorageQuantity += v.getQuantity();
@@ -181,8 +184,12 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
                 lvVariantDto.setSize(new CategoryDTO(v.getSizeId(), v.getSizeName()));
                 lvVariantDto.setStorageQty((int) (long) v.getQuantity());
                 lvVariantDto.setSoldQty((int) (long) v.getSoldQty());
+                lvVariantDto.setStatus(v.getStatus());
 
                 mvProductPriceService.assignPriceInfo(lvVariantDto, mvProductPriceRepository.findPresentPrices(lvVariantDto.getId()));
+                if (ProductStatus.ACT.equals(lvVariantDto.getStatus())) {
+                    lvProductStatus = ProductStatus.ACT;
+                }
 
                 lvVariantList.add(lvVariantDto);
             }
@@ -190,6 +197,9 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
             lvProduct.setTotalStorageQty(lvStorageQuantity);
             lvProduct.setTotalSoldQty(lvSoldQuantity);
             lvProduct.setVariants(lvVariantList);
+            lvProduct.setAttributes(lvAttributeList);
+            lvProduct.setStatusCode(lvProductStatus.name());
+            lvProduct.setStatusName(lvProductStatus.getLabel());
         }
     }
 
@@ -260,11 +270,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
             //Create attributes
             List<ProductAttributeDTO> lvAttributes = pProduct.getAttributes();
             if (!CollectionUtils.isEmpty(lvAttributes)) {
-                lvAttributes.forEach(lvAttr -> {
-                    lvAttr.setProductId(lvProductSaved.getId());
-                    lvAttr.setStatus(true);
-                });
-                mvProductAttributeService.saveAll(lvAttributes);
+                mvProductAttributeService.saveAll(lvProductSaved.getId(), lvAttributes);
             }
 
             mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_C, MasterObject.Product, "Thêm mới sản phẩm", lvProductSaved.getProductName());

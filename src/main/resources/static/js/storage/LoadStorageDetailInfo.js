@@ -20,8 +20,7 @@ function loadStorageItems(pageSize, pageNum) {
                 }
                 itemsTable.append(`
                     <tr>
-                        <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>
-                        <td>${itemImageSrc}</td>
+                        <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>                        
                         <td>${d.itemName}</td>
                         <td>${d.itemType}</td>
                         <td>${d.itemBrand}</td>

@@ -45,6 +45,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.persistence.criteria.*;
 import javax.validation.ConstraintViolationException;
@@ -72,6 +73,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     private final CartService mvCartService;
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private final ProductInfoService productInfoService;
 
     public ProductVariantServiceImpl(ProductDetailRepository pEntityRepository, ProductDetailTempRepository pProductVariantTempRepository,
                                      ProductPriceRepository pProductPriceRepository, ProductGenerateQRCodeService pProductGenerateQRCodeService,
@@ -80,7 +82,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
                                      StorageService pStorageService, OrderCartRepository pCartRepository,
                                      GenerateBarcodeService pGenerateBarcodeService, ProductPriceService pProductPriceService,
                                      SystemLogService pSystemLogService, SendOperatorNotificationService pSendOperatorNotificationService,
-                                     @Lazy ProductInfoService pProductInfoService, @Lazy CartService pCartService, @Lazy ProductImageService pProductImageService) {
+                                     @Lazy ProductInfoService pProductInfoService, @Lazy CartService pCartService, @Lazy ProductImageService pProductImageService, ProductInfoService productInfoService) {
         super(ProductDetail.class, ProductVariantDTO.class, pEntityRepository);
         this.mvSendOperatorNotificationService = pSendOperatorNotificationService;
         this.mvProductVariantTempRepository = pProductVariantTempRepository;
@@ -97,6 +99,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         this.mvStorageService = pStorageService;
         this.mvCartRepository = pCartRepository;
         this.mvCartService = pCartService;
+        this.productInfoService = productInfoService;
     }
 
     @Override
@@ -201,6 +204,37 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     @Override
     public ProductDetail findEntById(Long pId, boolean throwException) {
         return super.findEntById(pId, throwException);
+    }
+
+    @Override
+    public List<ProductVariantDTO> save(Long pProductId, List<ProductVariantDTO> pVariantDTOs) {
+        List<ProductVariantDTO> lvProductVariantSavedList = new ArrayList<>();
+        if (pProductId == null || pProductId <= 0 || CollectionUtils.isEmpty(pVariantDTOs)) {
+            return lvProductVariantSavedList;
+        }
+
+        Product lvProduct = productInfoService.findEntById(pProductId, true);
+        for (ProductVariantDTO lvVariant : pVariantDTOs) {
+            ProductPriceDTO lvPrice = lvVariant.getPrice();
+
+            lvVariant.setProductId(lvProduct.getId());
+            lvVariant.setColorId(lvVariant.getColor().getId());
+            lvVariant.setSizeId(lvVariant.getSize().getId());
+            lvVariant.setFabricTypeId(lvVariant.getFabricType().getId());
+            lvVariant.setVariantName(lvProduct.getProductName());
+            lvVariant.setDefectiveQty(0);
+            lvVariant.setNote("");
+            lvVariant.setPrice(ProductPriceDTO.builder()
+                    .retailPrice(lvPrice.getRetailPrice())
+                    .wholesalePrice(lvPrice.getWholesalePrice())
+                    .costPrice(lvPrice.getCostPrice())
+                    .build());
+            lvVariant.setStatus(ProductStatus.INA);
+
+            lvProductVariantSavedList.add(this.save(lvVariant));
+        }
+
+        return lvProductVariantSavedList;
     }
 
     @Transactional
@@ -503,14 +537,9 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     }
 
     @Override
-    public Page<ProductVariantDTO> getProductsOutOfStock(int pageSize, int pageNum) {
-        Pageable pageable = getPageable(pageNum, pageSize);
-        Page<ProductDetail> productVariants = mvEntityRepository.findProductsOutOfStock(pageable);
-        List<ProductVariantDTO> productVariantDTOs = ProductVariantConvert.entitiesToDTOs(productVariants.getContent());
-        for (ProductVariantDTO dto : productVariantDTOs) {
-            //assignPriceInfo(dto, mvProductPriceService.findPresentPrice(dto.getId()));
-        }
-        return new PageImpl<>(productVariantDTOs, pageable, productVariantDTOs.size());
+    public List<ProductVariantDTO> getProductsOutOfStock() {
+        List<ProductDetail> productVariants = mvEntityRepository.findProductsOutOfStock();
+        return ProductVariantConvert.entitiesToDTOs(productVariants);
     }
 
     private String genProductCode(String defaultCode) {

@@ -9,5 +9,5 @@ import java.util.List;
 public interface ProductAttributeService extends ICurdService<ProductAttributeDTO> {
     Page<ProductAttributeDTO> findAll(int pageSize, int pageNum, Long pProductDetailId);
 
-    List<ProductAttributeDTO> saveAll(List<ProductAttributeDTO> pAttributes);
+    List<ProductAttributeDTO> saveAll(Long pProductId, List<ProductAttributeDTO> pAttributes);
 }

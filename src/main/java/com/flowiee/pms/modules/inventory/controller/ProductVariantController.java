@@ -10,6 +10,7 @@ import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantTempDTO;
+import com.flowiee.pms.modules.inventory.model.CreateProductVariantReq;
 import com.flowiee.pms.modules.inventory.model.ProductVariantSearchRequest;
 import com.flowiee.pms.modules.inventory.service.ProductHistoryService;
 import com.flowiee.pms.modules.inventory.service.ProductPriceService;
@@ -84,6 +85,18 @@ public class ProductVariantController extends BaseController {
         }
     }
 
+    //Added 2026/03/06
+    @PostMapping("/{productId}/variant/create")
+    @PreAuthorize("@vldModuleProduct.insertProduct(true)")
+    public AppResponse<List<ProductVariantDTO>> createProductVariant(@PathVariable("productId") Long pProductId,
+                                                                     @RequestBody CreateProductVariantReq pBody) {
+        try {
+            return AppResponse.success(mvProductVariantService.save(pProductId, pBody.getVariants()));
+        } catch (RuntimeException ex) {
+            throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "productVariant") + ex.getMessage(), ex);
+        }
+    }
+
     @Operation(summary = "Update product variant")
     @PutMapping("/variant/update/{id}")
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
@@ -143,14 +156,5 @@ public class ProductVariantController extends BaseController {
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product"), ex);
         }
-    }
-
-    @Operation(summary = "Get list of product out of stock")
-    @GetMapping("/variant/out-of-stock")
-    @PreAuthorize("@vldModuleProduct.readProduct(true)")
-    public AppResponse<List<ProductVariantDTO>> getProductsOutOfStock(@RequestParam(value = "pageSize", required = false) Integer pageSize,
-                                                                      @RequestParam(value = "pageNum", required = false) Integer pageNum) {
-        Page<ProductVariantDTO> productVariantDTOPage = mvProductVariantService.getProductsOutOfStock(-1, -1);
-        return AppResponse.success(productVariantDTOPage.getContent(), pageNum, pageSize, productVariantDTOPage.getTotalPages(), productVariantDTOPage.getTotalElements());
     }
 }

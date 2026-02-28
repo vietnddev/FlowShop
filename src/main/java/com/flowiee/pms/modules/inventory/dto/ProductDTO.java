@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.inventory.dto;
 
 import com.flowiee.pms.common.base.dto.BaseDTO;
+import com.flowiee.pms.common.enumeration.ProductStatus;
 import com.flowiee.pms.modules.system.dto.CategoryDTO;
 import com.flowiee.pms.modules.sales.dto.VoucherInfoDTO;
 import com.flowiee.pms.modules.sales.dto.GarmentFactoryDTO;
@@ -55,7 +56,8 @@ public class ProductDTO extends BaseDTO implements Serializable {
     Integer productVariantQty;
     Integer soldQty;
     String description;
-    String status;
+    String statusCode;
+    String statusName;
     List<VoucherInfoDTO> listVoucherInfoApply;
 
     Long totalSoldQty;

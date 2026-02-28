@@ -174,6 +174,7 @@ public class ConfigServiceImpl extends BaseService<SystemConfig, SystemConfigDTO
     private void reloadCategoryLabel() {
         List<String> lvCategoryTypeList = new ArrayList<>();
         lvCategoryTypeList.add(CATEGORY.PRODUCT_STATUS.getName());
+        lvCategoryTypeList.add(CATEGORY.ORDER_STATUS.getName());
 
         List<Category> lvCategoryList = mvCategoryRepository.findSubCategory(lvCategoryTypeList);
         if (lvCategoryList == null) {

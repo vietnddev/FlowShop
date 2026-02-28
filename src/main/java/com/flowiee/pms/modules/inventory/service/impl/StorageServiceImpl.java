@@ -49,6 +49,7 @@ public class StorageServiceImpl extends BaseService<Storage, StorageDTO, Storage
         Optional<Storage> storage = super.findById(storageId);
         if (storage.isEmpty())
             throw new BadRequestException("Storage not found");
+
         Pageable pageable = getPageable(pageNum, pageSize);
         Page<Object[]> storageItemsRawData = mvEntityRepository.findAllItems(searchText, storageId, pageable);
         List<StorageItems> storageItems = new ArrayList<>();
@@ -58,6 +59,7 @@ public class StorageServiceImpl extends BaseService<Storage, StorageDTO, Storage
                 .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
                 .optionalEnd()
                 .toFormatter();
+
         for (Object[] object : storageItemsRawData) {
             StorageItems s = StorageItems.builder()
                     .storageId(storageId)
@@ -74,6 +76,7 @@ public class StorageServiceImpl extends BaseService<Storage, StorageDTO, Storage
             if (object[9] != null) s.setLastImportTime(LocalDateTime.parse(Objects.toString(object[9]), formatter));
             storageItems.add(s);
         }
+
         return new PageImpl<>(storageItems, pageable, storageItemsRawData.getTotalElements());
     }
 

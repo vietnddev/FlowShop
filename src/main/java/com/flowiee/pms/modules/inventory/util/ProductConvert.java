@@ -71,8 +71,8 @@ public class ProductConvert {
             dto.setInternalNotes(pInput.getInternalNotes());
             //dto.setGarmentFactory();
             //dto.setSupplier();
-            dto.setStatus("ACT");
-            dto.setSoldQty(null);
+            //dto.setStatus(null);
+            //dto.setSoldQty(null);
             dto.setCreatedAt(pInput.getCreatedAt());
             dto.setCreatedBy(pInput.getCreatedBy());
 

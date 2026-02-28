@@ -71,8 +71,8 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
     }
 
     @Override
-    public List<ProductAttributeDTO> saveAll(List<ProductAttributeDTO> pAttributes) {
-        if (CollectionUtils.isEmpty(pAttributes)) {
+    public List<ProductAttributeDTO> saveAll(Long pProductId, List<ProductAttributeDTO> pAttributes) {
+        if (pProductId == null || pProductId <= 0 ||  CollectionUtils.isEmpty(pAttributes)) {
             return Collections.emptyList();
         }
 
@@ -80,11 +80,11 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
         List<ProductAttribute> entities = pAttributes.stream()
                 .map(dto -> {
                     ProductAttribute attr = new ProductAttribute();
-                    attr.setProduct(new Product(dto.getProductId()));
+                    attr.setProduct(new Product(pProductId));
                     attr.setAttributeName(dto.getAttributeName());
                     attr.setAttributeValue(dto.getAttributeValue());
                     attr.setSort(dto.getSort());
-                    attr.setStatus(dto.getStatus());
+                    attr.setStatus(false);
                     return attr;
                 })
                 .toList();
@@ -113,7 +113,6 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
         attribute.setAttributeName(pAttribute.getAttributeName());
         attribute.setAttributeValue(pAttribute.getAttributeValue());
         attribute.setSort(pAttribute.getSort());
-        attribute.setStatus(pAttribute.getStatus());
         ProductAttribute lvAttributeUpdated = mvEntityRepository.save(attribute);
 
         changeLog.setNewObject(lvAttributeUpdated);

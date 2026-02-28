@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.dashboard.model;
 
+import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;
 import lombok.AccessLevel;
@@ -29,4 +30,5 @@ public class DashboardModel {
     LinkedHashMap<String, Float> revenueSalesChannel;
     LinkedHashMap<String, Integer> productsTopSellQty;
     LinkedHashMap<String, Integer> productsTopSellRevenue;
+    List<ProductVariantDTO> lowStockProducts;
 }

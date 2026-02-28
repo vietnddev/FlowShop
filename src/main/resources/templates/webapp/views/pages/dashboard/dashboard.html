@@ -124,6 +124,80 @@
                     <!-- ./col -->
                 </div>
                 <div class="row">
+                    <div class="col-sm-12">
+                        <div class="card card-info">
+                            <div class="card-header">
+                                <h3 class="card-title">Cảnh báo sắp hết hàng</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body table-responsive p-0" style="height: 250px;">
+                                <table class="table table-head-fixed text-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Tên sản phẩm</th>
+                                            <th>Số lượng</th>
+                                            <th>Mức cảnh báo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="i, index : ${thLowStockProducts}">
+                                            <td th:text="${index.index + 1}"></td>
+                                            <td th:text="${i.variantName}"></td>
+                                            <td th:text="${i.storageQty}"></td>
+                                            <td th:text="${i.lowStockThreshold}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="card card-info">
+                            <div class="card-header">
+                                <h3 class="card-title">Thay đổi giá gần đây</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body table-responsive p-0" style="height: 250px;">
+                                <table class="table table-head-fixed text-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Tên sản phẩm</th>
+                                            <th>Số lượng</th>
+                                            <th>Giá bán</th>
+                                            <th>Giá nhập</th>
+                                            <th>Thời gian</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                     <!--THỐNG KÊ THEO KÊNH BÁN HÀNG-->
                     <div class="col-sm-6">
                         <div class="card card-info">

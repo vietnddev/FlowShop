@@ -14,7 +14,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import java.io.Serial;
@@ -85,6 +84,9 @@ public class ProductDetail extends BaseEntity implements Serializable {
 
     @Column(name = "supplier_sku", unique = true)
     String supplierSku;
+
+    @Column(name = "barcode", length = 50, unique = true)
+    String barcode;
 
     @Column(name = "warranty_period")
     Integer warrantyPeriod;
@@ -184,15 +186,6 @@ public class ProductDetail extends BaseEntity implements Serializable {
 
     public int getAvailableSalesQty() {
         return storageQty == null ? 0 : storageQty - defectiveQty;
-    }
-
-    public boolean isExpiredDate() {
-        return expiryDate != null && expiryDate.isBefore(LocalDate.now());
-    }
-
-    private boolean isSalable() {
-        Assert.notNull(status, "Status can't null!");
-        return status.equals(ProductStatus.ACT);
     }
 
 	@Override

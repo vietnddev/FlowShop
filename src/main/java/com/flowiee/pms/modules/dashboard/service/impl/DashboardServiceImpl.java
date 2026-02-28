@@ -2,7 +2,9 @@ package com.flowiee.pms.modules.dashboard.service.impl;
 
 import com.flowiee.pms.modules.dashboard.model.DashboardModel;
 import com.flowiee.pms.modules.dashboard.service.DashboardService;
+import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.inventory.repository.ProductDetailRepository;
+import com.flowiee.pms.modules.inventory.service.ProductVariantService;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;
 import com.flowiee.pms.modules.sales.service.CustomerService;
@@ -31,6 +33,7 @@ import java.util.*;
 public class DashboardServiceImpl implements DashboardService {
     ProductDetailRepository mvProductVariantRepository;
     OrderStatisticsService mvOrderStatisticsService;
+    ProductVariantService mvProductVariantService;
     CustomerService mvCustomerService;
     EntityManager mvEntityManager;
     OrderService mvOrderService;
@@ -187,6 +190,9 @@ public class DashboardServiceImpl implements DashboardService {
 
         //Revenue by products
 
+        //Canh bao sap het hang
+        List<ProductVariantDTO> lvLowStockProducts = mvProductVariantService.getProductsOutOfStock();
+
 
         String revenueToday = CommonUtils.formatToVND(mvOrderStatisticsService.findRevenueToday());
         String revenueThisMonth = CommonUtils.formatToVND(mvOrderStatisticsService.findRevenueThisMonth());
@@ -207,6 +213,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .revenueMonthOfYear(revenueMonthOfYear)
                 .revenueSalesChannel(revenueSalesChannel)
                 .productsTopSellQty(productsTopSell)
+                .lowStockProducts(lvLowStockProducts)
                 .build();
     }
 

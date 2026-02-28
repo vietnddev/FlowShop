@@ -4,8 +4,6 @@ import com.flowiee.pms.common.base.repository.BaseRepository;
 import com.flowiee.pms.modules.inventory.entity.Product;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.model.ProductSummaryInfoModel;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -33,8 +31,8 @@ public interface ProductDetailRepository extends BaseRepository<ProductDetail, L
     @Query("select sum(p.storageQty) from ProductDetail p where p.status = 'A'")
     Integer countTotalQuantity();
 
-    @Query("from ProductDetail p where p.storageQty - p.defectiveQty = 0")
-    Page<ProductDetail> findProductsOutOfStock(Pageable pageable);
+    @Query("from ProductDetail p where p.storageQty = 0 or (p.lowStockThreshold is not null and p.storageQty < p.lowStockThreshold)")
+    List<ProductDetail> findProductsOutOfStock();
 
     @Query("from ProductDetail p where p.expiryDate = :expiryDate")
     List<ProductDetail> findByExpiryDate(LocalDate expiryDate);
@@ -54,11 +52,12 @@ public interface ProductDetailRepository extends BaseRepository<ProductDetail, L
             pd.color.name,
             pd.size.id,
             pd.size.name,
+            pd.status,
             SUM(COALESCE(pd.storageQty, 0)),
             SUM(COALESCE(pd.soldQty, 0)))
         FROM com.flowiee.pms.modules.inventory.entity.ProductDetail pd
         WHERE (coalesce(:productIds, -1) = -1 or pd.product.id in :productIds)
-        GROUP BY pd.id, pd.variantCode, pd.variantName, pd.product.id, pd.fabricType.id, pd.fabricType.name, pd.color.id, pd.color.name, pd.size.id, pd.size.name
+        GROUP BY pd.id, pd.variantCode, pd.variantName, pd.product.id, pd.fabricType.id, pd.fabricType.name, pd.color.id, pd.color.name, pd.size.id, pd.size.name, pd.status
     """)
     List<ProductSummaryInfoModel> findProductVariantInfo(@Param("productIds") List<Long> productIds);
 

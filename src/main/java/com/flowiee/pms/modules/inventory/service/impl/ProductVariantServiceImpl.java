@@ -80,7 +80,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
                                      ProductHistoryService pProductHistoryService,
                                      TransactionGoodsService pTransactionGoodsService, CategoryService pCategoryService,
                                      StorageService pStorageService, OrderCartRepository pCartRepository,
-                                     GenerateBarcodeService pGenerateBarcodeService, ProductPriceService pProductPriceService,
+                                     GenerateBarcodeService pGenerateBarcodeService, @Lazy ProductPriceService pProductPriceService,
                                      SystemLogService pSystemLogService, SendOperatorNotificationService pSendOperatorNotificationService,
                                      @Lazy ProductInfoService pProductInfoService, @Lazy CartService pCartService, @Lazy ProductImageService pProductImageService, ProductInfoService productInfoService) {
         super(ProductDetail.class, ProductVariantDTO.class, pEntityRepository);

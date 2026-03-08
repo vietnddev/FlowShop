@@ -3,6 +3,47 @@
 
 <div th:replace="~{header :: stylesheets(title='Products')}"></div>
 
+<style>
+    /* Thay đổi cách áp dụng border */
+    .product-row-active > td {
+        background: transparent;
+        /*transition: border 0.15s ease;*/
+    }
+
+    /* Border trên cho main row */
+    tr.product-row-active > td {
+        border-top: 2px solid #2a38db;
+    }
+
+    /* Border dưới cho sub row */
+    tr.expandable-body.product-row-active > td {
+        border-bottom: 2px solid #2a38db;
+    }
+
+    /* Giữ border giữa 2 row nhưng để màu mặc định */
+    tr.product-row-active:not(.expandable-body) > td {
+        border-bottom: 1px solid #dee2e6; /* Màu border mặc định của table */
+    }
+
+    tr.expandable-body.product-row-active > td {
+        border-top: 1px solid #dee2e6; /* Màu border mặc định của table */
+    }
+
+    /* Border trái/phải vẫn giữ màu vàng */
+    tr.product-row-active > td:first-child {
+        border-left: 2px solid #2a38db;
+    }
+
+    tr.product-row-active > td:last-child {
+        border-right: 2px solid #2a38db;
+    }
+
+    /* Override cho sub row bottom border */
+    tr.expandable-body.product-row-active > td {
+        border-bottom: 2px solid #2a38db !important;
+    }
+</style>
+
 <body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
     <div class="wrapper">
         <div th:replace="~{header :: header}"></div>
@@ -18,21 +59,8 @@
                             <div th:replace="~{fragments :: searchTool(${configSearchTool})}" id="searchTool"></div>
 
                             <div class="card">
-                                <div class="card-header">
-                                    <div class="row justify-content-between">
-                                        <div class="col-4" style="display: flex; align-items: center">
-                                            <h3 class="card-title"><strong class="text-uppercase">PRODUCTS</strong></h3>
-                                        </div>
-                                        <div class="col-6 text-right">
-                                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#import"><i class="fa-solid fa-cloud-arrow-up mr-2"></i>Import</button>
-                                            <a th:href="@{/api/v1/product/export}" class="btn btn-info btn-sm"><i class="fa-solid fa-cloud-arrow-down mr-2"></i>Export data</a>
-                                            <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#insert" id="createProduct"><i class="fa-solid fa-circle-plus mr-2"></i>Thêm mới</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- /.card-header -->
-                                <div class="card-body table-responsive p-0" style="height: 500px">
-                                    <table class="table table-head-fixed text-nowrap">
+                                <div class="card-body table-responsive p-0" style="height: 600px">
+                                    <table class="table table-head-fixed table-hover text-nowrap">
                                         <thead class="align-self-center">
                                             <tr class="align-self-center">
                                                 <th>STT</th>
@@ -40,12 +68,16 @@
                                                 <th th:text="#{inventory.product.list.table.header.product_name}">Product name</th>
                                                 <th>Brand</th>
                                                 <th>Type</th>
-                                                <th>Variants</th>
                                                 <th>Unit</th>
-                                                <th>Inventory qty</th>
-                                                <th>Sold qty</th>
+                                                <th>Stock</th>
+                                                <th>Reserved</th>
+                                                <th>Available</th>
+                                                <th>Sold</th>
                                                 <th>Status</th>
-                                                <th></th>
+                                                <th>
+                                                    <a th:href="@{/api/v1/product/export}" class="btn btn-sm btn-info"><i class="fa-solid fa-cloud-arrow-down mr-2"></i>Export</a>
+                                                    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#insert" id="createProduct"><i class="fa-solid fa-circle-plus mr-2"></i>New</button>
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody id="contentTable"></tbody>
@@ -165,6 +197,8 @@
 
                     <!--Modal create product -->
                     <div th:replace="~{pages/product/fragments/product-fragments :: createProductOriginal}"></div>
+                    <!--Modal view product history-->
+                    <div th:replace="~{pages/product/fragments/product-fragments :: productHistoryModal}"></div>
                     <!--Modal view storage history-->
                     <div th:replace="~{pages/product/fragments/product-fragments :: storageHistoryModal}"></div>
                     <!--Modal view product variant-->
@@ -182,6 +216,7 @@
 
         <div th:replace="~{header :: scripts}"></div>
         <script th:src="@{/js/product/Products.js}"></script>
+        <script th:src="@{/js/product/ProductHistory.js}"></script>
     </div>
 
     <script type="text/javascript">
@@ -202,6 +237,32 @@
                 let productStatusFilter = $('#productStatusFilter').val();
                 loadProducts($('#paginationInfo').attr("pageSize"), 1);
             })
+
+            $(document).on("click", "[data-widget='expandable-table']", function () {
+                let mainRow = $(this).closest("tr");
+                let subRow = mainRow.next(".expandable-body");
+                let productId = Number(mainRow.attr("productId"));
+
+                let tblVariants = subRow.find(".tblVariants");
+                let tblAttributes = subRow.find(".tblAttributes");
+
+                tblVariants.empty();
+                tblAttributes.empty();
+
+                $(this).toggleClass("rotate");
+
+                setTimeout(function () {
+                    if (mainRow.attr("aria-expanded") === "true") {
+                        mainRow.addClass("product-row-active");
+                        subRow.addClass("product-row-active");
+
+                        loadProductDetail(productId, tblVariants, tblAttributes);
+                    } else {
+                        mainRow.removeClass("product-row-active");
+                        subRow.removeClass("product-row-active");
+                    }
+                }, 50);
+            });
         });
 
         function loadProducts(pageSize, pageNum) {
@@ -233,77 +294,54 @@
                         });
 
                         let variantsBlock = '';
-                        $.each(p.variants, function (variantIndex, variantInfo) {
-                            variantsBlock +=
-                                `<tr class="row-variant-item" variantId="${variantInfo.id}">
-                                    <td>${variantIndex + 1}</td>
-                                    <td name="variantCode" style="color: #007bff; cursor: pointer">${variantInfo.variantCode}</td>
-                                    <td>${variantInfo.fabricType.name}</td>
-                                    <td>${variantInfo.color.name}</td>
-                                    <td>${variantInfo.size.name}</td>
-                                    <td class="text-right" name="colRetailPrice">${formatUSCurrency(variantInfo.price.retailPrice)}</td>
-                                    <td class="text-right" name="colCostPrice">${formatUSCurrency(variantInfo.price.costPrice)}</td>
-                                    <td class="text-right">${variantInfo.storageQty}</td>
-                                    <td class="text-right">${variantInfo.soldQty}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#popUpdatePrice" name="btnUpdatePrice" productId="${p.id}" productVariantId="${variantInfo.id}">
-                                            <i class="fa-solid fa-dollar-sign"></i>
-                                        </button>
-                                    </td>
-                                </tr>`;
-                        });
-
                         let attributesBlock = '';
-                        $.each(p.attributes, function (attributeIndex, attributeInfo) {
-                            attributesBlock +=
-                                `<tr class="row-attribute-item" attributeId="${attributeInfo.id}">
-                                    <td>${attributeIndex + 1}</td>
-                                    <td><input class="form-control" type="text" name="colAttributeName" value="${attributeInfo.attributeName}"/></td>
-                                    <td><input class="form-control" type="text" name="colAttributeValue" value="${attributeInfo.attributeValue}"/></td>
-                                    <td><input class="form-control" type="text" name="colSort" value="${attributeInfo.sort}"/></td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-info" name="btn-update-product-attribute" productId="${p.id}" productAttributeId="${attributeInfo.id}">
-                                            <i class="fa-solid fa-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>`;
-                        });
 
-                        let lvImageStyle = `width: 30px; height: 30px; border-radius: 3px`;
-                        let lvImageBlock = `<img src="/media/default/product" style="${lvImageStyle}">`;
-                        if (p.imageActive != null) {
-                            lvImageBlock = `<a href="${p.imageActive}" data-toggle="lightbox" data-title="${p.productName}" data-gallery="gallery">
-                                                <img src="${p.imageActive}" class="img-fluid" alt="white sample" style="${lvImageStyle}">
-                                            </a>`
-                        }
+                        let lvImageBlock = getImageBlock(p.imageActive, p.productName);
+                        let lvImageBlockDetail = getImageBlock(p.imageActive, p.productName, true);
 
                         contentTable.append(`
-                            <tr aria-expanded="false">
-                                <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>
-                                <td class="text-center">${lvImageBlock}</td>
-                                <td><a href="/san-pham/${p.id}">${p.productName}</a></td>
-                                <td>${p.brand.name}</td>
-                                <td>${p.productTypeName}</td>
-                                <td class="text-right">${p.variants.length} <i class="fa-solid fa-caret-down ml-1" data-widget="expandable-table"></i></td>
-                                <td>${p.unitName}</td>
-                                <td class="text-right">${p.totalStorageQty}</td>
-                                <td class="text-right">${p.totalSoldQty}</td>
-                                <td>${p.statusCode === 'ACT' ? `<span class="badge badge-primary">${p.statusName}</span>` : `${p.statusName}`}</td>
+                            <tr aria-expanded="false" productId="${p.id}">
+                                <td data-widget="expandable-table">${(((pageNum - 1) * pageSize + 1) + index)}</td>
+                                <td data-widget="expandable-table" class="text-center">${lvImageBlock}</td>
+                                <td data-widget="expandable-table">${p.productName}</td>
+                                <td data-widget="expandable-table">${p.brand.name}</td>
+                                <td data-widget="expandable-table">${p.productTypeName}</td>
+                                <td data-widget="expandable-table">${p.unitName}</td>
+                                <td data-widget="expandable-table" class="text-right">${p.totalStorageQty}</td>
+                                <td data-widget="expandable-table" class="text-right">${p.reservedQty}</td>
+                                <td data-widget="expandable-table" class="text-right">${p.availableQty}</td>
+                                <td data-widget="expandable-table" class="text-right">${p.totalSoldQty}</td>
+                                <td data-widget="expandable-table">${p.statusCode === 'ACT' ? `<span class="badge badge-primary">${p.statusName}</span>` : `${p.statusName}`}</td>
                                 <td>
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popProductDetail"  name="btnViewDetail"         productId="${p.id}">
                                         <i class="fa-solid fa-circle-info"></i></i>
                                     </button>
+                                    <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popProductHistory" name="btnViewProductHistory" productId="${p.id}" title="View product history">
+                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                    </button>
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popStorageHistory" name="btnViewStorageHistory" productId="${p.id}">
                                         <i class="fa-solid fa-warehouse"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#popDeleteProduct"     name="btnDeleteProduct"      productId="${p.id}">
+                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#popDeleteProduct"     name="btnDeleteProduct"      productId="${p.id}" title="Delete">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
                             <tr class="expandable-body d-none">
-                                <td colspan="11">
-                                    <div class="card-header p-0 pt-1 border-bottom-0" style="margin-left: 6px">
+                                <td colspan="3">
+                                    <div class="card-body pl-2 pt-2">
+                                        <dl class="row">
+                                            <dt class="col-sm-12 text-center">${lvImageBlockDetail}</dt>
+                                            <dt class="col-sm-12 text-center"><a href="/san-pham/${p.id}">${p.productName}</a></dt>
+                                            <dt class="col-sm-4 mb-0">Created at</dt>
+                                            <dd class="col-sm-8 mb-0">${p.createdAt}</dd>
+                                            <dt class="col-sm-4 mb-0">Created by</dt>
+                                            <dd class="col-sm-8 mb-0">${p.createdBy}</dd>
+                                        </dl>
+                                    </div>
+                                </td>
+                                <td colspan="9">
+                                    <div class="card-header p-0 pt-1 border-bottom-0">
                                         <ul class="nav nav-tabs" id="custom-tabs-${p.id}" role="tablist">
                                             <li class="nav-item">
                                                 <a class="nav-link font-weight-bold active" id="custom-tabs-variant-tab-${p.id}"
@@ -321,13 +359,13 @@
                                                 <table class="table table-bordered" style="margin: 6px auto">
                                                     <thead>
                                                         <tr>
-                                                            <th>No.</th><th>Code</th><th>Fabric</th><th>Color</th><th>Size</th><th>Retail price</th><th>Cost price</th><th>Inventory Qty</th><th>Sold Qty</th>
+                                                            <th>Code</th><th>Fabric</th><th>Color</th><th>Size</th><th>Price</th><th>Cost</th><th>Stock</th><th>Reserved</th><th>Available</th><th>Sold</th>
                                                             <th>
                                                                 <button type="button" class="btn btn-sm btn-success" name="btn-create-product-variant" productId="${p.id}"><i class="fa-solid fa-circle-plus"></i></button>
                                                             </th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
+                                                    <tbody class="tblVariants">
                                                         ${variantsBlock}
                                                     </tbody>
                                                 </table>
@@ -336,13 +374,13 @@
                                                 <table class="table table-bordered" style="margin: 6px auto">
                                                     <thead>
                                                         <tr>
-                                                            <th>No.</th><th>Attribute name</th><th>Value</th><th>Order displayed</th>
+                                                            <th>No.</th><th>Attribute name</th><th>Value</th><th>Order displayed</th><th>Status</th>
                                                             <th>
                                                                 <button type="button" class="btn btn-sm btn-success" name="btn-create-product-attribute" productId="${p.id}"><i class="fa-solid fa-circle-plus"></i></button>
                                                             </th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
+                                                    <tbody class="tblAttributes">
                                                         ${attributesBlock}
                                                     </tbody>
                                                 </table>
@@ -357,6 +395,70 @@
             }).fail(function () {
                 showErrorModal("Could not connect to the server");//nếu ko gọi xuống được controller thì báo lỗi
             });
+        }
+
+        function loadProductDetail(productId, tblVariants, tblAttributes) {
+            let apiURL = mvHostURLCallApi + '/product/' + productId;
+            $.get(apiURL, function (response) {
+                if (response.status === "OK") {
+                    let product = response.data;
+
+                    $.each(product.variants, function (variantIndex, variantInfo) {
+                        tblVariants.append(
+                            `<tr class="row-variant-item" variantId="${variantInfo.id}">
+                                <td name="variantCode" style="color: #007bff; cursor: pointer">${(variantIndex + 1) + '. '} ${variantInfo.variantCode}</td>
+                                <td>${variantInfo.fabricType.name}</td>
+                                <td>${variantInfo.color.name}</td>
+                                <td>${variantInfo.size.name}</td>
+                                <td class="text-right" name="colRetailPrice">${formatUSCurrency(variantInfo.price.retailPrice)}</td>
+                                <td class="text-right" name="colCostPrice">${formatUSCurrency(variantInfo.price.costPrice)}</td>
+                                <td class="text-right">${variantInfo.storageQty}</td>
+                                <td class="text-right">${variantInfo.reservedQty}</td>
+                                <td class="text-right">${variantInfo.availableQty}</td>
+                                <td class="text-right">${variantInfo.soldQty}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#popUpdatePrice" name="btnUpdatePrice" productId="${product.id}" productVariantId="${variantInfo.id}">
+                                        <i class="fa-solid fa-dollar-sign"></i>
+                                    </button>
+                                </td>
+                            </tr>`
+                        );
+                    });
+
+                    $.each(product.attributes, function (attributeIndex, attributeInfo) {
+                        tblAttributes.append(
+                            `<tr class="row-attribute-item" attributeId="${attributeInfo.id}">
+                                <td>${attributeIndex + 1}</td>
+                                <td><input class="form-control" type="text" name="colAttributeName" value="${attributeInfo.attributeName}"/></td>
+                                <td><input class="form-control" type="text" name="colAttributeValue" value="${attributeInfo.attributeValue}"/></td>
+                                <td><input class="form-control" type="text" name="colSort" value="${attributeInfo.sort}"/></td>
+                                <td><input class="form-control" type="text" name="colSort" value="${attributeInfo.status == true ? 'Active' : 'Inactive'}"/></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-info" name="btn-update-product-attribute" productId="${product.id}" productAttributeId="${attributeInfo.id}">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>`
+                        );
+                    });
+                }
+            }).fail(function (xhr) {
+                showErrorModal($.parseJSON(xhr.responseText).message);
+            });
+        }
+
+        function getImageBlock(imageUrl, productName, isDetail = false) {
+            const size = isDetail ? 60 : 30;
+            const style = `width: ${size}px; height: ${size}px; border-radius: 3px`;
+            const defaultImg = "/media/default/product";
+
+            if (!imageUrl) {
+                return `<img src="${defaultImg}" style="${style}">`;
+            }
+
+            return `<a href="${imageUrl}" data-toggle="lightbox" data-title="${productName}" data-gallery="gallery">
+                        <img src="${imageUrl}" class="img-fluid" alt="${productName}" style="${style}">
+                    </a>`;
         }
 
         function loadCategory() {
@@ -474,15 +576,6 @@
                 }
             });
         }
-
-        $(function () {
-            $(document).on('click', '[data-toggle="lightbox"]', function (event) {
-                event.preventDefault();
-                $(this).ekkoLightbox({
-                    alwaysShowClose: true
-                });
-            });
-        });
     </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.util;
 
+import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.modules.inventory.entity.Product;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
@@ -75,7 +76,7 @@ public class ProductVariantConvert {
 
         dto.setUnitCurrency(null);
         dto.setDefectiveQty(pInput.getDefectiveQty());
-        dto.setAvailableSalesQty((dto.getStorageQty() != null && dto.getDefectiveQty() != null) ? dto.getStorageQty() - dto.getDefectiveQty(): -1);
+        dto.setAvailableSalesQty(dto.getStorageQty() - CoreUtils.coalesce(dto.getReservedQty(), 0) - CoreUtils.coalesce(dto.getDefectiveQty(), 0));
         dto.setWeight(pInput.getWeight());
         dto.setNote(pInput.getNote());
         dto.setStatus(pInput.getStatus());

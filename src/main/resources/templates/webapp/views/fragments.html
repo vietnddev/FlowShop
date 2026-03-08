@@ -83,29 +83,29 @@
         </div>
 
         <div th:fragment="searchTool(configSearch)" th:remove="tag">
-            <div class="row col-10 input-group mb-2">
+            <div class="row col-10 input-group input-group-sm mb-2">
                 <input class="form-control col-8 mr-1" id="txtFilter"/>
-                <a class="btn btn-outline-secondary col-2 mr-1" data-toggle="collapse" href="#collapseExample" id="btnOpenSearchAdvance"
+                <a class="btn btn-sm btn-outline-secondary col-2 mr-1" data-toggle="collapse" href="#collapseExample" id="btnOpenSearchAdvance"
                    role="button" aria-expanded="false" aria-controls="collapseExample" th:if="${configSearch.enableFilter == true}"><i class="fa-solid fa-caret-down mr-2"></i>Nâng cao</a>
                 <button class="btn btn-info form-control col-2" id="btnSearch"><i class="fa-solid fa-magnifying-glass mr-2"></i>Tìm kiếm</button>
             </div>
             <div class="row col-12 collapse w-100 mt-2 mb-2" id="collapseExample">
                 <th:block th:if="${configSearch.filters != null}">
-                    <select class="form-control custom-select search-selection col mr-1" id="brandFilter"         th:entity="BRAND"          th:if="${configSearch.filters.contains('BRAND')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="productTypeFilter"   th:entity="PRODUCT_TYPE"   th:if="${configSearch.filters.contains('PRODUCT_TYPE')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="colorFilter"         th:entity="COLOR"          th:if="${configSearch.filters.contains('COLOR')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="sizeFilter"          th:entity="SIZE"           th:if="${configSearch.filters.contains('SIZE')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="unitFilter"          th:entity="UNIT"           th:if="${configSearch.filters.contains('UNIT')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="groupCustomerFilter" th:entity="GROUP_CUSTOMER" th:if="${configSearch.filters.contains('GROUP_CUSTOMER')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="shipMethodFilter"    th:entity="SHIP_METHOD"    th:if="${configSearch.filters.contains('SHIP_METHOD')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="orderTypeFilter"     th:entity="ORDERTYPE"      th:if="${configSearch.filters.contains('ORDERTYPE')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="paymentStatusFilter" th:entity="PAYMENT_STATUS" th:if="${configSearch.filters.contains('PAYMENT_STATUS')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="orderStatusFilter"   th:entity="ORDER_STATUS"   th:if="${configSearch.filters.contains('ORDER_STATUS')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="salesChannelFilter"  th:entity="SALES_CHANNEL"  th:if="${configSearch.filters.contains('SALES_CHANNEL')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="paymentMethodFilter" th:entity="PAYMENT_METHOD" th:if="${configSearch.filters.contains('PAYMENT_METHOD')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="branchFilter"        th:entity="BRANCH"         th:if="${configSearch.filters.contains('BRANCH')}"></select>
-                    <select class="form-control custom-select search-selection col mr-1" id="productStatusFilter" th:entity="PRODUCT_STATUS" th:if="${configSearch.filters.contains('PRODUCT_STATUS')}"></select>
-                    <select class="form-control custom-select search-selection col"      id="dateFilter"          th:entity="DATE_FILTER"    th:if="${configSearch.filters.contains('DATE_FILTER')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="brandFilter"         th:entity="BRAND"          th:if="${configSearch.filters.contains('BRAND')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="productTypeFilter"   th:entity="PRODUCT_TYPE"   th:if="${configSearch.filters.contains('PRODUCT_TYPE')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="colorFilter"         th:entity="COLOR"          th:if="${configSearch.filters.contains('COLOR')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="sizeFilter"          th:entity="SIZE"           th:if="${configSearch.filters.contains('SIZE')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="unitFilter"          th:entity="UNIT"           th:if="${configSearch.filters.contains('UNIT')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="groupCustomerFilter" th:entity="GROUP_CUSTOMER" th:if="${configSearch.filters.contains('GROUP_CUSTOMER')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="shipMethodFilter"    th:entity="SHIP_METHOD"    th:if="${configSearch.filters.contains('SHIP_METHOD')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="orderTypeFilter"     th:entity="ORDERTYPE"      th:if="${configSearch.filters.contains('ORDERTYPE')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="paymentStatusFilter" th:entity="PAYMENT_STATUS" th:if="${configSearch.filters.contains('PAYMENT_STATUS')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="orderStatusFilter"   th:entity="ORDER_STATUS"   th:if="${configSearch.filters.contains('ORDER_STATUS')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="salesChannelFilter"  th:entity="SALES_CHANNEL"  th:if="${configSearch.filters.contains('SALES_CHANNEL')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="paymentMethodFilter" th:entity="PAYMENT_METHOD" th:if="${configSearch.filters.contains('PAYMENT_METHOD')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="branchFilter"        th:entity="BRANCH"         th:if="${configSearch.filters.contains('BRANCH')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col mr-1" id="productStatusFilter" th:entity="PRODUCT_STATUS" th:if="${configSearch.filters.contains('PRODUCT_STATUS')}"></select>
+                    <select class="custom-select custom-select-sm search-selection col"      id="dateFilter"          th:entity="DATE_FILTER"    th:if="${configSearch.filters.contains('DATE_FILTER')}"></select>
                 </th:block>
             </div>
         </div>

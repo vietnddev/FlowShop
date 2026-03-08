@@ -173,10 +173,6 @@ public class ProductDetail extends BaseEntity implements Serializable {
 //    @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
 //    List<TransactionGoodsItem> transactionGoodsItemList;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
-    List<ProductPriceHistory> productPriceHistoryList;
-
     @Transient
     Integer availableSalesQty;
 

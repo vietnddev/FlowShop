@@ -18,7 +18,6 @@ public enum CATEGORY {
     DOCUMENT_TYPE("document-type", "DOCUMENT_TYPE", "Loại tài liệu"),
     SALES_CHANNEL("sales-channel", "SALES_CHANNEL", "Kênh bán hàng"),
     SHIP_METHOD("ship-method", "SHIP_METHOD", "Hình thức vận chuyển"),
-    ORDER_STATUS("order-status", "ORDER_STATUS", "Trạng thái đơn hàng"),
     GROUP_CUSTOMER("group-customer", "GROUP_CUSTOMER", "Nhóm khách hàng"),
     GROUP_OBJECT("group-object", "GROUP_OBJECT", "Nhóm đối tượng/ đối tác"),
     PAYMENT_METHOD("payment-method", "PAYMENT_METHOD", "Hình thức thanh toán"),

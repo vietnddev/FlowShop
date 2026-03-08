@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.inventory.dto;
 
 import com.flowiee.pms.common.base.dto.BaseDTO;
-import com.flowiee.pms.common.enumeration.ProductStatus;
 import com.flowiee.pms.modules.system.dto.CategoryDTO;
 import com.flowiee.pms.modules.sales.dto.VoucherInfoDTO;
 import com.flowiee.pms.modules.sales.dto.GarmentFactoryDTO;
@@ -21,8 +20,6 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDTO extends BaseDTO implements Serializable {
-    static final long serialVersionUID = 1L;
-
     String productCategory;
     CategoryDTO productType;
     CategoryDTO brand;
@@ -49,19 +46,17 @@ public class ProductDTO extends BaseDTO implements Serializable {
     Long supplierId;
     String supplierName;
     String imageActive;
-    Integer totalQtySell;
-    Integer totalQtyStorage;
-    Integer totalDefective;
-    Integer totalQtyAvailableSales;
-    Integer productVariantQty;
+    Integer defectiveQty = 0;
+    Integer reservedQty = 0;
+    Integer availableQty = 0;
     Integer soldQty;
     String description;
     String statusCode;
     String statusName;
     List<VoucherInfoDTO> listVoucherInfoApply;
 
-    Long totalSoldQty;
-    Long totalStorageQty;
+    Integer totalSoldQty = 0;
+    Integer totalStorageQty = 0;
     List<ProductVariantDTO> variants;
     List<ProductAttributeDTO> attributes;
 
@@ -71,17 +66,13 @@ public class ProductDTO extends BaseDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("ProductDTO [");
-		builder.append(", productTypeId=").append(productTypeId);
-		builder.append(", brandId=").append(brandId);
-		builder.append(", unitId=").append(unitId);
-		//builder.append(", status=").append(getStatus());
-		builder.append(", productVariantQty=").append(productVariantQty);
-		builder.append(", soldQty=").append(soldQty);
-		builder.append(", createdAt=").append(getCreatedAt());
-		builder.append(", createdByName=").append(getCreatedBy());
-		builder.append("]");
-		return builder.toString();
-	}        
+		return "ProductDTO [" +
+                ", productTypeId=" + productTypeId +
+                ", brandId=" + brandId +
+                ", unitId=" + unitId +
+                ", soldQty=" + soldQty +
+                ", createdAt=" + getCreatedAt() +
+                ", createdByName=" + getCreatedBy() +
+                "]";
+	}
 }

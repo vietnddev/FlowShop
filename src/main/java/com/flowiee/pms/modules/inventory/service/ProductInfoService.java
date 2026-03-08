@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.inventory.service;
 
 import com.flowiee.pms.modules.inventory.entity.ProductDescription;
-import com.flowiee.pms.modules.inventory.model.ProductHeld;
 import com.flowiee.pms.common.base.service.ICurdService;
 import com.flowiee.pms.modules.inventory.dto.ProductDTO;
 import com.flowiee.pms.modules.inventory.entity.Product;
@@ -17,11 +16,7 @@ public interface ProductInfoService extends ICurdService<ProductDTO> {
 
     List<Product> findProductsIdAndProductName();
 
-    boolean productInUse(Long productId);
-
-    List<ProductHeld> getProductHeldInUnfulfilledOrder();
-
-    List<ProductDTO> getDiscontinuedProducts();
-
     ProductDescription findDescription(Long pProductId);
+
+    String updateDescription(Long pProductId, String pDescription);
 }

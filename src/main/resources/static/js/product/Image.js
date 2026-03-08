@@ -54,28 +54,8 @@ function activeImage() {
     })
 }
 
-function loadImageInfoOnForm(subImage) {
-    $(document).on("click", ".sub-image", function () {
-        subImage = mvImagesOfProduct[$(this).attr("imageId")];
-        $("#imageNameField").val(subImage.name);
-        $("#imageSizeField").val(subImage.size);
-        $("#imageOriginalNameField").val(subImage.originalName);
-        $("#imageUploadByField").val(subImage.uploadByStr);
-        $("#imageUploadAtField").val(subImage.uploadAt);
-        $("#imageStatusField").val(subImage.isActive);
-    })
-    if (subImage != null) {
-        $("#imageNameField").val(subImage.name);
-        $("#imageSizeField").val(subImage.size);
-        $("#imageOriginalNameField").val(subImage.originalName);
-        $("#imageUploadByField").val(subImage.uploadByStr);
-        $("#imageUploadAtField").val(subImage.uploadAt);
-        $("#imageStatusField").val(subImage.isActive);
-    }
-}
-
 function loadImagesOfProduct() {
-    $("#custom-tabs-three-images-tab").on("click", function () {
+    $("#custom-tabs-two-images-tab").on("click", function () {
         let apiURL = mvHostURLCallApi + '/product/' + mvProductId + '/images';
         $.get(apiURL, function (response) {
             if (response.status === "OK") {

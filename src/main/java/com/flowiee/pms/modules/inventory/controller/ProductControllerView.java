@@ -3,12 +3,10 @@ package com.flowiee.pms.modules.inventory.controller;
 import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.modules.inventory.entity.ProductDescription;
 import com.flowiee.pms.modules.inventory.service.*;
-import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.system.model.EximResult;
 import com.flowiee.pms.modules.inventory.dto.ProductAttributeDTO;
 import com.flowiee.pms.modules.inventory.dto.ProductDTO;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
-import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.system.service.ExportService;
 
 import com.flowiee.pms.common.enumeration.CATEGORY;
@@ -64,25 +62,6 @@ public class ProductControllerView extends BaseController {
         return baseView(modelAndView);
     }
 
-    @GetMapping(value = "/variant/{id}")
-    @PreAuthorize("@vldModuleProduct.readProduct(true)")
-    public ModelAndView viewDetailProduct(@PathVariable("id") Long variantId) {
-        ProductVariantDTO productVariant = mvProductVariantService.findById(variantId, true);
-
-        ModelAndView modelAndView = new ModelAndView(Pages.PRO_PRODUCT_VARIANT.getTemplate());
-        modelAndView.addObject("listAttributes", mvProductAttributeService.findAll(-1, -1, variantId).getContent());
-        modelAndView.addObject("bienTheSanPhamId", variantId);
-        modelAndView.addObject("bienTheSanPham", productVariant);
-        modelAndView.addObject("listImageOfSanPhamBienThe", mvProductImageService.getImageOfProductVariant(variantId));
-        //FileStorage imageActive = productVariant.getActiveImage();
-        FileStorage imageActive = mvProductImageService.findImageActiveOfProductVariant(variantId);
-        if (imageActive == null) {
-            imageActive = new FileStorage();
-        }
-        modelAndView.addObject("imageActive", imageActive);        
-        return baseView(modelAndView);
-    }
-
     @PostMapping("/attribute/insert")
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
     public ModelAndView insertProductAttribute(HttpServletRequest request, @ModelAttribute("thuocTinhSanPham") ProductAttributeDTO productAttribute) {
@@ -134,13 +113,5 @@ public class ProductControllerView extends BaseController {
             model = exportService.exportToExcel(TemplateExport.EX_LIST_OF_PRODUCTS, null, false);
         }
         return ResponseEntity.ok().headers(model.getHttpHeaders()).body(model.getContent());
-    }
-
-    @GetMapping(value = "/held")
-    @PreAuthorize("@vldModuleProduct.readProduct(true)")
-    public ModelAndView viewProductHeld() {
-        ModelAndView modelAndView = new ModelAndView(Pages.PRO_PRODUCT_HELD.getTemplate());
-        modelAndView.addObject("productHeldList", mvProductInfoService.getProductHeldInUnfulfilledOrder());
-        return baseView(modelAndView);
     }
 }

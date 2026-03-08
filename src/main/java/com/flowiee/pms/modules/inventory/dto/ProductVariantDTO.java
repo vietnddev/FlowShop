@@ -27,9 +27,11 @@ public class ProductVariantDTO extends BaseDTO implements Serializable {
     CategoryDTO color;
     CategoryDTO size;
     CategoryDTO fabricType;
-    Integer storageQty;
-    Integer soldQty;
-    Integer defectiveQty;
+    Integer storageQty = 0;
+    Integer reservedQty = 0;
+    Integer availableQty = 0;
+    Integer soldQty = 0;
+    Integer defectiveQty = 0;
     String weight;
     String dimensions;
     String sku;

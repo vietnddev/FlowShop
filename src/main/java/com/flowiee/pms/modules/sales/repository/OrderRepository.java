@@ -90,4 +90,20 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
     @Modifying
     @Query("update Order o set o.loyaltyTransaction = :loyaltyTransaction where o.id = :orderId")
     void updateLoyaltyTransaction(@Param("orderId") Long orderId, @Param("loyaltyTransaction") LoyaltyTransaction loyaltyTransaction);
+
+    @Query("""
+        select coalesce(sum(od.quantity),0)
+        from OrderDetail od
+        where od.productDetail.id = :variantId
+            and od.order.orderStatus in :statuses
+       """)
+    int getReservedQtyByVariantId(Long variantId, List<OrderStatus> statuses);
+
+    @Query("""
+        select coalesce(sum(od.quantity),0)
+        from OrderDetail od
+        where od.productDetail.product.id = :productId
+            and od.order.orderStatus in :statuses
+       """)
+    int getReservedQtyByProductId(Long productId, List<OrderStatus> statuses);
 }

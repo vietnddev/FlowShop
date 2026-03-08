@@ -21,6 +21,7 @@ import com.flowiee.pms.modules.system.service.CategoryService;
 import com.flowiee.pms.modules.system.service.ConfigService;
 import com.flowiee.pms.modules.system.service.LanguageService;
 import com.flowiee.pms.modules.system.service.SystemLogService;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Log4j2
 @Service
 public class ConfigServiceImpl extends BaseService<SystemConfig, SystemConfigDTO, ConfigRepository> implements ConfigService {
     private final CategoryService mvCategoryService;
@@ -117,19 +119,12 @@ public class ConfigServiceImpl extends BaseService<SystemConfig, SystemConfigDTO
             //Root category's label
             List<Category> rootCategories = mvCategoryService.findRootCategory();
             for (Category c : rootCategories) {
-                if (c.getType() != null && !c.getType().trim().isEmpty()) {
-                    CATEGORY.valueOf(c.getType()).setLabel(c.getName());
-                }
-            }
-
-            //Reload order status
-            List<Category> lvOrderStatusList = mvCategoryService.findOrderStatus(null);
-            for (Category lvCategory : lvOrderStatusList) {
-                if (Category.ROOT_LEVEL.equals(lvCategory.getCode()))
-                    continue;
-                OrderStatus lvOrderStatus = OrderStatus.get(lvCategory.getCode());
-                if (lvOrderStatus != null) {
-                    lvOrderStatus.setDescription(lvCategory.getNote());
+                try {
+                    if (c.getType() != null && !c.getType().trim().isEmpty()) {
+                        CATEGORY.valueOf(c.getType()).setLabel(c.getName());
+                    }
+                } catch (IllegalArgumentException e) {
+                    log.warn(e);
                 }
             }
 
@@ -174,7 +169,6 @@ public class ConfigServiceImpl extends BaseService<SystemConfig, SystemConfigDTO
     private void reloadCategoryLabel() {
         List<String> lvCategoryTypeList = new ArrayList<>();
         lvCategoryTypeList.add(CATEGORY.PRODUCT_STATUS.getName());
-        lvCategoryTypeList.add(CATEGORY.ORDER_STATUS.getName());
 
         List<Category> lvCategoryList = mvCategoryRepository.findSubCategory(lvCategoryTypeList);
         if (lvCategoryList == null) {
@@ -192,11 +186,7 @@ public class ConfigServiceImpl extends BaseService<SystemConfig, SystemConfigDTO
                             lvPS.setLabel(lvLabel);
                     }
                     break;
-                case ORDER_STATUS:
-                    for (OrderStatus lvOS : OrderStatus.values()) {
-                        if (lvOS.name().equals(lvCode))
-                            lvOS.setDescription(lvLabel);
-                    }
+                default:
                     break;
             }
         }

@@ -2,10 +2,8 @@ package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.enumeration.CATEGORY;
-import com.flowiee.pms.modules.sales.entity.Items;
 import com.flowiee.pms.modules.sales.entity.OrderCart;
 import com.flowiee.pms.common.exception.BadRequestException;
-import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.sales.model.CartItemModel;
 import com.flowiee.pms.modules.system.service.CategoryService;
@@ -47,12 +45,7 @@ public class CartControllerView extends BaseController {
         modelAndView.addObject("listSalesChannel", mvCategoryService.findByType(CATEGORY.SALES_CHANNEL));
         modelAndView.addObject("listPaymentMethod", mvCategoryService.findByType(CATEGORY.PAYMENT_METHOD));
         modelAndView.addObject("listDeliveryType", mvCategoryService.findByType(CATEGORY.SHIP_METHOD));
-        modelAndView.addObject("listOrderStatus", mvCategoryService.findOrderStatus(null));
         modelAndView.addObject("orderStatusMap", OrderStatus.getAllMap(null));
-
-        //double totalAmountWithoutDiscount = mvCartService.calTotalAmountWithoutDiscount(listOrderCart.get(0).getId());
-        //double amountDiscount = 0;
-        //double totalAmountDiscount = totalAmountWithoutDiscount - amountDiscount;
         modelAndView.addObject("totalAmountWithoutDiscount", 0);
         modelAndView.addObject("totalAmountDiscount", 0);
         return baseView(modelAndView);

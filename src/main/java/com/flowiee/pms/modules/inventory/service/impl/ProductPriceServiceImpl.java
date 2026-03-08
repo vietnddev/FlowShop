@@ -9,9 +9,12 @@ import com.flowiee.pms.modules.inventory.dto.ProductPriceDTO;
 import com.flowiee.pms.modules.inventory.entity.ProductPriceHistory;
 import com.flowiee.pms.modules.inventory.enums.PriceChangeType;
 import com.flowiee.pms.modules.inventory.enums.PriceType;
+import com.flowiee.pms.modules.inventory.repository.ProductPriceHistoryRepository;
 import com.flowiee.pms.modules.inventory.repository.ProductPriceRepository;
 import com.flowiee.pms.modules.inventory.service.ProductPriceService;
+import com.flowiee.pms.modules.inventory.service.ProductVariantService;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +25,14 @@ import java.util.List;
 
 @Service
 public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPriceDTO, ProductPriceRepository> implements ProductPriceService {
-    public ProductPriceServiceImpl(ProductPriceRepository pEntityRepository) {
+    private final ProductVariantService mvProductVariantService;
+    private final ProductPriceHistoryRepository mvProductPriceHistoryRepository;
+
+    public ProductPriceServiceImpl(ProductPriceRepository pEntityRepository, @Lazy ProductVariantService pProductVariantService,
+                                   ProductPriceHistoryRepository pProductPriceHistoryRepository) {
         super(ProductPrice.class, ProductPriceDTO.class, pEntityRepository);
+        this.mvProductVariantService = pProductVariantService;
+        this.mvProductPriceHistoryRepository = pProductPriceHistoryRepository;
     }
 
     @Override
@@ -71,6 +80,13 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
 
     @Transactional
     @Override
+    public ProductPriceDTO updatePrice(Long pProductVariantId, ProductPriceDTO pRequestPrice) {
+        ProductDetail lvProductVariant = mvProductVariantService.findEntById(pProductVariantId, true);
+        return this.updatePrice(lvProductVariant, pRequestPrice);
+    }
+
+    @Transactional
+    @Override
     public ProductPriceDTO updatePrice(ProductDetail pProductVariant, ProductPriceDTO pRequestPrice) {
         ProductPriceDTO lvPriceUpdated = new ProductPriceDTO();
 
@@ -82,6 +98,16 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
                     mvEntityRepository.save(lvCPrice);
 
                     this.save(pProductVariant, pRequestPrice);
+
+                    mvProductPriceHistoryRepository.save(ProductPriceHistory.builder()
+                            .productPrice(lvCPrice)
+                            .changeType(PriceChangeType.MANUAL)
+                            .oldPrice(lvCPrice.getPriceValue())
+                            .newPrice(pRequestPrice.getRetailPrice())
+                            .changeTime(LocalDateTime.now())
+                            .changedBy(getUserPrincipal().getEntity())
+                            .reason("-")
+                            .build());
                 }
             }
             lvPriceUpdated = new ProductPriceDTO();
@@ -91,21 +117,6 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
         } else {
             lvPriceUpdated = extractPrice(this.save(pProductVariant, pRequestPrice));
         }
-
-
-        ProductPriceHistory history = new ProductPriceHistory();
-        //history.setProductPrice(price);
-        history.setChangeType(PriceChangeType.MANUAL);
-        //history.setOldValue(price.getRetailPrice());
-        //history.setNewValue(newPrice);
-        //history.setChangedBy(changer);
-        history.setChangeTime(LocalDateTime.now());
-        //history.setReason(reason);
-        //historyRepo.save(history);
-
-        // Cập nhật giá mới
-        //price.setRetailPrice(newPrice);
-        //priceRepo.save(price);
 
         return lvPriceUpdated;
     }

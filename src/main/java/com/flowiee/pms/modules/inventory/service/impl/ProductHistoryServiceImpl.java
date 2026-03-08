@@ -1,13 +1,11 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.model.BaseParameter;
-import com.flowiee.pms.modules.inventory.entity.Product;
-import com.flowiee.pms.modules.inventory.entity.ProductAttribute;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
-import com.flowiee.pms.modules.inventory.entity.ProductHistory;
+import com.flowiee.pms.modules.inventory.entity.*;
 import com.flowiee.pms.modules.inventory.dto.ProductHistoryDTO;
 import com.flowiee.pms.modules.inventory.repository.ProductHistoryRepository;
 import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.modules.inventory.repository.ProductPriceHistoryRepository;
 import com.flowiee.pms.modules.inventory.service.ProductHistoryService;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -15,15 +13,18 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductHistoryServiceImpl extends BaseService<ProductHistory, ProductHistoryDTO, ProductHistoryRepository> implements ProductHistoryService {
+    private final ProductPriceHistoryRepository mvProductPriceHistoryRepository;
 
-    public ProductHistoryServiceImpl(ProductHistoryRepository pProductHistoryRepository) {
+    public ProductHistoryServiceImpl(ProductHistoryRepository pProductHistoryRepository, ProductPriceHistoryRepository pProductPriceHistoryRepository) {
         super(ProductHistory.class, ProductHistoryDTO.class, pProductHistoryRepository);
+        this.mvProductPriceHistoryRepository= pProductPriceHistoryRepository;
     }
 
     @Override
@@ -60,21 +61,30 @@ public class ProductHistoryServiceImpl extends BaseService<ProductHistory, Produ
 
     @Override
     public List<ProductHistory> findByProduct(Long productId) {
-        return mvEntityRepository.findByProductId(productId);
+        List<ProductHistory> histories = new ArrayList<>();
+        histories.addAll(mvEntityRepository.findByProductId(productId));
+        histories.addAll(mvProductPriceHistoryRepository.findByProductId(productId)
+                        .stream()
+                        .map(this::mapToProductHistory)
+                        .toList());
+        return histories.stream()
+                .sorted(Comparator.comparing(ProductHistory::getCreatedAt).reversed())
+                .toList();
     }
 
-    @Override
-    public List<ProductHistory> findPriceChange(Long productDetailId) {
-        List<ProductHistory> prices =  mvEntityRepository.findHistoryChangeOfProductDetail(productDetailId, "PRICE");
-        for (ProductHistory priceChange : prices) {
-            if (priceChange.getProduct() != null) {
-                priceChange.setProductId(priceChange.getProduct().getId());
-                if (priceChange.getProductDetail() != null) {
-                    priceChange.setProductVariantId(priceChange.getProductDetail().getId());
-                }
-            }
-        }
-        return prices;
+    private ProductHistory mapToProductHistory(ProductPriceHistory pph) {
+        ProductPrice price = pph.getProductPrice();
+
+        ProductHistory history = new ProductHistory();
+        history.setProductVariantId(price.getProductVariant().getId());
+        history.setTitle(price.getPriceType().getDescription());
+        history.setField(price.getPriceType().name());
+        history.setOldValue(pph.getOldPrice().toPlainString());
+        history.setNewValue(pph.getNewPrice().toPlainString());
+        history.setCreatedBy(pph.getChangedBy() != null ? pph.getChangedBy().getId() : -1);
+        history.setCreatedAt(pph.getChangeTime());
+
+        return history;
     }
 
     @Override

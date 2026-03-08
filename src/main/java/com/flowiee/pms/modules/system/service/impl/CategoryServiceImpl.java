@@ -150,11 +150,6 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
     }
 
     @Override
-    public List<Category> findOrderStatus(Long ignoreId) {
-        return findSubCategory(CATEGORY.ORDER_STATUS, null, ignoreId != null ? List.of(ignoreId) : null, -1, -1).getContent();
-    }
-
-    @Override
     public List<Category> findByType(CATEGORY pType) {
         return findSubCategory(pType, null, null, -1, -1).getContent();
     }

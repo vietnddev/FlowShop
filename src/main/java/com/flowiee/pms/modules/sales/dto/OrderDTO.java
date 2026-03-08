@@ -137,7 +137,7 @@ public class OrderDTO implements Serializable {
 		dto.setSalesChannelId(lvSalesChannel.getId());
 		dto.setSalesChannelName(lvSalesChannel.getName());
 		dto.setOrderStatus(dto.getOrderStatus());
-		dto.setOrderStatusName(dto.getOrderStatus().getName());
+		dto.setOrderStatusName(dto.getOrderStatus().getLabel());
 		dto.setPayMethodId(lvPaymentMethod != null ? lvPaymentMethod.getId() : null);
 		dto.setPayMethodName(lvPaymentMethod != null ? lvPaymentMethod.getName() : null);
 		dto.setDeliveryMethod(lvDeliveryMethod != null ? new CategoryDTO(lvDeliveryMethod.getId(), lvDeliveryMethod.getName()) : new CategoryDTO());

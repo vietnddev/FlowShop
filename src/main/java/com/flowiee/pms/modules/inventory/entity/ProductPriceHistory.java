@@ -22,8 +22,8 @@ public class ProductPriceHistory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "product_variant_id", nullable = false)
-    private ProductDetail productVariant;
+    @JoinColumn(name = "product_price_id", nullable = false)
+    private ProductPrice productPrice;
 
     @Enumerated(EnumType.STRING)
     private PriceChangeType changeType;
@@ -39,7 +39,7 @@ public class ProductPriceHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "changed_by")
-    private Account changedBy; // Người thay đổi giá
+    private Account changedBy;
 
     @Column(name = "reason")
     private String reason;

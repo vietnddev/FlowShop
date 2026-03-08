@@ -4,7 +4,6 @@ import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantTempDTO;
 import com.flowiee.pms.modules.inventory.entity.ProductHistory;
-import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.model.ProductSearchRequest;
 import com.flowiee.pms.modules.inventory.service.ProductVariantService;
@@ -90,11 +89,7 @@ public class ProductController extends BaseController {
     @GetMapping("/{id}")
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public AppResponse<ProductDTO> findDetailProduct(@PathVariable("id") Long productId) {
-        ProductDTO product = mvProductInfoService.findById(productId, true);
-        if (product == null) {
-            throw new ResourceNotFoundException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product"));
-        }
-        return AppResponse.success(product);
+        return AppResponse.success(mvProductInfoService.findById(productId, true));
     }
 
     @Operation(summary = "Create clothes product")
@@ -105,6 +100,14 @@ public class ProductController extends BaseController {
     }
 
     @Operation(summary = "Update product")
+    @PutMapping("/description/update/{id}")
+    @PreAuthorize("@vldModuleProduct.updateProduct(true)")
+    public AppResponse<String> updateProduct(@PathVariable("id") Long pProductId, @RequestBody ProductDTO pDTO) {
+        return AppResponse.success(mvProductInfoService.updateDescription(pProductId, pDTO.getDescription()));
+    }
+
+    //Added 2026/03/09
+    @Operation(summary = "Update description of product")
     @PutMapping("/update/{id}")
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
     public AppResponse<ProductDTO> updateProduct(@RequestBody ProductDTO product, @PathVariable("id") Long productId) {
@@ -143,11 +146,6 @@ public class ProductController extends BaseController {
     public AppResponse<String> removeRelatedProduct(@PathVariable Long relationId) {
         mvProductRelatedService.remove(relationId);
         return AppResponse.success("Related product deleted successfully!");
-    }
-
-    @GetMapping("/discontinued")
-    public AppResponse<List<ProductDTO>> getDiscontinuedProducts() {
-        return AppResponse.success(mvProductInfoService.getDiscontinuedProducts());
     }
 
     @GetMapping("/import/template")

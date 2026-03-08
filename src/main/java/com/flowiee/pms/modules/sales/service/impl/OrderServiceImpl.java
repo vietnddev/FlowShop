@@ -315,7 +315,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         */
         if (isChangeStatus) {
             switch (lvRequestOrderStatus) {
-                case RTND:
+                case REFUNDED:
                     LocalDateTime lvSuccessfulDeliveryTime = request.getSuccessfulDeliveryTime();
 
                     SystemConfig lvReturnPeriodDaysMdl = mvConfigRepository.findByCode(ConfigCode.returnPeriodDays.name());
@@ -347,12 +347,12 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         */
         if (isChangeStatus) {
             switch (lvUpdatedOrder.getOrderStatus()) {
-                case CONF:
+                case PROCESSING:
                     if (SysConfigUtils.isYesOption(ConfigCode.sendNotifyCustomerOnOrderConfirmation)) {
                         mvSendCustomerNotificationService.notifyOrderConfirmation(lvUpdatedOrder, lvUpdatedOrder.getReceiverEmail());
                     }
                     break;
-                case RTND:
+                case REFUNDED:
                     for (TransactionGoods lvTransactionGoods : lvUpdatedOrder.getTransactionGoodsList()) {
                         Long lvStorageId = lvTransactionGoods.getWarehouse().getId();
                         mvTransactionGoodsService.restockReturnedItems(lvStorageId, lvUpdatedOrder.getCode());
@@ -362,7 +362,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
                         //create ledger transaction record for export
                     }
                     break;
-                case DLVD:
+                case COMPLETED:
                     mvLoyaltyProgramService.accumulatePoints(lvUpdatedOrder, null);
                     break;
             }
@@ -407,16 +407,16 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         Order lvOrder = super.findById(pOrderId).orElseThrow(() -> new BadRequestException("Order not found!"));
 
         if (lvOrder.getOrderStatus().equals(pOrderStatus)) {
-            throw new BadRequestException(String.format("Order status is %s now!", pOrderStatus.getName()));
+            throw new BadRequestException(String.format("Order status is %s now!", pOrderStatus.getLabel()));
         }
 
         lvOrder.setOrderStatus(pOrderStatus);
 
         switch (pOrderStatus) {
-            case DLVD:
+            case COMPLETED:
                 lvOrder.setDeliverySuccessTime(pSuccessfulDeliveryTime != null ? pSuccessfulDeliveryTime : LocalDateTime.now());
                 break;
-            case CNCL:
+            case CANCELLED:
                 lvOrder.setCancellationReason(cancellationReasonId);
                 lvOrder.setCancellationDate(LocalDateTime.now());
                 break;
@@ -446,7 +446,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     @Override
     public void doComplete(OrderDTO pOrder) {
         Order lvOrder = super.findEntById(pOrder.getId(), true);
-        lvOrder.setOrderStatus(OrderStatus.DLVD);
+        lvOrder.setOrderStatus(OrderStatus.COMPLETED);
         lvOrder.setDeliverySuccessTime(LocalDateTime.now());
         Order lvOrderUpdated = mvEntityRepository.save(lvOrder);
 
@@ -536,7 +536,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
 
         }
 
-        lvOrder.setOrderStatus(isReturnAllItems ? OrderStatus.FRTND : OrderStatus.RTND);
+        lvOrder.setOrderStatus(isReturnAllItems ? OrderStatus.REFUNDED : OrderStatus.REFUNDED);
         mvEntityRepository.save(lvOrder);
 
         StringBuilder lvMessageLog = new StringBuilder("Items id: ");
@@ -601,7 +601,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     }
 
     private OrderStatus getDefaultOrderStatus() {
-        return OrderStatus.PEND;
+        return OrderStatus.PROCESSING;
     }
 
     public boolean isWithinReturnPeriod(LocalDateTime successfulDeliveryTime, LocalDateTime currentDay, int periodDays) {

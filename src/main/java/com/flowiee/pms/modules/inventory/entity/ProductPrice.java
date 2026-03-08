@@ -13,6 +13,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Entity
@@ -31,24 +32,6 @@ public class ProductPrice extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "product_variant_id")
     ProductDetail productVariant;
-
-//    @Column(name = "purchase_price")
-//    BigDecimal purchasePrice = BigDecimal.ZERO;
-//
-//    @Column(name = "cost_price")
-//    BigDecimal costPrice = BigDecimal.ZERO;
-//
-//    @Column(name = "retail_price")
-//    BigDecimal retailPrice = BigDecimal.ZERO;
-//
-//    @Column(name = "retail_price_discount")
-//    BigDecimal retailPriceDiscount = BigDecimal.ZERO;
-//
-//    @Column(name = "wholesale_price")
-//    BigDecimal wholesalePrice = BigDecimal.ZERO;
-//
-//    @Column(name = "wholesale_price_discount")
-//    BigDecimal wholesalePriceDiscount = BigDecimal.ZERO;
 
     @Column(name = "price_value")
     BigDecimal priceValue = BigDecimal.ZERO; // new
@@ -82,4 +65,8 @@ public class ProductPrice extends BaseEntity implements Serializable {
 
     @Column(name = "state", nullable = false)
     String state;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "productPrice", fetch = FetchType.LAZY)
+    List<ProductPriceHistory> productPriceHistoryList;
 }

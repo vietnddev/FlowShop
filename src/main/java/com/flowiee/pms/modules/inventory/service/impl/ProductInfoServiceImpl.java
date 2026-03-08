@@ -13,13 +13,9 @@ import com.flowiee.pms.modules.system.dto.CategoryDTO;
 import com.flowiee.pms.modules.system.service.SystemLogService;
 import com.flowiee.pms.modules.inventory.entity.Product;
 import com.flowiee.pms.modules.inventory.entity.ProductDescription;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.sales.entity.Order;
-import com.flowiee.pms.modules.sales.entity.OrderDetail;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.common.exception.*;
-import com.flowiee.pms.modules.inventory.model.ProductHeld;
 import com.flowiee.pms.modules.inventory.model.ProductVariantSearchRequest;
 import com.flowiee.pms.modules.inventory.model.ProductSummaryInfoModel;
 import com.flowiee.pms.modules.inventory.repository.ProductDescriptionRepository;
@@ -39,8 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.util.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +89,24 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
         Long lvTotalRecords = lvQueryBuilder.buildCount();
 
         if (pFullInformation) {// Default is true for list of products page
-            enrichExtraInfo(lvResultListDto);
+            setImages(lvResultListDto);
+            //setVariants(lvResultListDto);
+        }
+
+        for (ProductDTO lvDto : lvResultListDto) {
+            lvDto.setTotalStorageQty(mvEntityRepository.getStockQty(lvDto.getId()));
+            lvDto.setSoldQty(mvEntityRepository.getSoldQty(lvDto.getId()));
+            lvDto.setTotalSoldQty(mvEntityRepository.getSoldQty(lvDto.getId()));
+            lvDto.setReservedQty(getReservedQuantityByProductId(lvDto.getId()));
+            lvDto.setDefectiveQty(mvEntityRepository.getDefectiveQty(lvDto.getId()));
+            lvDto.setAvailableQty(lvDto.getTotalStorageQty() -  lvDto.getReservedQty() - lvDto.getDefectiveQty());
+            if (mvEntityRepository.hasActiveStatus(lvDto.getId())) {
+                lvDto.setStatusCode(ProductStatus.ACT.name());
+                lvDto.setStatusName(ProductStatus.ACT.getLabel());
+            } else {
+                lvDto.setStatusCode(ProductStatus.INA.name());
+                lvDto.setStatusName(ProductStatus.INA.getLabel());
+            }
         }
 
         return new PageImpl<>(lvResultListDto, lvPageable, lvTotalRecords);
@@ -124,14 +135,13 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
                 .getResultList();
     }
 
-    private void enrichExtraInfo(List<ProductDTO> pProducts) {
+    private void setImages(List<ProductDTO> pProducts) {
         if (CollectionUtils.isEmpty(pProducts)) {
             return;
         }
 
         List<Long> lvProductIds = pProducts.stream().map(ProductDTO::getId).toList();
 
-        //1. Set images
         List<FileStorage> lvImageList = new ArrayList<>();
         int lvBatchSizeImage = 1000; // Số lượng tối đa trong một truy vấn
         for (int i = 0; i < lvProductIds.size(); i += lvBatchSizeImage) {
@@ -149,8 +159,15 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
                 ));
 
         pProducts.forEach(dto -> dto.setImageActive(imageMap.get(dto.getId())));
+    }
 
-        //2. Set variant's short info
+    private void setVariants(List<ProductDTO> pProducts) {
+        if (CollectionUtils.isEmpty(pProducts)) {
+            return;
+        }
+
+        List<Long> lvProductIds = pProducts.stream().map(ProductDTO::getId).toList();
+
         List<ProductSummaryInfoModel> lvVariantInfoList = new ArrayList<>();
         int lvBatchSizeVariant = 1000;
         for (int i = 0; i < lvProductIds.size(); i += lvBatchSizeVariant) {
@@ -165,8 +182,9 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
             //List<ProductSummaryInfoModel> lvVariantInfoList = mvProductDetailRepository.findProductVariantInfo(product.getId());
             List<ProductSummaryInfoModel> lvVariants = lvProductVariantMap.getOrDefault(lvProduct.getId(), Collections.emptyList());
 
-            long lvStorageQuantity = 0;
-            long lvSoldQuantity = 0;
+            int lvReservedQty = 0;
+            int lvStorageQuantity = 0;
+            int lvSoldQuantity = 0;
             ProductStatus lvProductStatus = ProductStatus.INA;
             List<ProductVariantDTO> lvVariantList = new ArrayList<>();
             List<ProductAttributeDTO> lvAttributeList = mvProductAttributeService.findAll(-1, -1, lvProduct.getId()).getContent();
@@ -185,6 +203,9 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
                 lvVariantDto.setStorageQty((int) (long) v.getQuantity());
                 lvVariantDto.setSoldQty((int) (long) v.getSoldQty());
                 lvVariantDto.setStatus(v.getStatus());
+                lvVariantDto.setReservedQty(getReservedQuantityByVariantId(v.getId()));
+                lvReservedQty += lvVariantDto.getReservedQty();
+                lvVariantDto.setAvailableQty(lvVariantDto.getStorageQty() -  lvVariantDto.getReservedQty() - lvVariantDto.getDefectiveQty());
 
                 mvProductPriceService.assignPriceInfo(lvVariantDto, mvProductPriceRepository.findPresentPrices(lvVariantDto.getId()));
                 if (ProductStatus.ACT.equals(lvVariantDto.getStatus())) {
@@ -196,6 +217,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
 
             lvProduct.setTotalStorageQty(lvStorageQuantity);
             lvProduct.setTotalSoldQty(lvSoldQuantity);
+            lvProduct.setReservedQty(lvReservedQty);
             lvProduct.setVariants(lvVariantList);
             lvProduct.setAttributes(lvAttributeList);
             lvProduct.setStatusCode(lvProductStatus.name());
@@ -219,7 +241,11 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
 
     @Override
     public ProductDTO findById(Long id, boolean pThrowException) {
-        return super.findDtoById(id, pThrowException);
+        ProductDTO lvDto = super.findDtoById(id, pThrowException);
+        setImages(List.of(lvDto));
+        setVariants(List.of(lvDto));
+
+        return lvDto;
     }
 
     @Transactional
@@ -300,18 +326,6 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
         lvProduct.setBrand(lvBrand);
         lvProduct.setUnit(lvUnit);
         //lvProduct.setStatus(productDTO.getStatus());
-
-        ProductDescription productDescription = findDescription(lvProduct.getId());
-        if (productDescription != null) {
-            productDescription.setDescription(pProductDTO.getDescription());
-        } else {
-            productDescription = ProductDescription.builder()
-                .productId(lvProduct.getId())
-                .description(pProductDTO.getDescription()).build();
-        }
-        ProductDescription productDescriptionUpdated = mvProductDescriptionRepository.save(productDescription);
-
-        //lvProduct.setProductDescription(productDescriptionUpdated);
         Product productUpdated = mvEntityRepository.save(lvProduct);
 
         changeLog.setNewObject(productUpdated);
@@ -343,8 +357,7 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
         }
     }
 
-    @Override
-    public boolean productInUse(Long productId) throws RuntimeException {
+    private boolean productInUse(Long productId) throws RuntimeException {
         return !mvProductVariantService.findAll(ProductVariantSearchRequest.builder()
                 .productId(productId)
                 .checkInAnyCart(false)
@@ -352,46 +365,31 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
         ).getContent().isEmpty();
     }
 
-    @Override
-    public List<ProductHeld> getProductHeldInUnfulfilledOrder() {
-        List<ProductHeld> productHeldList = new ArrayList<>();
-        List<Order> orderPage = mvOrderRepository.findByOrderStatus(List.of(OrderStatus.PROC, OrderStatus.DLVD));
-        if (orderPage.isEmpty()) {
-            return productHeldList;
-        }
-        Map<Long, ProductHeld> productHeldMap = new HashMap<>();
-        for (Order ord : orderPage) {
-            for (OrderDetail ordDetail : ord.getListOrderDetail()) {
-                ProductDetail lvProductVariant = ordDetail.getProductDetail();
-                Long lvProductVariantId = lvProductVariant.getId();
-
-                ProductHeld productHeldExisted = productHeldMap.get(lvProductVariantId);
-                if (productHeldExisted != null) {
-                    int currentQuantity = productHeldExisted.getQuantity();
-                    productHeldExisted.setQuantity(currentQuantity + ordDetail.getQuantity());
-                } else {
-                    ProductHeld productHeld = ProductHeld.builder()
-                            .productVariantId(lvProductVariantId)
-                            .productName(lvProductVariant.getVariantName())
-                            .orderCode(ord.getCode())
-                            .quantity(ordDetail.getQuantity())
-                            .orderStatus(ord.getOrderStatus())
-                            .build();
-                    productHeldList.add(productHeld);
-                    productHeldMap.put(lvProductVariantId, productHeld);
-                }
-            }
-        }
-        return productHeldList;
+    private int getReservedQuantityByVariantId(Long productVariantId) {
+        return mvOrderRepository.getReservedQtyByVariantId(productVariantId, List.of(OrderStatus.PROCESSING));
     }
 
-    @Override
-    public List<ProductDTO> getDiscontinuedProducts() {
-        return findAll(ProductSearchRequest.builder().status(ProductStatus.INA.name()).build(), false).getContent();
+    private int getReservedQuantityByProductId(Long productVariantId) {
+        return mvOrderRepository.getReservedQtyByProductId(productVariantId, List.of(OrderStatus.PROCESSING));
     }
 
     @Override
     public ProductDescription findDescription(Long pProductId) {
         return mvProductDescriptionRepository.findByProductId(pProductId);
+    }
+
+    @Override
+    public String updateDescription(Long pProductId, String pDescription) {
+        Product lvProduct = super.findEntById(pProductId, true);
+
+        ProductDescription productDescription = findDescription(lvProduct.getId());
+        if (productDescription != null) {
+            productDescription.setDescription(pDescription);
+            return mvProductDescriptionRepository.save(productDescription).getDescription();
+        }
+
+        return mvProductDescriptionRepository.save(ProductDescription.builder()
+                .productId(lvProduct.getId())
+                .description(pDescription).build()).getDescription();
     }
 }

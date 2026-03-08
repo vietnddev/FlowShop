@@ -24,10 +24,6 @@ public interface CategoryService {
 
     Page<Category> findSubCategory(CATEGORY categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum);
 
-    List<Category> findByIds(List<Long> pIds);
-
-    List<Category> findOrderStatus(Long ignoreId);
-
     List<Category> findByType(CATEGORY pType);
 
     boolean categoryInUse(Long categoryId);

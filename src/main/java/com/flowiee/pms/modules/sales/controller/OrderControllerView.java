@@ -37,14 +37,14 @@ public class OrderControllerView extends BaseController {
     private final CategoryService mvCategoryService;
     private final OrderService mvOrderService;
 
-    List<OrderStatus> mvOrderStatusCanModifyItem = List.of(OrderStatus.PEND, OrderStatus.CONF, OrderStatus.PROC);
-    List<OrderStatus> mvOrderStatusCanDeleteItem = List.of(OrderStatus.PEND, OrderStatus.CONF, OrderStatus.PROC);
-    List<OrderStatus> mvOrderStatusDoesNotAllowModify = List.of(OrderStatus.DLVD, OrderStatus.CNCL, OrderStatus.RTND);
+    List<OrderStatus> mvOrderStatusCanModifyItem = List.of(OrderStatus.PROCESSING);
+    List<OrderStatus> mvOrderStatusCanDeleteItem = List.of(OrderStatus.PROCESSING);
+    List<OrderStatus> mvOrderStatusDoesNotAllowModify = List.of(OrderStatus.COMPLETED);
 
     @GetMapping
     @PreAuthorize("@vldModuleSales.readOrder(true)")
     public ModelAndView viewAllOrders() {
-        setupSearchTool(true, List.of("BRANCH", CATEGORY.GROUP_CUSTOMER, CATEGORY.PAYMENT_METHOD, CATEGORY.ORDER_STATUS, CATEGORY.SALES_CHANNEL, "DATE_FILTER"));
+        setupSearchTool(true, List.of("BRANCH", CATEGORY.GROUP_CUSTOMER, CATEGORY.PAYMENT_METHOD, CATEGORY.SALES_CHANNEL, "DATE_FILTER"));
         return baseView(new ModelAndView(Pages.PRO_ORDER.getTemplate()));
     }
 
@@ -69,7 +69,7 @@ public class OrderControllerView extends BaseController {
 
         Map<String, String> statusMap = new LinkedHashMap<>();
         for (OrderStatus status : orderStatusList) {
-            statusMap.put(status.name(), status.getName());
+            statusMap.put(status.name(), status.getLabel());
         }
 
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_ORDER_DETAIL.getTemplate());

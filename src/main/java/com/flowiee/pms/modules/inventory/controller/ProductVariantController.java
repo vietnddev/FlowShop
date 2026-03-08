@@ -3,7 +3,6 @@ package com.flowiee.pms.modules.inventory.controller;
 import com.flowiee.pms.common.base.controller.BaseController;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.modules.inventory.dto.ProductPriceDTO;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.ProductHistory;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
@@ -114,23 +113,11 @@ public class ProductVariantController extends BaseController {
         return AppResponse.success(mvProductVariantService.delete(productVariantId));
     }
 
-    @Operation(summary = "Get price history of product detail")
-    @GetMapping(value = "/variant/price/history/{Id}")
-    @PreAuthorize("@vldModuleProduct.readProduct(true)")
-    public AppResponse<List<ProductHistory>> getHistoryPriceOfProductDetail(@PathVariable("Id") Long productVariantId) {
-        if (mvProductVariantService.findById(productVariantId, true) == null) {
-            throw new ResourceNotFoundException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product history"));
-        }
-        return AppResponse.success(mvProductHistoryService.findPriceChange(productVariantId));
-    }
-
     @Operation(summary = "Update price")
     @PutMapping(value = "/variant/{variantId}/price/update")
     @PreAuthorize("@vldModuleProduct.priceManagement(true)")
-    public AppResponse<ProductPriceDTO> updatePrice(@PathVariable("variantId") Long productVariantId,
-                                           @RequestBody ProductPriceDTO pPrice) {
-        ProductDetail lvProductVariant = mvProductVariantService.findEntById(productVariantId, true);
-        return AppResponse.success(mvProductPriceService.updatePrice(lvProductVariant, pPrice));
+    public AppResponse<ProductPriceDTO> updatePrice(@PathVariable("variantId") Long productVariantId, @RequestBody ProductPriceDTO pPrice) {
+        return AppResponse.success(mvProductPriceService.updatePrice(productVariantId, pPrice));
     }
 
     @Operation(summary = "Check product variant already exists")

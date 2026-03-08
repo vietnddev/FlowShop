@@ -6,33 +6,15 @@ import java.util.*;
 
 @Getter
 public enum OrderStatus {
-    PEND("Pending", ""),                  // Đang chờ xử lý
-    CONF("Confirmed", ""),                // Đã xác nhận
-    PROC("Processing", ""),               // Đang xử lý
-    SHIP("Shipped", ""),                  // Đã giao cho đơn vị vận chuyển
-    DLVD("Delivered", ""),                // Giao thành công
-    CNCL("Cancelled", ""),                // Đã hủy
-    FRTND("Returned all", ""),            // Đã trả toàn bộ hàng
-    RTND("Returned a part", ""),          // Đã trả một phần hàng
-    //FAIL("Failed", ""),                   // Lỗi
-    //HOLD("On Hold", ""),                  // Tạm dừng
-    //RFND("Refunded", ""),                 // Hoàn tiền
-    PART_DLVD("Partially Delivered", ""), // Giao một phần
-    //EXPD("Expired", ""),                  // Hết hạn
-    AWTP("Awaiting Pickup", ""),          // Chờ lấy hàng
-    DSPT("Disputed", ""),                 // Đang tranh chấp
-    ALL("All", "");                       // Tất cả trạng thái
+    PROCESSING("Processing"),
+    COMPLETED("Completed"),
+    CANCELLED("Cancelled"),
+    REFUNDED("Refunded");
 
-    private String name;
-    private String description;
+    private final String label;
 
-    OrderStatus(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    OrderStatus(String label) {
+        this.label = label;
     }
 
     public static OrderStatus get(String pOrderStatus) {
@@ -40,7 +22,7 @@ public enum OrderStatus {
             return null;
         }
         for (OrderStatus orderStatus : values()) {
-            if (orderStatus.name.equalsIgnoreCase(pOrderStatus.trim())) {
+            if (orderStatus.name().equalsIgnoreCase(pOrderStatus.trim())) {
                 return orderStatus;
             }
         }
@@ -63,7 +45,7 @@ public enum OrderStatus {
     public static LinkedHashMap<String, String> getAllMap(OrderStatus exclude) {
         LinkedHashMap<String, String> statusMap = new LinkedHashMap<>();
         for (OrderStatus status : getAll(exclude)) {
-            statusMap.put(status.name(), status.getName());
+            statusMap.put(status.name(), status.getLabel());
         }
         return statusMap;
     }

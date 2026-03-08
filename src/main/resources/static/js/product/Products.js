@@ -83,6 +83,11 @@ function createListener() {
         showProductDetailOnPopup(lvProductInfo);
     });
 
+    $(document).on('click', 'button[name="btnViewProductHistory"]', function () {
+        let lvProductId = Number($(this).attr("productId"));
+        loadHistoryOfProduct(lvProductId);
+    });
+
     $(document).on('click', 'button[name="btnUpdatePrice"]', function () {
         let productVariantId = $(this).attr("productVariantId");
         let rowInfo = $(this).closest('tr');
@@ -133,30 +138,6 @@ function createListener() {
     $(document).on('click', '#pUP_Confirm', function () {
         updatePrice();
     });
-
-    // $(document).on('click', '[data-widget="expandable-table"]', function (e) {
-    //     e.stopPropagation();
-    //     var $icon = $(this);
-    //     var $mainRow = $icon.closest('tr');
-    //     var $expandRow = $mainRow.next('.expandable-body');
-    //     var $subHeaderRow = $expandRow.find('thead tr');
-    //
-    //     // Small delay to wait Bootstrap toggle done
-    //     setTimeout(function() {
-    //         var isExpanded = !$expandRow.hasClass('d-none');
-    //
-    //         // Remove highlight class from all
-    //         $('tr').removeClass('table-primary');
-    //
-    //         if (isExpanded) {
-    //             $mainRow.addClass('table-primary');
-    //             $expandRow.addClass('table-primary');
-    //             $subHeaderRow.addClass('table-primary'); // Add for sub-header
-    //         }
-    //     }, 20);
-    // });
-
-
 
     $("#pUP_RetailPrice").on("change", function () {
         let inputValue = formatUSCurrency($(this).val());

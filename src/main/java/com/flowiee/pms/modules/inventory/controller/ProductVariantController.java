@@ -107,9 +107,9 @@ public class ProductVariantController extends BaseController {
     }
 
     @Operation(summary = "Delete product variant")
-    @DeleteMapping("/variant/delete/{id}")
+    @DeleteMapping("/variant/delete/{variantId}")
     @PreAuthorize("@vldModuleProduct.deleteProduct(true)")
-    public AppResponse<String> deleteProductVariant(@PathVariable("id") Long productVariantId) {
+    public AppResponse<String> deleteProductVariant(@PathVariable("variantId") Long productVariantId) {
         return AppResponse.success(mvProductVariantService.delete(productVariantId));
     }
 

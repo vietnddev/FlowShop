@@ -49,7 +49,7 @@ public class ProductDTO extends BaseDTO implements Serializable {
     Integer defectiveQty = 0;
     Integer reservedQty = 0;
     Integer availableQty = 0;
-    Integer soldQty;
+    Integer soldQty = 0;
     String description;
     String statusCode;
     String statusName;

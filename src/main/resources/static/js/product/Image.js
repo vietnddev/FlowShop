@@ -80,7 +80,9 @@ function loadImagesOfProduct() {
                                 <div class="col-2">
                                     <div class="${classCard}" style="${styleCard}">
                                         <div class="card-body product-image-thumb" style="margin: auto">
-                                            <img src="/${d.src}" alt="Product Image" class="sub-image" imageId="${d.id}">
+                                            <a href="/${d.src}" data-toggle="lightbox">                                                
+                                                <img src="/${d.src}" alt="Product Image" class="sub-image" imageId="${d.id}">
+                                            </a>                                                
                                         </div>
                                         <div class="card-footer row">
                                             <i style="cursor: pointer" imageId="${d.id}" class="fa-solid fa-arrows-rotate text-info col btn-change-image"></i>

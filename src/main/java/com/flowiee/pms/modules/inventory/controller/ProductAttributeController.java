@@ -64,9 +64,9 @@ public class ProductAttributeController extends BaseController {
     }
 
     @Operation(summary = "Delete product attribute")
-    @DeleteMapping("/attribute/delete/{id}")
+    @DeleteMapping("/attribute/delete/{attributeId}")
     @PreAuthorize("@vldModuleProduct.deleteProduct(true)")
-    public AppResponse<String> deleteProductAttribute(@PathVariable("id") Long productAttributeId) {
+    public AppResponse<String> deleteProductAttribute(@PathVariable("attributeId") Long productAttributeId) {
         return AppResponse.success(mvProductAttributeService.delete(productAttributeId));
     }
 }

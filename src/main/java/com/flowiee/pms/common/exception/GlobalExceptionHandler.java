@@ -92,7 +92,7 @@ public class GlobalExceptionHandler extends BaseController {
     @ExceptionHandler
     public ResponseEntity<AppResponse<Object>> exceptionHandler(DataInUseException ex) {
         mvLogger.error(ex.getMessage(), ex);
-        return ResponseEntity.internalServerError ().body(AppResponse.fail(HttpStatus.LOCKED, ex.getMessage()));
+        return ResponseEntity.internalServerError().body(AppResponse.fail(HttpStatus.LOCKED, ex.getMessage()));
     }
 
     @ExceptionHandler

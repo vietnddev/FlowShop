@@ -39,6 +39,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -48,7 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.criteria.*;
-import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -379,16 +380,27 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         }
     }
 
+    @Transactional
     @Override
     public String delete(Long productVariantId) {
         ProductDetail productDetailToDelete = super.findEntById(productVariantId, true);
+
+        //Validate here...
+
         try {
-            mvEntityRepository.deleteById(productVariantId);
-        } catch (ConstraintViolationException ex) {
-            throw new DataInUseException("Không thể xóa sản phẩm đã được sử dụng!", ex);
+            //Begin 2026/03/28 Replace hard delete by soft delete
+            //mvEntityRepository.deleteById(productVariantId);
+            mvEntityRepository.softDelete(productVariantId, LocalDateTime.now(), String.valueOf(getUserPrincipal().getId()));
+            //End 2026/03/28
+        } catch (DataIntegrityViolationException ex) {
+            throw new DataInUseException("Data in use!", ex);
+        } catch (DataAccessException ex) {
+            throw new AppException("Database error", ex);
         }
+
         mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Xóa biến thể sản phẩm", productDetailToDelete.getVariantName());
         LOG.info("Delete productVariant success! {}", productDetailToDelete);
+
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
 

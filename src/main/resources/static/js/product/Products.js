@@ -135,6 +135,22 @@ function createListener() {
         }
     });
 
+    $(document).on('click', `button[name="btnDeleteVariant"]`, function () {
+        //let productId = $(this).attr("productId");
+        let productVariantId = Number($(this).attr("productVariantId"));
+        if (confirm('Do you want to delete this variant?')) {
+            deleteVariant(productVariantId);
+        }
+    });
+
+    $(document).on('click', `button[name="btn-delete-product-attribute"]`, function () {
+        //let productId = $(this).attr("productId");
+        let productAttributeId = Number($(this).attr("productAttributeId"));
+        if (confirm('Do you want to delete this attribute?')) {
+            deleteAttribute(productAttributeId);
+        }
+    });
+
     $(document).on('click', '#pUP_Confirm', function () {
         updatePrice();
     });
@@ -376,4 +392,14 @@ function loadStorageTransactionHistory(productId) {
 function showCreateProductModalSection(...visibleSections) {
     $('.product-creation-section').hide();
     visibleSections.forEach(s => $(s).show());
+}
+
+function deleteVariant(pVariantId) {
+    let apiURL = `${mvHostURLCallApi}/product/variant/delete/${pVariantId}`;
+    callApiDelete(apiURL);
+}
+
+function deleteAttribute(pAttributeId) {
+    let apiURL = `${mvHostURLCallApi}/product/attribute/delete/${pAttributeId}`;
+    callApiDelete(apiURL);
 }

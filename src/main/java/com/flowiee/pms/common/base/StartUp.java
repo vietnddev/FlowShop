@@ -140,7 +140,7 @@ public class StartUp {
 				lvTemplate.setTemplateContent(lvTemplateContent.toString());
 				FlwSys.getEmailTemplateConfigs().put(lvNotificationType, lvTemplate);
 			});
-			logger.info("Email template has been loaded.");
+			logger.info("Email templates have been loaded.");
 
 			START_APP_TIME = LocalDateTime.now();
         };

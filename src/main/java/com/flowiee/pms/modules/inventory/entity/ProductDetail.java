@@ -14,6 +14,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serial;
@@ -24,6 +25,7 @@ import java.util.List;
 
 @Builder
 @Entity
+@Where(clause = "deleted_at is null")
 @Table(name = "product_detail",
        indexes = {@Index(name = "idx_ProductVariant_productId", columnList = "product_id"),
                   @Index(name = "idx_ProductVariant_colorId", columnList = "color_id"),

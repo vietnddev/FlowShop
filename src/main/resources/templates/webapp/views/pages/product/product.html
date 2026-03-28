@@ -420,6 +420,9 @@
                                     <button type="button" class="btn btn-sm btn-info" data-toggle="modal" data-target="#popUpdatePrice" name="btnUpdatePrice" productId="${product.id}" productVariantId="${variantInfo.id}">
                                         <i class="fa-solid fa-dollar-sign"></i>
                                     </button>
+                                    <button type="button" class="btn btn-sm btn-danger" name="btnDeleteVariant" productId="${product.id}" productVariantId="${variantInfo.id}">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </td>
                             </tr>`
                         );
@@ -436,6 +439,9 @@
                                 <td>
                                     <button type="button" class="btn btn-sm btn-info" name="btn-update-product-attribute" productId="${product.id}" productAttributeId="${attributeInfo.id}">
                                         <i class="fa-solid fa-pencil"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger" name="btn-delete-product-attribute" productId="${product.id}" productAttributeId="${attributeInfo.id}">
+                                        <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>`

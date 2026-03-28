@@ -7,6 +7,7 @@ import com.flowiee.pms.modules.inventory.dto.ProductAttributeDTO;
 import com.flowiee.pms.modules.inventory.dto.ProductPriceDTO;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.inventory.model.ProductSearchRequest;
+import com.flowiee.pms.modules.inventory.model.ProductSummaryModel;
 import com.flowiee.pms.modules.inventory.repository.ProductPriceRepository;
 import com.flowiee.pms.modules.inventory.service.*;
 import com.flowiee.pms.modules.system.dto.CategoryDTO;
@@ -94,11 +95,15 @@ public class ProductInfoServiceImpl extends BaseService<Product, ProductDTO, Pro
         }
 
         for (ProductDTO lvDto : lvResultListDto) {
-            lvDto.setTotalStorageQty(mvEntityRepository.getStockQty(lvDto.getId()));
-            lvDto.setSoldQty(mvEntityRepository.getSoldQty(lvDto.getId()));
-            lvDto.setTotalSoldQty(mvEntityRepository.getSoldQty(lvDto.getId()));
+            ProductSummaryModel productSummaryModel = mvEntityRepository.getSummariesQty(lvDto.getId());
+            if (productSummaryModel != null) {
+                lvDto.setTotalStorageQty(productSummaryModel.getStockQty());
+                lvDto.setSoldQty(productSummaryModel.getSoldQty());
+                lvDto.setTotalSoldQty(productSummaryModel.getSoldQty());
+                lvDto.setDefectiveQty(productSummaryModel.getDefectiveQty());
+            }
+
             lvDto.setReservedQty(getReservedQuantityByProductId(lvDto.getId()));
-            lvDto.setDefectiveQty(mvEntityRepository.getDefectiveQty(lvDto.getId()));
             lvDto.setAvailableQty(lvDto.getTotalStorageQty() -  lvDto.getReservedQty() - lvDto.getDefectiveQty());
             if (mvEntityRepository.hasActiveStatus(lvDto.getId())) {
                 lvDto.setStatusCode(ProductStatus.ACT.name());

@@ -148,10 +148,12 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         Order lvOrderEnt = super.findEntById(pOrderId, pThrowException);
         OrderDTO lvOrderDto = super.convertDTO(lvOrderEnt);
 
-        FileStorage imageQRCode = lvOrderEnt.getListImageQR().get(0);
-
         lvOrderDto.setListOrderDetail(OrderDetailDTO.fromOrderDetails(lvOrderEnt.getListOrderDetail()));
-        lvOrderDto.setQrCode(FileUtils.getImageUrl(imageQRCode, false));
+
+        if (!CollectionUtils.isEmpty(lvOrderEnt.getListImageQR())) {
+            FileStorage imageQRCode = lvOrderEnt.getListImageQR().get(0);
+            lvOrderDto.setQrCode(FileUtils.getImageUrl(imageQRCode, false));
+        }
 
         return lvOrderDto;
     }

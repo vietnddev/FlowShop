@@ -147,7 +147,7 @@ public class ConfigServiceImpl extends BaseService<SystemConfig, SystemConfigDTO
             throw new AppException("An error occurred while refreshing app configuration", ex);
         } finally {
             mvAppRefreshing = false;
-            LOG.info("Configuration has been successfully refreshed.");
+            LOG.info("Configurations have been refreshed successfully.");
         }
     }
 

@@ -41,9 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -328,6 +328,15 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
                     if (!isWithinReturnPeriod(lvSuccessfulDeliveryTime, LocalDateTime.now(), lvReturnPeriodDays))
                         throw new AppException("The return period has expired!");
                     break;
+                case COMPLETED:
+                    //Implement logic later
+                    break;
+                case CANCELLED:
+                    //Implement logic later
+                    break;
+                case PROCESSING:
+                    //Implement logic later
+                    break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + lvRequestOrderStatus);
             }
@@ -383,6 +392,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         return OrderDTO.toDto(lvUpdatedOrder);
     }
 
+    @Transactional
     @Override
     public String deleteOrder(Long id) {
         Order lvOrder = super.findEntById(id, true);
@@ -404,6 +414,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
 
+    @Transactional
     @Override
     public String updateOrderStatus(Long pOrderId, OrderStatus pOrderStatus, LocalDateTime pSuccessfulDeliveryTime, Long cancellationReasonId) {
         Order lvOrder = super.findById(pOrderId).orElseThrow(() -> new BadRequestException("Order not found!"));
@@ -431,10 +442,12 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         return "Updated successfully!";
     }
 
+    @Transactional
     @Override
     public void doCancel(OrderDTO pOrder, String pReason) {
         Order lvOrder = super.findEntById(pOrder.getId(), true);
-        lvOrder.setCancellationReason(null);
+        long cancellationReasonId = -1L;
+        lvOrder.setCancellationReason(cancellationReasonId);
         lvOrder.setCancellationDate(LocalDateTime.now());
         Order lvOrderUpdated = mvEntityRepository.save(lvOrder);
 
@@ -445,6 +458,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
         //...
     }
 
+    @Transactional
     @Override
     public void doComplete(OrderDTO pOrder) {
         Order lvOrder = super.findEntById(pOrder.getId(), true);
@@ -538,7 +552,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
 
         }
 
-        lvOrder.setOrderStatus(isReturnAllItems ? OrderStatus.REFUNDED : OrderStatus.REFUNDED);
+        lvOrder.setOrderStatus(isReturnAllItems ? OrderStatus.REFUNDED : OrderStatus.REFUNDED); //Implement new status later, exp: PARTIALLY_RETURNED
         mvEntityRepository.save(lvOrder);
 
         StringBuilder lvMessageLog = new StringBuilder("Items id: ");

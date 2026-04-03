@@ -85,6 +85,10 @@ function createListener() {
 
     $(document).on('click', 'button[name="btnViewProductHistory"]', function () {
         let lvProductId = Number($(this).attr("productId"));
+        $("#history-tabs-infoChangesTab").attr("productId", lvProductId);
+        $("#history-tabs-storageTransactionTab").attr("productId", lvProductId);
+        $("#tableProductHistory").empty();
+        $("#storageHistoryTbl").empty();
         loadHistoryOfProduct(lvProductId);
     });
 
@@ -165,11 +169,14 @@ function createListener() {
         $(this).val(inputValue);
     });
 
-    $(document).on('click', 'button[name="btnViewStorageHistory"]', function (e) {
-        e.preventDefault();
+    $('#history-tabs-infoChangesTab').on('click', function () {
+        let productId = $(this).attr("productId");
+        loadHistoryOfProduct(productId);
+    })
+
+    $('#history-tabs-storageTransactionTab').on('click', function () {
         let productId = $(this).attr("productId");
         loadStorageTransactionHistory(productId);
-        $("#storageHistoryModal").modal();
     })
 
     //View product variant on popup

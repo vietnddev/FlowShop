@@ -16,4 +16,9 @@ public class GarmentFactoryDTO extends BaseDTO implements Serializable {
     private String note;
     private String status;
     private List<ProductDTO> productList;
+
+    public GarmentFactoryDTO(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

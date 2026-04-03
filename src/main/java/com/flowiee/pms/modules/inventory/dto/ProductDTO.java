@@ -1,6 +1,7 @@
 package com.flowiee.pms.modules.inventory.dto;
 
 import com.flowiee.pms.common.base.dto.BaseDTO;
+import com.flowiee.pms.common.enumeration.ProductStatus;
 import com.flowiee.pms.modules.system.dto.CategoryDTO;
 import com.flowiee.pms.modules.sales.dto.VoucherInfoDTO;
 import com.flowiee.pms.modules.sales.dto.GarmentFactoryDTO;
@@ -34,29 +35,17 @@ public class ProductDTO extends BaseDTO implements Serializable {
     String internalNotes;
     GarmentFactoryDTO garmentFactory;
     SupplierDTO supplier;
-
-    Long productTypeId;
-    String productTypeName;
-    Long brandId;
-    String brandName;
-    Long unitId;
-    String unitName;
-    Long garmentFactoryId;
-    String garmentFactoryName;
-    Long supplierId;
-    String supplierName;
     String imageActive;
+    Integer stockQty = 0;
+    Integer soldQty = 0;
     Integer defectiveQty = 0;
     Integer reservedQty = 0;
     Integer availableQty = 0;
-    Integer soldQty = 0;
     String description;
-    String statusCode;
-    String statusName;
+    String statusCode = ProductStatus.INA.name();
+    String statusName = ProductStatus.INA.getLabel();
     List<VoucherInfoDTO> listVoucherInfoApply;
 
-    Integer totalSoldQty = 0;
-    Integer totalStorageQty = 0;
     List<ProductVariantDTO> variants;
     List<ProductAttributeDTO> attributes;
 
@@ -66,13 +55,6 @@ public class ProductDTO extends BaseDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ProductDTO [" +
-                ", productTypeId=" + productTypeId +
-                ", brandId=" + brandId +
-                ", unitId=" + unitId +
-                ", soldQty=" + soldQty +
-                ", createdAt=" + getCreatedAt() +
-                ", createdByName=" + getCreatedBy() +
-                "]";
+		return "ProductDTO [" + super.getId() + "]";
 	}
 }

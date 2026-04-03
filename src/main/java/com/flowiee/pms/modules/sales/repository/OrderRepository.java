@@ -98,12 +98,4 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
             and od.order.orderStatus in :statuses
        """)
     int getReservedQtyByVariantId(Long variantId, List<OrderStatus> statuses);
-
-    @Query("""
-        select coalesce(sum(od.quantity),0)
-        from OrderDetail od
-        where od.productDetail.product.id = :productId
-            and od.order.orderStatus in :statuses
-       """)
-    int getReservedQtyByProductId(Long productId, List<OrderStatus> statuses);
 }

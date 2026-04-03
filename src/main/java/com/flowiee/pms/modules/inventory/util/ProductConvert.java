@@ -1,5 +1,8 @@
 package com.flowiee.pms.modules.inventory.util;
 
+import com.flowiee.pms.modules.sales.dto.GarmentFactoryDTO;
+import com.flowiee.pms.modules.sales.dto.SupplierDTO;
+import com.flowiee.pms.modules.system.dto.CategoryDTO;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.inventory.entity.Product;
 import com.flowiee.pms.modules.sales.entity.GarmentFactory;
@@ -30,20 +33,20 @@ public class ProductConvert {
             //.listProductHistories(inputDTO.getListProductHistories())
             .build();
 
-        if (outputEntity.getProductType() == null && inputDTO.getProductTypeId() != null)
-            outputEntity.setProductType(new Category(inputDTO.getProductTypeId(), null));
+        if (outputEntity.getProductType() == null && inputDTO.getProductType() != null)
+            outputEntity.setProductType(new Category(inputDTO.getProductType().getId(), inputDTO.getProductType().getName()));
 
-        if (outputEntity.getBrand() == null && inputDTO.getBrandId() != null)
-            outputEntity.setBrand(new Category(inputDTO.getBrandId(), null));
+        if (outputEntity.getBrand() == null && inputDTO.getBrand() != null)
+            outputEntity.setBrand(new Category(inputDTO.getBrand().getId(), inputDTO.getBrand().getName()));
 
-        if (outputEntity.getUnit() == null && inputDTO.getUnitId() != null)
-            outputEntity.setUnit(new Category(inputDTO.getUnitId(), null));
+        if (outputEntity.getUnit() == null && inputDTO.getUnit() != null)
+            outputEntity.setUnit(new Category(inputDTO.getUnit().getId(), inputDTO.getUnit().getName()));
 
-        if (outputEntity.getGarmentFactory() == null && inputDTO.getGarmentFactoryId() != null)
-            outputEntity.setGarmentFactory(new GarmentFactory(inputDTO.getGarmentFactoryId()));
+        if (outputEntity.getGarmentFactory() == null && inputDTO.getGarmentFactory() != null)
+            outputEntity.setGarmentFactory(new GarmentFactory(inputDTO.getGarmentFactory().getId()));
 
-        if (outputEntity.getSupplier() == null && inputDTO.getSupplierId() != null)
-            outputEntity.setSupplier(new Supplier(inputDTO.getSupplierId(), inputDTO.getSupplierName()));
+        if (outputEntity.getSupplier() == null && inputDTO.getSupplier() != null)
+            outputEntity.setSupplier(new Supplier(inputDTO.getSupplier().getId(), inputDTO.getSupplier().getName()));
 
         outputEntity.setId(inputDTO.getId());
         outputEntity.setCreatedAt(inputDTO.getCreatedAt());
@@ -77,29 +80,29 @@ public class ProductConvert {
             dto.setCreatedBy(pInput.getCreatedBy());
 
             if (ObjectUtils.isNotEmpty(pInput.getProductType())) {
-                //dto.setProductType(inputEntity.getProductType());
-                dto.setProductTypeId(pInput.getProductType().getId());
-                dto.setProductTypeName(pInput.getProductType().getName());
+                dto.setProductType(new CategoryDTO(pInput.getProductType().getId(), pInput.getProductType().getName()));
+//                dto.setProductTypeId(pInput.getProductType().getId());
+//                dto.setProductTypeName(pInput.getProductType().getName());
             }
             if (ObjectUtils.isNotEmpty(pInput.getBrand())) {
-                //dto.setBrand(inputEntity.getBrand());
-                dto.setBrandId(pInput.getBrand().getId());
-                dto.setBrandName(pInput.getBrand().getName());
+                dto.setBrand(new CategoryDTO(pInput.getBrand().getId(), pInput.getBrand().getName()));
+//                dto.setBrandId(pInput.getBrand().getId());
+//                dto.setBrandName(pInput.getBrand().getName());
             }
             if (ObjectUtils.isNotEmpty(pInput.getUnit())) {
-                //dto.setUnit(inputEntity.getUnit());
-                dto.setUnitId(pInput.getUnit().getId());
-                dto.setUnitName(pInput.getUnit().getName());
+                dto.setUnit(new CategoryDTO(pInput.getUnit().getId(), pInput.getUnit().getName()));
+//                dto.setUnitId(pInput.getUnit().getId());
+//                dto.setUnitName(pInput.getUnit().getName());
             }
             if (ObjectUtils.isNotEmpty(pInput.getGarmentFactory())) {
-                //dto.setGarmentFactory(inputEntity.getGarmentFactory());
-                dto.setGarmentFactoryId(pInput.getGarmentFactory().getId());
-                dto.setGarmentFactoryName(pInput.getGarmentFactory().getName());
+                dto.setGarmentFactory(new GarmentFactoryDTO(pInput.getGarmentFactory().getId(), pInput.getGarmentFactory().getName()));
+//                dto.setGarmentFactoryId(pInput.getGarmentFactory().getId());
+//                dto.setGarmentFactoryName(pInput.getGarmentFactory().getName());
             }
             if (ObjectUtils.isNotEmpty(pInput.getSupplier())) {
-                //dto.setSupplier(inputEntity.getSupplier());
-                dto.setSupplierId(pInput.getSupplier().getId());
-                dto.setSupplierName(pInput.getSupplier().getName());
+                dto.setSupplier(new SupplierDTO(pInput.getSupplier().getId(), pInput.getSupplier().getName()));
+//                dto.setSupplierId(pInput.getSupplier().getId());
+//                dto.setSupplierName(pInput.getSupplier().getName());
             }
         }
         return dto;

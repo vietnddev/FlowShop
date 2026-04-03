@@ -198,26 +198,57 @@
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <strong class="modal-title">Lịch sử thay đổi thông tin</strong>
+                            <ul class="nav nav-tabs" id="history-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link font-weight-bold active" id="history-tabs-infoChangesTab"
+                                       data-toggle="pill" href="#history-tabs-infoChangesContent" role="tab">Information changes</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link font-weight-bold" id="history-tabs-storageTransactionTab"
+                                       data-toggle="pill" href="#history-tabs-storageTransactionContent" role="tab">Storage transaction</a>
+                                </li>
+                            </ul>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body p-0" style="max-height: 800px; overflow: scroll">
-                            <table class="table table-bordered" style="margin-bottom: 0">
-                                <thead>
-                                    <tr>
-                                        <th>STT</th>
-                                        <th>Title</th>
-                                        <th>Field name</th>
-                                        <th>Old value</th>
-                                        <th>New value</th>
-                                        <th>Updated by</th>
-                                        <th>Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tableProductHistory"></tbody>
-                            </table>
+                        <div class="modal-body" style="max-height: 800px; overflow: scroll">
+                            <div class="tab-content" id="history-content-tabs">
+                                <div class="tab-pane fade active show" id="history-tabs-infoChangesContent" role="tabpanel">
+                                    <table class="table table-bordered" style="margin-bottom: 0">
+                                        <thead>
+                                            <tr>
+                                                <th>STT</th>
+                                                <th>Title</th>
+                                                <th>Field name</th>
+                                                <th>Old value</th>
+                                                <th>New value</th>
+                                                <th>Updated by</th>
+                                                <th>Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableProductHistory"></tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane fade" id="history-tabs-storageTransactionContent" role="tabpanel">
+                                    <table class="table table-responsive table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>STT</th>
+                                                <th>Ngày ghi nhận</th>
+                                                <th>Nhân viên</th>
+                                                <th>Thao tác</th>
+                                                <th>Product code</th>
+                                                <th>Số lượng thay đổi</th>
+                                                <th>Tồn kho</th>
+                                                <th>Mã chứng từ</th>
+                                                <th>Chi nhánh</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="storageHistoryTbl"></tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-footer justify-content-end">
                             <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Hủy</button>
@@ -350,40 +381,6 @@
                 </div>
             </div>
             <div class="row pl-3 pr-3" id="gridSubImages"></div>
-        </div>
-
-        <div th:fragment="storageHistoryModal">
-            <div class="modal fade" id="storageHistoryModal">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <strong class="modal-title">Lịch sử kho</strong>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        </div>
-                        <div class="modal-body p-0">
-                            <table class="table table-responsive table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>STT</th>
-                                        <th>Ngày ghi nhận</th>
-                                        <th>Nhân viên</th>
-                                        <th>Thao tác</th>
-                                        <th>Product code</th>
-                                        <th>Số lượng thay đổi</th>
-                                        <th>Tồn kho</th>
-                                        <th>Mã chứng từ</th>
-                                        <th>Chi nhánh</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="storageHistoryTbl"></tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer justify-content-end">
-                            <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Đóng</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div th:fragment="searchProductModal">

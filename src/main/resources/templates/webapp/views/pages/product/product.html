@@ -199,8 +199,6 @@
                     <div th:replace="~{pages/product/fragments/product-fragments :: createProductOriginal}"></div>
                     <!--Modal view product history-->
                     <div th:replace="~{pages/product/fragments/product-fragments :: productHistoryModal}"></div>
-                    <!--Modal view storage history-->
-                    <div th:replace="~{pages/product/fragments/product-fragments :: storageHistoryModal}"></div>
                     <!--Modal view product variant-->
                     <div th:replace="~{pages/product/fragments/product-fragments :: viewProductVariantModal}"></div>
                 </div>
@@ -305,12 +303,12 @@
                                 <td data-widget="expandable-table" class="text-center">${lvImageBlock}</td>
                                 <td data-widget="expandable-table">${p.productName}</td>
                                 <td data-widget="expandable-table">${p.brand.name}</td>
-                                <td data-widget="expandable-table">${p.productTypeName}</td>
-                                <td data-widget="expandable-table">${p.unitName}</td>
-                                <td data-widget="expandable-table" class="text-right">${p.totalStorageQty}</td>
+                                <td data-widget="expandable-table">${p.productType.name}</td>
+                                <td data-widget="expandable-table">${p.unit.name}</td>
+                                <td data-widget="expandable-table" class="text-right">${p.stockQty}</td>
                                 <td data-widget="expandable-table" class="text-right">${p.reservedQty}</td>
                                 <td data-widget="expandable-table" class="text-right">${p.availableQty}</td>
-                                <td data-widget="expandable-table" class="text-right">${p.totalSoldQty}</td>
+                                <td data-widget="expandable-table" class="text-right">${p.soldQty}</td>
                                 <td data-widget="expandable-table">${p.statusCode === 'ACT' ? `<span class="badge badge-primary">${p.statusName}</span>` : `${p.statusName}`}</td>
                                 <td>
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popProductDetail"  name="btnViewDetail"         productId="${p.id}">
@@ -318,9 +316,6 @@
                                     </button>
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popProductHistory" name="btnViewProductHistory" productId="${p.id}" title="View product history">
                                         <i class="fa-solid fa-clock-rotate-left"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popStorageHistory" name="btnViewStorageHistory" productId="${p.id}">
-                                        <i class="fa-solid fa-warehouse"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#popDeleteProduct"     name="btnDeleteProduct"      productId="${p.id}" title="Delete">
                                         <i class="fa-solid fa-trash"></i>
@@ -541,10 +536,16 @@
             });
 
             let body = {
-                productTypeId: productTypeId,
-                brandId: brandId,
+                productType: {
+                    id: productTypeId
+                },
+                brand: {
+                    id: brandId
+                },
+                unit: {
+                    id: unitId
+                },
                 productName: productName,
-                unitId: unitId,
                 variants: mvVariantAddedList,
                 attributes: mvAttributeAddedList
             };

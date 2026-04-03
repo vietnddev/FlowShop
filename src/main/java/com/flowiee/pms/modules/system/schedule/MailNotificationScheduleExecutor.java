@@ -33,7 +33,7 @@ public class MailNotificationScheduleExecutor extends ScheduleExecutor {
         super();
     }
 
-    @Scheduled(cron = "*/15 * * * * ?")
+    @Scheduled(cron = "0 */10 * * * ?")
     @Override
     public void init() throws AppException {
         super.init(ScheduleTask.MailNotification);

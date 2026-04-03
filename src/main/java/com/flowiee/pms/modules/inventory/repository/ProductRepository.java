@@ -20,12 +20,16 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
             pd.product.id,
             cast(coalesce(sum(pd.storageQty),0) as integer),
             cast(coalesce(sum(pd.soldQty),0) as integer),
-            cast(coalesce(sum(pd.defectiveQty),0) as integer))
+            cast(coalesce(sum(pd.defectiveQty),0) as integer),
+            cast((select coalesce(sum(od.quantity),0) from OrderDetail od
+                where od.productDetail.product.id in (:productId)
+                     and od.order.orderStatus = 'PROCESSING') as integer),
+            (select count(pd_) > 0 from ProductDetail pd_ where pd_.product.id in (:productId) and pd_.status = 'ACT'))
         from com.flowiee.pms.modules.inventory.entity.ProductDetail pd
-        where pd.product.id = :productId and pd.deletedAt is null
+        where pd.product.id in (:productId) and pd.deletedAt is null
         group by pd.product.id
     """)
-    ProductSummaryModel getSummariesQty(@Param("productId") Long productId);
+    List<ProductSummaryModel> getSummariesQty(@Param("productId") List<Long> productId);
 
     @Query("select count(pd) > 0 from ProductDetail pd where pd.product.id = :productId and pd.status = 'ACT'")
     boolean hasActiveStatus(@Param("productId") Long productId);

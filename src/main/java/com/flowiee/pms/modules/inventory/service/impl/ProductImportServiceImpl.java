@@ -2,12 +2,12 @@ package com.flowiee.pms.modules.inventory.service.impl;
 
 import com.flowiee.pms.common.base.service.BaseImportService;
 import com.flowiee.pms.common.enumeration.CATEGORY;
-import com.flowiee.pms.common.enumeration.PID;
 import com.flowiee.pms.common.enumeration.ProductEximKeyField;
 import com.flowiee.pms.common.enumeration.ProductStatus;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.modules.inventory.service.ProductInfoService;
 import com.flowiee.pms.modules.inventory.service.ProductVariantService;
+import com.flowiee.pms.modules.system.dto.CategoryDTO;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.inventory.entity.ProductTemp;
 import com.flowiee.pms.modules.inventory.entity.ProductVariantTemp;
@@ -196,9 +196,9 @@ public class ProductImportServiceImpl extends BaseImportService {
             ProductDTO lvPDto = new ProductDTO();
             lvPDto.setProductCategory("-");
             lvPDto.setProductName(p.getProductName());
-            lvPDto.setBrandId(p.getBrandId());
-            lvPDto.setProductTypeId(p.getProductTypeId());
-            lvPDto.setUnitId(p.getUnitId());
+            lvPDto.setBrand(new CategoryDTO(p.getBrandId(), null));
+            lvPDto.setProductType(new CategoryDTO(p.getProductTypeId(), null));
+            lvPDto.setUnit(new CategoryDTO(p.getUnitId(), null));
             ProductDTO productSaved = productService.save(lvPDto);
 
             p.getProductVariantTempList().forEach(pv -> {

@@ -1,7 +1,7 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.modules.inventory.entity.ProductPrice;
-import com.flowiee.pms.modules.inventory.enums.PriceType;
+import com.flowiee.pms.product.entity.ProductPrice;
+import com.flowiee.pms.product.enums.PriceType;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigDecimal;

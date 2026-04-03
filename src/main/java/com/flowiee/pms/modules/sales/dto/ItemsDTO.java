@@ -1,7 +1,7 @@
 package com.flowiee.pms.modules.sales.dto;
 
 import com.flowiee.pms.shared.base.BaseDTO;
-import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
+import com.flowiee.pms.product.dto.ProductVariantDTO;
 import lombok.Getter;
 import lombok.Setter;
 

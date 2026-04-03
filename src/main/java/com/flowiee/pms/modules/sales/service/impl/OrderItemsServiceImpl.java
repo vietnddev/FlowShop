@@ -1,8 +1,7 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
-import com.flowiee.pms.common.model.BaseParameter;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
-import com.flowiee.pms.modules.inventory.entity.ProductPrice;
+import com.flowiee.pms.product.entity.ProductDetail;
+import com.flowiee.pms.product.entity.ProductPrice;
 import com.flowiee.pms.modules.sales.entity.Items;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.sales.entity.OrderDetail;
@@ -10,10 +9,10 @@ import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.EntityNotFoundException;
 import com.flowiee.pms.modules.sales.dto.OrderDTO;
-import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
-import com.flowiee.pms.modules.inventory.repository.ProductPriceRepository;
+import com.flowiee.pms.product.dto.ProductVariantDTO;
+import com.flowiee.pms.product.repository.ProductPriceRepository;
 import com.flowiee.pms.modules.sales.repository.CartItemsRepository;
-import com.flowiee.pms.modules.inventory.service.ProductVariantService;
+import com.flowiee.pms.product.service.ProductVariantService;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.enumeration.*;

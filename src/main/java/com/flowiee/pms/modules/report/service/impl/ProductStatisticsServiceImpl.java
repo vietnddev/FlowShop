@@ -1,8 +1,8 @@
 package com.flowiee.pms.modules.report.service.impl;
 
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
+import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.modules.report.model.DefectiveProductStatisticsModel;
-import com.flowiee.pms.modules.inventory.repository.ProductDetailRepository;
+import com.flowiee.pms.product.repository.ProductDetailRepository;
 import com.flowiee.pms.modules.report.service.ProductStatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

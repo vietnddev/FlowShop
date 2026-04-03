@@ -2,9 +2,9 @@ package com.flowiee.pms.modules.dashboard.service.impl;
 
 import com.flowiee.pms.modules.dashboard.model.DashboardModel;
 import com.flowiee.pms.modules.dashboard.service.DashboardService;
-import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
-import com.flowiee.pms.modules.inventory.repository.ProductDetailRepository;
-import com.flowiee.pms.modules.inventory.service.ProductVariantService;
+import com.flowiee.pms.product.dto.ProductVariantDTO;
+import com.flowiee.pms.product.repository.ProductDetailRepository;
+import com.flowiee.pms.product.service.ProductVariantService;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;
 import com.flowiee.pms.modules.sales.service.CustomerService;

@@ -1,16 +1,15 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
-import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.modules.sales.service.PromotionApplyService;
 import com.flowiee.pms.modules.sales.service.PromotionService;
 import com.flowiee.pms.modules.sales.entity.PromotionInfo;
 import com.flowiee.pms.common.exception.*;
-import com.flowiee.pms.modules.inventory.dto.ProductDTO;
+import com.flowiee.pms.product.dto.ProductDTO;
 import com.flowiee.pms.modules.sales.dto.PromotionApplyDTO;
 import com.flowiee.pms.modules.sales.dto.PromotionInfoDTO;
 import com.flowiee.pms.modules.sales.repository.PromotionInfoRepository;
-import com.flowiee.pms.modules.inventory.service.ProductInfoService;
+import com.flowiee.pms.product.service.ProductInfoService;
 import com.flowiee.pms.modules.system.service.MailMediaService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import com.flowiee.pms.common.enumeration.MessageCode;

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.inventory.entity.ProductReview;
+import com.flowiee.pms.product.entity.ProductReview;
 import com.flowiee.pms.modules.inventory.entity.GiftRedemption;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;
 

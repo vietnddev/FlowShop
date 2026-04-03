@@ -2,6 +2,9 @@ package com.flowiee.pms.modules.system.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.flowiee.pms.product.entity.Product;
+import com.flowiee.pms.product.entity.ProductDetail;
+import com.flowiee.pms.product.entity.ProductPrice;
 import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.modules.inventory.entity.*;
 import com.flowiee.pms.modules.sales.entity.Customer;

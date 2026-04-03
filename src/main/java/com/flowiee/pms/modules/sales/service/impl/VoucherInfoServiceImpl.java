@@ -11,7 +11,7 @@ import com.flowiee.pms.modules.sales.entity.VoucherInfo;
 import com.flowiee.pms.common.exception.*;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.enumeration.*;
-import com.flowiee.pms.modules.inventory.dto.ProductDTO;
+import com.flowiee.pms.product.dto.ProductDTO;
 import com.flowiee.pms.modules.sales.dto.VoucherInfoDTO;
 import com.flowiee.pms.modules.sales.repository.VoucherInfoRepository;
 

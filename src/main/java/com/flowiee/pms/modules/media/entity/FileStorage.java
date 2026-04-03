@@ -2,6 +2,10 @@ package com.flowiee.pms.modules.media.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.flowiee.pms.product.entity.Product;
+import com.flowiee.pms.product.entity.ProductCombo;
+import com.flowiee.pms.product.entity.ProductDamaged;
+import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.shared.base.BaseEntity;
 
 import com.flowiee.pms.modules.inventory.entity.*;

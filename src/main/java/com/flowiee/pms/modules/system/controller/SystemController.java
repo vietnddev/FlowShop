@@ -1,14 +1,14 @@
 package com.flowiee.pms.modules.system.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
-import com.flowiee.pms.modules.inventory.entity.ProductCrawled;
+import com.flowiee.pms.product.entity.ProductCrawled;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.ForbiddenException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.media.service.FileStorageService;
 import com.flowiee.pms.modules.system.dto.ScheduleDTO;
 import com.flowiee.pms.modules.system.dto.SystemConfigDTO;
-import com.flowiee.pms.modules.inventory.repository.ProductCrawlerRepository;
+import com.flowiee.pms.product.repository.ProductCrawlerRepository;
 import com.flowiee.pms.modules.inventory.service.CrawlerService;
 import com.flowiee.pms.modules.system.service.ConfigService;
 import com.flowiee.pms.common.enumeration.ErrorCode;

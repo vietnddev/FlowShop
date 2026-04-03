@@ -1,9 +1,10 @@
 package com.flowiee.pms.modules.inventory.dto;
 
+import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.shared.base.BaseDTO;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.modules.inventory.entity.Material;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
+import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.TransactionGoodsItem;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

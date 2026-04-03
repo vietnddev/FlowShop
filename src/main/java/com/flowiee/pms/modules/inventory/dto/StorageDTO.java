@@ -2,6 +2,7 @@ package com.flowiee.pms.modules.inventory.dto;
 
 import com.flowiee.pms.modules.inventory.entity.Storage;
 import com.flowiee.pms.modules.inventory.model.StorageItems;
+import com.flowiee.pms.product.dto.ProductVariantDTO;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;

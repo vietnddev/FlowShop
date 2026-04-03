@@ -2,9 +2,9 @@ package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.utils.*;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
+import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.TransactionGoods;
-import com.flowiee.pms.modules.inventory.service.ProductVariantService;
+import com.flowiee.pms.product.service.ProductVariantService;
 import com.flowiee.pms.modules.inventory.service.TransactionGoodsService;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.sales.dto.OrderReturnDTO;

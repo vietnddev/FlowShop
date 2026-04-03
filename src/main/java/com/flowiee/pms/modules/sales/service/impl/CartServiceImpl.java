@@ -5,8 +5,8 @@ import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.PriceUtils;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
-import com.flowiee.pms.modules.inventory.entity.ProductPrice;
+import com.flowiee.pms.product.entity.ProductDetail;
+import com.flowiee.pms.product.entity.ProductPrice;
 import com.flowiee.pms.modules.sales.dto.OrderCartDTO;
 import com.flowiee.pms.modules.sales.entity.Items;
 import com.flowiee.pms.modules.sales.entity.OrderCart;
@@ -16,11 +16,11 @@ import com.flowiee.pms.modules.sales.dto.ItemsDTO;
 import com.flowiee.pms.modules.sales.model.CartItemsReq;
 import com.flowiee.pms.modules.sales.model.CartReq;
 import com.flowiee.pms.common.enumeration.*;
-import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
-import com.flowiee.pms.modules.inventory.repository.ProductPriceRepository;
+import com.flowiee.pms.product.dto.ProductVariantDTO;
+import com.flowiee.pms.product.repository.ProductPriceRepository;
 import com.flowiee.pms.modules.sales.repository.CartItemsRepository;
 import com.flowiee.pms.modules.sales.repository.OrderCartRepository;
-import com.flowiee.pms.modules.inventory.service.ProductVariantService;
+import com.flowiee.pms.product.service.ProductVariantService;
 
 import com.flowiee.pms.modules.sales.service.CartItemsService;
 import com.flowiee.pms.modules.sales.service.CartService;
@@ -86,8 +86,8 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
                 //ProductPrice itemPrice = item.getProductDetail().getVariantPrice();
                 List<ProductPrice> itemPrice = mvProductPriceRepository.findPresentPrices(item.getProductDetail().getId());
                 if (itemPrice != null) {
-                    BigDecimal lvRetailPrice = PriceUtils.getPriceValue(itemPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
-                    BigDecimal lvWholesalePrice = PriceUtils.getPriceValue(itemPrice, com.flowiee.pms.modules.inventory.enums.PriceType.WHO);
+                    BigDecimal lvRetailPrice = PriceUtils.getPriceValue(itemPrice, com.flowiee.pms.product.enums.PriceType.RTL);
+                    BigDecimal lvWholesalePrice = PriceUtils.getPriceValue(itemPrice, com.flowiee.pms.product.enums.PriceType.WHO);
                     PriceType priceType = PriceType.valueOf(item.getPriceType());
                     if (priceType.equals(PriceType.L)) {
                         item.setPriceOriginal(lvRetailPrice);
@@ -251,8 +251,8 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
             if (productVariantPrice == null) {
                 throw new AppException(String.format("Sản phẩm %s chưa được thiết lập giá bán!", lvProductVariant.getVariantName()));
             }
-            BigDecimal lvRetailPrice = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
-            BigDecimal lvRetailPriceDiscount = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
+            BigDecimal lvRetailPrice = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.product.enums.PriceType.RTL);
+            BigDecimal lvRetailPriceDiscount = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.product.enums.PriceType.RTL);
 
             BigDecimal lvItemPrice = lvRetailPriceDiscount != null ? lvRetailPriceDiscount : lvRetailPrice;
             BigDecimal lvItemOriginalPrice = lvRetailPrice;
@@ -298,10 +298,10 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
             if (productVariantPrice == null) {
                 throw new AppException(String.format("Sản phẩm %s chưa được thiết lập giá bán!", productVariant.getVariantName()));
             }
-            BigDecimal lvRetailPrice = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
-            BigDecimal lvRetailPriceDiscount = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.RTL);
-            BigDecimal lvWholesalePrice = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.WHO);
-            BigDecimal lvWholesalePriceDiscount = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.modules.inventory.enums.PriceType.WHO);
+            BigDecimal lvRetailPrice = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.product.enums.PriceType.RTL);
+            BigDecimal lvRetailPriceDiscount = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.product.enums.PriceType.RTL);
+            BigDecimal lvWholesalePrice = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.product.enums.PriceType.WHO);
+            BigDecimal lvWholesalePriceDiscount = PriceUtils.getPriceValue(productVariantPrice, com.flowiee.pms.product.enums.PriceType.WHO);
 
             //String lvPriceType = pItemToUpdate.getPriceType();
             String lvPriceType = PriceType.L.name();
@@ -350,7 +350,7 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
             lvItemDto.setQuantity(lvItem.getQuantity());
             lvItemDto.setNote(lvItem.getNote());
             lvItemDto.setCartId(lvCart.getId());
-            lvItemDto.setPrice(PriceUtils.getPriceValue(lvItemPrices, com.flowiee.pms.modules.inventory.enums.PriceType.RTL));
+            lvItemDto.setPrice(PriceUtils.getPriceValue(lvItemPrices, com.flowiee.pms.product.enums.PriceType.RTL));
             lvItemDto.setExtraDiscount(lvItem.getExtraDiscount());
 
             lvItemDTOs.add(lvItemDto);

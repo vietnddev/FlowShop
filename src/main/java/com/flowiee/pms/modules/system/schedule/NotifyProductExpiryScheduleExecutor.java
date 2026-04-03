@@ -1,11 +1,11 @@
 package com.flowiee.pms.modules.system.schedule;
 
 import com.flowiee.pms.common.utils.SysConfigUtils;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
+import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.modules.system.entity.MailMedia;
 import com.flowiee.pms.modules.system.entity.SystemConfig;
 import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.modules.inventory.repository.ProductDetailRepository;
+import com.flowiee.pms.product.repository.ProductDetailRepository;
 import com.flowiee.pms.modules.staff.repository.AccountRepository;
 import com.flowiee.pms.modules.system.repository.ConfigRepository;
 import com.flowiee.pms.modules.system.service.MailMediaService;

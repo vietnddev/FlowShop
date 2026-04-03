@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.system.service.impl;
 
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
+import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.staff.repository.AccountRepository;
 import com.flowiee.pms.common.constants.Constants;

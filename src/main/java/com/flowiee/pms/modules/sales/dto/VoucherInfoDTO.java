@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.dto;
 
-import com.flowiee.pms.modules.inventory.dto.ProductDTO;
+import com.flowiee.pms.product.dto.ProductDTO;
 import com.flowiee.pms.modules.sales.entity.VoucherInfo;
 import com.flowiee.pms.modules.sales.entity.VoucherTicket;
 import com.flowiee.pms.common.enumeration.VoucherStatus;

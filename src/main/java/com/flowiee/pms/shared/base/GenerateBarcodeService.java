@@ -5,7 +5,7 @@ import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.FileUtils;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
+import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.staff.entity.Account;

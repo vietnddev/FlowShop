@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
+import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.common.exception.AppException;
@@ -14,7 +15,7 @@ import com.flowiee.pms.modules.inventory.model.TransactionGoodsReq;
 import com.flowiee.pms.modules.inventory.repository.TransactionGoodsItemRepository;
 import com.flowiee.pms.modules.inventory.service.StorageService;
 import com.flowiee.pms.modules.inventory.service.TransactionGoodsService;
-import com.flowiee.pms.modules.inventory.repository.ProductDetailRepository;
+import com.flowiee.pms.product.repository.ProductDetailRepository;
 import com.flowiee.pms.modules.inventory.repository.TransactionGoodsRepository;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.media.repository.FileStorageRepository;

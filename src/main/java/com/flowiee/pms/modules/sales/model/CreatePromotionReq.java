@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.model;
 
-import com.flowiee.pms.modules.inventory.dto.ProductDTO;
+import com.flowiee.pms.product.dto.ProductDTO;
 import com.flowiee.pms.modules.sales.dto.PromotionInfoDTO;
 import lombok.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;

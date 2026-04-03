@@ -2,8 +2,8 @@ package com.flowiee.pms.modules.media.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.modules.media.dto.FileDTO;
-import com.flowiee.pms.modules.inventory.service.ProductImageService;
-import com.flowiee.pms.modules.inventory.service.ProductInfoService;
+import com.flowiee.pms.product.service.ProductImageService;
+import com.flowiee.pms.product.service.ProductInfoService;
 import com.flowiee.pms.common.enumeration.Pages;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.flowiee.pms.common.base.service;
+package com.flowiee.pms.shared.base;
 
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.ExcelUtils;

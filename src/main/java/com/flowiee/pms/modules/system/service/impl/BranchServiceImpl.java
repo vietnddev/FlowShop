@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.system.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.modules.system.entity.Branch;
 import com.flowiee.pms.modules.system.dto.BranchDTO;
 import com.flowiee.pms.modules.system.repository.BranchRepository;

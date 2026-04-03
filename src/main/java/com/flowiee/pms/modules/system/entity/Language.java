@@ -1,13 +1,12 @@
 package com.flowiee.pms.modules.system.entity;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.shared.base.BaseEntity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.utils.*;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.TransactionGoods;

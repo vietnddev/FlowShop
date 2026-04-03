@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.controller;
 
-import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.modules.sales.dto.PromotionInfoDTO;
 import com.flowiee.pms.modules.sales.service.PromotionService;
 import com.flowiee.pms.common.enumeration.Pages;

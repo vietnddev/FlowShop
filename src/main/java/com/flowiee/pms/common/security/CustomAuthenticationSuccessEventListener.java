@@ -1,6 +1,6 @@
 package com.flowiee.pms.common.security;
 
-import com.flowiee.pms.common.base.FlwSys;
+import com.flowiee.pms.shared.base.FlwSys;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.SysConfigUtils;

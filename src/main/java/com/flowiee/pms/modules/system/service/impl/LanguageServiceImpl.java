@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.modules.system.dto.LanguageDTO;
 import com.flowiee.pms.modules.system.service.LanguageService;

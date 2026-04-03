@@ -1,7 +1,7 @@
 package com.flowiee.pms.modules.sales.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

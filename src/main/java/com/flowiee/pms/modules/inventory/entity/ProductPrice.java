@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.inventory.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.modules.inventory.enums.DiscountType;
 import com.flowiee.pms.modules.inventory.enums.PriceType;
 import com.flowiee.pms.modules.system.entity.Category;

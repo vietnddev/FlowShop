@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.service;
 
-import com.flowiee.pms.common.base.service.ICurdService;
+import com.flowiee.pms.shared.base.ICurdService;
 import com.flowiee.pms.modules.sales.entity.Customer;
 import com.flowiee.pms.modules.sales.model.PurchaseHistory;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;

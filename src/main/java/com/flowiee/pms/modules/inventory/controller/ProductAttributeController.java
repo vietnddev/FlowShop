@@ -1,12 +1,10 @@
 package com.flowiee.pms.modules.inventory.controller;
 
-import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.inventory.dto.ProductAttributeDTO;
-import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.inventory.model.CreateProductAttributeReq;
-import com.flowiee.pms.modules.inventory.model.CreateProductVariantReq;
 import com.flowiee.pms.modules.inventory.service.ProductAttributeService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;

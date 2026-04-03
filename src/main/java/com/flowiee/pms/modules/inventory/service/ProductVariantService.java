@@ -4,7 +4,7 @@ import com.flowiee.pms.common.enumeration.ProductStatus;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.model.ProductVariantSearchRequest;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantTempDTO;
-import com.flowiee.pms.common.base.service.ICurdService;
+import com.flowiee.pms.shared.base.ICurdService;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import org.springframework.data.domain.Page;
 

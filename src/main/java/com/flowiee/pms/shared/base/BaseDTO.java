@@ -1,4 +1,4 @@
-package com.flowiee.pms.common.base.dto;
+package com.flowiee.pms.shared.base;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

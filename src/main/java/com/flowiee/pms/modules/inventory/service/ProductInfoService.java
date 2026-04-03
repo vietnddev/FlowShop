@@ -1,7 +1,7 @@
 package com.flowiee.pms.modules.inventory.service;
 
 import com.flowiee.pms.modules.inventory.entity.ProductDescription;
-import com.flowiee.pms.common.base.service.ICurdService;
+import com.flowiee.pms.shared.base.ICurdService;
 import com.flowiee.pms.modules.inventory.dto.ProductDTO;
 import com.flowiee.pms.modules.inventory.entity.Product;
 import com.flowiee.pms.modules.inventory.model.ProductSearchRequest;

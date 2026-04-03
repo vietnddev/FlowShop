@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.staff.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.constants.Constants;
@@ -13,7 +13,6 @@ import com.flowiee.pms.modules.staff.dto.AccountDTO;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.common.exception.*;
 import com.flowiee.pms.modules.staff.repository.AccountRepository;
-import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.modules.staff.service.AccountService;
 import com.flowiee.pms.modules.system.service.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;
@@ -21,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
 import javax.transaction.Transactional;
 import java.util.List;

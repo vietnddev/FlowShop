@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.system.service.impl;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.modules.system.repository.CategoryRepository;
-import com.flowiee.pms.common.base.service.BaseImportService;
+import com.flowiee.pms.shared.base.BaseImportService;
 import com.flowiee.pms.common.utils.CommonUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

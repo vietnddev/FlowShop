@@ -5,7 +5,7 @@ import com.flowiee.pms.modules.inventory.entity.ProductReview;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.modules.inventory.dto.ProductReviewDTO;
 import com.flowiee.pms.modules.inventory.repository.ProductReviewRepository;
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.modules.inventory.service.ProductReviewService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

@@ -1,12 +1,8 @@
-package com.flowiee.pms.common.base.service;
+package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.base.repository.BaseRepository;
+import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.security.UserPrincipal;
-import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.sales.entity.Customer;
-import com.flowiee.pms.modules.sales.entity.OrderCart;
-import com.flowiee.pms.modules.sales.entity.VoucherTicket;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.system.entity.SystemLog;
 import com.flowiee.pms.common.model.Filter;
@@ -14,7 +10,7 @@ import com.flowiee.pms.common.exception.EntityNotFoundException;
 import com.flowiee.pms.modules.system.repository.SystemLogRepository;
 import com.flowiee.pms.common.security.UserSession;
 import javax.persistence.EntityGraph;
-import lombok.Data;
+
 import org.springframework.util.CollectionUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -379,5 +375,11 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
 
     protected UserPrincipal getUserPrincipal() {
         return mvUserSession.getUserPrincipal();
+    }
+
+    protected void validateId(Long id) {
+        if (id == null || id <= 0) {
+            throw new AppException("Invalid id: " + id);
+        }
     }
 }

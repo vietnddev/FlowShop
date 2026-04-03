@@ -1,9 +1,8 @@
 package com.flowiee.pms.modules.inventory.controller;
 
-import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.modules.inventory.dto.ProductPriceDTO;
-import com.flowiee.pms.modules.inventory.entity.ProductHistory;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;

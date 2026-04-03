@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.inventory.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

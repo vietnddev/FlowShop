@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.system.service.impl;
 
-import com.flowiee.pms.common.base.FlwSys;
+import com.flowiee.pms.shared.base.FlwSys;
 import com.flowiee.pms.common.config.TemplateSendEmail;
 import com.flowiee.pms.modules.system.entity.MailMedia;
 import com.flowiee.pms.modules.system.repository.MailMediaRepository;

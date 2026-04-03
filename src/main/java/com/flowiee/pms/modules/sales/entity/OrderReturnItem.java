@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.entity;
 
-import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.modules.sales.utils.OrderReturnCondition;
 import lombok.*;
 

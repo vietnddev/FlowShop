@@ -13,7 +13,7 @@ import com.flowiee.pms.modules.sales.service.OrderItemsService;
 import com.flowiee.pms.modules.sales.service.OrderPrintInvoiceService;
 import com.flowiee.pms.modules.sales.service.OrderService;
 import com.flowiee.pms.modules.sales.service.VoucherTicketService;
-import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.modules.system.service.CategoryService;
 
 import com.flowiee.pms.common.enumeration.CATEGORY;

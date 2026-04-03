@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.system.controller;
 
-import com.flowiee.pms.common.base.controller.BaseController;
-import com.flowiee.pms.common.utils.FileUtils;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.modules.inventory.entity.ProductCrawled;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.exception.ForbiddenException;
@@ -11,8 +10,6 @@ import com.flowiee.pms.modules.system.dto.ScheduleDTO;
 import com.flowiee.pms.modules.system.dto.SystemConfigDTO;
 import com.flowiee.pms.modules.inventory.repository.ProductCrawlerRepository;
 import com.flowiee.pms.modules.inventory.service.CrawlerService;
-import com.flowiee.pms.modules.system.repository.ScheduleRepository;
-import com.flowiee.pms.modules.system.schedule.entity.Schedule;
 import com.flowiee.pms.modules.system.service.ConfigService;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import com.flowiee.pms.modules.system.service.ScheduleService;
@@ -26,8 +23,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 

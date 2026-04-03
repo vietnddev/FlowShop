@@ -1,6 +1,6 @@
 package com.flowiee.pms.common.exception;
 
-import com.flowiee.pms.common.base.exception.BaseException;
+import com.flowiee.pms.shared.base.BaseException;
 import com.flowiee.pms.common.enumeration.ErrorCode;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;

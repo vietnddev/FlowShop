@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
-import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.modules.sales.entity.Order;
@@ -8,7 +8,7 @@ import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.common.exception.EntityNotFoundException;
 import com.flowiee.pms.modules.sales.repository.OrderRepository;
 import com.flowiee.pms.modules.media.repository.FileStorageRepository;
-import com.flowiee.pms.common.base.service.GenerateQRCodeService;
+import com.flowiee.pms.shared.base.GenerateQRCodeService;
 import com.flowiee.pms.modules.sales.service.OrderGenerateQRCodeService;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.media.controller;
 
-import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.common.enumeration.SystemDir;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.common.model.AppResponse;

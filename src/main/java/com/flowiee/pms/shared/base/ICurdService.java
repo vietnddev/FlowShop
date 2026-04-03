@@ -1,4 +1,4 @@
-package com.flowiee.pms.common.base.service;
+package com.flowiee.pms.shared.base;
 
 public interface ICurdService<T> {
     T findById(Long pEntityId, boolean pThrowException);

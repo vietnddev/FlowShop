@@ -1,7 +1,7 @@
 package com.flowiee.pms.modules.sales.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.flowiee.pms.common.base.dto.BaseDTO;
+import com.flowiee.pms.shared.base.BaseDTO;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.modules.sales.entity.*;
 import com.flowiee.pms.modules.system.dto.CategoryDTO;

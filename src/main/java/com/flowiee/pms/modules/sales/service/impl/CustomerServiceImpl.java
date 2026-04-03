@@ -1,18 +1,14 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseService;
-import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.utils.OrderUtils;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.modules.sales.dto.CustomerContactDTO;
-import com.flowiee.pms.common.security.UserSession;
-import com.flowiee.pms.modules.sales.model.OrderReq;
 import com.flowiee.pms.modules.sales.service.CustomerContactService;
 import com.flowiee.pms.modules.sales.service.CustomerService;
-import com.flowiee.pms.modules.system.service.ConfigService;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.modules.sales.model.PurchaseHistory;

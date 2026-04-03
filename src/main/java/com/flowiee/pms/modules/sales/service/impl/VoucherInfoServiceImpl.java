@@ -15,7 +15,7 @@ import com.flowiee.pms.modules.inventory.dto.ProductDTO;
 import com.flowiee.pms.modules.sales.dto.VoucherInfoDTO;
 import com.flowiee.pms.modules.sales.repository.VoucherInfoRepository;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.modules.system.service.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;

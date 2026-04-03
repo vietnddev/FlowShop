@@ -7,7 +7,7 @@ import com.flowiee.pms.common.enumeration.ACTION;
 import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.modules.inventory.dto.MaterialDTO;
 import com.flowiee.pms.modules.inventory.repository.MaterialRepository;
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 
 import com.flowiee.pms.common.enumeration.MasterObject;
 import com.flowiee.pms.common.enumeration.MessageCode;

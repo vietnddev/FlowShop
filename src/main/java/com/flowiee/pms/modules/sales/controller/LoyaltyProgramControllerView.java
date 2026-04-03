@@ -1,11 +1,11 @@
 package com.flowiee.pms.modules.sales.controller;
 
-import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.modules.sales.dto.LoyaltyProgramDTO;
 import com.flowiee.pms.modules.sales.entity.LoyaltyProgram;
 import com.flowiee.pms.modules.sales.service.LoyaltyProgramService;
 import com.flowiee.pms.common.enumeration.Pages;
-import javax.servlet.http.HttpServletRequest;
+
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

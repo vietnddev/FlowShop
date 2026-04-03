@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.modules.inventory.entity.Product;
 import com.flowiee.pms.modules.inventory.entity.ProductRelated;
 import com.flowiee.pms.common.exception.EntityNotFoundException;

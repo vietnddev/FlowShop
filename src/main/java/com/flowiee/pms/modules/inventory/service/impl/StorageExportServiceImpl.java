@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.inventory.service.impl;
 import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.modules.inventory.model.StorageItems;
 import com.flowiee.pms.modules.inventory.dto.StorageDTO;
-import com.flowiee.pms.common.base.service.BaseExportService;
+import com.flowiee.pms.shared.base.BaseExportService;
 import com.flowiee.pms.modules.inventory.service.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.xssf.usermodel.XSSFCell;

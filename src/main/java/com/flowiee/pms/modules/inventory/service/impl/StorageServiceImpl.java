@@ -9,7 +9,7 @@ import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.modules.inventory.model.StorageItems;
 import com.flowiee.pms.modules.inventory.dto.StorageDTO;
 import com.flowiee.pms.modules.inventory.repository.StorageRepository;
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.modules.inventory.service.StorageService;
 import com.flowiee.pms.modules.system.service.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;

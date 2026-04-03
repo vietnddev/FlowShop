@@ -1,8 +1,8 @@
 package com.flowiee.pms.common.exception;
 
-import com.flowiee.pms.common.base.FlwSys;
-import com.flowiee.pms.common.base.exception.BaseException;
-import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.shared.base.FlwSys;
+import com.flowiee.pms.shared.base.BaseException;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.common.utils.SysConfigUtils;
 import com.flowiee.pms.modules.system.entity.SystemConfig;
 import com.flowiee.pms.common.model.AppResponse;

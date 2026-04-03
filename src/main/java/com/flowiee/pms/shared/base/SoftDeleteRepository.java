@@ -1,4 +1,4 @@
-package com.flowiee.pms.common.base.repository;
+package com.flowiee.pms.shared.base;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

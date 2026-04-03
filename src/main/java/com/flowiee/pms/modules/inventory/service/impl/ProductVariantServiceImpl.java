@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.constants.JpaHints;
 import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.common.utils.SysConfigUtils;
@@ -21,7 +21,7 @@ import com.flowiee.pms.common.exception.*;
 import com.flowiee.pms.modules.inventory.model.ProductVariantSearchRequest;
 import com.flowiee.pms.modules.inventory.repository.ProductPriceRepository;
 import com.flowiee.pms.modules.sales.repository.OrderCartRepository;
-import com.flowiee.pms.common.base.service.GenerateBarcodeService;
+import com.flowiee.pms.shared.base.GenerateBarcodeService;
 import com.flowiee.pms.modules.sales.service.CartService;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.common.utils.CoreUtils;

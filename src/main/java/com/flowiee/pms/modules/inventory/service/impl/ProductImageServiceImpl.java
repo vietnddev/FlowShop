@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
-import com.flowiee.pms.common.base.StartUp;
+import com.flowiee.pms.shared.base.StartUp;
 import com.flowiee.pms.modules.inventory.entity.*;
 import com.flowiee.pms.modules.inventory.service.*;
 import com.flowiee.pms.modules.media.entity.FileStorage;

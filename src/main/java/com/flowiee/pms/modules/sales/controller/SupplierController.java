@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.sales.controller;
 
-import com.flowiee.pms.common.base.controller.BaseControllerNew;
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.common.constants.Constants;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.common.model.AppResponse;
@@ -21,13 +20,8 @@ import java.util.List;
 @RequestMapping("${app.api.prefix}/supplier")
 @Tag(name = "Material API", description = "Quản lý nhà cung cấp")
 @RequiredArgsConstructor
-public class SupplierController extends BaseControllerNew<SupplierDTO> {
+public class SupplierController extends BaseController {
     private final SupplierService mvSupplierService;
-
-    @Override
-    protected BaseService<?, SupplierDTO, ?> getService() {
-        return (BaseService<?, SupplierDTO, ?>) mvSupplierService;
-    }
 
     @Operation(summary = "Find all nhà cung cấp")
     @GetMapping("/all")
@@ -46,20 +40,20 @@ public class SupplierController extends BaseControllerNew<SupplierDTO> {
     @PostMapping("/create")
     @PreAuthorize("@vldModuleSales.insertSupplier(true)")
     public AppResponse<SupplierDTO> createNewSupplier(@RequestBody SupplierDTO supplier) {
-        return super.handleCreate(supplier);
+        return AppResponse.success(mvSupplierService.save(supplier));
     }
 
     @Operation(summary = "Cập nhật nhà cung cấp")
     @PutMapping("/update/{id}")
     @PreAuthorize("@vldModuleSales.updateSupplier(true)")
     public AppResponse<SupplierDTO> updateSupplier(@RequestBody SupplierDTO supplier, @PathVariable("id") Long supplierId) {
-        return super.handleUpdate(supplier, supplierId);
+        return AppResponse.success(mvSupplierService.update(supplier, supplierId));
     }
 
     @Operation(summary = "Xóa nhà cung cấp")
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("@vldModuleSales.deleteSupplier(true)")
     public AppResponse<String> deleteSupplier(@PathVariable("id") Long supplierId) {
-        return super.handleDelete(supplierId);
+        return AppResponse.success(mvSupplierService.delete(supplierId));
     }
 }

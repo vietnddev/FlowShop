@@ -4,7 +4,7 @@ import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.*;
 import com.flowiee.pms.modules.inventory.dto.ProductHistoryDTO;
 import com.flowiee.pms.modules.inventory.repository.ProductHistoryRepository;
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.modules.inventory.repository.ProductPriceHistoryRepository;
 import com.flowiee.pms.modules.inventory.service.ProductHistoryService;
 import lombok.AccessLevel;

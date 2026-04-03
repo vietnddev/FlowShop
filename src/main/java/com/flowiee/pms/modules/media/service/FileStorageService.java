@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.media.service;
 
-import com.flowiee.pms.common.base.service.ICurdService;
+import com.flowiee.pms.shared.base.ICurdService;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.flowiee.pms.modules.media.entity.FileStorage;

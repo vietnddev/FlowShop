@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.Material;
 import com.flowiee.pms.modules.inventory.entity.MaterialHistory;

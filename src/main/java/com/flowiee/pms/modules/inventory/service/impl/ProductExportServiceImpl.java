@@ -8,7 +8,7 @@ import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.inventory.entity.Product;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.entity.ProductPrice;
-import com.flowiee.pms.common.base.service.BaseExportService;
+import com.flowiee.pms.shared.base.BaseExportService;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.system.service.CategoryService;
 import javax.persistence.EntityManager;

@@ -1,6 +1,5 @@
-package com.flowiee.pms.common.base.service;
+package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.base.entity.BaseEntity;
 import com.flowiee.pms.common.enumeration.FileExtension;
 import com.flowiee.pms.common.enumeration.MODULE;
 import com.flowiee.pms.common.security.UserSession;
@@ -10,49 +9,28 @@ import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.sales.entity.Order;
 import com.flowiee.pms.modules.staff.entity.Account;
-import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
-@Component
-public abstract class GenerateQRCodeService {
+public abstract class GenerateBarcodeService {
     @Autowired
     private UserSession userSession;
 
-    protected FileExtension mvQRCodeFormat = FileExtension.PNG;
-    protected int mvQRCodeWidth = 200;
-    protected int mvQRCodeHeight = 200;
+    protected FileExtension mvBarcodeFormat = FileExtension.PNG;
+    protected int mvBarcodeWidth = 300;
+    protected int mvBarcodeHeight = 100;
 
-    protected void generateQRCode(String pContent, FileExtension pFormat, Path pPath) throws WriterException, IOException {
-        generateQRCode(pContent, pFormat, mvQRCodeWidth, mvQRCodeHeight, pPath);
-    }
+    public abstract FileStorage generateBarcode(Long pProductVariantId) throws WriterException, IOException;
 
-    protected void generateQRCode(String pContent, FileExtension pFormat, int pWidth, int pHeight, Path pPath) throws WriterException, IOException {
-        QRCodeWriter lvQrCodeWriter = new QRCodeWriter();
-        BitMatrix lvBitMatrix = lvQrCodeWriter.encode(pContent, BarcodeFormat.QR_CODE, pWidth, pHeight);
-        MatrixToImageWriter.writeToPath(lvBitMatrix, pFormat.name(), pPath);
-    }
-
-    protected String getCodeType() {
-        return FileStorage.QRCODE;
-    }
-
-    protected String getImageExtension() {
-        return mvQRCodeFormat.getKey();
-    }
+    public abstract FileStorage generateBarcode(Long pProductVariantId, int width, int height) throws WriterException, IOException;
 
     protected String getStorageName(long pCurrentTime, String pQRCodeName) {
         return pCurrentTime + "_" + pQRCodeName;
     }
 
-    protected FileStorage initQRCodeEnt(BaseEntity baseEntity, MODULE pModule, Long pOrderId, Long pProductVariantId) {
+    protected FileStorage initBarcodeEnt(BaseEntity baseEntity, MODULE pModule, Long pOrderId, Long pProductVariantId) {
         return FileStorage.builder()
                 .module(pModule.name())
                 .originalName(getImageName(baseEntity))
@@ -66,6 +44,10 @@ public abstract class GenerateQRCodeService {
                 .productDetail(pProductVariantId != null ? new ProductDetail(pProductVariantId) : null)
                 .fileType(getCodeType())
                 .build();
+    }
+
+    protected String getCodeType() {
+        return null;
     }
 
     protected String getImageName(BaseEntity baseEntity) {
@@ -82,5 +64,9 @@ public abstract class GenerateQRCodeService {
 
     protected String getGenPath(MODULE pModule) {
         return CommonUtils.getPathDirectory(pModule);
+    }
+
+    protected String getImageExtension() {
+        return null;
     }
 }

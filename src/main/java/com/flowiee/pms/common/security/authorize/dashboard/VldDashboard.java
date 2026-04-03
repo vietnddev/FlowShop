@@ -1,7 +1,7 @@
 package com.flowiee.pms.common.security.authorize.dashboard;
 
 import com.flowiee.pms.common.enumeration.ACTION;
-import com.flowiee.pms.common.base.BaseAuthorize;
+import com.flowiee.pms.shared.base.BaseAuthorize;
 import org.springframework.stereotype.Component;
 
 @Component

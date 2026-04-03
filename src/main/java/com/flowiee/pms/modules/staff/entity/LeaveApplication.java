@@ -1,7 +1,7 @@
 package com.flowiee.pms.modules.staff.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.common.enumeration.LeaveStatus;
 import lombok.*;

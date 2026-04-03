@@ -1,7 +1,7 @@
 package com.flowiee.pms.modules.inventory.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.shared.base.BaseEntity;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

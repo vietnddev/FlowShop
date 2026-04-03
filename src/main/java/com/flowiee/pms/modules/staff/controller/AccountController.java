@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.staff.controller;
 
-import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.modules.staff.dto.AccountDTO;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.common.exception.AppException;

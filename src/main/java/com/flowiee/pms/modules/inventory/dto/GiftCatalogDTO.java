@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.inventory.dto;
 
-import com.flowiee.pms.common.base.dto.BaseDTO;
+import com.flowiee.pms.shared.base.BaseDTO;
 import com.flowiee.pms.modules.inventory.entity.GiftRedemption;
 import lombok.Data;
 

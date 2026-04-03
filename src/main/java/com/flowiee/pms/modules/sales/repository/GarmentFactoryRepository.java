@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.repository;
 
-import com.flowiee.pms.common.base.repository.BaseRepository;
+import com.flowiee.pms.shared.base.BaseRepository;
 import org.springframework.stereotype.Repository;
 
 import com.flowiee.pms.modules.sales.entity.GarmentFactory;

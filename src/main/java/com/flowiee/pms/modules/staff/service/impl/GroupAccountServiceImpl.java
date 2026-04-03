@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.staff.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.staff.entity.GroupAccount;
 import com.flowiee.pms.common.exception.BadRequestException;

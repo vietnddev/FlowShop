@@ -1,7 +1,7 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
 import com.flowiee.pms.modules.sales.model.GeneralLedger;
-import com.flowiee.pms.common.base.service.BaseExportService;
+import com.flowiee.pms.shared.base.BaseExportService;
 import com.flowiee.pms.modules.sales.dto.LedgerTransactionDTO;
 import com.flowiee.pms.modules.sales.service.LedgerService;
 import lombok.AccessLevel;

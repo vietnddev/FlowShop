@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.inventory.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseImportService;
+import com.flowiee.pms.shared.base.BaseImportService;
 import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.common.enumeration.ProductEximKeyField;
 import com.flowiee.pms.common.enumeration.ProductStatus;

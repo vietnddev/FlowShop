@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.system.repository;
 
-import com.flowiee.pms.common.base.repository.BaseRepository;
+import com.flowiee.pms.shared.base.BaseRepository;
 import com.flowiee.pms.modules.system.entity.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

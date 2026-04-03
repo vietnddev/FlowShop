@@ -1,6 +1,6 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.common.base.StartUp;
+import com.flowiee.pms.shared.base.StartUp;
 import com.flowiee.pms.common.enumeration.SystemDir;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.common.exception.AppException;

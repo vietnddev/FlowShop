@@ -1,4 +1,4 @@
-package com.flowiee.pms.common.base.service;
+package com.flowiee.pms.shared.base;
 
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.exception.AppException;
@@ -13,7 +13,6 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

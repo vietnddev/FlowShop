@@ -6,7 +6,7 @@ import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.utils.ChangeLog;
 import com.flowiee.pms.modules.sales.dto.SupplierDTO;
 import com.flowiee.pms.modules.sales.repository.SupplierRepository;
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 
 import com.flowiee.pms.common.enumeration.ACTION;
 import com.flowiee.pms.common.enumeration.MODULE;

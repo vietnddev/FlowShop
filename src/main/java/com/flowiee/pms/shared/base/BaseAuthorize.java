@@ -1,4 +1,4 @@
-package com.flowiee.pms.common.base;
+package com.flowiee.pms.shared.base;
 
 import com.flowiee.pms.common.enumeration.ConfigCode;
 import com.flowiee.pms.common.utils.SysConfigUtils;

@@ -1,6 +1,6 @@
 package com.flowiee.pms.common.config;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.utils.CoreUtils;
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.slf4j.MDC;

@@ -1,9 +1,6 @@
 package com.flowiee.pms.modules.inventory.dto;
 
-import com.flowiee.pms.common.base.dto.BaseDTO;
-import com.flowiee.pms.modules.inventory.entity.Product;
-import com.flowiee.pms.modules.inventory.entity.ProductAttribute;
-import com.flowiee.pms.modules.inventory.entity.ProductDetail;
+import com.flowiee.pms.shared.base.BaseDTO;
 import com.flowiee.pms.modules.inventory.entity.ProductHistory;
 import lombok.Builder;
 import lombok.Data;

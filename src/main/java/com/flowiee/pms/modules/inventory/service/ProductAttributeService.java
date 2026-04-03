@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.inventory.service;
 
-import com.flowiee.pms.common.base.service.ICurdService;
+import com.flowiee.pms.shared.base.ICurdService;
 import com.flowiee.pms.modules.inventory.dto.ProductAttributeDTO;
 import org.springframework.data.domain.Page;
 

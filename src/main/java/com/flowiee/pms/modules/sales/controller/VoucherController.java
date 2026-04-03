@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.controller;
 
-import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.sales.dto.VoucherInfoDTO;
 import com.flowiee.pms.modules.sales.entity.VoucherInfo;

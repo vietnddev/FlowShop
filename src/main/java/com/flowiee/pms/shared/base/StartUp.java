@@ -1,6 +1,5 @@
-package com.flowiee.pms.common.base;
+package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.base.entity.BaseEntity;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.config.TemplateSendEmail;
 import com.flowiee.pms.modules.system.entity.Category;

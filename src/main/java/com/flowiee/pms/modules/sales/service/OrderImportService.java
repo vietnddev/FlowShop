@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.service;
 
-import com.flowiee.pms.common.base.service.BaseImportService;
+import com.flowiee.pms.shared.base.BaseImportService;
 import org.springframework.stereotype.Service;
 
 @Service

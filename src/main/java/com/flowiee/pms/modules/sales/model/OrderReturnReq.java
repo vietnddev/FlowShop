@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.model;
 
-import com.flowiee.pms.common.base.dto.BaseDTO;
+import com.flowiee.pms.shared.base.BaseDTO;
 import com.flowiee.pms.modules.sales.dto.OrderReturnItemDTO;
 import com.flowiee.pms.modules.sales.utils.OrderRefundMethod;
 import com.flowiee.pms.modules.sales.utils.OrderReturnStatus;

@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.system.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.modules.system.service.CategoryHistoryService;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.system.entity.CategoryHistory;

@@ -7,7 +7,7 @@ import com.flowiee.pms.modules.sales.dto.ItemsDTO;
 import com.flowiee.pms.modules.sales.dto.OrderCartDTO;
 import com.flowiee.pms.modules.sales.entity.Items;
 import com.flowiee.pms.modules.sales.model.CartReq;
-import com.flowiee.pms.common.base.service.ICurdService;
+import com.flowiee.pms.shared.base.ICurdService;
 import com.flowiee.pms.modules.sales.entity.OrderCart;
 
 public interface CartService extends ICurdService<OrderCartDTO> {

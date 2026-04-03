@@ -1,7 +1,6 @@
 package com.flowiee.pms.modules.sales.dto;
 
-import com.flowiee.pms.common.base.dto.BaseDTO;
-import lombok.Data;
+import com.flowiee.pms.shared.base.BaseDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

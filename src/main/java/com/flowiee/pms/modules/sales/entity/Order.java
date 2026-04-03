@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.sales.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.flowiee.pms.common.base.entity.BaseEntity;
+import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.modules.inventory.entity.TransactionGoods;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.staff.entity.Account;

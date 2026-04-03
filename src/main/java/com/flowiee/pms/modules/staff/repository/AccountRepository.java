@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.staff.repository;
 
-import com.flowiee.pms.common.base.repository.BaseRepository;
+import com.flowiee.pms.shared.base.BaseRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

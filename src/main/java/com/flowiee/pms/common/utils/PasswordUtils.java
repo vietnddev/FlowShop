@@ -1,6 +1,6 @@
 package com.flowiee.pms.common.utils;
 
-import com.flowiee.pms.common.base.FlwSys;
+import com.flowiee.pms.shared.base.FlwSys;
 import com.flowiee.pms.modules.system.entity.SystemConfig;
 import com.flowiee.pms.common.enumeration.ConfigCode;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

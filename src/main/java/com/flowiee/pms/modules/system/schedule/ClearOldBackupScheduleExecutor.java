@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.system.schedule;
 
-import com.flowiee.pms.common.base.FlwSys;
+import com.flowiee.pms.shared.base.FlwSys;
 import com.flowiee.pms.common.enumeration.ConfigCode;
 import com.flowiee.pms.common.enumeration.ScheduleTask;
 import com.flowiee.pms.common.enumeration.SystemDir;

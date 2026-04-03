@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.sales.service.impl;
 
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.enumeration.PriceType;
 import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
@@ -14,7 +14,6 @@ import com.flowiee.pms.modules.inventory.dto.ProductComboDTO;
 import com.flowiee.pms.modules.inventory.dto.ProductVariantDTO;
 import com.flowiee.pms.modules.sales.repository.CartItemsRepository;
 import com.flowiee.pms.modules.sales.repository.OrderCartRepository;
-import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.modules.inventory.service.ProductComboService;
 import com.flowiee.pms.modules.inventory.service.ProductVariantService;
 import com.flowiee.pms.common.enumeration.MessageCode;

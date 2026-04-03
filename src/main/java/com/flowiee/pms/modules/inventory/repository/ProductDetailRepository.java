@@ -1,7 +1,7 @@
 package com.flowiee.pms.modules.inventory.repository;
 
-import com.flowiee.pms.common.base.repository.BaseRepository;
-import com.flowiee.pms.common.base.repository.SoftDeleteRepository;
+import com.flowiee.pms.shared.base.BaseRepository;
+import com.flowiee.pms.shared.base.SoftDeleteRepository;
 import com.flowiee.pms.modules.inventory.entity.Product;
 import com.flowiee.pms.modules.inventory.entity.ProductDetail;
 import com.flowiee.pms.modules.inventory.model.ProductSummaryInfoModel;

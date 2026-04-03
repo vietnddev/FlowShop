@@ -1,8 +1,8 @@
 package com.flowiee.pms.modules.system.service.impl;
 
-import com.flowiee.pms.common.base.StartUp;
-import com.flowiee.pms.common.base.FlwSys;
-import com.flowiee.pms.common.base.service.BaseService;
+import com.flowiee.pms.shared.base.StartUp;
+import com.flowiee.pms.shared.base.FlwSys;
+import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.modules.system.entity.Category;
 import com.flowiee.pms.modules.system.entity.SystemConfig;
 import com.flowiee.pms.modules.system.entity.SystemLog;

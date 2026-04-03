@@ -1,6 +1,5 @@
-package com.flowiee.pms.common.base.controller;
+package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.base.BaseAuthorize;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.enumeration.CATEGORY;
 import com.flowiee.pms.common.security.UserSession;

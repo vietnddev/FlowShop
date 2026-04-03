@@ -1,6 +1,6 @@
 package com.flowiee.pms.modules.inventory.controller;
 
-import com.flowiee.pms.common.base.controller.BaseController;
+import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.modules.inventory.service.ProductDamagedService;
 import com.flowiee.pms.common.enumeration.Pages;
 import lombok.RequiredArgsConstructor;

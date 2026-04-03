@@ -1,6 +1,6 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.shared.util.CoreUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;

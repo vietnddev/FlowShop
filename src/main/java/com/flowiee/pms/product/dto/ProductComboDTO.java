@@ -1,7 +1,7 @@
 package com.flowiee.pms.product.dto;
 
 import com.flowiee.pms.shared.base.BaseDTO;
-import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.media.entity.FileStorage;
 import lombok.Data;
 
 import java.io.Serializable;

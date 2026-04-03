@@ -1,11 +1,11 @@
 package com.flowiee.pms.product.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
-import com.flowiee.pms.common.exception.ResourceNotFoundException;
-import com.flowiee.pms.common.model.AppResponse;
+import com.flowiee.pms.shared.exception.ResourceNotFoundException;
+import com.flowiee.pms.shared.response.AppResponse;
 import com.flowiee.pms.product.dto.ProductReviewDTO;
 import com.flowiee.pms.product.service.ProductReviewService;
-import com.flowiee.pms.common.enumeration.ErrorCode;
+import com.flowiee.pms.shared.enums.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

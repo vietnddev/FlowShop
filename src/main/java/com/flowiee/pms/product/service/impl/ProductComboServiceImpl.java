@@ -1,20 +1,21 @@
 package com.flowiee.pms.product.service.impl;
 
+import com.flowiee.pms.product.enums.ProductComboStatus;
 import com.flowiee.pms.shared.base.BaseService;
-import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.shared.request.BaseParameter;
 import com.flowiee.pms.product.entity.ProductCombo;
 import com.flowiee.pms.product.entity.ProductComboApply;
-import com.flowiee.pms.common.exception.BadRequestException;
-import com.flowiee.pms.common.exception.EntityNotFoundException;
+import com.flowiee.pms.shared.exception.BadRequestException;
+import com.flowiee.pms.shared.exception.EntityNotFoundException;
 import com.flowiee.pms.product.dto.ProductComboDTO;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.product.repository.ProductComboApplyRepository;
-import com.flowiee.pms.common.utils.ChangeLog;
-import com.flowiee.pms.common.enumeration.*;
+import com.flowiee.pms.shared.util.ChangeLog;
 import com.flowiee.pms.product.repository.ProductComboRepository;
 import com.flowiee.pms.product.service.ProductComboService;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.modules.system.service.SystemLogService;
+import com.flowiee.pms.shared.enums.*;
+import com.flowiee.pms.system.service.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

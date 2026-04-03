@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import com.flowiee.pms.shared.base.BaseEntity;
 
-import com.flowiee.pms.modules.sales.entity.Items;
+import com.flowiee.pms.cart.entity.Items;
 import com.flowiee.pms.order.entity.OrderDetail;
-import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.media.entity.FileStorage;
-import com.flowiee.pms.common.enumeration.ProductStatus;
+import com.flowiee.pms.system.entity.Category;
+import com.flowiee.pms.media.entity.FileStorage;
+import com.flowiee.pms.product.enums.ProductStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;

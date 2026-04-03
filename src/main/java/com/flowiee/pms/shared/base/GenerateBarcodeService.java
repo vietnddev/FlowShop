@@ -1,23 +1,19 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.enumeration.FileExtension;
-import com.flowiee.pms.common.enumeration.MODULE;
-import com.flowiee.pms.common.security.UserSession;
-import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.common.utils.FileUtils;
+import com.flowiee.pms.shared.enums.FileExtension;
+import com.flowiee.pms.shared.enums.MODULE;
+import com.flowiee.pms.shared.util.CommonUtils;
+import com.flowiee.pms.shared.util.FileUtils;
 import com.flowiee.pms.product.entity.ProductDetail;
-import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.media.entity.FileStorage;
 import com.flowiee.pms.order.entity.Order;
-import com.flowiee.pms.modules.staff.entity.Account;
+import com.flowiee.pms.shared.util.SecurityUtils;
+import com.flowiee.pms.system.entity.Account;
 import com.google.zxing.WriterException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
 public abstract class GenerateBarcodeService {
-    @Autowired
-    private UserSession userSession;
-
     protected FileExtension mvBarcodeFormat = FileExtension.PNG;
     protected int mvBarcodeWidth = 300;
     protected int mvBarcodeHeight = 100;
@@ -38,7 +34,7 @@ public abstract class GenerateBarcodeService {
                 .storageName(getImageStorageName())
                 .extension(getImageExtension())
                 .directoryPath(CommonUtils.getPathDirectory(pModule).substring(CommonUtils.getPathDirectory(pModule).indexOf("uploads")))
-                .uploadBy(new Account(userSession.getUserPrincipal().getId()))
+                .uploadBy(new Account(SecurityUtils.getCurrentUser().getId()))
                 .isActive(false)
                 .order(pOrderId != null ? new Order(pOrderId) : null)
                 .productDetail(pProductVariantId != null ? new ProductDetail(pProductVariantId) : null)

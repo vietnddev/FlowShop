@@ -1,11 +1,11 @@
 package com.flowiee.pms.product.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
-import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.common.model.AppResponse;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.shared.response.AppResponse;
 import com.flowiee.pms.product.dto.ProductComboDTO;
 import com.flowiee.pms.product.service.ProductComboService;
-import com.flowiee.pms.common.enumeration.ErrorCode;
+import com.flowiee.pms.shared.enums.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;

@@ -1,25 +1,26 @@
 package com.flowiee.pms.order.service.impl;
 
+import com.flowiee.pms.product.dto.ProductPriceDTO;
 import com.flowiee.pms.product.entity.ProductDetail;
-import com.flowiee.pms.product.entity.ProductPrice;
-import com.flowiee.pms.modules.sales.entity.Items;
+import com.flowiee.pms.cart.entity.Items;
 import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.order.entity.OrderDetail;
-import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.common.exception.BadRequestException;
-import com.flowiee.pms.common.exception.EntityNotFoundException;
+import com.flowiee.pms.product.enums.SalesType;
+import com.flowiee.pms.product.service.ProductPriceService;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.shared.exception.BadRequestException;
+import com.flowiee.pms.shared.exception.EntityNotFoundException;
 import com.flowiee.pms.order.dto.OrderDTO;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
-import com.flowiee.pms.product.repository.ProductPriceRepository;
-import com.flowiee.pms.modules.sales.repository.CartItemsRepository;
+import com.flowiee.pms.cart.repository.CartItemsRepository;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.common.utils.ChangeLog;
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.common.enumeration.*;
+import com.flowiee.pms.shared.util.ChangeLog;
+import com.flowiee.pms.shared.util.CoreUtils;
 import com.flowiee.pms.order.repository.OrderDetailRepository;
 import com.flowiee.pms.order.service.OrderHistoryService;
 import com.flowiee.pms.order.service.OrderItemsService;
-import com.flowiee.pms.modules.system.service.SystemLogService;
+import com.flowiee.pms.shared.enums.*;
+import com.flowiee.pms.system.service.SystemLogService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -41,10 +43,10 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class OrderItemsServiceImpl implements OrderItemsService {
-    SystemLogService       mvSystemLogService;
+    SystemLogService mvSystemLogService;
     OrderHistoryService mvOrderHistoryService;
-    OrderDetailRepository  mvOrderDetailRepository;
-    ProductPriceRepository mvProductPriceRepository;
+    OrderDetailRepository mvOrderDetailRepository;
+    ProductPriceService mvProductPriceService;
     @Autowired
     @NonFinal
     @Lazy
@@ -78,19 +80,18 @@ public class OrderItemsServiceImpl implements OrderItemsService {
                     orderDetail.setQuantity(orderDetail.getQuantity() + 1);
                     itemAdded.add(mvOrderDetailRepository.save(orderDetail));
                 } else {
-                    ProductPrice itemPrice = mvProductPriceRepository.findPricePresent(productDetail.getId());
-                    if (itemPrice == null) {
-                        throw new AppException(String.format("Sản phẩm %s chưa được thiết lập giá bán!", productDetail.getVariantName()));
-                    }
+                    ProductPriceDTO lvPrice = mvProductPriceService.getPrice(productDetail.getId());
                     itemAdded.add(this.save(OrderDetail.builder()
                             .order(new Order(pOrder.getId()))
                             .productDetail(new ProductDetail(productDetail.getId()))
                             .quantity(1)
                             .status(true)
-                            .price(itemPrice.getAppliedValue())
-                            .priceOriginal(itemPrice.getPriceValue())
+                            //.price(itemPrice.getAppliedValue())
+                            .price(lvPrice.getRetailPrice())
+                            //.priceOriginal(itemPrice.getPriceValue())
+                            .priceOriginal(lvPrice.getRetailPrice())
                             .extraDiscount(BigDecimal.ZERO)
-                            .priceType(PriceType.L.name())
+                            .priceType(SalesType.L.name())
                             .build()));
                 }
             }

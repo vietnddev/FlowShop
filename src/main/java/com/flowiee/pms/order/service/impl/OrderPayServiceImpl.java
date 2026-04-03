@@ -1,22 +1,24 @@
 package com.flowiee.pms.order.service.impl;
 
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.modules.sales.service.LedgerReceiptService;
+import com.flowiee.pms.ledger.enums.LedgerTranType;
+import com.flowiee.pms.shared.util.CoreUtils;
+import com.flowiee.pms.ledger.service.LedgerReceiptService;
 import com.flowiee.pms.order.service.OrderPayService;
 import com.flowiee.pms.order.service.OrderService;
-import com.flowiee.pms.modules.system.dto.CategoryDTO;
-import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.sales.entity.CustomerDebt;
+import com.flowiee.pms.shared.enums.*;
+import com.flowiee.pms.system.dto.CategoryDTO;
+import com.flowiee.pms.system.entity.Category;
+import com.flowiee.pms.customer.entity.CustomerDebt;
 import com.flowiee.pms.order.entity.Order;
-import com.flowiee.pms.common.exception.BadRequestException;
-import com.flowiee.pms.modules.sales.dto.LedgerTransactionDTO;
-import com.flowiee.pms.modules.system.repository.CategoryRepository;
-import com.flowiee.pms.modules.sales.repository.CustomerDebtRepository;
+import com.flowiee.pms.shared.exception.BadRequestException;
+import com.flowiee.pms.ledger.dto.LedgerTransactionDTO;
+import com.flowiee.pms.system.enums.CATEGORY;
+import com.flowiee.pms.system.repository.CategoryRepository;
+import com.flowiee.pms.customer.repository.CustomerDebtRepository;
 import com.flowiee.pms.order.repository.OrderRepository;
-import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.common.utils.OrderUtils;
-import com.flowiee.pms.common.enumeration.*;
-import com.flowiee.pms.modules.system.service.SystemLogService;
+import com.flowiee.pms.shared.util.CommonUtils;
+import com.flowiee.pms.shared.util.OrderUtils;
+import com.flowiee.pms.system.service.SystemLogService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -89,7 +91,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         lvLedgerTransactionDTO.setAmount(lvOrderAmount);
 
 
-        mvLedgerReceiptService.save(lvLedgerTransactionDTO);
+        mvLedgerReceiptService.create(lvLedgerTransactionDTO);
         logger.info("End generate receipt issued when completed an order");
 
         systemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_ORD_U, MasterObject.Order, "Cập nhật trạng thái thanh toán đơn hàng", "Số tiền: " + CommonUtils.formatToVND(paymentAmount));

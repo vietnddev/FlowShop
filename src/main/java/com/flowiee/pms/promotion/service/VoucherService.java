@@ -1,0 +1,12 @@
+package com.flowiee.pms.promotion.service;
+
+import com.flowiee.pms.shared.base.ICurdService;
+import com.flowiee.pms.promotion.dto.VoucherInfoDTO;
+import org.springframework.data.domain.Page;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public interface VoucherService extends ICurdService<VoucherInfoDTO> {
+    Page<VoucherInfoDTO> findAll(int pageSize, int pageNum, List<Long> pIds, String pTitle, LocalDateTime pStartTime, LocalDateTime pEndTime, String pStatus);
+}

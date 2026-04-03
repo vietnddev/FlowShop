@@ -1,6 +1,6 @@
 package com.flowiee.pms.product.entity;
 
-import com.flowiee.pms.modules.inventory.entity.ImageCrawled;
+import com.flowiee.pms.system.entity.ImageCrawled;
 import lombok.*;
 
 import javax.persistence.*;

@@ -1,20 +1,20 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.common.config.TemplateSendEmail;
-import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.sales.entity.Customer;
-import com.flowiee.pms.modules.system.schedule.entity.Schedule;
-import com.flowiee.pms.modules.system.entity.Branch;
-import com.flowiee.pms.modules.system.entity.SystemConfig;
-import com.flowiee.pms.modules.system.repository.BranchRepository;
-import com.flowiee.pms.modules.system.service.ConfigService;
-import com.flowiee.pms.modules.staff.entity.Account;
-import com.flowiee.pms.modules.staff.entity.GroupAccount;
-import com.flowiee.pms.modules.system.model.ServerInfo;
-import com.flowiee.pms.modules.system.repository.CategoryRepository;
-import com.flowiee.pms.modules.sales.repository.CustomerRepository;
-import com.flowiee.pms.common.utils.CommonUtils;
+import com.flowiee.pms.shared.util.CoreUtils;
+import com.flowiee.pms.shared.config.TemplateSendEmail;
+import com.flowiee.pms.system.entity.Category;
+import com.flowiee.pms.customer.entity.Customer;
+import com.flowiee.pms.schedule.entity.Schedule;
+import com.flowiee.pms.system.entity.Branch;
+import com.flowiee.pms.system.entity.SystemConfig;
+import com.flowiee.pms.system.repository.BranchRepository;
+import com.flowiee.pms.system.service.ConfigService;
+import com.flowiee.pms.system.entity.Account;
+import com.flowiee.pms.system.entity.GroupAccount;
+import com.flowiee.pms.system.model.ServerInfo;
+import com.flowiee.pms.system.repository.CategoryRepository;
+import com.flowiee.pms.customer.repository.CustomerRepository;
+import com.flowiee.pms.shared.util.CommonUtils;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -27,15 +27,15 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.flowiee.pms.common.utils.FileUtils;
-import com.flowiee.pms.common.utils.PasswordUtils;
-import com.flowiee.pms.common.enumeration.ConfigCode;
-import com.flowiee.pms.common.enumeration.EndPoint;
-import com.flowiee.pms.common.enumeration.NotificationType;
-import com.flowiee.pms.modules.system.repository.ConfigRepository;
-import com.flowiee.pms.modules.system.repository.ScheduleRepository;
-import com.flowiee.pms.modules.staff.repository.AccountRepository;
-import com.flowiee.pms.modules.staff.repository.GroupAccountRepository;
+import com.flowiee.pms.shared.util.FileUtils;
+import com.flowiee.pms.shared.util.PasswordUtils;
+import com.flowiee.pms.system.enums.ConfigCode;
+import com.flowiee.pms.shared.enums.EndPoint;
+import com.flowiee.pms.system.enums.NotificationType;
+import com.flowiee.pms.system.repository.ConfigRepository;
+import com.flowiee.pms.schedule.repository.ScheduleRepository;
+import com.flowiee.pms.system.repository.AccountRepository;
+import com.flowiee.pms.system.repository.GroupAccountRepository;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -62,8 +62,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Configuration
 @RequiredArgsConstructor
 public class StartUp {
-	private final Logger logger = LoggerFactory.getLogger(getClass());
-
 	private final ConfigRepository mvConfigRepository;
 	private final BranchRepository mvBranchRepository;
 	private final AccountRepository mvAccountRepository;
@@ -133,13 +131,13 @@ public class StartUp {
 						}
 						lvTemplateContent.append(new String(lvOs.toByteArray(), lvEncoding));
 					} catch (IOException e) {
-						logger.warn(e.getMessage(), e);
+						log.warn(e.getMessage(), e);
 					}
 				}
 				lvTemplate.setTemplateContent(lvTemplateContent.toString());
 				FlwSys.getEmailTemplateConfigs().put(lvNotificationType, lvTemplate);
 			});
-			logger.info("Email templates have been loaded.");
+			log.info("Email templates have been loaded.");
 
 			START_APP_TIME = LocalDateTime.now();
         };
@@ -155,7 +153,7 @@ public class StartUp {
 			Log.info("Couldn't get local host address");
 		}
 		CommonUtils.mvServerInfo = new ServerInfo(ipAddress, serverPort);
-		logger.info("Server is running on IP: " + ipAddress + ", Port: " + serverPort);
+		log.info("Server is running on IP: " + ipAddress + ", Port: " + serverPort);
 	}
 
 	private void configReport() {
@@ -263,7 +261,7 @@ public class StartUp {
 			lvFileReader.close();
 			lvCsvReader.close();
 		} catch (Exception e) {
-			logger.error("Failed to init category data", e);
+			log.error("Failed to init category data", e);
 		}
 
 		try {
@@ -367,7 +365,7 @@ public class StartUp {
 			}
 			lvWorkbook.close();
 		} catch (Exception e) {
-			logger.error("Failed to init system data", e);
+			log.error("Failed to init system data", e);
 		}
 
 		systemConfigInitData.setValue("Y");

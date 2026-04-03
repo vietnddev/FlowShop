@@ -1,25 +1,23 @@
 package com.flowiee.pms.order.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.common.utils.DateTimeUtil;
-import com.flowiee.pms.order.entity.Order;
-import com.flowiee.pms.common.exception.EntityNotFoundException;
-import com.flowiee.pms.common.model.AppResponse;
+import com.flowiee.pms.shared.util.CoreUtils;
+import com.flowiee.pms.shared.util.DateTimeUtil;
+import com.flowiee.pms.shared.response.AppResponse;
 import com.flowiee.pms.order.model.OrderReq;
 import com.flowiee.pms.order.model.OrderReturnReq;
-import com.flowiee.pms.modules.system.model.EximResult;
+import com.flowiee.pms.system.model.EximResult;
 import com.flowiee.pms.order.dto.OrderDTO;
-import com.flowiee.pms.common.exception.AppException;
+import com.flowiee.pms.shared.exception.AppException;
 import com.flowiee.pms.order.model.CreateOrderReq;
-import com.flowiee.pms.modules.sales.model.UpdateOrderReq;
-import com.flowiee.pms.modules.system.service.ExportService;
+import com.flowiee.pms.order.model.UpdateOrderReq;
+import com.flowiee.pms.system.service.ExportService;
 import com.flowiee.pms.order.service.OrderPayService;
 import com.flowiee.pms.order.service.OrderService;
-import com.flowiee.pms.common.constants.Constants;
-import com.flowiee.pms.common.enumeration.ErrorCode;
-import com.flowiee.pms.common.enumeration.OrderStatus;
-import com.flowiee.pms.common.enumeration.TemplateExport;
+import com.flowiee.pms.shared.constant.Constants;
+import com.flowiee.pms.shared.enums.ErrorCode;
+import com.flowiee.pms.order.enums.OrderStatus;
+import com.flowiee.pms.shared.enums.TemplateExport;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +28,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -140,19 +137,6 @@ public class OrderController extends BaseController {
     public ResponseEntity<InputStreamResource> exportToExcel() {
         EximResult model = mvExportService.exportToExcel(TemplateExport.EX_LIST_OF_ORDERS, null, false);
         return ResponseEntity.ok().headers(model.getHttpHeaders()).body(model.getContent());
-    }
-
-    @GetMapping("/scan/QR-Code/{code}")
-    public ModelAndView findOrderInfoByQRCode(@PathVariable("code") String pOrderCode) {
-        try {
-            Order lvOrder = mvOrderService.findByCode(pOrderCode);
-            if (lvOrder == null) {
-                throw new EntityNotFoundException(new Object[]{"order"}, null, null);
-            }
-            return new ModelAndView().addObject("orderInfo", lvOrder);
-        } catch (RuntimeException ex) {
-            throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "scan order"), ex);
-        }
     }
 
     @PostMapping("/{orderId}/returns")

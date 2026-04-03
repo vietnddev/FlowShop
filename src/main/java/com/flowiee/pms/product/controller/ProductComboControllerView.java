@@ -3,7 +3,7 @@ package com.flowiee.pms.product.controller;
 import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.product.dto.ProductComboDTO;
 import com.flowiee.pms.product.service.ProductComboService;
-import com.flowiee.pms.common.enumeration.Pages;
+import com.flowiee.pms.shared.enums.Pages;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -2,13 +2,13 @@ package com.flowiee.pms.product.service.impl;
 
 import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.shared.base.GenerateQRCodeService;
-import com.flowiee.pms.common.enumeration.MODULE;
-import com.flowiee.pms.common.utils.CommonUtils;
+import com.flowiee.pms.shared.enums.MODULE;
+import com.flowiee.pms.shared.util.CommonUtils;
 import com.flowiee.pms.product.entity.ProductDetail;
-import com.flowiee.pms.modules.media.entity.FileStorage;
-import com.flowiee.pms.common.exception.EntityNotFoundException;
+import com.flowiee.pms.media.entity.FileStorage;
+import com.flowiee.pms.shared.exception.EntityNotFoundException;
 import com.flowiee.pms.product.repository.ProductDetailRepository;
-import com.flowiee.pms.modules.media.repository.FileStorageRepository;
+import com.flowiee.pms.media.repository.FileStorageRepository;
 import com.flowiee.pms.product.service.ProductGenerateQRCodeService;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;

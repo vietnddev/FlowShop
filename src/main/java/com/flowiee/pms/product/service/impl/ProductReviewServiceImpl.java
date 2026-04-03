@@ -1,8 +1,8 @@
 package com.flowiee.pms.product.service.impl;
 
-import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.shared.request.BaseParameter;
 import com.flowiee.pms.product.entity.ProductReview;
-import com.flowiee.pms.common.exception.BadRequestException;
+import com.flowiee.pms.shared.exception.BadRequestException;
 import com.flowiee.pms.product.dto.ProductReviewDTO;
 import com.flowiee.pms.product.repository.ProductReviewRepository;
 import com.flowiee.pms.shared.base.BaseService;

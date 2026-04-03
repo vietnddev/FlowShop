@@ -1,7 +1,5 @@
 package com.flowiee.pms.product.dto;
 
-import com.flowiee.pms.product.entity.Product;
-import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.product.entity.ProductPrice;
 import lombok.*;
 
@@ -14,17 +12,16 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ProductPriceDTO implements Serializable {
-    Product productBase;//Change to DTO or remove in next version
-    ProductDetail productVariant;//Change to DTO or remove in next version
-    BigDecimal retailPrice;
-    BigDecimal retailPriceDiscount;
-    BigDecimal wholesalePrice;
-    BigDecimal wholesalePriceDiscount;
-    BigDecimal purchasePrice;
-    BigDecimal costPrice;
-    LocalDateTime lastUpdatedAt;
-    String note;
-    String state;
+    private Long productVariantId;
+    private BigDecimal retailPrice;
+    private BigDecimal retailPriceDiscount;
+    private BigDecimal wholesalePrice;
+    private BigDecimal wholesalePriceDiscount;
+    private BigDecimal purchasePrice;
+    private BigDecimal costPrice;
+    private LocalDateTime lastUpdatedAt;
+    private String note;
+    private String state;
 
     public ProductPriceDTO() {
         this.retailPrice = BigDecimal.ZERO;
@@ -33,6 +30,15 @@ public class ProductPriceDTO implements Serializable {
         this.wholesalePriceDiscount = BigDecimal.ZERO;
         this.purchasePrice = BigDecimal.ZERO;
         this.costPrice = BigDecimal.ZERO;
+    }
+
+    public ProductPriceDTO(Long productVariantId, BigDecimal retailPrice, BigDecimal wholesalePrice, BigDecimal costPrice) {
+        this.productVariantId = productVariantId;
+        this.retailPrice = retailPrice;
+        this.retailPriceDiscount = retailPrice;
+        this.wholesalePrice = wholesalePrice;
+        this.wholesalePriceDiscount = wholesalePrice;
+        this.costPrice = costPrice;
     }
 
     public static ProductPriceDTO toDTO(ProductPrice productPrice) {

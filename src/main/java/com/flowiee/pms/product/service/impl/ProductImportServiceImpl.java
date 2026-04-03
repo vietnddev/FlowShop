@@ -1,25 +1,27 @@
 package com.flowiee.pms.product.service.impl;
 
+import com.flowiee.pms.product.service.ProductService;
 import com.flowiee.pms.shared.base.BaseImportService;
-import com.flowiee.pms.common.enumeration.CATEGORY;
-import com.flowiee.pms.common.enumeration.ProductEximKeyField;
-import com.flowiee.pms.common.enumeration.ProductStatus;
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.product.service.ProductInfoService;
+import com.flowiee.pms.shared.security.UserPrincipal;
+import com.flowiee.pms.shared.util.SecurityUtils;
+import com.flowiee.pms.system.enums.CATEGORY;
+import com.flowiee.pms.product.enums.ProductEximKeyField;
+import com.flowiee.pms.product.enums.ProductStatus;
+import com.flowiee.pms.shared.util.CoreUtils;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.modules.system.dto.CategoryDTO;
-import com.flowiee.pms.modules.system.entity.Category;
+import com.flowiee.pms.system.dto.CategoryDTO;
+import com.flowiee.pms.system.entity.Category;
 import com.flowiee.pms.product.entity.ProductTemp;
 import com.flowiee.pms.product.entity.ProductVariantTemp;
-import com.flowiee.pms.common.exception.AppException;
+import com.flowiee.pms.shared.exception.AppException;
 import com.flowiee.pms.product.dto.ProductDTO;
 import com.flowiee.pms.product.dto.ProductPriceDTO;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
-import com.flowiee.pms.modules.system.repository.CategoryRepository;
+import com.flowiee.pms.system.repository.CategoryRepository;
 import com.flowiee.pms.product.repository.ProductTempRepository;
 import com.flowiee.pms.product.repository.ProductVariantTempRepository;
-import com.flowiee.pms.common.security.UserSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 
@@ -33,21 +35,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductImportServiceImpl extends BaseImportService {
     private final ProductVariantTempRepository productVariantTempRepository;
     private final ProductTempRepository productTempRepository;
     private final ProductVariantService productVariantService;
-    private final ProductInfoService productService;
+    private final ProductService productService;
     private final CategoryRepository categoryRepository;
-    private final UserSession userSession;
 
     @Override
     protected void writeData() throws AppException, IOException {
         List<ProductTemp> lvData = new ArrayList<>();
 
         StringBuilder lvMessageError = new StringBuilder();
+        UserPrincipal currentUser = SecurityUtils.getCurrentUser();
 
         Map<String, ProductTemp> productMap = new HashMap<>();
 
@@ -148,12 +151,12 @@ public class ProductImportServiceImpl extends BaseImportService {
         productTempRepository.deleteAll();
         for (ProductTemp p : lvData) {
             p.setCreatedAt(LocalDateTime.now());
-            p.setCreatedBy(userSession.getUserPrincipal().getUsername());
+            p.setCreatedBy(currentUser.getUsername());
             ProductTemp productTempSaved = productTempRepository.save(p);
 
             for (ProductVariantTemp pv : p.getProductVariantTempList()) {
                 pv.setCreatedAt(LocalDateTime.now());
-                pv.setCreatedBy(userSession.getUserPrincipal().getUsername());
+                pv.setCreatedBy(currentUser.getUsername());
                 pv.setProductTemp(productTempSaved);
                 productVariantTempRepository.save(pv);
             }
@@ -230,7 +233,7 @@ public class ProductImportServiceImpl extends BaseImportService {
 
         productTempRepository.deleteAll();
 
-        logger.info("Approved {} record (s)", totalRecordApproved.get());
+        log.info("Approved {} record (s)", totalRecordApproved.get());
 
         return String.format("%s record (s) is approved OK", totalRecordApproved.get());
     }

@@ -1,16 +1,16 @@
 package com.flowiee.pms.product.service.impl;
 
-import com.flowiee.pms.common.enumeration.CATEGORY;
-import com.flowiee.pms.common.enumeration.ProductEximKeyField;
-import com.flowiee.pms.common.enumeration.ProductStatus;
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.modules.system.entity.Category;
+import com.flowiee.pms.system.enums.CATEGORY;
+import com.flowiee.pms.product.enums.ProductEximKeyField;
+import com.flowiee.pms.product.enums.ProductStatus;
+import com.flowiee.pms.shared.util.CoreUtils;
+import com.flowiee.pms.system.entity.Category;
 import com.flowiee.pms.product.entity.Product;
 import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.product.entity.ProductPrice;
 import com.flowiee.pms.shared.base.BaseExportService;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
-import com.flowiee.pms.modules.system.service.CategoryService;
+import com.flowiee.pms.system.service.CategoryService;
 import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;

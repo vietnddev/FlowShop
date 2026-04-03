@@ -1,5 +1,11 @@
 package com.flowiee.pms.product.service.impl;
 
+import com.flowiee.pms.inventory.dto.StorageDTO;
+import com.flowiee.pms.inventory.dto.TransactionGoodsDTO;
+import com.flowiee.pms.inventory.entity.Storage;
+import com.flowiee.pms.inventory.enums.TransactionGoodsType;
+import com.flowiee.pms.inventory.service.StorageService;
+import com.flowiee.pms.inventory.service.TransactionGoodsService;
 import com.flowiee.pms.product.dto.ProductPriceDTO;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.product.dto.ProductVariantTempDTO;
@@ -7,37 +13,33 @@ import com.flowiee.pms.product.entity.Product;
 import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.product.entity.ProductPrice;
 import com.flowiee.pms.product.entity.ProductVariantExim;
+import com.flowiee.pms.product.enums.ProductStatus;
 import com.flowiee.pms.product.service.*;
 import com.flowiee.pms.shared.base.BaseService;
-import com.flowiee.pms.common.constants.JpaHints;
-import com.flowiee.pms.common.model.BaseParameter;
-import com.flowiee.pms.common.utils.SysConfigUtils;
-import com.flowiee.pms.modules.inventory.dto.*;
-import com.flowiee.pms.modules.inventory.entity.*;
-import com.flowiee.pms.modules.inventory.enums.TransactionGoodsStatus;
-import com.flowiee.pms.modules.inventory.service.*;
-import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.system.service.CategoryService;
-import com.flowiee.pms.modules.system.service.SendOperatorNotificationService;
-import com.flowiee.pms.modules.system.service.SystemLogService;
-import com.flowiee.pms.modules.sales.entity.Items;
-import com.flowiee.pms.order.entity.OrderCart;
-import com.flowiee.pms.modules.media.entity.FileStorage;
-import com.flowiee.pms.common.exception.*;
+import com.flowiee.pms.shared.enums.*;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.shared.exception.BadRequestException;
+import com.flowiee.pms.shared.exception.DataExistsException;
+import com.flowiee.pms.shared.exception.DataInUseException;
+import com.flowiee.pms.shared.jpa.JpaHints;
+import com.flowiee.pms.shared.request.BaseParameter;
+import com.flowiee.pms.shared.util.*;
+import com.flowiee.pms.inventory.enums.TransactionGoodsStatus;
+import com.flowiee.pms.system.entity.Category;
+import com.flowiee.pms.system.enums.CATEGORY;
+import com.flowiee.pms.system.enums.ConfigCode;
+import com.flowiee.pms.system.service.CategoryService;
+import com.flowiee.pms.system.service.SendOperatorNotificationService;
+import com.flowiee.pms.system.service.SystemLogService;
+import com.flowiee.pms.cart.entity.Items;
+import com.flowiee.pms.cart.entity.OrderCart;
+import com.flowiee.pms.media.entity.FileStorage;
 import com.flowiee.pms.product.model.ProductVariantSearchRequest;
-import com.flowiee.pms.product.repository.ProductPriceRepository;
-import com.flowiee.pms.order.repository.OrderCartRepository;
+import com.flowiee.pms.cart.repository.OrderCartRepository;
 import com.flowiee.pms.shared.base.GenerateBarcodeService;
-import com.flowiee.pms.modules.sales.service.CartService;
-import com.flowiee.pms.common.utils.ChangeLog;
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.common.utils.FileUtils;
-import com.flowiee.pms.common.enumeration.ACTION;
-import com.flowiee.pms.common.enumeration.MODULE;
+import com.flowiee.pms.cart.service.CartService;
 import com.flowiee.pms.product.repository.ProductDetailRepository;
 import com.flowiee.pms.product.repository.ProductDetailTempRepository;
-import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.common.enumeration.*;
 import com.flowiee.pms.product.mapper.ProductVariantConvert;
 import com.google.zxing.WriterException;
 import javax.persistence.EntityGraph;
@@ -67,12 +69,11 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     private final ProductGenerateQRCodeService mvProductGenerateQRCodeService;
     private final ProductDetailTempRepository mvProductVariantTempRepository;
     private final TransactionGoodsService mvTransactionGoodsService;
-    private final ProductPriceRepository mvProductPriceRepository;
     private final GenerateBarcodeService mvGenerateBarcodeService;
     private final ProductHistoryService mvProductHistoryService;
     private final ProductPriceService mvProductPriceService;
     private final ProductImageService mvProductImageService;
-    private final ProductInfoService mvProductInfoService;
+    private final ProductService mvProductService;
     private final OrderCartRepository mvCartRepository;
     private final SystemLogService mvSystemLogService;
     private final CategoryService mvCategoryService;
@@ -80,33 +81,31 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     private final CartService mvCartService;
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
-    private final ProductInfoService productInfoService;
+    private final ProductService productService;
 
     public ProductVariantServiceImpl(ProductDetailRepository pEntityRepository, ProductDetailTempRepository pProductVariantTempRepository,
-                                     ProductPriceRepository pProductPriceRepository, ProductGenerateQRCodeService pProductGenerateQRCodeService,
-                                     ProductHistoryService pProductHistoryService,
+                                     ProductGenerateQRCodeService pProductGenerateQRCodeService, ProductHistoryService pProductHistoryService,
                                      TransactionGoodsService pTransactionGoodsService, CategoryService pCategoryService,
                                      StorageService pStorageService, OrderCartRepository pCartRepository,
                                      GenerateBarcodeService pGenerateBarcodeService, @Lazy ProductPriceService pProductPriceService,
                                      SystemLogService pSystemLogService, SendOperatorNotificationService pSendOperatorNotificationService,
-                                     @Lazy ProductInfoService pProductInfoService, @Lazy CartService pCartService, @Lazy ProductImageService pProductImageService, ProductInfoService productInfoService) {
+                                     @Lazy ProductService pProductService, @Lazy CartService pCartService, @Lazy ProductImageService pProductImageService, ProductService productService) {
         super(ProductDetail.class, ProductVariantDTO.class, pEntityRepository);
         this.mvSendOperatorNotificationService = pSendOperatorNotificationService;
         this.mvProductVariantTempRepository = pProductVariantTempRepository;
         this.mvProductGenerateQRCodeService = pProductGenerateQRCodeService;
         this.mvTransactionGoodsService = pTransactionGoodsService;
-        this.mvProductPriceRepository = pProductPriceRepository;
         this.mvGenerateBarcodeService = pGenerateBarcodeService;
         this.mvProductHistoryService = pProductHistoryService;
         this.mvProductImageService = pProductImageService;
         this.mvProductPriceService = pProductPriceService;
-        this.mvProductInfoService = pProductInfoService;
+        this.mvProductService = pProductService;
         this.mvSystemLogService = pSystemLogService;
         this.mvCategoryService = pCategoryService;
         this.mvStorageService = pStorageService;
         this.mvCartRepository = pCartRepository;
         this.mvCartService = pCartService;
-        this.productInfoService = productInfoService;
+        this.productService = productService;
     }
 
     @Override
@@ -134,7 +133,9 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         List<Long> lvCartItemIds = lvCartItems.isEmpty() ? List.of() : lvCartItems.stream().map(a -> a.getProductDetail().getId()).toList();
 
         for (ProductVariantDTO lvDto : lvProductVariantDTOs) {
-            mvProductPriceService.assignPriceInfo(lvDto, mvProductPriceRepository.findPresentPrices(lvDto.getId()));
+            ProductPriceDTO lvPrice = mvProductPriceService.getPrice(lvDto.getId());
+            lvDto.setPrice(lvPrice);
+
             String lvImageUrl = FileUtils.getImageUrl(lvImageActiveList.get(lvDto.getId()), true);
             lvDto.setImageSrc(lvImageUrl != null ? lvImageUrl : EndPoint.URL_MEDIA_DEFAULT_PRODUCT.getValue());
             lvDto.setCurrentInCart(lvCartItemIds.contains(lvDto.getId()));
@@ -184,7 +185,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     }
 
     private OrderCart getCurrentCart() {
-        List<OrderCart> cartList = mvCartRepository.findByAccountId(getUserPrincipal().getId());
+        List<OrderCart> cartList = mvCartRepository.findByAccountId(SecurityUtils.getCurrentUser().getId());
         if (ObjectUtils.isNotEmpty(cartList)) {
             return cartList.get(0);
         }
@@ -203,7 +204,8 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
                     lvProductPrice.add(price);
             }
         }
-        mvProductPriceService.assignPriceInfo(lvDto, lvProductPrice);
+
+        lvDto.setPrice(mvProductPriceService.getPrice(pProductVariantId));
 
         return lvDto;
     }
@@ -220,7 +222,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             return lvProductVariantSavedList;
         }
 
-        Product lvProduct = productInfoService.findEntById(pProductId, true);
+        Product lvProduct = productService.findEntById(pProductId, true);
         for (ProductVariantDTO lvVariant : pVariantDTOs) {
             ProductPriceDTO lvPrice = lvVariant.getPrice();
 
@@ -287,7 +289,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     }
 
     private ProductDetail buildEntity(ProductVariantDTO pDto) {
-        Product lvProduct = mvProductInfoService.findEntById(pDto.getProductId(), true);
+        Product lvProduct = mvProductService.findEntById(pDto.getProductId(), true);
 
         Map<CATEGORY, Category> lvCategoryMap = mvCategoryService.findByIdsAsMap(Set.of(pDto.getColorId(),
                 pDto.getSizeId(), pDto.getFabricTypeId()));
@@ -322,7 +324,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
 
         TransactionGoodsDTO lvTransactionGoodsDto = mvTransactionGoodsService.createExportTransaction(TransactionGoodsDTO.builder()
                 .title("Initialize storage")
-                .transactionType(com.flowiee.pms.modules.inventory.enums.TransactionGoodsType.EXPORT)
+                .transactionType(TransactionGoodsType.EXPORT)
                 .warehouse(new StorageDTO(lvStorage.getId()))
                 .transactionStatus(TransactionGoodsStatus.APPROVED)
                 .description(initMessage)
@@ -342,7 +344,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
 
         TransactionGoodsDTO lvTransactionGoodsDto = mvTransactionGoodsService.createExportTransaction(TransactionGoodsDTO.builder()
                 .title("Initialize storage")
-                .transactionType(com.flowiee.pms.modules.inventory.enums.TransactionGoodsType.EXPORT)
+                .transactionType(TransactionGoodsType.EXPORT)
                 .warehouse(new StorageDTO(lvStorage.getId()))
                 .transactionStatus(TransactionGoodsStatus.APPROVED)
                 .description(initMessage)
@@ -396,7 +398,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         try {
             //Begin 2026/03/28 Replace hard delete by soft delete
             //mvEntityRepository.deleteById(productVariantId);
-            mvEntityRepository.softDelete(productVariantId, LocalDateTime.now(), String.valueOf(getUserPrincipal().getId()));
+            mvEntityRepository.softDelete(productVariantId, LocalDateTime.now(), String.valueOf(SecurityUtils.getCurrentUser().getId()));
             //End 2026/03/28
         } catch (DataIntegrityViolationException ex) {
             throw new DataInUseException("Data in use!", ex);

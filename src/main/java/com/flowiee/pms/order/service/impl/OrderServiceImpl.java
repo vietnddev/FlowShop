@@ -1,6 +1,11 @@
 package com.flowiee.pms.order.service.impl;
 
+import com.flowiee.pms.cart.entity.OrderCart;
+import com.flowiee.pms.cart.service.CartService;
+import com.flowiee.pms.customer.entity.Customer;
+import com.flowiee.pms.customer.service.CustomerService;
 import com.flowiee.pms.order.entity.*;
+import com.flowiee.pms.order.enums.OrderStatus;
 import com.flowiee.pms.order.repository.OrderRepository;
 import com.flowiee.pms.order.repository.OrderReturnItemRepository;
 import com.flowiee.pms.order.repository.OrderReturnRepository;
@@ -8,39 +13,43 @@ import com.flowiee.pms.order.service.OrderGenerateQRCodeService;
 import com.flowiee.pms.order.service.OrderHistoryService;
 import com.flowiee.pms.order.service.OrderItemsService;
 import com.flowiee.pms.order.service.OrderService;
+import com.flowiee.pms.promotion.entity.LoyaltyTransaction;
+import com.flowiee.pms.promotion.entity.VoucherTicket;
+import com.flowiee.pms.promotion.service.LoyaltyProgramService;
+import com.flowiee.pms.promotion.service.VoucherTicketService;
 import com.flowiee.pms.shared.base.BaseService;
-import com.flowiee.pms.common.utils.*;
 import com.flowiee.pms.product.entity.ProductDetail;
-import com.flowiee.pms.modules.inventory.entity.TransactionGoods;
+import com.flowiee.pms.inventory.entity.TransactionGoods;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.modules.inventory.service.TransactionGoodsService;
-import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.inventory.service.TransactionGoodsService;
+import com.flowiee.pms.media.entity.FileStorage;
 import com.flowiee.pms.order.dto.OrderReturnDTO;
 import com.flowiee.pms.order.dto.OrderReturnItemDTO;
-import com.flowiee.pms.modules.sales.entity.*;
 import com.flowiee.pms.order.model.OrderReq;
 import com.flowiee.pms.order.model.OrderReturnReq;
-import com.flowiee.pms.modules.sales.service.*;
 import com.flowiee.pms.order.enums.OrderRefundMethod;
 import com.flowiee.pms.order.enums.OrderReturnCondition;
 import com.flowiee.pms.order.enums.OrderReturnStatus;
-import com.flowiee.pms.modules.staff.entity.Account;
-import com.flowiee.pms.modules.staff.repository.AccountRepository;
-import com.flowiee.pms.modules.system.entity.SystemConfig;
-import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.common.exception.BadRequestException;
+import com.flowiee.pms.shared.enums.*;
+import com.flowiee.pms.shared.util.*;
+import com.flowiee.pms.system.entity.Account;
+import com.flowiee.pms.system.enums.CATEGORY;
+import com.flowiee.pms.system.enums.ConfigCode;
+import com.flowiee.pms.system.repository.AccountRepository;
+import com.flowiee.pms.system.entity.SystemConfig;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.shared.exception.BadRequestException;
 import com.flowiee.pms.order.dto.OrderDetailDTO;
 import com.flowiee.pms.order.model.CreateOrderReq;
-import com.flowiee.pms.modules.sales.model.UpdateOrderReq;
-import com.flowiee.pms.modules.system.repository.ConfigRepository;
-import com.flowiee.pms.modules.system.service.CategoryService;
-import com.flowiee.pms.modules.system.service.SendCustomerNotificationService;
-import com.flowiee.pms.common.enumeration.*;
+import com.flowiee.pms.order.model.UpdateOrderReq;
+import com.flowiee.pms.system.repository.ConfigRepository;
+import com.flowiee.pms.system.service.CategoryService;
+import com.flowiee.pms.system.service.SendCustomerNotificationService;
 import com.flowiee.pms.order.dto.OrderDTO;
-import com.flowiee.pms.common.exception.DataInUseException;
-import com.flowiee.pms.modules.system.entity.Category;
+import com.flowiee.pms.shared.exception.DataInUseException;
+import com.flowiee.pms.system.entity.Category;
 
-import com.flowiee.pms.modules.system.service.SystemLogService;
+import com.flowiee.pms.system.service.SystemLogService;
 import com.google.zxing.WriterException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
@@ -166,11 +175,6 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     }
 
     @Override
-    public Order findByCode(String pOrderCode) {
-        return mvEntityRepository.findByOrderCode(pOrderCode);
-    }
-
-    @Override
     public OrderDTO findByTrackingCode(String pTrackingCode) {
         return convertDTO(mvEntityRepository.findByTrackingCode(pTrackingCode));
     }
@@ -286,7 +290,7 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
 
         //Log
         mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_ORD_C, MasterObject.Order, "Thêm mới đơn hàng", lvOrderSaved.getCode());
-        LOG.info("Insert new order success! insertBy={}", getUserPrincipal().getUsername());
+        LOG.info("Insert new order success! insertBy={}", SecurityUtils.getCurrentUser().getUsername());
 
         return OrderDTO.toDto(lvOrderSaved);
     }

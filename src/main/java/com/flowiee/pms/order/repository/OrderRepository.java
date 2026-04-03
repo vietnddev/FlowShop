@@ -1,10 +1,10 @@
 package com.flowiee.pms.order.repository;
 
 import com.flowiee.pms.shared.base.BaseRepository;
-import com.flowiee.pms.modules.sales.entity.LoyaltyTransaction;
+import com.flowiee.pms.promotion.entity.LoyaltyTransaction;
 import com.flowiee.pms.order.entity.Order;
 
-import com.flowiee.pms.common.enumeration.OrderStatus;
+import com.flowiee.pms.order.enums.OrderStatus;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

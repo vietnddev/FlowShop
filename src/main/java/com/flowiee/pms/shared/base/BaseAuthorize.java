@@ -1,13 +1,13 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.enumeration.ConfigCode;
-import com.flowiee.pms.common.utils.SysConfigUtils;
-import com.flowiee.pms.common.exception.AuthenticationException;
-import com.flowiee.pms.common.exception.ForbiddenException;
-import com.flowiee.pms.common.constants.Constants;
-import com.flowiee.pms.common.enumeration.ACTION;
-import com.flowiee.pms.common.security.UserSession;
-import com.flowiee.pms.modules.staff.service.RoleService;
+import com.flowiee.pms.shared.util.SecurityUtils;
+import com.flowiee.pms.system.enums.ConfigCode;
+import com.flowiee.pms.shared.util.SysConfigUtils;
+import com.flowiee.pms.shared.exception.AuthenticationException;
+import com.flowiee.pms.shared.exception.ForbiddenException;
+import com.flowiee.pms.shared.constant.Constants;
+import com.flowiee.pms.shared.enums.ACTION;
+import com.flowiee.pms.system.service.RoleService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -19,8 +19,6 @@ import org.springframework.stereotype.Component;
 public class BaseAuthorize {
     @Autowired
     private RoleService roleService;
-    @Autowired
-    private UserSession userSession;
 
     @SneakyThrows
     protected boolean isAuthenticated() {
@@ -41,7 +39,7 @@ public class BaseAuthorize {
     
     protected boolean isAuthorized(ACTION action, boolean throwException) {
         if (isAuthenticated()) {
-            String lvActor = userSession.getUserPrincipal().getUsername();
+            String lvActor = SecurityUtils.getCurrentUser().getUsername();
             String lvActionName = action.name();
 
             if (Constants.ADMINISTRATOR.equals(lvActor)) {
@@ -71,7 +69,7 @@ public class BaseAuthorize {
     }
 
     protected boolean vldAdminRole() {
-        if (userSession.getUserPrincipal().isAdmin()) {
+        if (SecurityUtils.getCurrentUser().isAdmin()) {
             return true;
         }
         throw new ForbiddenException("This function is for administrator use only!");

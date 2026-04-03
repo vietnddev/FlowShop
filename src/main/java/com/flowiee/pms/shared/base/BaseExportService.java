@@ -1,16 +1,15 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.common.utils.ExcelUtils;
-import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.modules.system.model.EximResult;
-import com.flowiee.pms.modules.system.service.ExportService;
-import com.flowiee.pms.common.enumeration.TemplateExport;
+import com.flowiee.pms.shared.util.CoreUtils;
+import com.flowiee.pms.shared.util.ExcelUtils;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.system.model.EximResult;
+import com.flowiee.pms.system.service.ExportService;
+import com.flowiee.pms.shared.enums.TemplateExport;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -26,11 +25,11 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalTime;
 import java.util.List;
 
+@Slf4j
 public abstract class BaseExportService implements ExportService {
     protected abstract void prepareData(Object pCondition, boolean pTemplateOnly);
     protected abstract void writeData(Object pCondition);
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
     protected XSSFSheet mvDataSheet;
     protected String mvDataSheetName = "data";
     protected int mvHeadKeyLine = 1;
@@ -71,7 +70,7 @@ public abstract class BaseExportService implements ExportService {
             return mvEximResult;
         } catch (Exception e) {
             mvEximResult.setResultStatus("NOK");
-            logger.error("Error when export data!", e);
+            log.error("Error when export data!", e);
             throw new AppException("Error when export data!", e);
         } finally {
             try {
@@ -79,7 +78,7 @@ public abstract class BaseExportService implements ExportService {
                 Files.deleteIfExists(mvEximResult.getPathTarget());
                 mvEximResult.setFinishTime(LocalTime.now());
             } catch (IOException e) {
-                logger.error("Error when export data!", e);
+                log.error("Error when export data!", e);
             }
         }
     }

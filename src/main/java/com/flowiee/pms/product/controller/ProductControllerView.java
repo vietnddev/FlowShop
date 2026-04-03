@@ -2,19 +2,19 @@ package com.flowiee.pms.product.controller;
 
 import com.flowiee.pms.product.service.ProductAttributeService;
 import com.flowiee.pms.product.service.ProductImageService;
-import com.flowiee.pms.product.service.ProductInfoService;
+import com.flowiee.pms.product.service.ProductService;
 import com.flowiee.pms.product.service.ProductVariantService;
 import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.product.entity.ProductDescription;
-import com.flowiee.pms.modules.system.model.EximResult;
+import com.flowiee.pms.system.model.EximResult;
 import com.flowiee.pms.product.dto.ProductAttributeDTO;
 import com.flowiee.pms.product.dto.ProductDTO;
-import com.flowiee.pms.common.exception.ResourceNotFoundException;
-import com.flowiee.pms.modules.system.service.ExportService;
+import com.flowiee.pms.shared.exception.ResourceNotFoundException;
+import com.flowiee.pms.system.service.ExportService;
 
-import com.flowiee.pms.common.enumeration.CATEGORY;
-import com.flowiee.pms.common.enumeration.Pages;
-import com.flowiee.pms.common.enumeration.TemplateExport;
+import com.flowiee.pms.system.enums.CATEGORY;
+import com.flowiee.pms.shared.enums.Pages;
+import com.flowiee.pms.shared.enums.TemplateExport;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,7 +34,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class ProductControllerView extends BaseController {
-    ProductInfoService mvProductInfoService;
+    ProductService mvProductService;
     ProductImageService mvProductImageService;
     ProductVariantService mvProductVariantService;
     ProductAttributeService mvProductAttributeService;
@@ -53,8 +53,8 @@ public class ProductControllerView extends BaseController {
     @GetMapping(value = "/{id}")
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public ModelAndView viewGeneralProduct(@PathVariable("id") Long productId) {
-        ProductDTO product = mvProductInfoService.findById(productId, true);
-        ProductDescription lvProductDescription = mvProductInfoService.findDescription(productId);
+        ProductDTO product = mvProductService.findById(productId, true);
+        ProductDescription lvProductDescription = mvProductService.findDescription(productId);
         if (lvProductDescription != null) {
             product.setDescription(lvProductDescription.getDescription());
         }

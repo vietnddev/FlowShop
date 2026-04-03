@@ -1,5 +1,7 @@
 package com.flowiee.pms.product.service.impl;
 
+import com.flowiee.pms.inventory.entity.TransactionGoods;
+import com.flowiee.pms.inventory.service.TransactionGoodsService;
 import com.flowiee.pms.product.entity.ProductCombo;
 import com.flowiee.pms.product.entity.ProductDamaged;
 import com.flowiee.pms.product.entity.ProductDetail;
@@ -7,19 +9,17 @@ import com.flowiee.pms.product.service.ProductComboService;
 import com.flowiee.pms.product.service.ProductImageService;
 import com.flowiee.pms.product.service.ProductVariantService;
 import com.flowiee.pms.shared.base.StartUp;
-import com.flowiee.pms.modules.inventory.entity.*;
-import com.flowiee.pms.modules.inventory.service.*;
-import com.flowiee.pms.modules.media.entity.FileStorage;
-import com.flowiee.pms.common.exception.BadRequestException;
+import com.flowiee.pms.media.entity.FileStorage;
+import com.flowiee.pms.shared.exception.BadRequestException;
 import com.flowiee.pms.product.dto.ProductComboDTO;
 import com.flowiee.pms.product.repository.ProductDamagedRepository;
-import com.flowiee.pms.common.security.UserSession;
-import com.flowiee.pms.modules.media.service.FileStorageService;
-import com.flowiee.pms.common.enumeration.MODULE;
+import com.flowiee.pms.media.service.FileStorageService;
+import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
-import com.flowiee.pms.modules.media.repository.FileStorageRepository;
-import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.common.utils.FileUtils;
+import com.flowiee.pms.media.repository.FileStorageRepository;
+import com.flowiee.pms.shared.util.CommonUtils;
+import com.flowiee.pms.shared.util.FileUtils;
+import com.flowiee.pms.shared.util.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -50,7 +50,6 @@ public class ProductImageServiceImpl implements ProductImageService {
     ProductVariantService mvProductVariantService;
     FileStorageRepository mvFileStorageRepository;
     ProductDamagedRepository mvProductDamagedRepository;
-    UserSession userSession;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -69,7 +68,7 @@ public class ProductImageServiceImpl implements ProductImageService {
     public FileStorage saveImageProduct(MultipartFile fileUpload, long pProductId, boolean makeActive) throws IOException {
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), pProductId);
         fileInfo.setActive(makeActive);
-        return mvFileStorageService.save(fileInfo);
+        return mvFileStorageService.create(fileInfo);
     }
 
     @Override
@@ -80,7 +79,7 @@ public class ProductImageServiceImpl implements ProductImageService {
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), productDetail.getProductId());
         fileInfo.setProductDetail(new ProductDetail(productDetail.getId()));
 
-        return mvFileStorageService.save(fileInfo);
+        return mvFileStorageService.create(fileInfo);
     }
 
     @Override
@@ -90,7 +89,7 @@ public class ProductImageServiceImpl implements ProductImageService {
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), null);
         fileInfo.setProductCombo(new ProductCombo(productCombo.getId()));
 
-        return mvFileStorageService.save(fileInfo);
+        return mvFileStorageService.create(fileInfo);
     }
 
     @Override
@@ -103,7 +102,7 @@ public class ProductImageServiceImpl implements ProductImageService {
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), null);
         fileInfo.setProductDamaged(productDamaged.get());
 
-        return mvFileStorageService.save(fileInfo);
+        return mvFileStorageService.create(fileInfo);
     }
 
     @Override
@@ -113,7 +112,7 @@ public class ProductImageServiceImpl implements ProductImageService {
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.STORAGE.name(), null);
         fileInfo.setTransactionGoods(lvTransactionGoods);
 
-        return mvFileStorageService.save(fileInfo);
+        return mvFileStorageService.create(fileInfo);
     }
 
     @Override
@@ -204,7 +203,7 @@ public class ProductImageServiceImpl implements ProductImageService {
         fileToChange.setExtension(FileUtils.getFileExtension(fileAttached.getOriginalFilename()));
         fileToChange.setContentType(fileAttached.getContentType());
         fileToChange.setDirectoryPath(CommonUtils.getPathDirectory(MODULE.PRODUCT).substring(CommonUtils.getPathDirectory(MODULE.PRODUCT).indexOf("uploads")));
-        fileToChange.setAccount(userSession.getUserPrincipal().getEntity());
+        fileToChange.setAccount(SecurityUtils.getCurrentUser().getEntity());
         FileStorage imageSaved = mvFileStorageRepository.save(fileToChange);
 
         //Lưu file mới vào thư mục chứa file upload

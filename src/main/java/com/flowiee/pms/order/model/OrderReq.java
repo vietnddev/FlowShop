@@ -1,7 +1,7 @@
 package com.flowiee.pms.order.model;
 
-import com.flowiee.pms.common.enumeration.OrderStatus;
-import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.order.enums.OrderStatus;
+import com.flowiee.pms.shared.request.BaseParameter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;

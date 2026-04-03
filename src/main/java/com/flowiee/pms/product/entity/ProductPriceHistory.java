@@ -1,7 +1,7 @@
 package com.flowiee.pms.product.entity;
 
 import com.flowiee.pms.product.enums.PriceChangeType;
-import com.flowiee.pms.modules.staff.entity.Account;
+import com.flowiee.pms.system.entity.Account;
 import javax.persistence.*;
 import lombok.*;
 

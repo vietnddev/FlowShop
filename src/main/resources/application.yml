@@ -38,7 +38,7 @@ spring:
           fail_on_pagination_over_collection_fetch: false
           in_clause_parameter_padding: true
         session_factory:
-          statement_inspector: com.flowiee.pms.common.config.CustomHibernateInterceptor
+          statement_inspector: com.flowiee.pms.shared.config.CustomHibernateInterceptor
         enhancer:
           enableLazyInitialization: false
           enableDirtyTracking: false

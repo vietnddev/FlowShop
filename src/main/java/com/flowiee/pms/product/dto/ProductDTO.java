@@ -1,11 +1,10 @@
 package com.flowiee.pms.product.dto;
 
 import com.flowiee.pms.shared.base.BaseDTO;
-import com.flowiee.pms.common.enumeration.ProductStatus;
-import com.flowiee.pms.modules.system.dto.CategoryDTO;
-import com.flowiee.pms.modules.sales.dto.VoucherInfoDTO;
-import com.flowiee.pms.modules.sales.dto.GarmentFactoryDTO;
-import com.flowiee.pms.modules.sales.dto.SupplierDTO;
+import com.flowiee.pms.product.enums.ProductStatus;
+import com.flowiee.pms.system.dto.CategoryDTO;
+import com.flowiee.pms.promotion.dto.VoucherInfoDTO;
+import com.flowiee.pms.supplier.dto.SupplierDTO;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +32,6 @@ public class ProductDTO extends BaseDTO implements Serializable {
     String returnPolicy;
     Long variantDefault;
     String internalNotes;
-    GarmentFactoryDTO garmentFactory;
     SupplierDTO supplier;
     String imageActive;
     Integer stockQty = 0;

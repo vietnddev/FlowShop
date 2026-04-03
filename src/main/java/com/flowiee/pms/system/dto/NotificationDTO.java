@@ -1,0 +1,17 @@
+package com.flowiee.pms.system.dto;
+
+import com.flowiee.pms.shared.base.BaseDTO;
+import lombok.Data;
+
+import java.io.Serializable;
+
+@Data
+public class NotificationDTO extends BaseDTO implements Serializable {
+    private Long send;
+    private Long receive;
+    private String type;
+    private String title;
+    private String content;
+    private Boolean readed;
+    private Long importId;
+}

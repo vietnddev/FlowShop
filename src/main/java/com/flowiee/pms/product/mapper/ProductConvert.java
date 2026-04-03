@@ -1,12 +1,10 @@
 package com.flowiee.pms.product.mapper;
 
-import com.flowiee.pms.modules.sales.dto.GarmentFactoryDTO;
-import com.flowiee.pms.modules.sales.dto.SupplierDTO;
-import com.flowiee.pms.modules.system.dto.CategoryDTO;
-import com.flowiee.pms.modules.system.entity.Category;
+import com.flowiee.pms.supplier.dto.SupplierDTO;
+import com.flowiee.pms.system.dto.CategoryDTO;
+import com.flowiee.pms.system.entity.Category;
 import com.flowiee.pms.product.entity.Product;
-import com.flowiee.pms.modules.sales.entity.GarmentFactory;
-import com.flowiee.pms.modules.sales.entity.Supplier;
+import com.flowiee.pms.supplier.entity.Supplier;
 import com.flowiee.pms.product.dto.ProductDTO;
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -26,7 +24,6 @@ public class ProductConvert {
             .productType(new Category(inputDTO.getProductType().getId()))
             .brand(new Category(inputDTO.getBrand().getId()))
             .unit(new Category(inputDTO.getUnit().getId()))
-            .garmentFactory(new GarmentFactory(inputDTO.getGarmentFactory().getId()))
             .supplier(new Supplier(inputDTO.getSupplier().getId(), null))
             //.productVariantList(inputDTO.getProductVariantList())
             //.listImages(inputDTO.getListImages())
@@ -41,9 +38,6 @@ public class ProductConvert {
 
         if (outputEntity.getUnit() == null && inputDTO.getUnit() != null)
             outputEntity.setUnit(new Category(inputDTO.getUnit().getId(), inputDTO.getUnit().getName()));
-
-        if (outputEntity.getGarmentFactory() == null && inputDTO.getGarmentFactory() != null)
-            outputEntity.setGarmentFactory(new GarmentFactory(inputDTO.getGarmentFactory().getId()));
 
         if (outputEntity.getSupplier() == null && inputDTO.getSupplier() != null)
             outputEntity.setSupplier(new Supplier(inputDTO.getSupplier().getId(), inputDTO.getSupplier().getName()));
@@ -93,11 +87,6 @@ public class ProductConvert {
                 dto.setUnit(new CategoryDTO(pInput.getUnit().getId(), pInput.getUnit().getName()));
 //                dto.setUnitId(pInput.getUnit().getId());
 //                dto.setUnitName(pInput.getUnit().getName());
-            }
-            if (ObjectUtils.isNotEmpty(pInput.getGarmentFactory())) {
-                dto.setGarmentFactory(new GarmentFactoryDTO(pInput.getGarmentFactory().getId(), pInput.getGarmentFactory().getName()));
-//                dto.setGarmentFactoryId(pInput.getGarmentFactory().getId());
-//                dto.setGarmentFactoryName(pInput.getGarmentFactory().getName());
             }
             if (ObjectUtils.isNotEmpty(pInput.getSupplier())) {
                 dto.setSupplier(new SupplierDTO(pInput.getSupplier().getId(), pInput.getSupplier().getName()));

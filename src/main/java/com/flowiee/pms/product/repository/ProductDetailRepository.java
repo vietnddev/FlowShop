@@ -47,7 +47,7 @@ public interface ProductDetailRepository extends BaseRepository<ProductDetail, L
     List<ProductDetail> findDefective();
 
     @Query("""
-        SELECT new com.flowiee.pms.modules.inventory.model.ProductSummaryInfoModel(
+        SELECT new com.flowiee.pms.product.model.ProductSummaryInfoModel(
             pd.id,
             pd.variantCode,
             pd.variantName,
@@ -61,7 +61,7 @@ public interface ProductDetailRepository extends BaseRepository<ProductDetail, L
             pd.status,
             SUM(COALESCE(pd.storageQty, 0)),
             SUM(COALESCE(pd.soldQty, 0)))
-        FROM com.flowiee.pms.modules.inventory.entity.ProductDetail pd
+        FROM com.flowiee.pms.product.entity.ProductDetail pd
         WHERE (coalesce(:productIds, -1) = -1 or pd.product.id in :productIds) and pd.deletedAt is null
         GROUP BY pd.id, pd.variantCode, pd.variantName, pd.product.id, pd.fabricType.id, pd.fabricType.name, pd.color.id, pd.color.name, pd.size.id, pd.size.name, pd.status
     """)

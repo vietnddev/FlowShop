@@ -1,11 +1,11 @@
 package com.flowiee.pms.product.service.impl;
 
 import com.flowiee.pms.shared.base.BaseService;
-import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.shared.request.BaseParameter;
 import com.flowiee.pms.product.entity.ProductDamaged;
 import com.flowiee.pms.product.entity.ProductDetail;
-import com.flowiee.pms.modules.media.entity.FileStorage;
-import com.flowiee.pms.common.exception.BadRequestException;
+import com.flowiee.pms.media.entity.FileStorage;
+import com.flowiee.pms.shared.exception.BadRequestException;
 import com.flowiee.pms.product.dto.ProductDamagedDTO;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.product.repository.ProductDamagedRepository;

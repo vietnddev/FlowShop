@@ -1,6 +1,6 @@
 package com.flowiee.pms.product.model;
 
-import com.flowiee.pms.common.enumeration.ProductStatus;
+import com.flowiee.pms.product.enums.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,8 +1,7 @@
 package com.flowiee.pms.product.service.impl;
 
 import com.flowiee.pms.shared.base.BaseService;
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.product.dto.ProductVariantDTO;
+import com.flowiee.pms.shared.util.CoreUtils;
 import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.product.entity.ProductPrice;
 import com.flowiee.pms.product.dto.ProductPriceDTO;
@@ -13,6 +12,7 @@ import com.flowiee.pms.product.repository.ProductPriceHistoryRepository;
 import com.flowiee.pms.product.repository.ProductPriceRepository;
 import com.flowiee.pms.product.service.ProductPriceService;
 import com.flowiee.pms.product.service.ProductVariantService;
+import com.flowiee.pms.shared.util.SecurityUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -33,6 +33,22 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
         super(ProductPrice.class, ProductPriceDTO.class, pEntityRepository);
         this.mvProductVariantService = pProductVariantService;
         this.mvProductPriceHistoryRepository = pProductPriceHistoryRepository;
+    }
+
+    @Override
+    public ProductPriceDTO getPrice(Long productVariantId) {
+        return mvEntityRepository.findPricesByVariantIds(List.of(productVariantId))
+                .stream()
+                .findFirst()
+                .orElseGet(() -> ProductPriceDTO.builder()
+                        .retailPrice(BigDecimal.ZERO)
+                        .retailPriceDiscount(BigDecimal.ZERO)
+                        .wholesalePrice(BigDecimal.ZERO)
+                        .wholesalePriceDiscount(BigDecimal.ZERO)
+                        .purchasePrice(BigDecimal.ZERO)
+                        .costPrice(BigDecimal.ZERO)
+                        .build()
+                );
     }
 
     @Override
@@ -80,7 +96,7 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
 
     @Transactional
     @Override
-    public ProductPriceDTO updatePrice(Long pProductVariantId, ProductPriceDTO pRequestPrice) {
+    public ProductPriceDTO update(ProductPriceDTO pRequestPrice, Long pProductVariantId) {
         ProductDetail lvProductVariant = mvProductVariantService.findEntById(pProductVariantId, true);
         return this.updatePrice(lvProductVariant, pRequestPrice);
     }
@@ -88,115 +104,56 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
     @Transactional
     @Override
     public ProductPriceDTO updatePrice(ProductDetail pProductVariant, ProductPriceDTO pRequestPrice) {
-        ProductPriceDTO lvPriceUpdated = new ProductPriceDTO();
-
-        List<ProductPrice> lvCurrentPrices = mvEntityRepository.findPresentPrices(pProductVariant.getId());
-        if (CollectionUtils.isNotEmpty(lvCurrentPrices)) {
-            for (ProductPrice lvCPrice : lvCurrentPrices) {
-                if (isPriceChanged(lvCPrice, pRequestPrice)) {
-                    lvCPrice.setState(ProductPrice.STATE_INACTIVE);
-                    mvEntityRepository.save(lvCPrice);
-
-                    this.save(pProductVariant, pRequestPrice);
-
-                    mvProductPriceHistoryRepository.save(ProductPriceHistory.builder()
-                            .productPrice(lvCPrice)
-                            .changeType(PriceChangeType.MANUAL)
-                            .oldPrice(lvCPrice.getPriceValue())
-                            .newPrice(pRequestPrice.getRetailPrice())
-                            .changeTime(LocalDateTime.now())
-                            .changedBy(getUserPrincipal().getEntity())
-                            .reason("-")
-                            .build());
+        List<ProductPrice> lvPrices = mvEntityRepository.findByVariantId(pProductVariant.getId());
+        for (ProductPrice lvPrice : lvPrices) {
+            BigDecimal lvPriceCurrent = lvPrice.getPriceValue();
+            if (PriceType.RTL.equals(lvPrice.getPriceType())) {
+                BigDecimal lvRequestRetailPrice = pRequestPrice.getRetailPrice();
+                if (lvPriceCurrent.compareTo(lvRequestRetailPrice) != 0) {
+                    handlePriceUpdate(lvPrice, pProductVariant, PriceType.RTL, lvPriceCurrent, lvRequestRetailPrice);
                 }
             }
-            lvPriceUpdated = new ProductPriceDTO();
-            lvPriceUpdated.setRetailPrice(pRequestPrice.getRetailPrice());
-            lvPriceUpdated.setCostPrice(pRequestPrice.getCostPrice());
-            lvPriceUpdated.setLastUpdatedAt(LocalDateTime.now());
-        } else {
-            lvPriceUpdated = extractPrice(this.save(pProductVariant, pRequestPrice));
-        }
-
-        return lvPriceUpdated;
-    }
-
-    @Override
-    public List<ProductPriceDTO> findPresentPrices(List<Long> pProductVariantIds) {
-        if (CollectionUtils.isEmpty(pProductVariantIds)) {
-            return List.of();
-        }
-
-        List<ProductPrice> lvPriceList = new ArrayList<>();
-        int batchSize = 1000; // Số lượng tối đa trong một truy vấn
-        for (int i = 0; i < pProductVariantIds.size(); i += batchSize) {
-            List<Long> batch = new ArrayList<>(pProductVariantIds.subList(i, Math.min(i + batchSize, pProductVariantIds.size())));
-            lvPriceList.addAll(mvEntityRepository.findPresentPrices(batch));
-        }
-
-        return convertDTOs(lvPriceList);
-    }
-
-    @Override
-    public ProductPriceDTO findPresentPrice(Long productVariantId) {
-        ProductPrice lvPrice = mvEntityRepository.findPricePresent(productVariantId);
-        return lvPrice != null ? ProductPriceDTO.toDTO(lvPrice) : new ProductPriceDTO();
-    }
-
-    @Override
-    public ProductVariantDTO assignPriceInfo(ProductVariantDTO pDto, List<ProductPrice> pProductPrice) {
-        if (pDto != null) {
-            if (pProductPrice != null) {
-                pDto.setPrice(extractPrice(pProductPrice));
-            } else {
-                pDto.setPrice(new ProductPriceDTO());
+            if (PriceType.WHO.equals(lvPrice.getPriceType())) {
+                BigDecimal lvRequestWholesalePrice = pRequestPrice.getWholesalePrice();
+                if (lvPriceCurrent.compareTo(lvRequestWholesalePrice) != 0) {
+                    handlePriceUpdate(lvPrice, pProductVariant, PriceType.RTL, lvPriceCurrent, lvRequestWholesalePrice);
+                }
+            }
+            if (PriceType.CSP.equals(lvPrice.getPriceType())) {
+                BigDecimal lvRequestCostPrice = pRequestPrice.getCostPrice();
+                if (lvPriceCurrent.compareTo(lvRequestCostPrice) != 0) {
+                    handlePriceUpdate(lvPrice, pProductVariant, PriceType.CSP, lvPriceCurrent, lvRequestCostPrice);
+                }
             }
         }
-        return pDto;
+
+        return getPrice(pProductVariant.getId());
     }
 
-    private ProductPriceDTO extractPrice(List<ProductPrice> pProductPrices) {
-        ProductPriceDTO lvPriceDto = new ProductPriceDTO();
-        for (ProductPrice lvPrice : pProductPrices)
-        {
-            PriceType lvType = lvPrice.getPriceType();
-            BigDecimal lvValue = lvPrice.getPriceValue();
-            LocalDateTime lvLastUpdated = lvPrice.getLastUpdatedAt();
-
-            if (PriceType.RTL.equals(lvType)) {
-                lvPriceDto.setRetailPrice(lvValue);
-                lvPriceDto.setLastUpdatedAt(lvLastUpdated);
-            } else if (PriceType.WHO.equals(lvType)) {
-                lvPriceDto.setWholesalePrice(lvValue);
-                lvPriceDto.setLastUpdatedAt(lvLastUpdated);
-            } else if (PriceType.CSP.equals(lvType)) {
-                lvPriceDto.setCostPrice(lvValue);
-                lvPriceDto.setLastUpdatedAt(lvLastUpdated);
-            }
-        }
-        return lvPriceDto;
+    private void handlePriceUpdate(ProductPrice pPrice, ProductDetail pProductVariant, PriceType pPriceType, BigDecimal currentPrice, BigDecimal newPrice) {
+        mvEntityRepository.inactivePrice(pPrice.getId());
+        createNewPrice(pProductVariant, pPriceType, newPrice);
+        createPriceHistory(pPrice, currentPrice, newPrice);
     }
 
-    private boolean isPriceChanged(ProductPrice pCPrice, ProductPriceDTO pRPrice) {
-        //Current price
-        PriceType lvCPriceType = pCPrice.getPriceType();
-        BigDecimal lvCPriceValue = pCPrice.getPriceValue();
+    private void createNewPrice(ProductDetail productVariant, PriceType priceType, BigDecimal priceValue) {
+        mvEntityRepository.save(ProductPrice.builder()
+                .state(ProductPrice.STATE_ACTIVE)
+                .productVariant(productVariant)
+                .priceType(priceType)
+                .priceValue(priceValue)
+                .build());
+    }
 
-        //Request price
-        BigDecimal lvRRetailPrice = CoreUtils.coalesce(pRPrice.getRetailPrice());
-        BigDecimal lvRWholesalePrice = CoreUtils.coalesce(pRPrice.getWholesalePrice());
-        BigDecimal lvRPurchasePrice = CoreUtils.coalesce(pRPrice.getPurchasePrice());
-        BigDecimal lvRCostPrice = CoreUtils.coalesce(pRPrice.getCostPrice());
-
-        boolean isChanged = false;
-        if (PriceType.RTL.equals(lvCPriceType) && lvCPriceValue.compareTo(lvRRetailPrice) != 0) {
-            isChanged = true;
-        } else if (PriceType.WHO.equals(lvCPriceType) && lvCPriceValue.compareTo(lvRWholesalePrice) != 0) {
-            isChanged = true;
-        } else if (PriceType.CSP.equals(lvCPriceType) && lvCPriceValue.compareTo(lvRCostPrice) != 0) {
-            isChanged = true;
-        }
-
-        return isChanged;
+    private void createPriceHistory(ProductPrice productPrice, BigDecimal oldPrice, BigDecimal newPrice) {
+        mvProductPriceHistoryRepository.save(ProductPriceHistory.builder()
+                .productPrice(productPrice)
+                .changeType(PriceChangeType.MANUAL)
+                .oldPrice(oldPrice)
+                .newPrice(newPrice)
+                .changeTime(LocalDateTime.now())
+                .changedBy(SecurityUtils.getCurrentUser().getEntity())
+                .reason("-")
+                .build());
     }
 }

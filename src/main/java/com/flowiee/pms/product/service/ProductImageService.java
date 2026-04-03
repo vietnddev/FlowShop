@@ -1,6 +1,6 @@
 package com.flowiee.pms.product.service;
 
-import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.media.entity.FileStorage;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

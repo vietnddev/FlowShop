@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.product.enums.DiscountType;
 import com.flowiee.pms.product.enums.PriceType;
-import com.flowiee.pms.modules.system.entity.Category;
+import com.flowiee.pms.system.entity.Category;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

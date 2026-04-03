@@ -1,16 +1,16 @@
 package com.flowiee.pms.product.controller;
 
+import com.flowiee.pms.product.service.ProductService;
 import com.flowiee.pms.shared.base.BaseController;
-import com.flowiee.pms.modules.media.entity.FileStorage;
-import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.common.exception.BadRequestException;
-import com.flowiee.pms.common.model.AppResponse;
-import com.flowiee.pms.modules.media.dto.FileDTO;
+import com.flowiee.pms.media.entity.FileStorage;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.shared.exception.BadRequestException;
+import com.flowiee.pms.shared.response.AppResponse;
+import com.flowiee.pms.media.dto.FileDTO;
 import com.flowiee.pms.product.service.ProductImageService;
-import com.flowiee.pms.product.service.ProductInfoService;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.modules.media.service.FileStorageService;
-import com.flowiee.pms.common.enumeration.ErrorCode;
+import com.flowiee.pms.media.service.FileStorageService;
+import com.flowiee.pms.shared.enums.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -31,7 +31,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class ProductImageController extends BaseController {
-    ProductInfoService mvProductInfoService;
+    ProductService mvProductService;
     FileStorageService mvFileStorageService;
     ProductImageService mvProductImageService;
     ProductVariantService mvProductVariantService;
@@ -41,7 +41,7 @@ public class ProductImageController extends BaseController {
     @PreAuthorize("@vldModuleProduct.updateImage(true)")
     public AppResponse<FileStorage> uploadImageOfProduct(@RequestParam("file") MultipartFile file, @PathVariable("productId") Long productId) {
         try {
-            if (productId <= 0 || mvProductInfoService.findById(productId, true) == null) {
+            if (productId <= 0 || mvProductService.findById(productId, true) == null) {
                 //throw new BadRequestException();
             }
             if (file.isEmpty()) {

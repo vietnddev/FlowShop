@@ -4,11 +4,13 @@ import com.flowiee.pms.shared.base.BaseDTO;
 import com.flowiee.pms.product.entity.ProductHistory;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 
 @Builder
 @Data
+@Slf4j
 public class ProductHistoryDTO extends BaseDTO implements Serializable {
     private ProductDTO product;
     private ProductVariantDTO productDetail;

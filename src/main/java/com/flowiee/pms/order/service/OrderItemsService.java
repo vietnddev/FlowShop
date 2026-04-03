@@ -1,6 +1,6 @@
 package com.flowiee.pms.order.service;
 
-import com.flowiee.pms.modules.sales.entity.Items;
+import com.flowiee.pms.cart.entity.Items;
 import com.flowiee.pms.shared.base.ICurdService;
 import com.flowiee.pms.order.entity.OrderDetail;
 import com.flowiee.pms.order.dto.OrderDTO;

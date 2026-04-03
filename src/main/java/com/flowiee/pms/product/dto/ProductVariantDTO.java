@@ -1,8 +1,8 @@
 package com.flowiee.pms.product.dto;
 
 import com.flowiee.pms.shared.base.BaseDTO;
-import com.flowiee.pms.common.enumeration.ProductStatus;
-import com.flowiee.pms.modules.system.dto.CategoryDTO;
+import com.flowiee.pms.product.enums.ProductStatus;
+import com.flowiee.pms.system.dto.CategoryDTO;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +19,6 @@ import java.time.LocalDateTime;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductVariantDTO extends BaseDTO implements Serializable {
-    static final long serialVersionUID = 1L;
-
     ProductDTO product;
     String variantCode;
     String variantName;

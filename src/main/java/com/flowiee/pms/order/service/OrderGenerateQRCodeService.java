@@ -1,6 +1,6 @@
 package com.flowiee.pms.order.service;
 
-import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.media.entity.FileStorage;
 import com.google.zxing.WriterException;
 
 import java.io.IOException;

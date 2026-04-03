@@ -1,0 +1,124 @@
+package com.flowiee.pms.system.controller;
+
+import com.flowiee.pms.shared.base.BaseController;
+import com.flowiee.pms.product.entity.ProductCrawled;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.shared.exception.ForbiddenException;
+import com.flowiee.pms.shared.response.AppResponse;
+import com.flowiee.pms.media.service.FileStorageService;
+import com.flowiee.pms.schedule.dto.ScheduleDTO;
+import com.flowiee.pms.shared.util.SecurityUtils;
+import com.flowiee.pms.system.dto.SystemConfigDTO;
+import com.flowiee.pms.product.repository.ProductCrawlerRepository;
+import com.flowiee.pms.system.service.CrawlerService;
+import com.flowiee.pms.system.service.ConfigService;
+import com.flowiee.pms.shared.enums.ErrorCode;
+import com.flowiee.pms.schedule.service.ScheduleService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+
+@RestController
+@RequestMapping("${app.api.prefix}/sys")
+@Tag(name = "System API", description = "Quản lý hệ thống")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
+public class SystemController extends BaseController {
+    ConfigService configService;
+    CrawlerService crawlerService;
+    ProductCrawlerRepository productCrawlerRepository;
+    FileStorageService fileStorageService;
+    ScheduleService scheduleService;
+
+    private static boolean mvSystemCrawlingData = false;
+    private static boolean mvSystemMergingData = false;
+
+    @Operation(summary = "Find all configs")
+    @GetMapping("/config/all")
+    @PreAuthorize("@vldModuleSystem.readConfig(true)")
+    public AppResponse<List<SystemConfigDTO>> findConfigs() {
+        try {
+            return AppResponse.success(configService.getAll());
+        } catch (RuntimeException ex) {
+            throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "configs"), ex);
+        }
+    }
+
+    @Operation(summary = "Update config")
+    @PutMapping("/config/update/{id}")
+    @PreAuthorize("@vldModuleSystem.updateConfig(true)")
+    public AppResponse<SystemConfigDTO> updateConfig(@RequestBody SystemConfigDTO config, @PathVariable("id") Long configId) {
+        return AppResponse.success(configService.update(config, configId));
+    }
+
+    @GetMapping("/refresh")
+    public AppResponse<String> refreshApp() {
+        return AppResponse.success(configService.refreshApp());
+    }
+
+    @PostMapping("/crawler-data")
+    @PreAuthorize("@vldModuleProduct.insertProduct(true)")
+    public AppResponse<List<ProductCrawled>> crawlerData() {
+        if (!SecurityUtils.getCurrentUser().isAdmin()) {
+            throw new ForbiddenException("403");
+        }
+        if (mvSystemCrawlingData) {
+            return AppResponse.success(null, "System is crawling data, please try late!");
+        }
+        mvSystemCrawlingData = true;
+        try {
+            return AppResponse.success(crawlerService.crawl(), "Successfully crawler data");
+        } catch (AppException ex) {
+            throw new AppException();
+        } finally {
+            mvSystemCrawlingData = false;
+        }
+    }
+
+    @GetMapping("/data-temp")
+    public AppResponse<List<ProductCrawled>> getDataTemp(@RequestParam("pageSize") int pageSize, @RequestParam("pageNum") int pageNum) {
+        Page<ProductCrawled> productCrawledPage = productCrawlerRepository.findAll(PageRequest.of(pageNum - 1, pageSize));
+        return AppResponse.paged(productCrawledPage);
+    }
+
+    @PostMapping("/data-temp/merge")
+    public AppResponse<String> mergeDataTemp() {
+        if (!SecurityUtils.getCurrentUser().isAdmin()) {
+            throw new ForbiddenException("403");
+        }
+        if (mvSystemMergingData) {
+            return AppResponse.success(null, "System is merging data, please try late!");
+        }
+        mvSystemMergingData = true;
+        try {
+            crawlerService.merge();
+            return AppResponse.success(null, "Successfully merged data");
+        } catch (AppException ex) {
+            throw new AppException(ex.getDisplayMessage(), ex);
+        } finally {
+            mvSystemMergingData = false;
+        }
+    }
+
+
+    @GetMapping("/schedule")
+    @PreAuthorize("@vldModuleSystem.readConfig(true)")
+    public AppResponse<List<ScheduleDTO>> getSchedules() {
+        return AppResponse.success(scheduleService.getSchedules());
+    }
+
+    @GetMapping("/volume")
+    @PreAuthorize("@vldModuleSystem.readConfig(true)")
+    public AppResponse<List<LinkedHashMap<String, String>>> getVolume() {
+        return AppResponse.success(fileStorageService.getSystemVolumes());
+    }
+}

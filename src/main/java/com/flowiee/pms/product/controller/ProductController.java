@@ -1,24 +1,24 @@
 package com.flowiee.pms.product.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
-import com.flowiee.pms.common.constants.Constants;
+import com.flowiee.pms.shared.constant.Constants;
 import com.flowiee.pms.product.dto.ProductVariantTempDTO;
 import com.flowiee.pms.product.entity.ProductHistory;
-import com.flowiee.pms.common.model.AppResponse;
+import com.flowiee.pms.shared.response.AppResponse;
 import com.flowiee.pms.product.model.ProductSearchRequest;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.modules.system.model.EximResult;
+import com.flowiee.pms.system.model.EximResult;
 import com.flowiee.pms.product.dto.ProductDTO;
-import com.flowiee.pms.common.exception.AppException;
+import com.flowiee.pms.shared.exception.AppException;
 import com.flowiee.pms.product.dto.ProductRelatedDTO;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.product.service.ProductHistoryService;
-import com.flowiee.pms.product.service.ProductInfoService;
+import com.flowiee.pms.product.service.ProductService;
 import com.flowiee.pms.product.service.ProductRelatedService;
-import com.flowiee.pms.modules.system.service.ExportService;
-import com.flowiee.pms.modules.system.service.ImportService;
-import com.flowiee.pms.common.enumeration.ErrorCode;
-import com.flowiee.pms.common.enumeration.TemplateExport;
+import com.flowiee.pms.system.service.ExportService;
+import com.flowiee.pms.system.service.ImportService;
+import com.flowiee.pms.shared.enums.ErrorCode;
+import com.flowiee.pms.shared.enums.TemplateExport;
 import com.flowiee.pms.product.mapper.ProductConvert;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,7 +50,7 @@ public class ProductController extends BaseController {
     @NonFinal
     @Qualifier("productImportServiceImpl")
     ImportService mvImportService;
-    ProductInfoService mvProductInfoService;
+    ProductService mvProductService;
     ProductHistoryService mvProductHistoryService;
     ProductRelatedService mvProductRelatedService;
     ProductVariantService mvProductVariantService;
@@ -72,9 +72,9 @@ public class ProductController extends BaseController {
                                                       @RequestParam(value = "fullInfo", required = false) Boolean fullInfo) {
         try {
             if (fullInfo != null && !fullInfo) {
-                return AppResponse.success(ProductConvert.convertToDTOs(mvProductInfoService.findProductsIdAndProductName()));
+                return AppResponse.success(ProductConvert.convertToDTOs(mvProductService.findProductsIdAndProductName()));
             }
-            Page<ProductDTO> productPage = mvProductInfoService.findAll(ProductSearchRequest.builder()
+            Page<ProductDTO> productPage = mvProductService.findAll(ProductSearchRequest.builder()
                     .pageSize(pageSize).pageNum(pageNum - 1).txtSearch(txtSearch)
                     .brandId(pBrand).productTypeId(pProductType).colorId(pColor)
                     .sizeId(pSize).unitId(pUnit).gender(pGender)
@@ -89,21 +89,21 @@ public class ProductController extends BaseController {
     @GetMapping("/{id}")
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public AppResponse<ProductDTO> findDetailProduct(@PathVariable("id") Long productId) {
-        return AppResponse.success(mvProductInfoService.findById(productId, true));
+        return AppResponse.success(mvProductService.findById(productId, true));
     }
 
     @Operation(summary = "Create clothes product")
     @PostMapping("/create")
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
     public AppResponse<ProductDTO> createProduct(@RequestBody ProductDTO pDto) {
-        return AppResponse.success(mvProductInfoService.save(pDto));
+        return AppResponse.success(mvProductService.save(pDto));
     }
 
     @Operation(summary = "Update product")
     @PutMapping("/description/update/{id}")
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
     public AppResponse<String> updateProduct(@PathVariable("id") Long pProductId, @RequestBody ProductDTO pDTO) {
-        return AppResponse.success(mvProductInfoService.updateDescription(pProductId, pDTO.getDescription()));
+        return AppResponse.success(mvProductService.updateDescription(pProductId, pDTO.getDescription()));
     }
 
     //Added 2026/03/09
@@ -111,14 +111,14 @@ public class ProductController extends BaseController {
     @PutMapping("/update/{id}")
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
     public AppResponse<ProductDTO> updateProduct(@RequestBody ProductDTO product, @PathVariable("id") Long productId) {
-        return AppResponse.success(mvProductInfoService.update(product, productId));
+        return AppResponse.success(mvProductService.update(product, productId));
     }
 
     @Operation(summary = "Delete product")
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("@vldModuleProduct.deleteProduct(true)")
     public AppResponse<String> deleteProduct(@PathVariable("id") Long productId) {
-        return AppResponse.success(mvProductInfoService.delete(productId));
+        return AppResponse.success(mvProductService.delete(productId));
     }
 
     @Operation(summary = "Get histories of product")

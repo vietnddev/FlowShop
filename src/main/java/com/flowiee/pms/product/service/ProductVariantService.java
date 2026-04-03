@@ -1,6 +1,6 @@
 package com.flowiee.pms.product.service;
 
-import com.flowiee.pms.common.enumeration.ProductStatus;
+import com.flowiee.pms.product.enums.ProductStatus;
 import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.product.model.ProductVariantSearchRequest;
 import com.flowiee.pms.product.dto.ProductVariantTempDTO;

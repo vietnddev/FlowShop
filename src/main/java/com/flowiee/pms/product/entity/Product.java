@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flowiee.pms.shared.base.BaseEntity;
 
-import com.flowiee.pms.modules.system.entity.Category;
-import com.flowiee.pms.modules.sales.entity.GarmentFactory;
-import com.flowiee.pms.modules.sales.entity.Supplier;
-import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.system.entity.Category;
+import com.flowiee.pms.supplier.entity.Supplier;
+import com.flowiee.pms.media.entity.FileStorage;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.OnDelete;
@@ -79,10 +78,6 @@ public class Product extends BaseEntity implements Serializable {
 
     @Column(name = "notes")
     String internalNotes;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "garment_factory_id")
-    GarmentFactory garmentFactory;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "supplier_id")

@@ -1,13 +1,13 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.common.enumeration.CATEGORY;
-import com.flowiee.pms.common.security.UserSession;
+import com.flowiee.pms.shared.util.CommonUtils;
+import com.flowiee.pms.shared.util.SecurityUtils;
+import com.flowiee.pms.system.enums.CATEGORY;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -16,12 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 @Getter
 public class BaseController extends BaseAuthorize {
-	@Autowired
-	protected UserSession mvUserSession;
-
 	@Getter
 	@Setter
 	class SearchTool {
@@ -33,13 +31,12 @@ public class BaseController extends BaseAuthorize {
 		}
 	}
 
-	protected Logger   mvLogger = LoggerFactory.getLogger(getClass());
 	private SearchTool searchTool;
 
 	protected ModelAndView baseView(ModelAndView modelAndView) {
 		SearchTool searchTool = getSearchTool();
 		modelAndView.addObject("configSearchTool", searchTool != null ? searchTool : new SearchTool());
-		modelAndView.addObject("USERNAME_LOGIN", mvUserSession.getUserPrincipal().getUsername());
+		modelAndView.addObject("USERNAME_LOGIN", SecurityUtils.getCurrentUser().getUsername());
 		setURLHeader(modelAndView);
 		setURLSidebar(modelAndView);
 		return modelAndView;

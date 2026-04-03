@@ -2,7 +2,7 @@ package com.flowiee.pms.product.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.product.service.ProductDamagedService;
-import com.flowiee.pms.common.enumeration.Pages;
+import com.flowiee.pms.shared.enums.Pages;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

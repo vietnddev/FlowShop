@@ -1,6 +1,6 @@
 package com.flowiee.pms.product.service.impl;
 
-import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.shared.request.BaseParameter;
 import com.flowiee.pms.product.dto.ProductHistoryDTO;
 import com.flowiee.pms.product.entity.*;
 import com.flowiee.pms.product.repository.ProductHistoryRepository;

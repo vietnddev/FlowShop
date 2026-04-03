@@ -1,0 +1,23 @@
+package com.flowiee.pms.system.entity;
+
+import lombok.*;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Data
+@Entity
+@Table(name = "serial")
+public class Serial {
+    @Id
+    @Column(name = "id")
+    private String id;
+
+    @Column(name = "prefix", nullable = false)
+    private String prefix;
+
+    @Column(name = "current_value", nullable = false)
+    private Integer currentValue;
+}

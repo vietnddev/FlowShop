@@ -3,7 +3,7 @@ package com.flowiee.pms.product.service.impl;
 import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.product.entity.Product;
 import com.flowiee.pms.product.entity.ProductRelated;
-import com.flowiee.pms.common.exception.EntityNotFoundException;
+import com.flowiee.pms.shared.exception.EntityNotFoundException;
 import com.flowiee.pms.product.dto.ProductRelatedDTO;
 import com.flowiee.pms.product.repository.ProductRelatedRepository;
 import com.flowiee.pms.product.repository.ProductRepository;

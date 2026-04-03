@@ -1,7 +1,7 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.common.enumeration.ErrorCode;
+import com.flowiee.pms.shared.util.CoreUtils;
+import com.flowiee.pms.shared.enums.ErrorCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;

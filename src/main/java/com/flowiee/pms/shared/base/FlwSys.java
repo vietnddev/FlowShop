@@ -1,9 +1,9 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.config.TemplateSendEmail;
-import com.flowiee.pms.common.enumeration.ConfigCode;
-import com.flowiee.pms.common.enumeration.NotificationType;
-import com.flowiee.pms.modules.system.entity.SystemConfig;
+import com.flowiee.pms.shared.config.TemplateSendEmail;
+import com.flowiee.pms.system.enums.ConfigCode;
+import com.flowiee.pms.system.enums.NotificationType;
+import com.flowiee.pms.system.entity.SystemConfig;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,20 +1,19 @@
 package com.flowiee.pms.product.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
-import com.flowiee.pms.common.constants.Constants;
+import com.flowiee.pms.shared.constant.Constants;
 import com.flowiee.pms.product.dto.ProductPriceDTO;
-import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.common.exception.ResourceNotFoundException;
-import com.flowiee.pms.common.model.AppResponse;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.shared.exception.ResourceNotFoundException;
+import com.flowiee.pms.shared.response.AppResponse;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.product.dto.ProductVariantTempDTO;
 import com.flowiee.pms.product.model.CreateProductVariantReq;
 import com.flowiee.pms.product.model.ProductVariantSearchRequest;
-import com.flowiee.pms.product.service.ProductHistoryService;
 import com.flowiee.pms.product.service.ProductPriceService;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.common.enumeration.ErrorCode;
+import com.flowiee.pms.shared.util.CoreUtils;
+import com.flowiee.pms.shared.enums.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -33,7 +32,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductVariantController extends BaseController {
     ProductVariantService mvProductVariantService;
-    ProductHistoryService mvProductHistoryService;
     ProductPriceService   mvProductPriceService;
 
     @Operation(summary = "Find all variants")
@@ -116,7 +114,7 @@ public class ProductVariantController extends BaseController {
     @PutMapping(value = "/variant/{variantId}/price/update")
     @PreAuthorize("@vldModuleProduct.priceManagement(true)")
     public AppResponse<ProductPriceDTO> updatePrice(@PathVariable("variantId") Long productVariantId, @RequestBody ProductPriceDTO pPrice) {
-        return AppResponse.success(mvProductPriceService.updatePrice(productVariantId, pPrice));
+        return AppResponse.success(mvProductPriceService.update(pPrice, productVariantId));
     }
 
     @Operation(summary = "Check product variant already exists")

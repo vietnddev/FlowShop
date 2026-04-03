@@ -1,10 +1,10 @@
 package com.flowiee.pms.product.mapper;
 
-import com.flowiee.pms.common.utils.CoreUtils;
+import com.flowiee.pms.shared.util.CoreUtils;
 import com.flowiee.pms.product.entity.Product;
 import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
-import com.flowiee.pms.modules.system.entity.Category;
+import com.flowiee.pms.system.entity.Category;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 

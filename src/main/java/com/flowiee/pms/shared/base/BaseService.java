@@ -1,16 +1,17 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.common.model.BaseParameter;
-import com.flowiee.pms.common.security.UserPrincipal;
-import com.flowiee.pms.modules.staff.entity.Account;
-import com.flowiee.pms.modules.system.entity.SystemLog;
-import com.flowiee.pms.common.model.Filter;
-import com.flowiee.pms.common.exception.EntityNotFoundException;
-import com.flowiee.pms.modules.system.repository.SystemLogRepository;
-import com.flowiee.pms.common.security.UserSession;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.shared.request.BaseParameter;
+import com.flowiee.pms.shared.util.SecurityUtils;
+import com.flowiee.pms.system.entity.Account;
+import com.flowiee.pms.system.entity.SystemLog;
+import com.flowiee.pms.shared.request.Filter;
+import com.flowiee.pms.shared.exception.EntityNotFoundException;
+import com.flowiee.pms.system.repository.SystemLogRepository;
+
 import javax.persistence.EntityGraph;
 
+import lombok.Getter;
 import org.springframework.util.CollectionUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +37,6 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
     private ModelMapper mvModelMapper;
     @Autowired
     private SystemLogRepository mvSystemLogRepository;
-    @Autowired
-    private UserSession mvUserSession;
 
     private Class<E> mvEntityClass;
     private Class<D> mvDtoClass;
@@ -126,8 +125,8 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
                     .title("Delete entity")
                     .content("Delete " + mvEntityClass.getSimpleName() + " with ID is " + pId)
                     .contentChange("-")
-                    .ip(getUserPrincipal().getIp())
-                    .account(new Account(getUserPrincipal().getId()))
+                    .ip(SecurityUtils.getCurrentUser().getIp())
+                    .account(new Account(SecurityUtils.getCurrentUser().getId()))
                     .build());
         }
         return "Entity with ID " + pId + " deleted successfully.";
@@ -169,10 +168,12 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
         private final Class<T> entityClass;
         private final CriteriaBuilder cb;
         private final CriteriaQuery<T> query;
+        @Getter
         private final Root<T> root;
         private final List<Predicate> predicates = new ArrayList<>();
         private final List<Order> orders = new ArrayList<>();
         private final Map<String, Join<?, ?>> joins = new HashMap<>();
+        @Getter
         private final EntityManager entityManager;
 
         public QueryBuilder(Class<T> entityClass, EntityManager entityManager) {
@@ -181,18 +182,6 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
             this.cb = entityManager.getCriteriaBuilder();
             this.query = cb.createQuery(entityClass);
             this.root = query.from(entityClass);
-        }
-
-        public CriteriaBuilder getCriteriaBuilder() {
-            return this.cb;
-        }
-
-        public Root<T> getRoot() {
-            return this.root;
-        }
-
-        public EntityManager getEntityManager() {
-            return this.entityManager;
         }
 
         // Thêm điều kiện equal với path phức tạp (vd: "product.brand.id")
@@ -293,7 +282,7 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
 
             List<Predicate> countPredicates = predicates.stream()
                     .map(p -> recreatePredicate(p, countRoot))
-                    .collect(Collectors.toList());
+                    .toList();
 
             countQuery.select(cb.countDistinct(countRoot));
             countQuery.where(countPredicates.toArray(new Predicate[0]));
@@ -362,19 +351,6 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
-    }
-
-    public <E, D> Page<D> mapEntPageToDtoPage(Page<E> entityPage, Class<D> dtoClass) {
-        List<D> dtoList = entityPage.getContent()
-                .stream()
-                .map(entity -> mvModelMapper.map(entity, dtoClass))
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(dtoList, entityPage.getPageable(), entityPage.getTotalElements());
-    }
-
-    protected UserPrincipal getUserPrincipal() {
-        return mvUserSession.getUserPrincipal();
     }
 
     protected void validateId(Long id) {

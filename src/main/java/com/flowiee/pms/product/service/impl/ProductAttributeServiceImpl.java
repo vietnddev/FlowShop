@@ -1,19 +1,19 @@
 package com.flowiee.pms.product.service.impl;
 
-import com.flowiee.pms.common.model.BaseParameter;
+import com.flowiee.pms.shared.request.BaseParameter;
 import com.flowiee.pms.product.entity.Product;
 import com.flowiee.pms.product.entity.ProductAttribute;
-import com.flowiee.pms.common.utils.ChangeLog;
-import com.flowiee.pms.common.enumeration.ACTION;
-import com.flowiee.pms.common.enumeration.MODULE;
+import com.flowiee.pms.shared.util.ChangeLog;
+import com.flowiee.pms.shared.enums.ACTION;
+import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.product.dto.ProductAttributeDTO;
 import com.flowiee.pms.product.repository.ProductAttributeRepository;
 import com.flowiee.pms.shared.base.BaseService;
-import com.flowiee.pms.common.enumeration.MasterObject;
-import com.flowiee.pms.common.enumeration.MessageCode;
+import com.flowiee.pms.shared.enums.MasterObject;
+import com.flowiee.pms.shared.enums.MessageCode;
 import com.flowiee.pms.product.service.ProductAttributeService;
 import com.flowiee.pms.product.service.ProductHistoryService;
-import com.flowiee.pms.modules.system.service.SystemLogService;
+import com.flowiee.pms.system.service.SystemLogService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

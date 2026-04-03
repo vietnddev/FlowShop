@@ -3,12 +3,12 @@ package com.flowiee.pms.order.service;
 import com.flowiee.pms.order.dto.OrderReturnDTO;
 import com.flowiee.pms.order.entity.Order;
 
-import com.flowiee.pms.common.enumeration.OrderStatus;
+import com.flowiee.pms.order.enums.OrderStatus;
 import com.flowiee.pms.order.dto.OrderDTO;
 import com.flowiee.pms.order.model.CreateOrderReq;
 import com.flowiee.pms.order.model.OrderReq;
 import com.flowiee.pms.order.model.OrderReturnReq;
-import com.flowiee.pms.modules.sales.model.UpdateOrderReq;
+import com.flowiee.pms.order.model.UpdateOrderReq;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
@@ -22,8 +22,6 @@ public interface OrderService {
     OrderDTO findDtoById(Long orderId, boolean throwException);
 
     OrderDTO findByTrackingCode(String pTrackingCode);
-
-    Order findByCode(String pOrderCode);
 
     List<Order> findOrdersToday();
 

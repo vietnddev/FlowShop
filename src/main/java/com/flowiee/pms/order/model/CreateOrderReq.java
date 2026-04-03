@@ -1,7 +1,7 @@
 package com.flowiee.pms.order.model;
 
 import com.flowiee.pms.order.dto.OrderDTO;
-import com.flowiee.pms.common.enumeration.OrderStatus;
+import com.flowiee.pms.order.enums.OrderStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;

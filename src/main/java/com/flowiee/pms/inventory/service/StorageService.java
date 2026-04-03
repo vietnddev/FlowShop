@@ -1,0 +1,18 @@
+package com.flowiee.pms.inventory.service;
+
+import com.flowiee.pms.shared.base.ICurdService;
+import com.flowiee.pms.inventory.entity.Storage;
+import com.flowiee.pms.inventory.model.StorageItems;
+import com.flowiee.pms.inventory.dto.StorageDTO;
+import org.springframework.data.domain.Page;
+
+public interface StorageService extends ICurdService<StorageDTO> {
+    Page<StorageDTO> find(int pageSize, int pageNum);
+
+    Page<StorageItems> findStorageItems(int pageSize, int pageNum, Long storageId, String searchText);
+
+    Storage findEntById(Long pStorageId, boolean pThrowException);
+
+    //void calculateAvailableStock();
+    //void calculateReservedStock();
+}

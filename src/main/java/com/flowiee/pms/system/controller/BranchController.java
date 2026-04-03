@@ -1,0 +1,67 @@
+package com.flowiee.pms.system.controller;
+
+import com.flowiee.pms.shared.base.BaseController;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.shared.response.AppResponse;
+import com.flowiee.pms.system.dto.BranchDTO;
+import com.flowiee.pms.system.service.BranchService;
+import com.flowiee.pms.shared.enums.ErrorCode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("${app.api.prefix}/system/branch")
+@Tag(name = "Branch API", description = "Quản lý danh sách chi nhánh")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
+public class BranchController extends BaseController {
+    BranchService branchService;
+
+    @Operation(summary = "Find all branches")
+    @GetMapping("/all")
+    @PreAuthorize("@vldModuleSystem.readBranch(true)")
+    public AppResponse<List<BranchDTO>> findAllBranches() {
+        try {
+            return AppResponse.success(branchService.find());
+        } catch (RuntimeException ex) {
+            throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "branch"), ex);
+        }
+    }
+
+    @PostMapping
+    @PreAuthorize("@vldModuleSystem.insertBranch(true)")
+    public AppResponse<BranchDTO> createBranch(@RequestBody BranchDTO branch) {
+        try {
+            return AppResponse.success(branchService.save(branch));
+        } catch (RuntimeException ex) {
+            throw new AppException(String.format(ErrorCode.DELETE_ERROR_OCCURRED.getDescription(), "branch"), ex);
+        }
+    }
+
+    @PutMapping("/update/{id}")
+    @PreAuthorize("@vldModuleSystem.updateBranch(true)")
+    public AppResponse<BranchDTO> updateBranch(@RequestBody BranchDTO branch, @PathVariable("id") Long branchId) {
+        try {
+            return AppResponse.success(branchService.update(branch, branchId));
+        } catch (RuntimeException ex) {
+            throw new AppException(String.format(ErrorCode.DELETE_ERROR_OCCURRED.getDescription(), "branch"), ex);
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("@vldModuleSystem.deleteBranch(true)")
+    public AppResponse<String> deleteBranch(@PathVariable("id") Long branchId) {
+        try {
+            return AppResponse.success(branchService.delete(branchId));
+        } catch (RuntimeException ex) {
+            throw new AppException(String.format(ErrorCode.DELETE_ERROR_OCCURRED.getDescription(), "branch"), ex);
+        }
+    }
+}

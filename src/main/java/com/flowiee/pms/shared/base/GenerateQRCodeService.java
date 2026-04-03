@@ -1,20 +1,19 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.enumeration.FileExtension;
-import com.flowiee.pms.common.enumeration.MODULE;
-import com.flowiee.pms.common.security.UserSession;
-import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.common.utils.FileUtils;
+import com.flowiee.pms.shared.enums.FileExtension;
+import com.flowiee.pms.shared.enums.MODULE;
+import com.flowiee.pms.shared.util.CommonUtils;
+import com.flowiee.pms.shared.util.FileUtils;
 import com.flowiee.pms.product.entity.ProductDetail;
-import com.flowiee.pms.modules.media.entity.FileStorage;
+import com.flowiee.pms.media.entity.FileStorage;
 import com.flowiee.pms.order.entity.Order;
-import com.flowiee.pms.modules.staff.entity.Account;
+import com.flowiee.pms.shared.util.SecurityUtils;
+import com.flowiee.pms.system.entity.Account;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -22,9 +21,6 @@ import java.nio.file.Path;
 
 @Component
 public abstract class GenerateQRCodeService {
-    @Autowired
-    private UserSession userSession;
-
     protected FileExtension mvQRCodeFormat = FileExtension.PNG;
     protected int mvQRCodeWidth = 200;
     protected int mvQRCodeHeight = 200;
@@ -59,7 +55,7 @@ public abstract class GenerateQRCodeService {
                 .storageName(getImageStorageName())
                 .extension(getImageExtension())
                 .directoryPath(CommonUtils.getPathDirectory(pModule).substring(CommonUtils.getPathDirectory(pModule).indexOf("uploads")))
-                .uploadBy(new Account(userSession.getUserPrincipal().getId()))
+                .uploadBy(new Account(SecurityUtils.getCurrentUser().getId()))
                 .isActive(false)
                 .order(pOrderId != null ? new Order(pOrderId) : null)
                 .productDetail(pProductVariantId != null ? new ProductDetail(pProductVariantId) : null)

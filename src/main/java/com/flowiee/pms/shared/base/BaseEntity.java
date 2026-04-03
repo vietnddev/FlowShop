@@ -2,7 +2,7 @@ package com.flowiee.pms.shared.base;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flowiee.pms.common.utils.CommonUtils;
+import com.flowiee.pms.shared.util.SecurityUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -54,14 +54,14 @@ public class BaseEntity implements Cloneable {
     @PrePersist
     public void onCreate() {
         if (createdBy == null) {
-            createdBy = CommonUtils.getUserPrincipal().getId();
+            createdBy = SecurityUtils.getCurrentUser().getId();
         }
     }
 
     @PreUpdate
     public void onUpdate() {
         if (lastUpdatedBy == null) {
-            lastUpdatedBy = CommonUtils.getUserPrincipal().getUsername();
+            lastUpdatedBy = SecurityUtils.getCurrentUser().getUsername();
         }
     }
 

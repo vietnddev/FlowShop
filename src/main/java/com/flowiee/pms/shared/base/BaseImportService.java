@@ -1,18 +1,17 @@
 package com.flowiee.pms.shared.base;
 
-import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.common.exception.AppException;
-import com.flowiee.pms.modules.system.model.EximResult;
-import com.flowiee.pms.modules.system.service.ImportService;
-import com.flowiee.pms.common.utils.CommonUtils;
-import com.flowiee.pms.common.enumeration.TemplateExport;
+import com.flowiee.pms.shared.util.CoreUtils;
+import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.system.model.EximResult;
+import com.flowiee.pms.system.service.ImportService;
+import com.flowiee.pms.shared.util.CommonUtils;
+import com.flowiee.pms.shared.enums.TemplateExport;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.xssf.usermodel.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -29,11 +28,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalTime;
 
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class BaseImportService implements ImportService {
     protected abstract void writeData() throws AppException, IOException;
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
     protected XSSFSheet mvDataSheet;
     protected String mvDataSheetName = "data";
     protected int mvHeadKeyLine = 1;
@@ -68,7 +67,7 @@ public abstract class BaseImportService implements ImportService {
 //                    .beginTime(mvEximResult.getBeginTime())
 //                    .finishTime(LocalTime.now())
 //                    .filePath(lvPath.toString())
-//                    .account(CommonUtils.getUserPrincipal().toEntity())
+//                    .account(SecurityUtils.getCurrentUser().toEntity())
 //                    .build());
 
             if ("NOK".equals(mvEximResult.getResultStatus())) {
@@ -80,7 +79,7 @@ public abstract class BaseImportService implements ImportService {
             return mvEximResult;
         } catch (Exception e) {
             mvEximResult.setResultStatus("NOK");
-            logger.error("Error when import data!" + e.getMessage(), e);
+            log.error("Error when import data!" + e.getMessage(), e);
             throw new AppException("Error when import data!", e);
         } finally {
             try {
@@ -88,7 +87,7 @@ public abstract class BaseImportService implements ImportService {
                 Files.deleteIfExists(mvEximResult.getPathTarget());
                 mvEximResult.setFinishTime(LocalTime.now());
             } catch (IOException e) {
-                logger.error("Error when import data!", e);
+                log.error("Error when import data!", e);
             }
             if (CoreUtils.isNullStr(mvEximResult.getResultStatus())) {
                 mvEximResult.setResultStatus("OK");

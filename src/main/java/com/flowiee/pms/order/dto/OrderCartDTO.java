@@ -1,6 +1,6 @@
 package com.flowiee.pms.order.dto;
 
-import com.flowiee.pms.modules.sales.dto.ItemsDTO;
+import com.flowiee.pms.cart.dto.ItemsDTO;
 import com.flowiee.pms.shared.base.BaseDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

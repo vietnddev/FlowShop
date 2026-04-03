@@ -1,0 +1,33 @@
+package com.flowiee.pms.shared.security.authorize.storage;
+
+import com.flowiee.pms.shared.base.BaseAuthorize;
+import com.flowiee.pms.shared.enums.ACTION;
+import org.springframework.stereotype.Component;
+
+@Component
+public class VldModuleStorage extends BaseAuthorize implements IVldModuleStorage {
+    @Override
+    public boolean dashboard(boolean throwException) {
+        return super.isAuthorized(ACTION.STG_DASHBOARD, throwException);
+    }
+
+    @Override
+    public boolean readStorage(boolean throwException) {
+        return super.isAuthorized(ACTION.STG_STORAGE, throwException);
+    }
+
+    @Override
+    public boolean insertStorage(boolean throwException) {
+        return super.isAuthorized(ACTION.STG_STORAGE, throwException);
+    }
+
+    @Override
+    public boolean updateStorage(boolean throwException) {
+        return super.isAuthorized(ACTION.STG_STORAGE, throwException);
+    }
+
+    @Override
+    public boolean deleteStorage(boolean throwException) {
+        return super.isAuthorized(ACTION.STG_STORAGE, throwException);
+    }
+}

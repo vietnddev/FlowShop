@@ -1,7 +1,7 @@
 package com.flowiee.pms.modules.dashboard.model;
 
 import com.flowiee.pms.product.dto.ProductVariantDTO;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -4,11 +4,11 @@ import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.common.exception.AppException;
 import com.flowiee.pms.modules.sales.dto.CustomerContactDTO;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;
-import com.flowiee.pms.modules.sales.model.OrderReq;
+import com.flowiee.pms.order.model.OrderReq;
 import com.flowiee.pms.modules.sales.service.CustomerContactService;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.modules.sales.service.CustomerService;
-import com.flowiee.pms.modules.sales.service.OrderService;
+import com.flowiee.pms.order.service.OrderService;
 
 import com.flowiee.pms.common.enumeration.ContactType;
 import com.flowiee.pms.common.enumeration.Pages;

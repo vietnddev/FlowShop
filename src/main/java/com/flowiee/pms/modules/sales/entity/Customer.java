@@ -3,6 +3,7 @@ package com.flowiee.pms.modules.sales.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.modules.system.entity.Category;

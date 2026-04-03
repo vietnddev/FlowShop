@@ -9,7 +9,7 @@ import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.shared.base.BaseEntity;
 
 import com.flowiee.pms.modules.inventory.entity.*;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.FileUtils;

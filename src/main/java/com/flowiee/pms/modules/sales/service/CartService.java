@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.flowiee.pms.modules.sales.dto.ItemsDTO;
-import com.flowiee.pms.modules.sales.dto.OrderCartDTO;
+import com.flowiee.pms.order.dto.OrderCartDTO;
 import com.flowiee.pms.modules.sales.entity.Items;
 import com.flowiee.pms.modules.sales.model.CartReq;
 import com.flowiee.pms.shared.base.ICurdService;
-import com.flowiee.pms.modules.sales.entity.OrderCart;
+import com.flowiee.pms.order.entity.OrderCart;
 
 public interface CartService extends ICurdService<OrderCartDTO> {
     OrderCartDTO addDraftCart();

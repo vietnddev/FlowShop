@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.sales.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.common.enumeration.CATEGORY;
-import com.flowiee.pms.modules.sales.entity.OrderCart;
+import com.flowiee.pms.order.entity.OrderCart;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.sales.model.CartItemModel;

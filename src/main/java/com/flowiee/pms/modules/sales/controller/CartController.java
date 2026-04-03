@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.sales.controller;
 import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.common.model.AppResponse;
 import com.flowiee.pms.modules.sales.dto.ItemsDTO;
-import com.flowiee.pms.modules.sales.dto.OrderCartDTO;
+import com.flowiee.pms.order.dto.OrderCartDTO;
 import com.flowiee.pms.modules.sales.model.CartItemsReq;
 import com.flowiee.pms.modules.sales.model.CartReq;
 import com.flowiee.pms.modules.sales.service.CartService;

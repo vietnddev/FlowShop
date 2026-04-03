@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.sales.service;
 import com.flowiee.pms.modules.sales.dto.LoyaltyProgramDTO;
 import com.flowiee.pms.modules.sales.entity.LoyaltyProgram;
 import com.flowiee.pms.modules.sales.entity.LoyaltyTransaction;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.shared.base.ICurdService;
 
 import java.util.List;

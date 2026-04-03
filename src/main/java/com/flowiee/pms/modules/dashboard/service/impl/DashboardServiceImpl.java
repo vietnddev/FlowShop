@@ -5,11 +5,11 @@ import com.flowiee.pms.modules.dashboard.service.DashboardService;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.product.repository.ProductDetailRepository;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.modules.sales.dto.CustomerDTO;
 import com.flowiee.pms.modules.sales.service.CustomerService;
 
-import com.flowiee.pms.modules.sales.service.OrderService;
+import com.flowiee.pms.order.service.OrderService;
 import com.flowiee.pms.modules.sales.service.OrderStatisticsService;
 import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.CoreUtils;

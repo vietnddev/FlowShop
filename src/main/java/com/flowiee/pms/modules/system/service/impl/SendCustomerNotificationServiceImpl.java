@@ -1,8 +1,8 @@
 package com.flowiee.pms.modules.system.service.impl;
 
 import com.flowiee.pms.product.entity.ProductDetail;
-import com.flowiee.pms.modules.sales.entity.Order;
-import com.flowiee.pms.modules.sales.entity.OrderDetail;
+import com.flowiee.pms.order.entity.Order;
+import com.flowiee.pms.order.entity.OrderDetail;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.OrderUtils;
 import com.flowiee.pms.common.enumeration.NotificationType;

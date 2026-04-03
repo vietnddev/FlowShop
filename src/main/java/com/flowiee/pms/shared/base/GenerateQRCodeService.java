@@ -7,7 +7,7 @@ import com.flowiee.pms.common.utils.CommonUtils;
 import com.flowiee.pms.common.utils.FileUtils;
 import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.modules.media.entity.FileStorage;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;

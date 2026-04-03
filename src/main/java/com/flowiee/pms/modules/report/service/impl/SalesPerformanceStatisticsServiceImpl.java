@@ -1,16 +1,16 @@
 package com.flowiee.pms.modules.report.service.impl;
 
 import com.flowiee.pms.modules.report.service.SalesPerformanceStatisticsService;
-import com.flowiee.pms.modules.sales.entity.Order;
-import com.flowiee.pms.modules.sales.model.OrderReq;
+import com.flowiee.pms.order.entity.Order;
+import com.flowiee.pms.order.model.OrderReq;
 import com.flowiee.pms.modules.staff.entity.Account;
 import com.flowiee.pms.modules.staff.entity.GroupAccount;
-import com.flowiee.pms.modules.sales.dto.OrderDTO;
+import com.flowiee.pms.order.dto.OrderDTO;
 import com.flowiee.pms.modules.report.model.OrderSalesChannelStatisticsModel;
 import com.flowiee.pms.modules.report.model.SalesPerformanceStatisticsModel;
-import com.flowiee.pms.modules.sales.repository.OrderRepository;
+import com.flowiee.pms.order.repository.OrderRepository;
 import com.flowiee.pms.modules.staff.repository.AccountRepository;
-import com.flowiee.pms.modules.sales.service.OrderService;
+import com.flowiee.pms.order.service.OrderService;
 import com.flowiee.pms.common.utils.CoreUtils;
 import com.flowiee.pms.common.utils.OrderUtils;
 import javax.persistence.EntityManager;

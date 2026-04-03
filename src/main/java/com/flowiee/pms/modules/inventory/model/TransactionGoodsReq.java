@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.inventory.model;
 import com.flowiee.pms.common.model.BaseParameter;
 import com.flowiee.pms.modules.inventory.dto.StorageDTO;
 import com.flowiee.pms.modules.inventory.dto.TransactionGoodsItemDTO;
-import com.flowiee.pms.modules.sales.dto.OrderDTO;
+import com.flowiee.pms.order.dto.OrderDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

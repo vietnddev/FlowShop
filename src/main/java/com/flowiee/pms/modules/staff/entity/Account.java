@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flowiee.pms.shared.base.BaseEntity;
 
 import com.flowiee.pms.modules.sales.entity.Customer;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.common.enumeration.AccountStatus;
 import com.flowiee.pms.modules.media.entity.FileStorage;
 import com.flowiee.pms.modules.system.entity.Branch;

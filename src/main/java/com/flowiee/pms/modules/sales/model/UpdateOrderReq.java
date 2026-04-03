@@ -1,5 +1,6 @@
 package com.flowiee.pms.modules.sales.model;
 
+import com.flowiee.pms.order.model.CreateOrderReq;
 import lombok.Data;
 
 import java.time.LocalDateTime;

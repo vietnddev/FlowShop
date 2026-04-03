@@ -2,7 +2,7 @@ package com.flowiee.pms.modules.system.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.common.utils.CoreUtils;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.common.security.UserSession;
 import com.flowiee.pms.modules.staff.service.AccountService;
 import com.flowiee.pms.common.enumeration.Pages;

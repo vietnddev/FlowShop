@@ -2,8 +2,8 @@ package com.flowiee.pms.modules.report.service.impl;
 
 import com.flowiee.pms.common.utils.DateTimeUtil;
 import com.flowiee.pms.modules.report.service.RevenueStatisticsService;
-import com.flowiee.pms.modules.sales.entity.Order;
-import com.flowiee.pms.modules.sales.repository.OrderRepository;
+import com.flowiee.pms.order.entity.Order;
+import com.flowiee.pms.order.repository.OrderRepository;
 import com.flowiee.pms.common.utils.OrderUtils;
 import com.flowiee.pms.common.enumeration.FilterDate;
 import lombok.RequiredArgsConstructor;

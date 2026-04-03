@@ -3,7 +3,7 @@ package com.flowiee.pms.modules.sales.service.impl;
 import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.common.utils.OrderUtils;
 import com.flowiee.pms.common.utils.SysConfigUtils;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.common.exception.BadRequestException;
 import com.flowiee.pms.common.exception.ResourceNotFoundException;
 import com.flowiee.pms.modules.sales.dto.CustomerContactDTO;
@@ -18,7 +18,7 @@ import com.flowiee.pms.common.exception.DataInUseException;
 import com.flowiee.pms.modules.sales.entity.Customer;
 import com.flowiee.pms.modules.sales.repository.CustomerContactRepository;
 import com.flowiee.pms.modules.sales.repository.CustomerRepository;
-import com.flowiee.pms.modules.sales.repository.OrderRepository;
+import com.flowiee.pms.order.repository.OrderRepository;
 
 import com.flowiee.pms.modules.system.service.SystemLogService;
 import org.apache.commons.collections.CollectionUtils;

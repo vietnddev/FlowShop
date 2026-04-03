@@ -1,0 +1,27 @@
+package com.flowiee.pms.order.dto;
+
+import com.flowiee.pms.modules.sales.dto.ItemsDTO;
+import com.flowiee.pms.shared.base.BaseDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class OrderCartDTO extends BaseDTO implements Serializable {
+    private Long salesChannelId;
+    private Long paymentMethodId;
+    private List<ItemsDTO> items;
+    private Boolean isFinish;
+
+    @Override
+    public String toString() {
+        return "OrderCartDTO{" +
+                "id=" + id +
+                '}';
+    }
+}

@@ -9,7 +9,7 @@ import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.modules.inventory.entity.*;
 import com.flowiee.pms.modules.sales.entity.Customer;
 import com.flowiee.pms.modules.sales.entity.LedgerTransaction;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.modules.staff.entity.LeaveApplication;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

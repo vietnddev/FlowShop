@@ -21,7 +21,7 @@ import com.flowiee.pms.product.model.ProductVariantSearchRequest;
 import com.flowiee.pms.product.model.ProductSummaryInfoModel;
 import com.flowiee.pms.product.repository.ProductDescriptionRepository;
 import com.flowiee.pms.product.repository.ProductDetailRepository;
-import com.flowiee.pms.modules.sales.repository.OrderRepository;
+import com.flowiee.pms.order.repository.OrderRepository;
 import com.flowiee.pms.modules.media.repository.FileStorageRepository;
 import com.flowiee.pms.modules.system.service.CategoryService;
 import com.flowiee.pms.common.utils.ChangeLog;

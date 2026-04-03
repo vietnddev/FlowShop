@@ -5,7 +5,7 @@ import com.flowiee.pms.shared.base.BaseEntity;
 import com.flowiee.pms.modules.inventory.enums.TransactionGoodsStatus;
 import com.flowiee.pms.modules.inventory.enums.TransactionGoodsType;
 import com.flowiee.pms.modules.media.entity.FileStorage;
-import com.flowiee.pms.modules.sales.entity.Order;
+import com.flowiee.pms.order.entity.Order;
 import lombok.*;
 
 import javax.persistence.*;

@@ -45,7 +45,7 @@ public class GiftCatalogServiceImpl extends BaseService<GiftCatalog, GiftCatalog
     }
 
     @Override
-    public String delete(Long pEntityId) {
+    public boolean delete(Long pEntityId) {
         return super.delete(pEntityId);
     }
 

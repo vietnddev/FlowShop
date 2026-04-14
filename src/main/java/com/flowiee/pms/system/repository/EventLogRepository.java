@@ -11,9 +11,6 @@ import java.util.List;
 
 @Repository
 public interface EventLogRepository extends JpaRepository<EventLog, Long> {
-    @Query("from EventLog el where el.requestId = :requestId")
-    EventLog findByRequestId(@Param("requestId") Long requestId);
-
     @Query("from EventLog el where el.createdTime <= :createdTime")
     List<EventLog> getEventLogFrom(@Param("createdTime") LocalDateTime createdTime);
 }

@@ -76,37 +76,7 @@
                                             <th></th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tblItems">
-                                        <!-- th:each="cart, cartIndex : ${listCart}"
-                                        <tr th:each="item, itemIndex : ${cart.listItems}">
-                                            <td class="text-left">
-                                                <input type="hidden" id="productVariantIdField" th:value="${item.productDetail.Id}"/>
-                                                <a th:text="${itemIndex.index + 1 + '. ' + item.productDetail.variantName}"
-                                                   th:href="@{/san-pham/variant/{id}(id=${item.productDetail.id})}"></a>
-                                                <p class="font-italic" th:text="${item.note}"></p>
-                                            </td>
-                                            <td th:text="${item.price != null}
-                                                                                    ? ${#numbers.formatDecimal (item.price, 0, 'COMMA', 0, 'NONE')} + ' đ (' + ${item.priceType == 'L' ? 'Lẻ' : 'Sỉ'} + ')'
-                                                                                    : '-'"></td>
-                                            <td th:text="${item.extraDiscount != null}
-                                                                                    ? ${#numbers.formatDecimal(item.extraDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ'
-                                                                                    : '-'"></td>
-                                            <td th:text="${item.quantity}"></td>
-                                            <td th:text="${item.price != null}
-                                                                                    ? ${#numbers.formatDecimal(item.price * item.quantity - item.extraDiscount, 0, 'COMMA', 0, 'NONE')} + ' đ'
-                                                                                    : '-'"></td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" th:data-target="'#modalUpdateItems_' + ${item.id}">
-                                                    <i class="fa-solid fa-pencil"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" th:data-target="'#modalDeleteItems_' + ${item.id}">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                                &lt;!&ndash;Modal update item&ndash;&gt;
-                                                <div th:replace="~{pages/sales/order/fragments/create-order-fragments :: modalUpdateItem}"></div>
-                                            </td>
-                                        </tr>-->
-                                    </tbody>
+                                    <tbody id="tblItems"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -299,7 +269,6 @@
             init();
             createListener();
             loadCarts();
-            loadCustomers();
             createOrder();
             checkVoucherIsAvailable();
             useVoucher();
@@ -357,22 +326,6 @@
                 let itemName = $(this).attr("itemName");
                 deleteItem(itemId, itemName);
             });
-        }
-
-        async function loadCustomers() {
-            let selectElement = $('#customerField');
-            let apiURL = mvHostURLCallApi + '/customer/all'
-            let response = await fetch(apiURL)
-            if (response.ok) {
-                let data = (await response.json()).data;
-                selectElement.append('<option value="-1">Chọn khách hàng</option>');
-                $.each(data, function (index, d) {
-                    selectElement.append(`<option value="${d.id}">${d.customerName}</option>`);
-                    mvCustomers[d.id] = d; //Tương tự map trong Java, d.id là key, d là value
-                });
-            } else {
-                alert('Load customer fail!')
-            }
         }
 
         function checkVoucherIsAvailable() {

@@ -58,7 +58,7 @@ public class CategoryController extends BaseController {
     public AppResponse<CategoryDTO> createCategory(@RequestBody CategoryDTO category) {
         try {
             category.setType(CommonUtils.getCategoryType(category.getType()));
-            return AppResponse.success(mvCategoryService.save(category));
+            return AppResponse.success(mvCategoryService.create(category));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "category"), ex);
         }
@@ -83,6 +83,6 @@ public class CategoryController extends BaseController {
     @DeleteMapping("/delete/{categoryId}")
     @PreAuthorize("@vldModuleCategory.deleteCategory(true)")
     public AppResponse<String> deleteCategory(@PathVariable("categoryId") Long categoryId) {
-        return AppResponse.success(mvCategoryService.delete(categoryId));
+        return AppResponse.success("Success: " + mvCategoryService.delete(categoryId));
     }
 }

@@ -61,10 +61,10 @@ public class VoucherApplyServiceImpl implements VoucherApplyService {
     }
 
     @Override
-    public String delete(Long entityId) {
+    public boolean delete(Long entityId) {
         VoucherApply voucherApply = this.findById(entityId, true);
         mvVoucherApplyRepository.deleteById(voucherApply.getId());
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     private List<VoucherApplyDTO> extractDataQuery(List<Object[]> objects) {

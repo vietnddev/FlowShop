@@ -50,7 +50,7 @@ public class CartController extends BaseController {
     @DeleteMapping("/{cartId}")
     @PreAuthorize("@vldModuleSales.insertOrder(true)")
     public AppResponse<String> deleteCart(@PathVariable("cartId") Long cartId) {
-        return AppResponse.success(mvCartService.delete(cartId));
+        return AppResponse.success("Success: " + mvCartService.delete(cartId));
     }
 
     @PutMapping("/{cartId}/item/{itemId}")

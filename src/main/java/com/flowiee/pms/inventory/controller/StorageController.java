@@ -89,7 +89,7 @@ public class StorageController extends BaseController {
     @DeleteMapping("/delete/{storageId}")
     @PreAuthorize("@vldModuleStorage.deleteStorage(true)")
     public AppResponse<String> deleteStorage(@PathVariable("storageId") Long storageId) {
-        return AppResponse.success(mvStorageService.delete(storageId));
+        return AppResponse.success("Success: " + mvStorageService.delete(storageId));
     }
 
     @Operation(summary = "Find detail storage")

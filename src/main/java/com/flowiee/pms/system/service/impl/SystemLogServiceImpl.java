@@ -12,7 +12,6 @@ import com.flowiee.pms.system.repository.SystemLogRepository;
 
 import com.flowiee.pms.shared.enums.ACTION;
 import com.flowiee.pms.system.enums.LogType;
-import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.shared.enums.MasterObject;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -52,32 +51,32 @@ public class SystemLogServiceImpl implements SystemLogService {
     }
 
     @Override
-    public SystemLog writeLogCreate(MODULE module, ACTION function, MasterObject object, String title, String content) {
-        return this.writeLog(module, function, object, LogType.I, title, content, "-");
+    public SystemLog writeLogCreate(ACTION function, MasterObject object, String title, String content) {
+        return this.writeLog(function, object, LogType.I, title, content, "-");
     }
 
     @Override
-    public SystemLog writeLogUpdate(MODULE module, ACTION function, MasterObject object, String title, ChangeLog changeLog) {
-        return this.writeLog(module, function, object, LogType.U, title, changeLog.getOldValues(), changeLog.getNewValues());
+    public SystemLog writeLogUpdate(ACTION function, MasterObject object, String title, ChangeLog changeLog) {
+        return this.writeLog(function, object, LogType.U, title, changeLog.getOldValues(), changeLog.getNewValues());
     }
 
     @Override
-    public SystemLog writeLogUpdate(MODULE module, ACTION function, MasterObject object, String title, String content) {
-        return this.writeLog(module, function, object, LogType.U, title, content, "-");
+    public SystemLog writeLogUpdate(ACTION function, MasterObject object, String title, String content) {
+        return this.writeLog(function, object, LogType.U, title, content, "-");
     }
 
     @Override
-    public SystemLog writeLogUpdate(MODULE module, ACTION function, MasterObject object, String title, String content, String contentChange) {
-        return this.writeLog(module, function, object, LogType.U, title, content, contentChange);
+    public SystemLog writeLogUpdate(ACTION function, MasterObject object, String title, String content, String contentChange) {
+        return this.writeLog(function, object, LogType.U, title, content, contentChange);
     }
 
     @Override
-    public SystemLog writeLogDelete(MODULE module, ACTION function, MasterObject object, String title, String content) {
-        return this.writeLog(module, function, object, LogType.D, title, content, "-");
+    public SystemLog writeLogDelete(ACTION function, MasterObject object, String title, String content) {
+        return this.writeLog(function, object, LogType.D, title, content, "-");
     }
 
     @Override
-    public SystemLog writeLog(MODULE module, ACTION function, MasterObject object, LogType mode, String title, String content, String contentChange) {
+    public SystemLog writeLog(ACTION function, MasterObject object, LogType mode, String title, String content, String contentChange) {
         String lvContent = CoreUtils.isNullStr(content) ? SystemLog.EMPTY : CoreUtils.trim(content);
         String lvContentChange = CoreUtils.isNullStr(contentChange) ? SystemLog.EMPTY : CoreUtils.trim(contentChange);
         if (lvContent.equals(lvContentChange)) {
@@ -85,9 +84,9 @@ public class SystemLogServiceImpl implements SystemLogService {
         }
         UserPrincipal currentUser = SecurityUtils.getCurrentUser();
         return mvSystemLogRepository.save(SystemLog.builder()
-                .module(module.name())
+                .module(function.getModule().name())
                 .function(function.name())
-                .object(object.name())
+                .object(CoreUtils.trim(object.name()))
                 .mode(mode.name())
                 .title(title)
                 .content(lvContent)

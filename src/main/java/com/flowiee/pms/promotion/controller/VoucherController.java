@@ -82,7 +82,7 @@ public class VoucherController extends BaseController {
     @DeleteMapping("/delete/{voucherInfoId}")
     @PreAuthorize("@vldModuleSales.deleteVoucher(true)")
     public AppResponse<String> deleteVoucher(@PathVariable("voucherInfoId") Long voucherInfoId) {
-        return AppResponse.success(mvVoucherService.delete(voucherInfoId));
+        return AppResponse.success("Success: " + mvVoucherService.delete(voucherInfoId));
     }
 
     @Operation(summary = "Check the voucher is available")

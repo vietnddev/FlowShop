@@ -1,6 +1,7 @@
 package com.flowiee.pms.cart.repository;
 
 import com.flowiee.pms.shared.base.BaseRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,10 @@ import java.util.List;
 
 @Repository
 public interface OrderCartRepository extends BaseRepository<OrderCart, Long> {
-    //@Query("from OrderCart c where c.createdBy=:createdBy")
     @Query("select distinct c from OrderCart c left join fetch c.listItems where c.createdBy = :createdBy and (c.isFinish <> true)")
     List<OrderCart> findByAccountId(@Param("createdBy") Long createdBy);
+
+    @Modifying
+    @Query("update OrderCart c set c.isFinish = :isFinish where c.id = :cartId")
+    void updateIsFinish(@Param("cartId") Long cartId, boolean isFinish);
 }

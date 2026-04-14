@@ -79,19 +79,15 @@ $(document).ready(function () {
         let rowInfo = customerSelectedCkx.closest("tr");
         let customerId = customerSelectedCkx.attr("customerId");
         let lvCustomer = {
+            customerId: customerId,
             customerName: rowInfo.find('.col-customer-name').text(),
             phoneDefault: rowInfo.find('.col-phone').text(),
             emailDefault: rowInfo.find('.col-email').text(),
             addressDefault: rowInfo.find('.col-address').text()
         };
+        $('#customerField').empty();
         fillCustomerInfoOntoForm(lvCustomer);
-        $('#customerField').val(customerId).trigger('change');
         $("#modalSearchCustomer").modal("hide");
-    });
-
-    $('#customerField').on('click', function () {
-        let lvCustomer = mvCustomers[$(this).val()];
-        fillCustomerInfoOntoForm(lvCustomer);
     });
 
     //Only allow one customer's check box is checked
@@ -174,10 +170,10 @@ function searchCustomer(pCustomerName, pPhoneNumber) {
     }).fail(function (xhr) {
         alert("Error: " + $.parseJSON(xhr.responseText).message);
     });
-    //do something more
 }
 
 function fillCustomerInfoOntoForm(pCustomer) {
+    $('#customerField').append(`<option value="${pCustomer.customerId}">${pCustomer.customerName}</option>`);
     $('#receiveNameField').val(pCustomer.customerName);
     $('#receivePhoneNumberField').val(pCustomer.phoneDefault);
     $('#receiveEmailField').val(pCustomer.emailDefault);

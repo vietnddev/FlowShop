@@ -16,7 +16,6 @@ import com.flowiee.pms.cart.dto.ItemsDTO;
 import com.flowiee.pms.cart.model.CartItemsReq;
 import com.flowiee.pms.cart.model.CartReq;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
-import com.flowiee.pms.product.repository.ProductPriceRepository;
 import com.flowiee.pms.cart.repository.CartItemsRepository;
 import com.flowiee.pms.cart.repository.OrderCartRepository;
 import com.flowiee.pms.product.service.ProductVariantService;
@@ -79,7 +78,7 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
             }
 
             for (Items item : cart.getListItems()) {
-                ProductPriceDTO lvPrice = mvProductPriceService.getPrice(item.getProductDetail().getId());
+                ProductPriceDTO lvPrice = mvProductPriceService.getPrices(item.getProductDetail().getId());
                 BigDecimal lvRetailPrice = lvPrice.getRetailPrice();
                 BigDecimal lvWholesalePrice = lvPrice.getWholesalePrice();
                 SalesType priceType = SalesType.valueOf(item.getPriceType());
@@ -101,11 +100,6 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
     @Override
     public List<OrderCartDTO>find(BaseParameter pParam) {
         return super.find(pParam);
-    }
-
-    @Override
-    public OrderCartDTO findById(Long id, boolean pThrowException) {
-        return super.findDtoById(id, pThrowException);
     }
 
     @Override
@@ -173,25 +167,14 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
 
     @Transactional
     @Override
-    public String delete(Long cartId) {
+    public boolean delete(Long cartId) {
         OrderCart cart = super.findEntById(cartId, true);
         mvCartItemsRepository.deleteAllItems(cart.getId());
         mvCartRepository.deleteById(cartId);
 
-        systemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_CART_C, MasterObject.Cart, "Xóa/Reset giỏ hàng", "cartId = " + cartId);
+        systemLogService.writeLogDelete(ACTION.PRO_CART_C, MasterObject.Cart, "Xóa/Reset giỏ hàng", "cartId = " + cartId);
 
-        return MessageCode.DELETE_SUCCESS.getDescription();
-    }
-
-    @Override
-    public BigDecimal calTotalAmountWithoutDiscount(long cartId) {
-        return mvCartItemsRepository.calTotalAmountWithoutDiscount(cartId);
-    }
-
-    @Override
-    public boolean isItemExistsInCart(Long cartId, Long productVariantId) {
-        Items item = mvCartItemsRepository.findByCartAndProductVariant(cartId, productVariantId);
-        return item != null;
+        return true;
     }
 
     @Override
@@ -241,14 +224,14 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
                 throw new AppException(ErrorCode.ProductOutOfStock, new Object[]{lvProductVariant.getVariantName()}, null, getClass(), null);
             }
 
-            ProductPriceDTO lvPrice = mvProductPriceService.getPrice(lvProductVariant.getId());
+            ProductPriceDTO lvPrice = mvProductPriceService.getPrices(lvProductVariant.getId());
             BigDecimal lvRetailPrice = lvPrice.getRetailPrice();
             BigDecimal lvRetailPriceDiscount = lvPrice.getRetailPriceDiscount();
 
             BigDecimal lvItemPrice = lvRetailPriceDiscount != null ? lvRetailPriceDiscount : lvRetailPrice;
             BigDecimal lvItemOriginalPrice = lvRetailPrice;
 
-            if (this.isItemExistsInCart(lvCartId, lvProductVariant.getId())) {
+            if (mvCartItemsRepository.existsByCartAndProductVariant(lvCartId, lvProductVariant.getId())) {
                 Items items = mvCartItemsService.findItemByCartAndProductVariant(lvCartId, lvProductVariant.getId());
                 //mvCartItemsService.increaseItemQtyInCart(items.getId(), items.getQuantity() + 1);
                 items.setQuantity(items.getQuantity() + lvItemQty);
@@ -285,7 +268,7 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
                 throw new AppException(ErrorCode.ProductOutOfStock, new Object[]{productVariant.getVariantName()}, null, getClass(), null);
             }
 
-            ProductPriceDTO lvPrice = mvProductPriceService.getPrice(productVariant.getId());
+            ProductPriceDTO lvPrice = mvProductPriceService.getPrices(productVariant.getId());
             BigDecimal lvRetailPrice = lvPrice.getRetailPrice();
             BigDecimal lvRetailPriceDiscount = lvPrice.getRetailPriceDiscount();
             BigDecimal lvWholesalePrice = lvPrice.getWholesalePrice();
@@ -314,37 +297,6 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
 
             mvCartItemsRepository.save(lvItem);
         }
-    }
-
-    @Override
-    public List<ItemsDTO> findItems(Long pCartId) {
-        OrderCart lvCart = super.findEntById(pCartId, true);
-
-        List<Items> lvItems = lvCart.getListItems();
-        if (CollectionUtils.isEmpty(lvItems)) {
-            return List.of();
-        }
-
-        List<ItemsDTO> lvItemDTOs = new ArrayList<>();
-        for (Items lvItem : lvItems) {
-            ItemsDTO lvItemDto = new ItemsDTO();
-
-            ProductVariantDTO lvProductVariantDto = new ProductVariantDTO();
-            lvProductVariantDto.setId(lvItem.getProductDetail().getId());
-
-            lvItemDto.setProductDetail(lvProductVariantDto);
-            lvItemDto.setQuantity(lvItem.getQuantity());
-            lvItemDto.setNote(lvItem.getNote());
-            lvItemDto.setCartId(lvCart.getId());
-            lvItemDto.setExtraDiscount(lvItem.getExtraDiscount());
-
-            ProductPriceDTO lvPrice = mvProductPriceService.getPrice(lvItem.getProductDetail().getId());
-            lvItemDto.setPrice(lvPrice.getRetailPrice());
-
-            lvItemDTOs.add(lvItemDto);
-        }
-
-        return lvItemDTOs;
     }
 
     @Transactional
@@ -390,12 +342,5 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
     @Override
     public BigDecimal getCartValuePreDiscount(Long pCartId) {
         return mvCartItemsRepository.calTotalAmountWithoutDiscount(pCartId);
-    }
-
-    @Override
-    public void markOrderFinished(Long pCartId) {
-        OrderCart lvCart = super.findEntById(pCartId, true);
-        lvCart.setIsFinish(true);
-        mvEntityRepository.save(lvCart);
     }
 }

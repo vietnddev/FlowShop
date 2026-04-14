@@ -12,7 +12,6 @@ import com.flowiee.pms.order.service.OrderService;
 
 import com.flowiee.pms.customer.enums.ContactType;
 import com.flowiee.pms.shared.enums.Pages;
-import com.flowiee.pms.shared.util.DateUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,7 +42,6 @@ public class CustomerControllerView extends BaseController {
                                        @Nullable @RequestParam("address") String address) {
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_CUSTOMER.getTemplate());
         modelAndView.addObject("customer", new CustomerDTO());
-        modelAndView.addObject("listCustomer", mvCustomerService.find(-1, -1, name, sex, birthday != null ? DateUtils.convertStringToDate(birthday, "YYYY/MM/dd") : null, phone, email, address));
         modelAndView.addObject("filter_name", name);
         modelAndView.addObject("filter_sex", sex);
         modelAndView.addObject("filter_birthday", birthday);

@@ -1,5 +1,6 @@
 package com.flowiee.pms.promotion.service.impl;
 
+import com.flowiee.pms.customer.entity.Customer;
 import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.shared.exception.ResourceNotFoundException;
 import com.flowiee.pms.shared.request.BaseParameter;
@@ -13,6 +14,7 @@ import com.flowiee.pms.promotion.dto.VoucherTicketDTO;
 import com.flowiee.pms.promotion.repository.VoucherTicketRepository;
 import com.flowiee.pms.shared.enums.MessageCode;
 import com.flowiee.pms.promotion.enums.VoucherStatus;
+import com.flowiee.pms.shared.util.CoreUtils;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -77,13 +80,13 @@ public class VoucherTicketServiceImpl extends BaseService<VoucherTicket, Voucher
     }
 
     @Override
-    public String delete(Long ticketId) {
+    public boolean delete(Long ticketId) {
         VoucherTicket voucherTicket = super.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticker not found!"));
         if (voucherTicket.isUsed()) {
             throw new AppException("Voucher ticket in use!");
         }
         mvEntityRepository.deleteById(ticketId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Override
@@ -135,5 +138,23 @@ public class VoucherTicketServiceImpl extends BaseService<VoucherTicket, Voucher
             statusTicket = "Invalid!";
         }
         return statusTicket;
+    }
+
+    @Override
+    public void markCouponAsUsed(String pCouponCode, Long pCustomerId) {
+        if (CoreUtils.isNullStr(pCouponCode)) {
+            return;
+        }
+
+        VoucherTicket lvVoucherTicket = mvEntityRepository.findByCode(pCouponCode);
+        if (lvVoucherTicket == null) {
+            return;
+        }
+
+        lvVoucherTicket.setCustomer(new Customer(pCustomerId));
+        lvVoucherTicket.setActiveTime(new Date());
+        lvVoucherTicket.setUsed(true);
+
+        mvEntityRepository.save(lvVoucherTicket);
     }
 }

@@ -68,6 +68,6 @@ public class ProductComboController extends BaseController {
     @DeleteMapping("/delete/{comboId}")
     @PreAuthorize("@vldModuleProduct.deleteCombo(true)")
     public AppResponse<String> deleteCombo(@PathVariable("comboId") Long comboId) {
-        return AppResponse.success(mvProductComboService.delete(comboId));
+        return AppResponse.success("Success: " + mvProductComboService.delete(comboId));
     }
 }

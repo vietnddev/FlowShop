@@ -88,7 +88,7 @@ public class ProductControllerView extends BaseController {
     @DeleteMapping(value = "/attribute/delete/{id}")
     @PreAuthorize("@vldModuleProduct.updateProduct(true)")
     public ResponseEntity<String> deleteAttribute(@PathVariable("id") Long attributeId) {
-        return ResponseEntity.ok().body(mvProductAttributeService.delete(attributeId));
+        return ResponseEntity.ok().body("Success: " + mvProductAttributeService.delete(attributeId));
     }
 
     @PostMapping(value = "/variant/active-image/{sanPhamBienTheId}")

@@ -1,7 +1,7 @@
 package com.flowiee.pms.dashboard;
 
+import com.flowiee.pms.order.dto.OrderDTO;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
-import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.customer.dto.CustomerDTO;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -21,7 +21,7 @@ public class DashboardModel {
     Integer ordersNewTodayQty;
     Integer ordersCancelTodayQty;
     Integer ordersReturnTodayQty;
-    List<Order> listOrdersToday;
+    List<OrderDTO> listOrdersToday;
     Integer customersNewInMonthQty;
     Integer customersNewInTodayQty;
     List<CustomerDTO> listCustomersNewInMonth;

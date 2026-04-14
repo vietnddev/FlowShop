@@ -1,7 +1,6 @@
 package com.flowiee.pms.system.service.impl;
 
 import com.flowiee.pms.shared.enums.ACTION;
-import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.shared.enums.MasterObject;
 import com.flowiee.pms.shared.enums.SystemDir;
 import com.flowiee.pms.shared.util.FileUtils;
@@ -69,7 +68,7 @@ public class FileRestoreServiceImpl implements FileRestoreService {
             throw new IOException("Restore failed: " + e.getMessage(), e);
         } finally {
             String lvMessage = "%s, uploaded file name: " + backupZip.getOriginalFilename();
-            systemLogService.writeLogUpdate(MODULE.SYSTEM, ACTION.SYS_DATA_RESTORE, MasterObject.FileStorage, "Restore data", String.format(lvMessage, restoreStatus ? "Success" : "Fail"));
+            systemLogService.writeLogUpdate(ACTION.SYS_DATA_RESTORE, MasterObject.FileStorage, "Restore data", String.format(lvMessage, restoreStatus ? "Success" : "Fail"));
         }
     }
 

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SerialRepository extends BaseRepository<Serial, String> {
-    Serial findById(SerialCode serialCode);
+    Serial findById(String serialCode);
 }

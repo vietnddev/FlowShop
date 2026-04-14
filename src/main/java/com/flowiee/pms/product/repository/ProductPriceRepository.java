@@ -25,7 +25,7 @@ public interface ProductPriceRepository extends BaseRepository<ProductPrice, Lon
             max(case when pp.priceType = com.flowiee.pms.product.enums.PriceType.CSP then pp.priceValue else null end))
         from ProductPrice pp
         where pp.state = 'A'
-            and (:productVariantIds is null or pp.productVariant.id in :productVariantIds)
+            and (coalesce(:productVariantIds) is null or pp.productVariant.id in :productVariantIds)
         group by pp.productVariant.id
     """)
     List<ProductPriceDTO> findPricesByVariantIds(@Param("productVariantIds") List<Long> productVariantIds);

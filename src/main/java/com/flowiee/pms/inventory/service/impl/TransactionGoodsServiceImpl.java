@@ -144,7 +144,7 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
 
         mvEntityRepository.deleteById(lvTransactionGoods.getId());
 
-        systemLogService.writeLogDelete(MODULE.STORAGE, ACTION.STG_TICKET_IM, MasterObject.TicketImport, "Xóa phiếu nhập hàng", lvTransactionGoods.getTitle());
+        systemLogService.writeLogDelete(ACTION.STG_TICKET_IM, MasterObject.TicketImport, "Xóa phiếu nhập hàng", lvTransactionGoods.getTitle());
 
         return MessageCode.DELETE_SUCCESS.getDescription();
     }
@@ -218,7 +218,7 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
 
         mvEntityRepository.deleteById(lvTransactionGoods.getId());
 
-        systemLogService.writeLogDelete(MODULE.STORAGE, ACTION.STG_TICKET_EX, MasterObject.TicketExport, "Xóa phiếu xuất hàng", lvTransactionGoods.getTitle());
+        systemLogService.writeLogDelete(ACTION.STG_TICKET_EX, MasterObject.TicketExport, "Xóa phiếu xuất hàng", lvTransactionGoods.getTitle());
 
         return MessageCode.DELETE_SUCCESS.getDescription();
     }

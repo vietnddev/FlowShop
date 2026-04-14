@@ -1,9 +1,10 @@
 package com.flowiee.pms.dashboard;
 
+import com.flowiee.pms.order.dto.OrderDTO;
+import com.flowiee.pms.order.model.OrderReq;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.product.repository.ProductDetailRepository;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.customer.dto.CustomerDTO;
 import com.flowiee.pms.customer.service.CustomerService;
 
@@ -12,11 +13,8 @@ import com.flowiee.pms.report.service.OrderStatisticsService;
 import com.flowiee.pms.shared.util.CommonUtils;
 import com.flowiee.pms.shared.util.CoreUtils;
 import javax.persistence.EntityManager;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Query;
@@ -25,23 +23,21 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
+@Slf4j
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
-    ProductDetailRepository mvProductVariantRepository;
-    OrderStatisticsService mvOrderStatisticsService;
-    ProductVariantService mvProductVariantService;
-    CustomerService mvCustomerService;
-    EntityManager mvEntityManager;
-    OrderService mvOrderService;
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final ProductDetailRepository mvProductVariantRepository;
+    private final OrderStatisticsService mvOrderStatisticsService;
+    private final ProductVariantService mvProductVariantService;
+    private final CustomerService mvCustomerService;
+    private final EntityManager mvEntityManager;
+    private final OrderService mvOrderService;
 
     @Override
     @SuppressWarnings("unchecked")
     public DashboardModel loadDashboard() {
-        logger.info("Start loadDashboard(): " + CommonUtils.now("YYYY/MM/dd HH:mm:ss"));
+        log.info("Start loadDashboard(): {}", CommonUtils.now("YYYY/MM/dd HH:mm:ss"));
 
         int currentYear = LocalDate.now().getYear();
         int currentMonth = LocalDate.now().getMonth().getValue();
@@ -195,9 +191,9 @@ public class DashboardServiceImpl implements DashboardService {
         String revenueToday = CommonUtils.formatToVND(mvOrderStatisticsService.findRevenueToday());
         String revenueThisMonth = CommonUtils.formatToVND(mvOrderStatisticsService.findRevenueThisMonth());
         List<CustomerDTO> customersNew = mvCustomerService.findCustomerNewInMonth();
-        List<Order> ordersToday = mvOrderService.findOrdersToday();
+        List<OrderDTO> ordersToday = mvOrderService.find(OrderReq.builder().fromDate(null).toDate(null).build()).getContent();
 
-        logger.info("Finished loadDashboard(): " + CommonUtils.now("YYYY/MM/dd HH:mm:ss"));
+        log.info("Finished loadDashboard(): " + CommonUtils.now("YYYY/MM/dd HH:mm:ss"));
 
         return DashboardModel.builder()
                 .totalProducts(mvProductVariantRepository.countTotalQuantity())

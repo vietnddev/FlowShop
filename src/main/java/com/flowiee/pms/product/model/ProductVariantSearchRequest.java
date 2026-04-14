@@ -16,7 +16,6 @@ public class ProductVariantSearchRequest {
     private Long sizeId;
     private Long fabricTypeId;
     private Boolean availableForSales;
-    private Boolean checkInAnyCart = false;
     private int pageNum = -1;
     private int pageSize = -1;
 

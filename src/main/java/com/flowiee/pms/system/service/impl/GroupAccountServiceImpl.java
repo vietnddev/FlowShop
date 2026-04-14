@@ -8,7 +8,6 @@ import com.flowiee.pms.shared.util.ChangeLog;
 import com.flowiee.pms.system.dto.GroupAccountDTO;
 import com.flowiee.pms.system.repository.GroupAccountRepository;
 import com.flowiee.pms.shared.enums.ACTION;
-import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.shared.enums.MasterObject;
 import com.flowiee.pms.system.service.SystemLogService;
 import com.flowiee.pms.system.service.GroupAccountService;
@@ -64,13 +63,13 @@ public class GroupAccountServiceImpl extends BaseService<GroupAccount, GroupAcco
         changeLog.setOldObject(groupAccountUpdated);
         changeLog.doAudit();
 
-        mvSystemLogService.writeLogUpdate(MODULE.SYSTEM, ACTION.SYS_GR_ACC_U, MasterObject.GroupAccount, "Cập nhật thông tin nhóm người dùng", changeLog.getOldValues(), changeLog.getNewValues());
+        mvSystemLogService.writeLogUpdate(ACTION.SYS_GR_ACC_U, MasterObject.GroupAccount, "Cập nhật thông tin nhóm người dùng", changeLog.getOldValues(), changeLog.getNewValues());
 
         return super.convertDTO(groupAccountUpdated);
     }
 
     @Override
-    public String delete(Long pGroupId) {
+    public boolean delete(Long pGroupId) {
         return super.delete(pGroupId);
     }
 }

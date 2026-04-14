@@ -50,7 +50,7 @@ public class ProductVariantController extends BaseController {
                 .pageNum(CoreUtils.coalesce(pageNum) - 1).pageSize(CoreUtils.coalesce(pageSize)).txtSearch(pTxtSearch)
                 .productId(productId).brandId(pBrandId).colorId(pColorId)
                 .sizeId(pSizeId).fabricTypeId(fabricTypeId).availableForSales(readyForSales)
-                .checkInAnyCart(true).build());
+                .build());
         return AppResponse.paged(data);
     }
 
@@ -59,7 +59,9 @@ public class ProductVariantController extends BaseController {
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public AppResponse<List<ProductVariantDTO>> findVariantsOfProduct(@PathVariable("productId") Long productId) {
         return AppResponse.success(mvProductVariantService.findAll(ProductVariantSearchRequest.builder()
-                .productId(productId).checkInAnyCart(false).build()).getContent());
+                        .productId(productId)
+                        .build())
+                .getContent());
     }
 
     @Operation(summary = "Find detail product variant")
@@ -107,14 +109,14 @@ public class ProductVariantController extends BaseController {
     @DeleteMapping("/variant/delete/{variantId}")
     @PreAuthorize("@vldModuleProduct.deleteProduct(true)")
     public AppResponse<String> deleteProductVariant(@PathVariable("variantId") Long productVariantId) {
-        return AppResponse.success(mvProductVariantService.delete(productVariantId));
+        return AppResponse.success("Success: " + mvProductVariantService.delete(productVariantId));
     }
 
     @Operation(summary = "Update price")
     @PutMapping(value = "/variant/{variantId}/price/update")
     @PreAuthorize("@vldModuleProduct.priceManagement(true)")
     public AppResponse<ProductPriceDTO> updatePrice(@PathVariable("variantId") Long productVariantId, @RequestBody ProductPriceDTO pPrice) {
-        return AppResponse.success(mvProductPriceService.update(pPrice, productVariantId));
+        return AppResponse.success(mvProductPriceService.updatePrice(productVariantId, pPrice));
     }
 
     @Operation(summary = "Check product variant already exists")

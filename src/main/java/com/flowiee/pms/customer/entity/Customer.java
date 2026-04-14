@@ -10,7 +10,6 @@ import com.flowiee.pms.shared.util.CoreUtils;
 import com.flowiee.pms.system.entity.Category;
 import com.flowiee.pms.product.entity.ProductReview;
 import com.flowiee.pms.promotion.dto.GiftRedemption;
-import com.flowiee.pms.customer.dto.CustomerDTO;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -113,16 +112,6 @@ public class Customer extends BaseEntity implements Serializable {
 	public Customer(long id, String customerName) {
 		super.id = id;
 		this.customerName = customerName;
-	}
-
-	public static Customer fromCustomerDTO(CustomerDTO dto) {
-		Customer customer = Customer.builder()
-			.customerName(dto.getCustomerName())
-			.dateOfBirth(dto.getDateOfBirth())
-			.gender(dto.getGender())
-			.build();
-		customer.setId(dto.getId());
-		return customer;
 	}
 
 	public boolean isWalkInCustomer() {

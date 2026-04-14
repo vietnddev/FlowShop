@@ -5,7 +5,6 @@ import com.flowiee.pms.shared.request.BaseParameter;
 import com.flowiee.pms.ledger.entity.LedgerTransaction;
 import com.flowiee.pms.shared.exception.BadRequestException;
 import com.flowiee.pms.shared.enums.ACTION;
-import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.ledger.dto.LedgerTransactionDTO;
 import com.flowiee.pms.ledger.repository.LedgerTransactionRepository;
 import com.flowiee.pms.ledger.enums.LedgerTranStatus;
@@ -84,7 +83,7 @@ public class LedgerTransactionServiceImpl extends BaseService<LedgerTransaction,
             logTitle = "Thêm mới phiếu chi";
             logFunc = ACTION.SLS_PMT_C;
         }
-        mvSystemLogService.writeLogCreate(MODULE.PRODUCT, logFunc, MasterObject.LedgerTransaction, logTitle, transactionSaved.getGroupObject().getName());
+        mvSystemLogService.writeLogCreate(logFunc, MasterObject.LedgerTransaction, logTitle, transactionSaved.getGroupObject().getName());
 
         return transactionSaved;
     }
@@ -102,7 +101,7 @@ public class LedgerTransactionServiceImpl extends BaseService<LedgerTransaction,
             logTitle = "Cập nhật phiếu chi";
             logFunc = ACTION.SLS_PMT_U;
         }
-        mvSystemLogService.writeLogCreate(MODULE.PRODUCT, logFunc, MasterObject.LedgerTransaction, logTitle, lvTransactionUpdated.getGroupObject().getName());
+        mvSystemLogService.writeLogCreate(logFunc, MasterObject.LedgerTransaction, logTitle, lvTransactionUpdated.getGroupObject().getName());
 
         return convertDTO(lvTransactionUpdated);
     }

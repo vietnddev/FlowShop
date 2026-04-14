@@ -58,7 +58,7 @@ public class ProductVariantDTO extends BaseDTO implements Serializable {
     Long brandId;
     String brandName;
     Long unitId;
-    String  unitName;
+    String unitName;
     Long colorId;
     String colorName;
     Long sizeId;
@@ -68,12 +68,10 @@ public class ProductVariantDTO extends BaseDTO implements Serializable {
     BigDecimal originalPrice;
     BigDecimal discountPrice;
     String unitCurrency;
-    //List<ProductHistory> listPrices;
     Long storageIdInitStorageQty;
     Long storageIdInitSoldQty;
     ProductPriceDTO price;
     String imageSrc;
-    Boolean currentInCart;
 
     public ProductVariantDTO(Long id) {
         this.id = id;

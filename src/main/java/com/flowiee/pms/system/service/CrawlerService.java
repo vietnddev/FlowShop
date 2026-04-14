@@ -170,7 +170,7 @@ public class CrawlerService {
         productCrawlerRepository.deleteAll();
         imageCrawlerRepository.deleteAll();
 
-        systemLogService.writeLogCreate(MODULE.SYSTEM, ACTION.SYS_DATA_MERGE, MasterObject.Master, "Merge data temp into system", SystemLog.EMPTY);
+        systemLogService.writeLogCreate(ACTION.SYS_DATA_MERGE, MasterObject.Master, "Merge data temp into system", SystemLog.EMPTY);
         logger.info("Merge temp data: finish");
     }
 
@@ -241,7 +241,7 @@ public class CrawlerService {
             imageCrawlerRepository.saveAll(p.getImageCrawledList());
         }
 
-        systemLogService.writeLogCreate(MODULE.SYSTEM, ACTION.SYS_DATA_CRAWLER, MasterObject.Master, "Crawl data temp", SystemLog.EMPTY);
+        systemLogService.writeLogCreate(ACTION.SYS_DATA_CRAWLER, MasterObject.Master, "Crawl data temp", SystemLog.EMPTY);
 
         return productMdlList;
     }

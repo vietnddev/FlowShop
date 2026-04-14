@@ -104,7 +104,7 @@ public class Account extends BaseEntity implements Serializable {
 	List<FileStorage> listImages;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "nhanVienBanHang", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "seller", fetch = FetchType.LAZY)
 	List<Order> listOrder;
 
 	@JsonIgnore

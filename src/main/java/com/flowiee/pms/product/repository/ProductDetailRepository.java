@@ -2,7 +2,6 @@ package com.flowiee.pms.product.repository;
 
 import com.flowiee.pms.shared.base.BaseRepository;
 import com.flowiee.pms.shared.base.SoftDeleteRepository;
-import com.flowiee.pms.product.entity.Product;
 import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.product.model.ProductSummaryInfoModel;
 import org.springframework.data.jpa.repository.Modifying;
@@ -66,8 +65,4 @@ public interface ProductDetailRepository extends BaseRepository<ProductDetail, L
         GROUP BY pd.id, pd.variantCode, pd.variantName, pd.product.id, pd.fabricType.id, pd.fabricType.name, pd.color.id, pd.color.name, pd.size.id, pd.size.name, pd.status
     """)
     List<ProductSummaryInfoModel> findProductVariantInfo(@Param("productIds") List<Long> productIds);
-
-    @Query("select p.product from ProductDetail p " +
-           "where (coalesce(:variantIds, -1) = -1 or p.product.id in :variantIds) and p.deletedAt is null ")
-    List<Product> findProductByVariantIds(@Param("variantIds") List<Long> variantIds);
 }

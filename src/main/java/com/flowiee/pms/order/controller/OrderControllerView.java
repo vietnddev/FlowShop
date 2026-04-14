@@ -64,21 +64,13 @@ public class OrderControllerView extends BaseController {
         OrderDTO lvOrderDetail = mvOrderService.findDtoById(orderId, true);
         OrderStatus lvOrderStatus = lvOrderDetail.getOrderStatus();
 
-        List<OrderStatus> orderStatusList = new ArrayList<>(List.of(lvOrderStatus));
-        orderStatusList.addAll(OrderStatus.getAll(lvOrderStatus));
-
-        Map<String, String> statusMap = new LinkedHashMap<>();
-        for (OrderStatus status : orderStatusList) {
-            statusMap.put(status.name(), status.getLabel());
-        }
-
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_ORDER_DETAIL.getTemplate());
         modelAndView.addObject("orderDetailId", orderId);
         modelAndView.addObject("orderDetail", lvOrderDetail);
         //modelAndView.addObject("listOrderDetail", lvOrderDetail.getListOrderDetailDTO());
-        modelAndView.addObject("listOrderDetail", lvOrderDetail.getListOrderDetail());
+        modelAndView.addObject("listOrderDetail", lvOrderDetail.getItems());
         modelAndView.addObject("listPaymentMethod", mvCategoryService.findSubCategory(CATEGORY.PAYMENT_METHOD, null, null, -1, -1).getContent());
-        modelAndView.addObject("orderStatus", statusMap);
+        modelAndView.addObject("orderStatuses", OrderStatus.values());
         modelAndView.addObject("allowEditItem", mvOrderStatusCanModifyItem.contains(lvOrderStatus));
         modelAndView.addObject("allowEditGeneral", !mvOrderStatusDoesNotAllowModify.contains(lvOrderStatus));
         modelAndView.addObject("allowDoPay", !mvOrderStatusDoesNotAllowModify.contains(lvOrderStatus));
@@ -115,11 +107,11 @@ public class OrderControllerView extends BaseController {
         modelAndView.addObject("orderCode", lvOrder.getCode());
         modelAndView.addObject("orderTime", DateTimeUtil.format(lvOrder.getOrderTime(), DateTimeUtil.FORMAT_DATE_TIME));
         modelAndView.addObject("orderStatus", lvOrder.getOrderStatus());
-        modelAndView.addObject("orderItems", lvOrder.getListOrderDetail());
+        modelAndView.addObject("orderItems", lvOrder.getItems());
         modelAndView.addObject("receiverName", lvOrder.getReceiverName());
         modelAndView.addObject("receiverPhone", lvOrder.getReceiverPhone());
         modelAndView.addObject("receiverAddress", lvOrder.getReceiverAddress());
-        modelAndView.addObject("totalAmount", OrderUtils.calTotalAmount(lvOrder.getListOrderDetail(), lvOrder.getAmountDiscount()));
+        modelAndView.addObject("totalAmount", OrderUtils.calTotalAmount(lvOrder.getItems(), lvOrder.getAmountDiscount()));
         return modelAndView;
     }
 

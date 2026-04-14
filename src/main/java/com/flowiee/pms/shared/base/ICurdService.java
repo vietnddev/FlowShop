@@ -7,5 +7,5 @@ public interface ICurdService<T> {
 
     T update(T pEntity, Long pEntityId);
 
-    String delete(Long pEntityId);
+    boolean delete(Long pEntityId);
 }

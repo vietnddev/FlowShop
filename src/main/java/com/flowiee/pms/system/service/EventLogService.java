@@ -8,6 +8,4 @@ import java.time.LocalDateTime;
 
 public interface EventLogService {
     EventLog writeLog(ServletRequestAttributes pServletRequestAttributes, JoinPoint pJoinPoint, LocalDateTime pCreateTime, String pApplication);
-
-    void updateDuration(Long pRequestID, long pDuration);
 }

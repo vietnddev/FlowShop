@@ -15,9 +15,6 @@ import com.flowiee.pms.shared.util.CoreUtils;
 import com.flowiee.pms.shared.util.OrderUtils;
 import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Query;
@@ -31,10 +28,7 @@ public class SalesPerformanceStatisticsServiceImpl implements SalesPerformanceSt
     private final AccountRepository accountRepository;
     private final OrderRepository orderRepository;
     private final OrderService mvOrderService;
-    private final ModelMapper modelMapper;
     private final EntityManager mvEntityManager;
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public List<SalesPerformanceStatisticsModel> getPerformanceEmployee() {
@@ -51,9 +45,9 @@ public class SalesPerformanceStatisticsServiceImpl implements SalesPerformanceSt
             BigDecimal lvTotalRevenue = BigDecimal.ZERO;
             int lvNumberOfProductsSold = 0;
             for (OrderDTO d : orderList) {
-                BigDecimal lvRevenue = OrderUtils.calTotalAmount(d.getListOrderDetail(), d.getAmountDiscount());
+                BigDecimal lvRevenue = OrderUtils.calTotalAmount(d.getItems(), d.getAmountDiscount());
                 lvTotalRevenue = lvTotalRevenue.add(lvRevenue);
-                lvNumberOfProductsSold += OrderUtils.countItemsEachOrder(d.getListOrderDetail());
+                lvNumberOfProductsSold += OrderUtils.countItemsEachOrder(d.getItems());
             }
 
             Integer lvTotalTransactions = orderList.size();

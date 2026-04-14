@@ -44,7 +44,7 @@ public class ProductReviewServiceImpl extends BaseService<ProductReview, Product
     }
 
     @Override
-    public String delete(Long productReviewId) {
+    public boolean delete(Long productReviewId) {
         return super.delete(productReviewId);
     }
 

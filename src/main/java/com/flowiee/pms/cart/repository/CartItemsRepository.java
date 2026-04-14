@@ -19,7 +19,10 @@ public interface CartItemsRepository extends BaseRepository<Items, Long> {
     @Query("select i.quantity from Items i where i.orderCart.id=:cartId and i.productDetail.id=:productVariantId")
     Integer findQuantityByProductVariantId(@Param("cartId") Long cartId, @Param("productVariantId") Long productVariantId);
 
-    @Query("from Items i where i.orderCart.id=:cartId and i.productDetail.id=:productVariantId")
+    @Query("select count(i) > 0 from Items i where i.orderCart.id=:cartId and i.productDetail.id=:productVariantId")
+    boolean existsByCartAndProductVariant(@Param("cartId") Long cartId, @Param("productVariantId") Long productVariantId);
+
+    @Query("select count(i) > 0 from Items i where i.orderCart.id=:cartId and i.productDetail.id=:productVariantId")
     Items findByCartAndProductVariant(@Param("cartId") Long cartId, @Param("productVariantId") Long productVariantId);
 
     @Query("from Items i where i.orderCart.id=:cartId and (coalesce(:productVariantIds, -1) = -1 or i.productDetail.id in :productVariantIds)")
@@ -29,14 +32,6 @@ public interface CartItemsRepository extends BaseRepository<Items, Long> {
            "from Items i " +
            "where i.orderCart.id=:cartId")
     BigDecimal calTotalAmountWithoutDiscount(@Param("cartId") long cartId);
-
-    @Modifying
-    @Query("update Items i set i.quantity=:quantity where i.id=:itemId")
-    void updateItemQty(@Param("itemId") Long itemId, @Param("quantity") Integer quantity);
-
-    @Modifying
-    @Query("delete Items")
-    void deleteAllItems();
 
     @Modifying
     @Query("delete Items where orderCart.id=:cartId")

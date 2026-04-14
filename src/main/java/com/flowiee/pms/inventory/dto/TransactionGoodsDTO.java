@@ -9,6 +9,7 @@ import com.flowiee.pms.inventory.enums.TransactionGoodsType;
 import com.flowiee.pms.media.entity.FileStorage;
 import com.flowiee.pms.order.dto.OrderDTO;
 import com.flowiee.pms.order.entity.Order;
+import com.flowiee.pms.order.mapper.OrderConvert;
 import lombok.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.CollectionUtils;
@@ -104,7 +105,7 @@ public class TransactionGoodsDTO {
         if (pInput == null) {
             return new OrderDTO();
         }
-        return OrderDTO.toDto(pInput);
+        return OrderConvert.toDto(pInput);
     }
 
     private static StorageDTO mapStorage(Storage pInput) {

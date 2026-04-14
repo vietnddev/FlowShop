@@ -1,6 +1,7 @@
 package com.flowiee.pms.shared.base;
 
 import com.flowiee.pms.shared.exception.AppException;
+import com.flowiee.pms.shared.exception.BadRequestException;
 import com.flowiee.pms.shared.request.BaseParameter;
 import com.flowiee.pms.shared.util.SecurityUtils;
 import com.flowiee.pms.system.entity.Account;
@@ -111,9 +112,9 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
         return mvModelMapper.map(savedEntity, mvDtoClass);
     }
 
-    public String delete(Long pId) {
+    public boolean delete(Long pId) {
         if (!mvEntityRepository.existsById(pId)) {
-            return mvEntityClass.getSimpleName() + " not found with Id: " + pId;
+            throw new BadRequestException(mvEntityClass.getSimpleName() + " not found with Id: " + pId);
         }
         mvEntityRepository.deleteById(pId);
         if (mvAutoAudit) {
@@ -129,7 +130,7 @@ public class BaseService<E, D, R extends BaseRepository<E, Long>> {
                     .account(new Account(SecurityUtils.getCurrentUser().getId()))
                     .build());
         }
-        return "Entity with ID " + pId + " deleted successfully.";
+        return true;
     }
 
     public void setAutoAudit(boolean pAutoAudit) {

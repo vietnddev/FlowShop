@@ -3,15 +3,16 @@ package com.flowiee.pms.system.service;
 import com.flowiee.pms.shared.util.RequestUtils;
 import com.flowiee.pms.system.entity.EventLog;
 import com.flowiee.pms.shared.util.CommonUtils;
+import com.flowiee.pms.system.repository.EventLogRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -21,14 +22,15 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+@Slf4j
 @Aspect
 @Component
 @RequiredArgsConstructor
 public class LoggingAspect {
-    private final Logger mvLogger = LoggerFactory.getLogger(getClass());
+    private final EventLogRepository mvEventLogRepository;
     private final EventLogService mvEventLogService;
 
-    private ThreadLocal<RequestContext> mvRequestContext = ThreadLocal.withInitial(RequestContext::new); // Tạo ThreadLocal để lưu thông tin của request
+    private final ThreadLocal<RequestContext> mvRequestContext = ThreadLocal.withInitial(RequestContext::new); // Tạo ThreadLocal để lưu thông tin của request
 
     @Getter
     @Setter
@@ -37,10 +39,6 @@ public class LoggingAspect {
         private long startTime;
         private String username;
         private String ip;
-    }
-
-    public RequestContext getRequestContext() {
-        return mvRequestContext.get();
     }
 
     @Around("execution(* com.flowiee.pms..controller..*(..))")
@@ -66,32 +64,35 @@ public class LoggingAspect {
         lvRequestContext.setIp(lvIpAddress);
         mvRequestContext.set(lvRequestContext);
 
-        mvLogger.info("[REQUEST {}] {}",
+        MDC.put("customKey", String.valueOf(lvRequestContext.getRequestId()));
+
+        log.info("[REQUEST {}] {}",
                 lvRequestContext.getRequestId(),
                 formatRequestInfo(attributes.getRequest(), joinPoint, attributes, lvUsername));
 
         Object result;
         try {
             result = joinPoint.proceed();
+            long duration = System.currentTimeMillis() - startTime;
+
+            eventLog.setDuration(duration);
+            mvEventLogRepository.save(eventLog);
+
+            log.info("[RESPONSE {}] ({} ms) {}",
+                    lvRequestContext.getRequestId(),
+                    duration,
+                    result.toString());
+            return result;
         } catch (Throwable ex) {
-            mvLogger.error("[EXCEPTION {}] {}",
+            log.error("[EXCEPTION {}] {}",
                     lvRequestContext.getRequestId(),
                     formatRequestException(attributes.getRequest(), joinPoint, ex.getMessage()),
                     ex);
             throw ex;
+        } finally {
+            MDC.remove("customKey");
+            mvRequestContext.remove();
         }
-
-        long duration = System.currentTimeMillis() - startTime;
-
-        mvEventLogService.updateDuration(lvRequestContext.requestId, duration);
-        mvRequestContext.remove();
-
-        mvLogger.info("[RESPONSE {}] ({} ms) {}",
-                lvRequestContext.getRequestId(),
-                duration,
-                result.toString());
-
-        return result;
     }
 
     public String formatRequestException(HttpServletRequest pRequest, JoinPoint pJoinPoint, String pMessage) {

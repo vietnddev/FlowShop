@@ -25,20 +25,18 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -53,8 +51,6 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     ProductVariantService mvProductVariantService;
     CartItemsRepository   mvCartItemsRepository;
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
     @Override
     public OrderDetail findById(Long orderDetailId, boolean pThrowException) {
         Optional<OrderDetail> entityOptional = mvOrderDetailRepository.findById(orderDetailId);
@@ -62,11 +58,6 @@ public class OrderItemsServiceImpl implements OrderItemsService {
             throw new EntityNotFoundException(new Object[] {"cart item"}, null, null);
         }
         return entityOptional.orElse(null);
-    }
-
-    @Override
-    public List<OrderDetail> findByOrderId(Long orderId) {
-        return mvOrderDetailRepository.findByOrderId(orderId);
     }
 
     @Override
@@ -80,7 +71,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
                     orderDetail.setQuantity(orderDetail.getQuantity() + 1);
                     itemAdded.add(mvOrderDetailRepository.save(orderDetail));
                 } else {
-                    ProductPriceDTO lvPrice = mvProductPriceService.getPrice(productDetail.getId());
+                    ProductPriceDTO lvPrice = mvProductPriceService.getPrices(productDetail.getId());
                     itemAdded.add(this.save(OrderDetail.builder()
                             .order(new Order(pOrder.getId()))
                             .productDetail(new ProductDetail(productDetail.getId()))
@@ -100,12 +91,15 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     }
 
     @Override
-    public List<OrderDetail> save(Long pCartId, Long pOrderId, List<Items> pItemsList) {
+    public List<OrderDetail> save(Long pCartId, Long pOrderId) {
         List<OrderDetail> lvOrderDetailList = new ArrayList<>();
-        if (pItemsList == null || pItemsList.isEmpty()) {
+
+        List<Items> lvItemsList = mvCartItemsRepository.findByCartId(pCartId);
+        if (lvItemsList == null || lvItemsList.isEmpty()) {
             return lvOrderDetailList;
         }
-        for (Items items : pItemsList) {
+
+        for (Items items : lvItemsList) {
             Long lvProductVariantId = items.getProductDetail().getId();
             ProductVariantDTO productDetail = mvProductVariantService.findById(lvProductVariantId, true);
             String productVariantName = productDetail.getVariantName();
@@ -136,8 +130,8 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         orderDetail.setExtraDiscount(CoreUtils.coalesce(orderDetail.getExtraDiscount(), BigDecimal.ZERO));
         try {
             OrderDetail orderDetailSaved = mvOrderDetailRepository.save(orderDetail);
-            mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_ORD_C, MasterObject.OrderDetail, "Thêm mới item vào đơn hàng", orderDetail.toString());
-            logger.info("{}: Thêm mới item vào đơn hàng {}", OrderServiceImpl.class.getName(), orderDetail.toString());
+            mvSystemLogService.writeLogCreate(ACTION.PRO_ORD_C, MasterObject.OrderDetail, "Thêm mới item vào đơn hàng", orderDetail.toString());
+            log.info("{}: Thêm mới item vào đơn hàng {}", OrderServiceImpl.class.getName(), orderDetail.toString());
             return orderDetailSaved;
         } catch (RuntimeException ex) {
             throw new AppException(ex);
@@ -166,8 +160,8 @@ public class OrderItemsServiceImpl implements OrderItemsService {
             String logTitle = "Cập nhật đơn hàng " + orderItemUpdated.getOrder().getCode();
 
             mvOrderHistoryService.save(changeLog.getLogChanges(), logTitle, orderDetailId, orderDetailId);
-            mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_ORD_U, MasterObject.OrderDetail, logTitle, changeLog);
-            logger.info("{}: Cập nhật item of đơn hàng {}", OrderServiceImpl.class.getName(), orderItemUpdated.toString());
+            mvSystemLogService.writeLogUpdate(ACTION.PRO_ORD_U, MasterObject.OrderDetail, logTitle, changeLog);
+            log.info("{}: Cập nhật item of đơn hàng {}", OrderServiceImpl.class.getName(), orderItemUpdated.toString());
 
             return orderItemUpdated;
         } catch (RuntimeException ex) {
@@ -176,21 +170,15 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     }
 
     @Override
-    public String delete(Long orderDetailId) {
+    public boolean delete(Long orderDetailId) {
         OrderDetail orderDetail = this.findById(orderDetailId, true);
         try {
             mvOrderDetailRepository.deleteById(orderDetailId);
-            mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_ORD_D, MasterObject.OrderDetail, "Xóa item of đơn hàng", orderDetail.toString());
-            logger.info("{}: Xóa item of đơn hàng {}", OrderServiceImpl.class.getName(), orderDetail.toString());
-            return MessageCode.DELETE_SUCCESS.getDescription();
+            mvSystemLogService.writeLogDelete(ACTION.PRO_ORD_D, MasterObject.OrderDetail, "Xóa item of đơn hàng", orderDetail.toString());
+            log.info("{}: Xóa item of đơn hàng {}", OrderServiceImpl.class.getName(), orderDetail.toString());
+            return true;
         } catch (RuntimeException ex) {
             throw new AppException(ex);
         }
-    }
-
-    @Transactional
-    @Override
-    public void updateReturnsStatus(long pItemId, boolean pIsReturned) {
-        mvOrderDetailRepository.updateReturnsStatus(pItemId, pIsReturned);
     }
 }

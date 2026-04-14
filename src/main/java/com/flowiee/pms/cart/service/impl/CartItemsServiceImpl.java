@@ -16,7 +16,6 @@ import com.flowiee.pms.cart.repository.CartItemsRepository;
 import com.flowiee.pms.cart.repository.OrderCartRepository;
 import com.flowiee.pms.product.service.ProductComboService;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.shared.enums.MessageCode;
 import com.flowiee.pms.cart.service.CartItemsService;
 import com.flowiee.pms.shared.util.SecurityUtils;
 import org.springframework.stereotype.Service;
@@ -29,16 +28,16 @@ import java.util.List;
 
 @Service
 public class CartItemsServiceImpl extends BaseService<Items, ItemsDTO, CartItemsRepository> implements CartItemsService {
-    private final OrderCartRepository cartRepository;
-    private final ProductComboService mvProductComboService;
     private final ProductVariantService mvProductVariantService;
+    private final ProductComboService mvProductComboService;
+    private final OrderCartRepository cartRepository;
 
     public CartItemsServiceImpl(CartItemsRepository pCartItemsRepository, OrderCartRepository pCartRepository,
                                 ProductComboService pProductComboService, ProductVariantService pProductVariantService) {
         super(Items.class, ItemsDTO.class, pCartItemsRepository);
-        this.cartRepository = pCartRepository;
-        this.mvProductComboService = pProductComboService;
         this.mvProductVariantService = pProductVariantService;
+        this.mvProductComboService = pProductComboService;
+        this.cartRepository = pCartRepository;
     }
 
     @Override
@@ -63,7 +62,6 @@ public class CartItemsServiceImpl extends BaseService<Items, ItemsDTO, CartItems
         List<ProductComboDTO> productCombos = mvProductComboService.findAll(-1, -1).getContent();
         List<ProductVariantDTO> productVariantDTOs = mvProductVariantService.findAll(ProductVariantSearchRequest.builder()
                 .availableForSales(true)
-                .checkInAnyCart(false)
                 .build()
         ).getContent();
 
@@ -111,11 +109,6 @@ public class CartItemsServiceImpl extends BaseService<Items, ItemsDTO, CartItems
     }
 
     @Override
-    public Integer findQuantityOfItemCombo(Long cartId, Long comboId) {
-        return mvEntityRepository.findQuantityByProductVariantId(cartId, comboId);//It is wrong now, will fix in the future
-    }
-
-    @Override
     public Items findItemByCartAndProductVariant(Long cartId, Long productVariantId) {
         return mvEntityRepository.findByCartAndProductVariant(cartId, productVariantId);
     }
@@ -156,15 +149,8 @@ public class CartItemsServiceImpl extends BaseService<Items, ItemsDTO, CartItems
     }
 
     @Override
-    public String delete(Long itemId) {
-        super.delete(itemId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
-    }
-
-    @Transactional
-    @Override
-    public void increaseItemQtyInCart(Long itemId, int quantity) {
-        mvEntityRepository.updateItemQty(itemId, quantity);
+    public boolean delete(Long itemId) {
+        return super.delete(itemId);
     }
 
     @Transactional

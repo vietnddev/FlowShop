@@ -41,9 +41,8 @@ function getListOfProductsOnSearchModal(pageSize, pageNum) {
             mvProductSearchModalList = [];
             $.each(data, function (index, d) {
                 mvProductSearchModalList[d.id] = d;
-                let bgRowColor = d.currentInCart ? "lightcyan" : "none";
                 contentTable.append(`
-                    <tr style="background-color: ${bgRowColor}">
+                    <tr>
                         <td>${(((pagination.pageNum - 1) * pagination.pageSize + 1) + index)}</td>
                         <td>
                             <input type="checkbox" class="cbxChooseProduct" style="width: 25px; height: 25px" productVariantId="${d.id}">

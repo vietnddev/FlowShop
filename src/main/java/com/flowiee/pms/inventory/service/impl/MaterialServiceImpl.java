@@ -4,13 +4,11 @@ import com.flowiee.pms.shared.request.BaseParameter;
 import com.flowiee.pms.inventory.entity.Material;
 import com.flowiee.pms.shared.util.ChangeLog;
 import com.flowiee.pms.shared.enums.ACTION;
-import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.inventory.dto.MaterialDTO;
 import com.flowiee.pms.inventory.repository.MaterialRepository;
 import com.flowiee.pms.shared.base.BaseService;
 
 import com.flowiee.pms.shared.enums.MasterObject;
-import com.flowiee.pms.shared.enums.MessageCode;
 import com.flowiee.pms.inventory.service.MaterialHistoryService;
 import com.flowiee.pms.inventory.service.MaterialService;
 import com.flowiee.pms.system.service.SystemLogService;
@@ -64,7 +62,7 @@ public class MaterialServiceImpl extends BaseService<Material, MaterialDTO, Mate
     @Override
     public MaterialDTO save(MaterialDTO pDto) {
         MaterialDTO materialSaved = super.save(pDto);
-        systemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.STG_MAT_C, MasterObject.Material, "Thêm mới nguyên vật liệu", materialSaved.getName());
+        systemLogService.writeLogCreate(ACTION.STG_MAT_C, MasterObject.Material, "Thêm mới nguyên vật liệu", materialSaved.getName());
         return materialSaved;
     }
 
@@ -82,23 +80,23 @@ public class MaterialServiceImpl extends BaseService<Material, MaterialDTO, Mate
 
         String logTitle = "Cập nhật nguyên vật liệu: " + materialUpdated.getName();
         mvMaterialHistoryService.save(changeLog.getLogChanges(), logTitle, materialId);
-        systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.STG_MAT_U, MasterObject.Material, logTitle, changeLog);
+        systemLogService.writeLogUpdate(ACTION.STG_MAT_U, MasterObject.Material, logTitle, changeLog);
         logger.info(logTitle);
 
         return modelMapper.map(materialUpdated, MaterialDTO.class);
     }
 
     @Override
-    public String delete(Long entityId) {
+    public boolean delete(Long entityId) {
         Material materialToDelete = super.findEntById(entityId, true);
 
         mvEntityRepository.deleteById(materialToDelete.getId());
 
         String logTitle = "Xóa nguyên vật liệu";
-        systemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.STG_MAT_U, MasterObject.Material, "Xóa nguyên vật liệu", materialToDelete.getName());
+        systemLogService.writeLogDelete(ACTION.STG_MAT_U, MasterObject.Material, "Xóa nguyên vật liệu", materialToDelete.getName());
         logger.info("{}: {}", logTitle, materialToDelete.getName());
 
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Transactional
@@ -107,10 +105,10 @@ public class MaterialServiceImpl extends BaseService<Material, MaterialDTO, Mate
         String logTitle = "Cập nhật số lượng nguyên vật liệu";
         if ("I".equals(type)) {
             mvEntityRepository.updateQuantityIncrease(quantity, materialId);
-            systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.STG_MAT_U, MasterObject.Material, logTitle, " + " + quantity);
+            systemLogService.writeLogUpdate(ACTION.STG_MAT_U, MasterObject.Material, logTitle, " + " + quantity);
         } else if ("D".equals(type)) {
             mvEntityRepository.updateQuantityDecrease(quantity, materialId);
-            systemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.STG_MAT_U, MasterObject.Material, logTitle, " - " + quantity);
+            systemLogService.writeLogUpdate(ACTION.STG_MAT_U, MasterObject.Material, logTitle, " - " + quantity);
         }
     }
 }

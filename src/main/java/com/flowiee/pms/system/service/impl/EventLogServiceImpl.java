@@ -47,13 +47,4 @@ public class EventLogServiceImpl implements EventLogService {
                 .application(CommonUtils.productID)
                 .build());
     }
-
-    @Override
-    public void updateDuration(Long pRequestID, long pDuration) {
-        EventLog eventLog = eventLogRepository.findByRequestId(pRequestID);
-        if (eventLog != null) {
-            eventLog.setDuration(pDuration);
-            eventLogRepository.save(eventLog);
-        }
-    }
 }

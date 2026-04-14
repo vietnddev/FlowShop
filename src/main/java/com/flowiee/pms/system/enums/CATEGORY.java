@@ -22,6 +22,7 @@ public enum CATEGORY {
     GROUP_OBJECT("group-object", "GROUP_OBJECT", "Nhóm đối tượng/ đối tác"),
     PAYMENT_METHOD("payment-method", "PAYMENT_METHOD", "Hình thức thanh toán"),
     PAYMENT_STATUS("payment-status", "PAYMENT_STATUS", "Trạng thái thanh toán"),
+    DELIVERY_STATUS("delivery-status", "DELIVERY_STATUS", "Delivery status/ Trạng thái thanh toán"),
     COMMUNE("commune", "COMMUNE", "Xã"),
     DISTRICT("district", "DISTRICT", "Huyện"),
     PROVINCE("province", "PROVINCE", "Tỉnh"),

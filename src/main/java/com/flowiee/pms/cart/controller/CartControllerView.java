@@ -1,9 +1,8 @@
 package com.flowiee.pms.cart.controller;
 
 import com.flowiee.pms.shared.base.BaseController;
-import com.flowiee.pms.shared.util.SecurityUtils;
+import com.flowiee.pms.system.entity.Category;
 import com.flowiee.pms.system.enums.CATEGORY;
-import com.flowiee.pms.cart.entity.OrderCart;
 import com.flowiee.pms.shared.exception.BadRequestException;
 import com.flowiee.pms.shared.response.AppResponse;
 import com.flowiee.pms.cart.model.CartItemModel;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/sls/order")
@@ -40,12 +40,13 @@ public class CartControllerView extends BaseController {
     public ModelAndView showPageBanHang() {
         ModelAndView modelAndView = new ModelAndView(Pages.PRO_ORDER_SELL.getTemplate());
 
-        List<OrderCart> listOrderCart = mvCartService.findCartByAccountId(SecurityUtils.getCurrentUser().getId());
-        modelAndView.addObject("listCart", listOrderCart);
+        Map<CATEGORY, List<Category>> lvCategories = mvCategoryService.findByType(List.of(
+                CATEGORY.SALES_CHANNEL, CATEGORY.PAYMENT_METHOD, CATEGORY.SHIP_METHOD));
+
         modelAndView.addObject("listAccount", mvAccountService.find());
-        modelAndView.addObject("listSalesChannel", mvCategoryService.findByType(CATEGORY.SALES_CHANNEL));
-        modelAndView.addObject("listPaymentMethod", mvCategoryService.findByType(CATEGORY.PAYMENT_METHOD));
-        modelAndView.addObject("listDeliveryType", mvCategoryService.findByType(CATEGORY.SHIP_METHOD));
+        modelAndView.addObject("listSalesChannel", lvCategories.get(CATEGORY.SALES_CHANNEL));
+        modelAndView.addObject("listPaymentMethod", lvCategories.get(CATEGORY.PAYMENT_METHOD));
+        modelAndView.addObject("listDeliveryType", lvCategories.get(CATEGORY.SHIP_METHOD));
         modelAndView.addObject("orderStatusMap", OrderStatus.getAllMap(null));
         modelAndView.addObject("totalAmountWithoutDiscount", 0);
         modelAndView.addObject("totalAmountDiscount", 0);
@@ -62,7 +63,7 @@ public class CartControllerView extends BaseController {
     @PostMapping("/ban-hang/cart/{cartId}/reset")
     @PreAuthorize("@vldModuleSales.insertOrder(true)")
     public ModelAndView resetCart(@PathVariable("cartId") Long cartId) {
-        if (mvCartService.findById(cartId, true) == null) {
+        if (mvCartService.findEntById(cartId, true) == null) {
             throw new BadRequestException("Cart not found! cartId=" + cartId);
         }
         mvCartService.resetCart(cartId);

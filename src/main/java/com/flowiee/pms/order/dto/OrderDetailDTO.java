@@ -17,10 +17,9 @@ import java.util.List;
 public class OrderDetailDTO extends OrderDetail implements Serializable {
     private Long orderId;
     private ProductVariantDTO productVariantDTO;
-    private ProductVariantDTO item;
     private Boolean isReturned;
 
-    public static OrderDetailDTO fromOrderDetail(OrderDetail pInput) {
+    public static OrderDetailDTO toDTO(OrderDetail pInput) {
         OrderDetailDTO dto = new OrderDetailDTO();
         dto.setId(pInput.getId());
         dto.setOrder(pInput.getOrder());
@@ -38,12 +37,12 @@ public class OrderDetailDTO extends OrderDetail implements Serializable {
         return dto;
     }
 
-    public static List<OrderDetailDTO> fromOrderDetails(List<OrderDetail> pItems) {
+    public static List<OrderDetailDTO> toDTOs(List<OrderDetail> pItems) {
         if (CollectionUtils.isEmpty(pItems)) {
             return new ArrayList<>();
         }
         return pItems.stream()
-                .map(OrderDetailDTO::fromOrderDetail)
+                .map(OrderDetailDTO::toDTO)
                 .toList();
     }
 }

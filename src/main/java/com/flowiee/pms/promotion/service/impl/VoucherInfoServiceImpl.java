@@ -163,7 +163,7 @@ public class VoucherInfoServiceImpl extends BaseService<VoucherInfo, VoucherInfo
     }
 
     @Override
-    public String delete(Long voucherId) {
+    public boolean delete(Long voucherId) {
         VoucherInfo voucherInfoBefore = this.findEntById(voucherId, true);
 
         if (!mvVoucherApplyService.findByVoucherId(voucherId).isEmpty()) {
@@ -171,7 +171,7 @@ public class VoucherInfoServiceImpl extends BaseService<VoucherInfo, VoucherInfo
         }
         mvEntityRepository.deleteById(voucherId);
         mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_VOU_D, MasterObject.VoucherInfo, "Xóa voucher", voucherInfoBefore.getTitle());
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     private String generateRandomKeyVoucher(int lengthOfKey, String voucherType) {

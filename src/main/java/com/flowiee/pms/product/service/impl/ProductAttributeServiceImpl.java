@@ -126,9 +126,9 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
     }
 
     @Override
-    public String delete(Long pAttributeId) {
+    public boolean delete(Long pAttributeId) {
         super.delete(pAttributeId);
         mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Xóa thuộc tính sản phẩm", "id: " + pAttributeId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 }

@@ -49,6 +49,6 @@ public class ProductReviewController extends BaseController {
     @DeleteMapping("/delete/{reviewId}")
     @PreAuthorize("@vldModuleProduct.deleteReview(true)")
     public AppResponse<String> deleteProductReview(@PathVariable("reviewId") Long reviewId) {
-        return AppResponse.success(mvProductReviewService.delete(reviewId));
+        return AppResponse.success("Success: " + mvProductReviewService.delete(reviewId));
     }
 }

@@ -139,16 +139,16 @@ public class StorageServiceImpl extends BaseService<Storage, StorageDTO, Storage
     }
 
     @Override
-    public String delete(Long storageId) {
+    public boolean delete(Long storageId) {
         try {
             Storage storage = this.findEntById(storageId, true);
             if ("Y".equals(storage.getStatus())) {
-                return "This storage is in use!";
+                throw new AppException("This storage is in use!");
             }
             mvEntityRepository.deleteById(storageId);
             systemLogService.writeLogDelete(MODULE.STORAGE, ACTION.STG_STORAGE, MasterObject.Storage, "Xóa kho", storage.getName());
             LOG.info("Delete storage success! storageId={}", storageId);
-            return MessageCode.DELETE_SUCCESS.getDescription();
+            return true;
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.DELETE_ERROR_OCCURRED.getDescription(), "Storage storageId=" + storageId), ex);
         }

@@ -100,7 +100,7 @@ public class AccountController extends BaseController {
     @DeleteMapping(value = "/delete/{accountId}")
     @PreAuthorize("@vldModuleSystem.deleteAccount(true)")
     public AppResponse<String> deleteAccount(@PathVariable("accountId") Long accountId) {
-        return AppResponse.success(accountService.delete(accountId));
+        return AppResponse.success("Success: " + accountService.delete(accountId));
     }
 
     @Operation(summary = "Find roles of account")

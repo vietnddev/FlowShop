@@ -254,7 +254,7 @@ public class CustomerServiceImpl extends BaseService<Customer, CustomerDTO, Cust
     }
 
     @Override
-    public String delete(Long id) {
+    public boolean delete(Long id) {
         Customer customer = this.findEntById(id, true);
         List<Order> orderOfCustomer = mvOrderRepository.findByCustomer(customer.getId());
         if (ObjectUtils.isNotEmpty(orderOfCustomer)) {
@@ -265,7 +265,7 @@ public class CustomerServiceImpl extends BaseService<Customer, CustomerDTO, Cust
         mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_CUS_D, MasterObject.Customer, "Xóa khách hàng", customer.getCustomerName());
         LOG.info("Deleted customer id={}", customer.getId());
 
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     private void setContactDefaults(List<CustomerDTO> customerDTOs) {

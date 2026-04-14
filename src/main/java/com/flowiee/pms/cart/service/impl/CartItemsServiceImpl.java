@@ -111,11 +111,6 @@ public class CartItemsServiceImpl extends BaseService<Items, ItemsDTO, CartItems
     }
 
     @Override
-    public Integer findQuantityOfItemCombo(Long cartId, Long comboId) {
-        return mvEntityRepository.findQuantityByProductVariantId(cartId, comboId);//It is wrong now, will fix in the future
-    }
-
-    @Override
     public Items findItemByCartAndProductVariant(Long cartId, Long productVariantId) {
         return mvEntityRepository.findByCartAndProductVariant(cartId, productVariantId);
     }
@@ -156,15 +151,8 @@ public class CartItemsServiceImpl extends BaseService<Items, ItemsDTO, CartItems
     }
 
     @Override
-    public String delete(Long itemId) {
-        super.delete(itemId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
-    }
-
-    @Transactional
-    @Override
-    public void increaseItemQtyInCart(Long itemId, int quantity) {
-        mvEntityRepository.updateItemQty(itemId, quantity);
+    public boolean delete(Long itemId) {
+        return super.delete(itemId);
     }
 
     @Transactional

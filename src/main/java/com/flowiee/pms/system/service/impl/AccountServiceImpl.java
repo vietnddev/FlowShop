@@ -15,9 +15,8 @@ import com.flowiee.pms.system.enums.AccountStatus;
 import com.flowiee.pms.system.repository.AccountRepository;
 import com.flowiee.pms.system.service.AccountService;
 import com.flowiee.pms.system.service.SystemLogService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +24,10 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class AccountServiceImpl extends BaseService<Account, AccountDTO, AccountRepository> implements AccountService {
     private final SystemLogService mvSystemLogService;
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     public AccountServiceImpl(AccountRepository pEntityRepository, SystemLogService pSystemLogService) {
         super(Account.class, AccountDTO.class, pEntityRepository);
@@ -70,7 +68,7 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
         Account accountSaved = mvEntityRepository.save(account);
 
         mvSystemLogService.writeLogCreate(MODULE.SYSTEM, ACTION.SYS_ACC_C, MasterObject.Account, "Thêm mới account", username);
-        logger.info("Insert account success! username={}", username);
+        log.info("Insert account success! username={}", username);
 
         return accountSaved;
     }
@@ -94,7 +92,7 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
         changeLog.doAudit();
 
         mvSystemLogService.writeLogUpdate(MODULE.SYSTEM, ACTION.SYS_ACC_U, MasterObject.Account, "Cập nhật tài khoản " + accountUpdated.getUsername(), changeLog);
-        logger.info("Update account success! username={}", accountUpdated.getUsername());
+        log.info("Update account success! username={}", accountUpdated.getUsername());
 
         return accountUpdated;
     }
@@ -111,15 +109,15 @@ public class AccountServiceImpl extends BaseService<Account, AccountDTO, Account
 
     @Transactional
     @Override
-    public String delete(Long accountId) {
+    public boolean delete(Long accountId) {
         try {
             Optional<Account> account = mvEntityRepository.findById(accountId);
             if (account.isPresent()) {
                 mvEntityRepository.delete(account.get());
                 mvSystemLogService.writeLogDelete(MODULE.SYSTEM, ACTION.SYS_ACC_D, MasterObject.Account, "Xóa account", account.get().getUsername());
-                logger.info("Delete account success! username={}", account.get().getUsername());
+                log.info("Delete account success! username={}", account.get().getUsername());
             }
-            return MessageCode.DELETE_SUCCESS.getDescription();
+            return true;
         } catch (Exception ex) {
             throw new AppException("Delete account fail! id=" + accountId, ex);
         }

@@ -90,7 +90,7 @@ public class ProductDamagedServiceImpl extends BaseService<ProductDamaged, Produ
     }
 
     @Override
-    public String delete(Long pEntityId) {
+    public boolean delete(Long pEntityId) {
         return super.delete(pEntityId);
     }
 }

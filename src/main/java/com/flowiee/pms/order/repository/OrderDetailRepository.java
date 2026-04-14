@@ -20,5 +20,5 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 
     @Modifying
     @Query("update OrderDetail d set d.isReturned = :isReturned where d.id = :itemId")
-    void updateReturnsStatus(@Param("itemId") long itemId, @Param("isReturned") boolean isReturned);
+    void updateIsReturnedStatus(@Param("itemId") long itemId, @Param("isReturned") boolean isReturned);
 }

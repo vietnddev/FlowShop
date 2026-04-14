@@ -54,6 +54,6 @@ public class SupplierController extends BaseController {
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("@vldModuleSales.deleteSupplier(true)")
     public AppResponse<String> deleteSupplier(@PathVariable("id") Long supplierId) {
-        return AppResponse.success(mvSupplierService.delete(supplierId));
+        return AppResponse.success("Success: " + mvSupplierService.delete(supplierId));
     }
 }

@@ -70,7 +70,7 @@ public class GroupAccountServiceImpl extends BaseService<GroupAccount, GroupAcco
     }
 
     @Override
-    public String delete(Long pGroupId) {
+    public boolean delete(Long pGroupId) {
         return super.delete(pGroupId);
     }
 }

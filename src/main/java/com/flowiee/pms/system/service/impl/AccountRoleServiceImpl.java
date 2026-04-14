@@ -19,8 +19,6 @@ import com.flowiee.pms.system.service.GroupAccountService;
 import com.flowiee.pms.system.service.SystemLogService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +34,6 @@ public class AccountRoleServiceImpl implements RoleService {
     private final GroupAccountService mvGroupAccountService;
     private final AccountRoleRepository mvAccountRoleRepository;
     private final SystemLogService systemLogService;
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     public AccountRoleServiceImpl(@Lazy AccountRepository mvAccountRepository, @Lazy GroupAccountService mvGroupAccountService, AccountRoleRepository mvAccountRoleRepository, SystemLogService systemLogService) {
         this.mvAccountRepository = mvAccountRepository;
@@ -183,13 +179,13 @@ public class AccountRoleServiceImpl implements RoleService {
     }
 
     @Override
-    public String deleteAllRole(Long groupId, Long accountId) {
+    public boolean deleteAllRole(Long groupId, Long accountId) {
         if (groupId == null && accountId == null) {
             throw new IllegalArgumentException("groupId and accountId cannot be null");
         }
         mvAccountRoleRepository.deleteByAccountId(accountId);
         mvAccountRoleRepository.deleteByGroupAccountId(groupId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Override

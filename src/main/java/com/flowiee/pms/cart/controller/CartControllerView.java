@@ -62,7 +62,7 @@ public class CartControllerView extends BaseController {
     @PostMapping("/ban-hang/cart/{cartId}/reset")
     @PreAuthorize("@vldModuleSales.insertOrder(true)")
     public ModelAndView resetCart(@PathVariable("cartId") Long cartId) {
-        if (mvCartService.findById(cartId, true) == null) {
+        if (mvCartService.findEntById(cartId, true) == null) {
             throw new BadRequestException("Cart not found! cartId=" + cartId);
         }
         mvCartService.resetCart(cartId);

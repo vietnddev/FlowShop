@@ -114,10 +114,10 @@ public class ProductComboServiceImpl extends BaseService<ProductCombo, ProductCo
     }
 
     @Override
-    public String delete(Long pComboId) {
+    public boolean delete(Long pComboId) {
         super.delete(pComboId);
         mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_CBO_C, MasterObject.ProductCombo, "Cập nhật combo sản phẩm", "id: " + pComboId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     private void setProductIncludes(List<ProductCombo> productComboPage) {

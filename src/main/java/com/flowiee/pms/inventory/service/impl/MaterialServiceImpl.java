@@ -89,7 +89,7 @@ public class MaterialServiceImpl extends BaseService<Material, MaterialDTO, Mate
     }
 
     @Override
-    public String delete(Long entityId) {
+    public boolean delete(Long entityId) {
         Material materialToDelete = super.findEntById(entityId, true);
 
         mvEntityRepository.deleteById(materialToDelete.getId());
@@ -98,7 +98,7 @@ public class MaterialServiceImpl extends BaseService<Material, MaterialDTO, Mate
         systemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.STG_MAT_U, MasterObject.Material, "Xóa nguyên vật liệu", materialToDelete.getName());
         logger.info("{}: {}", logTitle, materialToDelete.getName());
 
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Transactional

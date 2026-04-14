@@ -11,27 +11,20 @@ import com.flowiee.pms.product.enums.PriceType;
 import com.flowiee.pms.product.repository.ProductPriceHistoryRepository;
 import com.flowiee.pms.product.repository.ProductPriceRepository;
 import com.flowiee.pms.product.service.ProductPriceService;
-import com.flowiee.pms.product.service.ProductVariantService;
 import com.flowiee.pms.shared.util.SecurityUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPriceDTO, ProductPriceRepository> implements ProductPriceService {
-    private final ProductVariantService mvProductVariantService;
     private final ProductPriceHistoryRepository mvProductPriceHistoryRepository;
 
-    public ProductPriceServiceImpl(ProductPriceRepository pEntityRepository, @Lazy ProductVariantService pProductVariantService,
-                                   ProductPriceHistoryRepository pProductPriceHistoryRepository) {
+    public ProductPriceServiceImpl(ProductPriceRepository pEntityRepository, ProductPriceHistoryRepository pProductPriceHistoryRepository) {
         super(ProductPrice.class, ProductPriceDTO.class, pEntityRepository);
-        this.mvProductVariantService = pProductVariantService;
         this.mvProductPriceHistoryRepository = pProductPriceHistoryRepository;
     }
 
@@ -52,88 +45,70 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
     }
 
     @Override
-    public List<ProductPrice> save(ProductDetail productVariant, ProductPriceDTO pPriceDTO) {
+    public ProductPriceDTO create(ProductPriceDTO pPriceDTO) {
+        Long lvProductVariantId = pPriceDTO.getProductVariantId();
         BigDecimal lvRetailPrice = CoreUtils.coalesce(pPriceDTO.getRetailPrice());
         BigDecimal lvWholesalePrice = CoreUtils.coalesce(pPriceDTO.getWholesalePrice());
-        BigDecimal lvPurchasePrice = CoreUtils.coalesce(pPriceDTO.getPurchasePrice());
         BigDecimal lvCostPrice = CoreUtils.coalesce(pPriceDTO.getCostPrice());
 
-        List<ProductPrice> lvPrices = new ArrayList<>();
         for (PriceType lvType : PriceType.values()) {
             ProductPrice lvPriceModel = ProductPrice.builder()
                     .state(ProductPrice.STATE_ACTIVE)
-                    .productVariant(productVariant)
+                    .productVariant(new ProductDetail(lvProductVariantId))
                     .priceType(lvType)
                     .build();
-            if (lvType.equals(PriceType.RTL))
-            {
+            if (lvType.equals(PriceType.RTL)) {
                 lvPriceModel.setPriceValue(lvRetailPrice);
-                if (!mvEntityRepository.existsByStateAndTypeAndProductVariantId(ProductPrice.STATE_ACTIVE,
-                        PriceType.RTL, productVariant.getId())) {
-                    lvPrices.add(mvEntityRepository.save(lvPriceModel));
+                if (!mvEntityRepository.existsByStateAndTypeAndProductVariantId(ProductPrice.STATE_ACTIVE, PriceType.RTL, lvProductVariantId)) {
+                    mvEntityRepository.save(lvPriceModel);
                 }
             }
-            else if (lvType.equals(PriceType.WHO))
-            {
+            else if (lvType.equals(PriceType.WHO)) {
                 lvPriceModel.setPriceValue(lvWholesalePrice);
-                if (!mvEntityRepository.existsByStateAndTypeAndProductVariantId(ProductPrice.STATE_ACTIVE,
-                        PriceType.WHO, productVariant.getId())) {
-                    lvPrices.add(mvEntityRepository.save(lvPriceModel));
+                if (!mvEntityRepository.existsByStateAndTypeAndProductVariantId(ProductPrice.STATE_ACTIVE, PriceType.WHO, lvProductVariantId)) {
+                    mvEntityRepository.save(lvPriceModel);
                 }
             }
-            else if (lvType.equals(PriceType.CSP))
-            {
+            else if (lvType.equals(PriceType.CSP)) {
                 lvPriceModel.setPriceValue(lvCostPrice);
-                if (!mvEntityRepository.existsByStateAndTypeAndProductVariantId(ProductPrice.STATE_ACTIVE,
-                        PriceType.CSP, productVariant.getId())) {
-                    lvPrices.add(mvEntityRepository.save(lvPriceModel));
+                if (!mvEntityRepository.existsByStateAndTypeAndProductVariantId(ProductPrice.STATE_ACTIVE, PriceType.CSP, lvProductVariantId)) {
+                    mvEntityRepository.save(lvPriceModel);
                 }
             }
         }
 
-        return lvPrices;
+        return getPrice(lvProductVariantId);
     }
 
     @Transactional
     @Override
-    public ProductPriceDTO update(ProductPriceDTO pRequestPrice, Long pProductVariantId) {
-        ProductDetail lvProductVariant = mvProductVariantService.findEntById(pProductVariantId, true);
-        return this.updatePrice(lvProductVariant, pRequestPrice);
-    }
-
-    @Transactional
-    @Override
-    public ProductPriceDTO updatePrice(ProductDetail pProductVariant, ProductPriceDTO pRequestPrice) {
-        List<ProductPrice> lvPrices = mvEntityRepository.findByVariantId(pProductVariant.getId());
+    public ProductPriceDTO updatePrice(Long pProductVariantId, ProductPriceDTO pRequestPrice) {
+        List<ProductPrice> lvPrices = mvEntityRepository.findByVariantId(pProductVariantId);
         for (ProductPrice lvPrice : lvPrices) {
-            BigDecimal lvPriceCurrent = lvPrice.getPriceValue();
             if (PriceType.RTL.equals(lvPrice.getPriceType())) {
-                BigDecimal lvRequestRetailPrice = pRequestPrice.getRetailPrice();
-                if (lvPriceCurrent.compareTo(lvRequestRetailPrice) != 0) {
-                    handlePriceUpdate(lvPrice, pProductVariant, PriceType.RTL, lvPriceCurrent, lvRequestRetailPrice);
-                }
+                handlePriceUpdate(lvPrice, pRequestPrice.getRetailPrice());
             }
             if (PriceType.WHO.equals(lvPrice.getPriceType())) {
-                BigDecimal lvRequestWholesalePrice = pRequestPrice.getWholesalePrice();
-                if (lvPriceCurrent.compareTo(lvRequestWholesalePrice) != 0) {
-                    handlePriceUpdate(lvPrice, pProductVariant, PriceType.RTL, lvPriceCurrent, lvRequestWholesalePrice);
-                }
+                handlePriceUpdate(lvPrice, pRequestPrice.getWholesalePrice());
             }
             if (PriceType.CSP.equals(lvPrice.getPriceType())) {
-                BigDecimal lvRequestCostPrice = pRequestPrice.getCostPrice();
-                if (lvPriceCurrent.compareTo(lvRequestCostPrice) != 0) {
-                    handlePriceUpdate(lvPrice, pProductVariant, PriceType.CSP, lvPriceCurrent, lvRequestCostPrice);
-                }
+                handlePriceUpdate(lvPrice, pRequestPrice.getCostPrice());
             }
         }
 
-        return getPrice(pProductVariant.getId());
+        return getPrice(pProductVariantId);
     }
 
-    private void handlePriceUpdate(ProductPrice pPrice, ProductDetail pProductVariant, PriceType pPriceType, BigDecimal currentPrice, BigDecimal newPrice) {
-        mvEntityRepository.inactivePrice(pPrice.getId());
-        createNewPrice(pProductVariant, pPriceType, newPrice);
-        createPriceHistory(pPrice, currentPrice, newPrice);
+    private void handlePriceUpdate(ProductPrice pCurrentPriceEntity, BigDecimal newPrice) {
+        if (newPrice == null) {
+            return;
+        }
+
+        if (pCurrentPriceEntity.getPriceValue().compareTo(newPrice) != 0) {
+            mvEntityRepository.inactivePrice(pCurrentPriceEntity.getId());
+            createNewPrice(pCurrentPriceEntity.getProductVariant(), pCurrentPriceEntity.getPriceType(), newPrice);
+            createPriceHistory(pCurrentPriceEntity, newPrice);
+        }
     }
 
     private void createNewPrice(ProductDetail productVariant, PriceType priceType, BigDecimal priceValue) {
@@ -145,11 +120,11 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
                 .build());
     }
 
-    private void createPriceHistory(ProductPrice productPrice, BigDecimal oldPrice, BigDecimal newPrice) {
+    private void createPriceHistory(ProductPrice pCurrentPriceEntity, BigDecimal newPrice) {
         mvProductPriceHistoryRepository.save(ProductPriceHistory.builder()
-                .productPrice(productPrice)
+                .productPrice(pCurrentPriceEntity)
                 .changeType(PriceChangeType.MANUAL)
-                .oldPrice(oldPrice)
+                .oldPrice(pCurrentPriceEntity.getPriceValue())
                 .newPrice(newPrice)
                 .changeTime(LocalDateTime.now())
                 .changedBy(SecurityUtils.getCurrentUser().getEntity())

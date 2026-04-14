@@ -6,14 +6,12 @@ import com.flowiee.pms.system.repository.SerialRepository;
 import com.flowiee.pms.system.service.SerialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class SerialServiceImpl implements SerialService {
     SerialRepository mvSerialRepository;
 
-    @Transactional
     @Override
     public String getNextSerial(SerialCode serialCode) {
         Serial lvSerial = mvSerialRepository.findById(serialCode);

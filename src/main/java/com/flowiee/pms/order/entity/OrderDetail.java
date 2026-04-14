@@ -24,13 +24,11 @@ public class OrderDetail extends BaseEntity implements java.io.Serializable {
 	static final long serialVersionUID = 1L;
 
 	@JsonIgnore
-	@JsonIgnoreProperties("listDonHangChiTiet")
 	@ManyToOne
 	@JoinColumn(name = "order_id", nullable = false)
 	Order order;
 
 	@JsonIgnore
-	@JsonIgnoreProperties("listDonHangChiTiet")
 	@ManyToOne
 	@JoinColumn(name = "product_variant_id", nullable = false)
 	ProductDetail productDetail;

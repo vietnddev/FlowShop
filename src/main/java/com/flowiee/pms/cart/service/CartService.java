@@ -7,10 +7,10 @@ import com.flowiee.pms.cart.dto.ItemsDTO;
 import com.flowiee.pms.order.dto.OrderCartDTO;
 import com.flowiee.pms.cart.entity.Items;
 import com.flowiee.pms.cart.model.CartReq;
-import com.flowiee.pms.shared.base.ICurdService;
 import com.flowiee.pms.cart.entity.OrderCart;
+import com.flowiee.pms.shared.base.DeleteService;
 
-public interface CartService extends ICurdService<OrderCartDTO> {
+public interface CartService extends DeleteService {
     OrderCartDTO addDraftCart();
 
     OrderCart findEntById(Long id, boolean pThrowException);
@@ -21,10 +21,6 @@ public interface CartService extends ICurdService<OrderCartDTO> {
 
     List<OrderCart> findCartByAccountId(Long accountId);
 
-    BigDecimal calTotalAmountWithoutDiscount(long cartId);
-
-    boolean isItemExistsInCart(Long cartId, Long productVariantId);
-
     List<Items> getItems(Long cartId, List<Long> productVariantIds);
 
     void resetCart(Long cartId);
@@ -33,13 +29,9 @@ public interface CartService extends ICurdService<OrderCartDTO> {
 
     void updateItemsOfCart(ItemsDTO items, Long itemId);
 
-    List<ItemsDTO> findItems(Long pCartId);
-
     String deleteItem(Long pCartId, Long pItemId);
 
     ItemsDTO updateItemQuantity(Long pCartId, Long pItemId, Integer pQuantity);
 
     BigDecimal getCartValuePreDiscount(Long pCartId);
-
-    void markOrderFinished(Long pCartId);
 }

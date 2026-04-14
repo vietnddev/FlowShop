@@ -73,7 +73,7 @@ public class GroupAccountController extends BaseController {
     @DeleteMapping(value = "/delete/{groupId}")
     @PreAuthorize("@vldModuleSystem.deleteGroupAccount(true)")
     public AppResponse<String> delete(@PathVariable("groupId") Long groupId) {
-        return AppResponse.success(groupAccountService.delete(groupId));
+        return AppResponse.success("Success: " + groupAccountService.delete(groupId));
     }
 
     @Operation(summary = "Find rights of group")

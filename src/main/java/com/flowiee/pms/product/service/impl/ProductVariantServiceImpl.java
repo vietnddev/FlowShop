@@ -253,7 +253,9 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             ProductDetail lvVariantEntity = buildEntity(pDto);
             ProductDetail lvProductVariantSaved = mvEntityRepository.save(lvVariantEntity);
 
-            mvProductPriceService.save(lvProductVariantSaved, pDto.getPrice());
+            ProductPriceDTO lvProductPriceDTO = pDto.getPrice();
+            lvProductPriceDTO.setProductVariantId(lvProductVariantSaved.getId());
+            mvProductPriceService.create(lvProductPriceDTO);
 
             //Make it async in next version
             try {
@@ -374,7 +376,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             changeLog.setNewObject(lvProductVariantUpdated);
             changeLog.doAudit();
 
-            mvProductPriceService.updatePrice(lvProductVariantUpdated, pDto.getPrice());
+            mvProductPriceService.updatePrice(lvProductVariantUpdated.getId(), pDto.getPrice());
 
             //Log
             String logTitle = "Cập nhật thông tin sản phẩm: " + lvProductVariantUpdated.getVariantName();
@@ -390,7 +392,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
 
     @Transactional
     @Override
-    public String delete(Long productVariantId) {
+    public boolean delete(Long productVariantId) {
         ProductDetail productDetailToDelete = super.findEntById(productVariantId, true);
 
         //Validate here...
@@ -409,7 +411,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Xóa biến thể sản phẩm", productDetailToDelete.getVariantName());
         LOG.info("Delete productVariant success! {}", productDetailToDelete);
 
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Override

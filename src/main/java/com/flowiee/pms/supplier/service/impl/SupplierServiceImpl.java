@@ -76,7 +76,7 @@ public class SupplierServiceImpl extends BaseService<Supplier, SupplierDTO, Supp
     }
 
     @Override
-    public String delete(Long pEntityId) {
+    public boolean delete(Long pEntityId) {
         if (pEntityId == null || pEntityId <= 0) {
             throw new BadRequestException();
         }

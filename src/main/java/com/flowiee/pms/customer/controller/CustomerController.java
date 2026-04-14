@@ -82,7 +82,7 @@ public class CustomerController extends BaseController {
     @DeleteMapping("/delete/{customerId}")
     @PreAuthorize("@vldModuleSales.deleteCustomer(true)")
     public AppResponse<String> deleteCustomer(@PathVariable("customerId") Long customerId) {
-        return AppResponse.success(mvCustomerService.delete(customerId));
+        return AppResponse.success("Success: " + mvCustomerService.delete(customerId));
     }
 
     @Operation(summary = "Find the number of purchase of customer per month")

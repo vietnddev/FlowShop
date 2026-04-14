@@ -1,9 +1,10 @@
 package com.flowiee.pms.dashboard;
 
+import com.flowiee.pms.order.dto.OrderDTO;
+import com.flowiee.pms.order.model.OrderReq;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.product.repository.ProductDetailRepository;
 import com.flowiee.pms.product.service.ProductVariantService;
-import com.flowiee.pms.order.entity.Order;
 import com.flowiee.pms.customer.dto.CustomerDTO;
 import com.flowiee.pms.customer.service.CustomerService;
 
@@ -195,7 +196,7 @@ public class DashboardServiceImpl implements DashboardService {
         String revenueToday = CommonUtils.formatToVND(mvOrderStatisticsService.findRevenueToday());
         String revenueThisMonth = CommonUtils.formatToVND(mvOrderStatisticsService.findRevenueThisMonth());
         List<CustomerDTO> customersNew = mvCustomerService.findCustomerNewInMonth();
-        List<Order> ordersToday = mvOrderService.findOrdersToday();
+        List<OrderDTO> ordersToday = mvOrderService.find(OrderReq.builder().fromDate(null).toDate(null).build()).getContent();
 
         logger.info("Finished loadDashboard(): " + CommonUtils.now("YYYY/MM/dd HH:mm:ss"));
 

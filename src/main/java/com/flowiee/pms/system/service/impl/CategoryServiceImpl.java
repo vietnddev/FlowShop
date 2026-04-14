@@ -16,10 +16,9 @@ import com.flowiee.pms.shared.util.ChangeLog;
 import com.flowiee.pms.system.repository.CategoryRepository;
 
 import com.flowiee.pms.system.service.SystemLogService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,10 +27,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, CategoryRepository> implements CategoryService {
-    private final Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
-
     private final CategoryRepository mvCategoryRepository;
     private final CategoryHistoryService mvCategoryHistoryService;
     private final SystemLogService mvSystemLogService;
@@ -57,7 +55,7 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
 
     @Transactional
     @Override
-    public CategoryDTO save(CategoryDTO pDto) {
+    public CategoryDTO create(CategoryDTO pDto) {
         if (pDto == null) {
             throw new BadRequestException();
         }
@@ -88,14 +86,14 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
         mvCategoryHistoryService.save(changeLog.getLogChanges(), logTitle, categoryId);
 
         mvSystemLogService.writeLogUpdate(MODULE.CATEGORY, ACTION.CTG_U, MasterObject.Category, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
-        LOG.info("Update Category success! {}", categorySaved);
+        log.info("Update Category success! {}", categorySaved);
 
         return mvModelMapper.map(categorySaved, CategoryDTO.class);
     }
 
     @Transactional
     @Override
-    public String delete(Long categoryId) {
+    public boolean delete(Long categoryId) {
         Category lvCurrentCategory = this.findEntById(categoryId, true);
 
         if (categoryInUse(categoryId)) {
@@ -106,7 +104,7 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
 
         mvSystemLogService.writeLogDelete(MODULE.CATEGORY, ACTION.CTG_D, MasterObject.Category, "Xóa danh mục " + lvCurrentCategory.getType(), lvCurrentCategory.getName());
 
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Override
@@ -142,11 +140,6 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
             c.setStatusName(statusName);
         }
         return new PageImpl<>(categoryPage.getContent(), pageable, categoryPage.getTotalElements());
-    }
-
-    @Override
-    public List<Category> findByIds(List<Long> pIds) {
-        return super.findByIds(pIds);
     }
 
     @Override

@@ -107,14 +107,14 @@ public class ProductVariantController extends BaseController {
     @DeleteMapping("/variant/delete/{variantId}")
     @PreAuthorize("@vldModuleProduct.deleteProduct(true)")
     public AppResponse<String> deleteProductVariant(@PathVariable("variantId") Long productVariantId) {
-        return AppResponse.success(mvProductVariantService.delete(productVariantId));
+        return AppResponse.success("Success: " + mvProductVariantService.delete(productVariantId));
     }
 
     @Operation(summary = "Update price")
     @PutMapping(value = "/variant/{variantId}/price/update")
     @PreAuthorize("@vldModuleProduct.priceManagement(true)")
     public AppResponse<ProductPriceDTO> updatePrice(@PathVariable("variantId") Long productVariantId, @RequestBody ProductPriceDTO pPrice) {
-        return AppResponse.success(mvProductPriceService.update(pPrice, productVariantId));
+        return AppResponse.success(mvProductPriceService.updatePrice(productVariantId, pPrice));
     }
 
     @Operation(summary = "Check product variant already exists")

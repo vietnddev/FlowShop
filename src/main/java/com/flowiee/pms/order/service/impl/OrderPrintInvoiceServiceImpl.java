@@ -31,7 +31,6 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class OrderPrintInvoiceServiceImpl implements OrderPrintInvoiceService {
-    OrderService mvOrderService;
     OrderGenerateQRCodeService mvOrderGenerateQRCodeService;
 
     @Override
@@ -70,7 +69,7 @@ public class OrderPrintInvoiceServiceImpl implements OrderPrintInvoiceService {
         // orderDetails
         List<OrderDetailRpt> listDetail = new ArrayList<>();
         //for (OrderDetailDTO detailDTO : lvOrderDto.getListOrderDetailDTO()) {
-        for (OrderDetailDTO detailDTO : lvOrderDto.getListOrderDetail()) {
+        for (OrderDetailDTO detailDTO : lvOrderDto.getItems()) {
             BigDecimal lvUnitPrice = detailDTO.getPrice();
             int lvQuantity = detailDTO.getQuantity();
             listDetail.add(OrderDetailRpt.builder()

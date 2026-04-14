@@ -132,7 +132,7 @@ public class PromotionInfoServiceImpl implements PromotionService {
     }
 
     @Override
-    public String delete(Long promotionId) {
+    public boolean delete(Long promotionId) {
         if (this.findById(promotionId, true) == null) {
             throw new ResourceNotFoundException("Promotion not found!");
         }
@@ -140,7 +140,7 @@ public class PromotionInfoServiceImpl implements PromotionService {
             throw new DataInUseException(ErrorCode.ERROR_DATA_LOCKED.getDescription());
         }
         mvPromotionInfoRepository.deleteById(promotionId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     private String genPromotionStatus(LocalDateTime startTime, LocalDateTime endTime) {

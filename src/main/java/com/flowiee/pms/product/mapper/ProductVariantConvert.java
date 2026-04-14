@@ -76,7 +76,7 @@ public class ProductVariantConvert {
 
         dto.setUnitCurrency(null);
         dto.setDefectiveQty(pInput.getDefectiveQty());
-        dto.setAvailableSalesQty(dto.getStorageQty() - CoreUtils.coalesce(dto.getReservedQty(), 0) - CoreUtils.coalesce(dto.getDefectiveQty(), 0));
+        dto.setAvailableSalesQty(CoreUtils.coalesce(dto.getStorageQty(), 0) - CoreUtils.coalesce(dto.getReservedQty(), 0) - CoreUtils.coalesce(dto.getDefectiveQty(), 0));
         dto.setWeight(pInput.getWeight());
         dto.setNote(pInput.getNote());
         dto.setStatus(pInput.getStatus());

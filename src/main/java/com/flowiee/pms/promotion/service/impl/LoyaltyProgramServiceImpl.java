@@ -92,13 +92,13 @@ public class LoyaltyProgramServiceImpl extends BaseService<LoyaltyProgram, Loyal
     }
 
     @Override
-    public String delete(Long loyaltyProgramId) {
+    public boolean delete(Long loyaltyProgramId) {
         LoyaltyProgram existingProgram = super.findEntById(loyaltyProgramId, true);
         if (!existingProgram.getLoyaltyTransactionList().isEmpty()) {
             throw new BadRequestException("The program has a transaction that does not allow deletion!");
         }
         mvLoyaltyProgramRepository.deleteById(loyaltyProgramId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Override

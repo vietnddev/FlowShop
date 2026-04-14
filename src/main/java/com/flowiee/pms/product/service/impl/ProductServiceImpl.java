@@ -383,7 +383,7 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
 
     @Transactional
     @Override
-    public String delete(Long id) {
+    public boolean delete(Long id) {
         try {
             Product productToDelete = this.findEntById(id, true);
             if (productInUse(productToDelete.getId())) {
@@ -392,7 +392,7 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
             mvEntityRepository.deleteById(productToDelete.getId());
             mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_D, MasterObject.Product, "Xóa sản phẩm", productToDelete.getProductName());
             log.info("Delete product success! productId={}", id);
-            return MessageCode.DELETE_SUCCESS.getDescription();
+            return true;
         } catch (RuntimeException ex) {
             throw new AppException("Delete product fail! productId=" + id, ex);
         }

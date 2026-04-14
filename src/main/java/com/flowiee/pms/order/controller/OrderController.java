@@ -1,11 +1,11 @@
 package com.flowiee.pms.order.controller;
 
+import com.flowiee.pms.order.model.ChangeOrderStatusReq;
 import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.shared.util.CoreUtils;
 import com.flowiee.pms.shared.util.DateTimeUtil;
 import com.flowiee.pms.shared.response.AppResponse;
 import com.flowiee.pms.order.model.OrderReq;
-import com.flowiee.pms.order.model.OrderReturnReq;
 import com.flowiee.pms.system.model.EximResult;
 import com.flowiee.pms.order.dto.OrderDTO;
 import com.flowiee.pms.shared.exception.AppException;
@@ -141,9 +141,9 @@ public class OrderController extends BaseController {
 
     @PostMapping("/{orderId}/returns")
     @PreAuthorize("@vldModuleSales.updateOrder(true)")
-    public AppResponse<String> returnOrder(@PathVariable("orderId") Long pOrderId, @RequestBody OrderReturnReq pRequest) {
+    public AppResponse<String> returnOrder(@PathVariable("orderId") Long pOrderId, @RequestBody ChangeOrderStatusReq pRequest) {
         try {
-            mvOrderService.doReturn(pRequest);
+            mvOrderService.changeStatus(pOrderId, pRequest);
             return AppResponse.success("Successfully!");
         } catch (Exception e) {
             throw new RuntimeException(e);

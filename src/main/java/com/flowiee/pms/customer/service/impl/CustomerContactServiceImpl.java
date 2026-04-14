@@ -70,7 +70,7 @@ public class CustomerContactServiceImpl extends BaseService<CustomerContact, Cus
     }
 
     @Override
-    public String delete(Long contactId) {
+    public boolean delete(Long contactId) {
         CustomerContact customerContact = this.findEntById(contactId, true);
         if (customerContact.isUsed()) {
             throw new DataInUseException("This contact has been used!");
@@ -81,7 +81,7 @@ public class CustomerContactServiceImpl extends BaseService<CustomerContact, Cus
         String customerName = customerContact.getCustomer().getCustomerName();
         mvSystemLogService.writeLogDelete(MODULE.SALES, ACTION.PRO_CUS_D, MasterObject.CustomerContact, "Xóa %s của khách hàng %s".formatted(contactCode, customerName), customerContact.getValue());
 
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Override

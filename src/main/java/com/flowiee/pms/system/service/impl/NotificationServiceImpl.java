@@ -64,7 +64,7 @@ public class NotificationServiceImpl extends BaseService<Notification, Notificat
     }
 
     @Override
-    public String delete(Long pNotifyId) {
+    public boolean delete(Long pNotifyId) {
         return super.delete(pNotifyId);
     }
 }

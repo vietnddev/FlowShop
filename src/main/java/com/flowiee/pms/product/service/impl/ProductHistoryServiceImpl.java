@@ -55,7 +55,7 @@ public class ProductHistoryServiceImpl extends BaseService<ProductHistory, Produ
     }
 
     @Override
-    public String delete(Long productHistoryId) {
+    public boolean delete(Long productHistoryId) {
         return super.delete(productHistoryId);
     }
 

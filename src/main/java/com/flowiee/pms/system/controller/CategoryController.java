@@ -39,13 +39,14 @@ public class CategoryController extends BaseController {
     public AppResponse<List<Category>> findByType(@PathVariable("type") String categoryType,
                                                   @RequestParam(name = "parentId", required = false) Long parentId,
                                                   @RequestParam(name = "pageSize", required = false) Integer pageSize,
-                                                  @RequestParam(name = "pageNum", required = false) Integer pageNum) {
+                                                  @RequestParam(name = "pageNum", required = false) Integer pageNum,
+                                                  @RequestParam(value = "searchText", required = false) String searchText) {
         try {
             if (Objects.isNull(pageSize) || Objects.isNull(pageNum)) {
                 pageSize = -1;
                 pageNum = -1;
             }
-            Page<Category> categories = mvCategoryService.findSubCategory(CommonUtils.getCategoryEnum(categoryType), parentId, null, pageSize, pageNum - 1);
+            Page<Category> categories = mvCategoryService.findSubCategory(CommonUtils.getCategoryEnum(categoryType), parentId, null, pageSize, pageNum - 1, searchText);
             return AppResponse.paged(categories);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "category"), ex);
@@ -56,12 +57,8 @@ public class CategoryController extends BaseController {
     @PostMapping("/create")
     @PreAuthorize("@vldModuleCategory.insertCategory(true)")
     public AppResponse<CategoryDTO> createCategory(@RequestBody CategoryDTO category) {
-        try {
-            category.setType(CommonUtils.getCategoryType(category.getType()));
-            return AppResponse.success(mvCategoryService.save(category));
-        } catch (RuntimeException ex) {
-            throw new AppException(String.format(ErrorCode.CREATE_ERROR_OCCURRED.getDescription(), "category"), ex);
-        }
+        category.setType(CommonUtils.getCategoryType(category.getType()));
+        return AppResponse.success(mvCategoryService.create(category));
     }
 
     @Operation(summary = "Update category")
@@ -83,6 +80,6 @@ public class CategoryController extends BaseController {
     @DeleteMapping("/delete/{categoryId}")
     @PreAuthorize("@vldModuleCategory.deleteCategory(true)")
     public AppResponse<String> deleteCategory(@PathVariable("categoryId") Long categoryId) {
-        return AppResponse.success(mvCategoryService.delete(categoryId));
+        return AppResponse.success("Success: " + mvCategoryService.delete(categoryId));
     }
 }

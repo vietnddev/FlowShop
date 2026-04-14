@@ -102,7 +102,7 @@ public class Order extends BaseEntity implements Serializable {
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "sales")
-	Account nhanVienBanHang;
+	Account seller;
 
 	@JsonIgnore
 	@ManyToOne
@@ -134,7 +134,7 @@ public class Order extends BaseEntity implements Serializable {
 	LocalDateTime cancellationDate;
 
 	@Column(name = "cancellation_reason")
-	Long cancellationReason;
+	String cancellationReason;
 
 	@Column(name = "successful_delivery_time")
 	LocalDateTime deliverySuccessTime;
@@ -161,7 +161,7 @@ public class Order extends BaseEntity implements Serializable {
 	PriorityLevel priorityLevel;
 
 	@Column(name = "refund_amount")
-	String refundAmount;
+	BigDecimal refundAmount;
 
 	@Column(name = "refund_status")
 	String refundStatus;
@@ -217,7 +217,7 @@ public class Order extends BaseEntity implements Serializable {
 				+ ", receiverEmail=" + receiverEmail + ", receiverAddress=" + receiverAddress + ", customer=" + customer
 				+ ", ghiChu=" + note + ", orderTime=" + orderTime
 				+ ", couponCode=" + couponCode + ", amountDiscount=" + amountDiscount
-				+ ", nhanVienBanHang=" + nhanVienBanHang
+				+ ", nhanVienBanHang=" + seller
 				+ ", salesChannel=" + salesChannel + ", orderStatus=" + orderStatus + "]";
 	}
 }

@@ -59,7 +59,7 @@ public class BranchController extends BaseController {
     @PreAuthorize("@vldModuleSystem.deleteBranch(true)")
     public AppResponse<String> deleteBranch(@PathVariable("id") Long branchId) {
         try {
-            return AppResponse.success(branchService.delete(branchId));
+            return AppResponse.success("Success: " + branchService.delete(branchId));
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.DELETE_ERROR_OCCURRED.getDescription(), "branch"), ex);
         }

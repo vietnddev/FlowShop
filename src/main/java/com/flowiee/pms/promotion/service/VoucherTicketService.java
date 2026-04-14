@@ -19,4 +19,6 @@ public interface VoucherTicketService extends ICurdService<VoucherTicketDTO> {
     VoucherTicket findTicketByCode(String code);
 
     String checkTicketToUse(String code);
+
+    void markCouponAsUsed(String pCouponCode, Long pCustomerId);
 }

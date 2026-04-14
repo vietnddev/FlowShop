@@ -1,14 +1,10 @@
 package com.flowiee.pms.product.service.impl;
 
-import com.flowiee.pms.shared.request.BaseParameter;
-import com.flowiee.pms.product.dto.ProductHistoryDTO;
 import com.flowiee.pms.product.entity.*;
 import com.flowiee.pms.product.repository.ProductHistoryRepository;
-import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.product.repository.ProductPriceHistoryRepository;
 import com.flowiee.pms.product.service.ProductHistoryService;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
@@ -18,51 +14,15 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ProductHistoryServiceImpl extends BaseService<ProductHistory, ProductHistoryDTO, ProductHistoryRepository> implements ProductHistoryService {
+@RequiredArgsConstructor
+public class ProductHistoryServiceImpl implements ProductHistoryService {
     private final ProductPriceHistoryRepository mvProductPriceHistoryRepository;
-
-    public ProductHistoryServiceImpl(ProductHistoryRepository pProductHistoryRepository, ProductPriceHistoryRepository pProductPriceHistoryRepository) {
-        super(ProductHistory.class, ProductHistoryDTO.class, pProductHistoryRepository);
-        this.mvProductPriceHistoryRepository= pProductPriceHistoryRepository;
-    }
-
-    @Override
-    public List<ProductHistoryDTO>find(BaseParameter pParam) {
-        return super.convertDTOs(mvEntityRepository.findAll());
-    }
-
-    @Override
-    public ProductHistoryDTO findById(Long productHistoryId, boolean pThrowException) {
-        return super.findDtoById(productHistoryId, pThrowException);
-    }
-
-    @Override
-    public ProductHistoryDTO save(ProductHistoryDTO pDto) {
-        return ProductHistoryDTO.toDto(mvEntityRepository.save(ProductHistory.builder()
-                .product(new Product(pDto.getProduct().getId()))
-                .productDetail(new ProductDetail(pDto.getProductDetail().getId()))
-                .title(pDto.getTitle())
-                .field(pDto.getField())
-                .oldValue(pDto.getOldValue())
-                .newValue(pDto.getNewValue())
-                .build()));
-    }
-
-    @Override
-    public ProductHistoryDTO update(ProductHistoryDTO pProductHistory, Long pProductHistoryId) {
-        return super.update(pProductHistory, pProductHistoryId);
-    }
-
-    @Override
-    public String delete(Long productHistoryId) {
-        return super.delete(productHistoryId);
-    }
+    private final ProductHistoryRepository mvProductHistoryRepository;
 
     @Override
     public List<ProductHistory> findByProduct(Long productId) {
         List<ProductHistory> histories = new ArrayList<>();
-        histories.addAll(mvEntityRepository.findByProductId(productId));
+        histories.addAll(mvProductHistoryRepository.findByProductId(productId));
         histories.addAll(mvProductPriceHistoryRepository.findByProductId(productId)
                         .stream()
                         .map(this::mapToProductHistory)
@@ -74,11 +34,12 @@ public class ProductHistoryServiceImpl extends BaseService<ProductHistory, Produ
 
     private ProductHistory mapToProductHistory(ProductPriceHistory pph) {
         ProductPrice price = pph.getProductPrice();
+        ProductDetail productVariant = price.getProductVariant();
 
         ProductHistory history = new ProductHistory();
         history.setProductVariantId(price.getProductVariant().getId());
-        history.setTitle(price.getPriceType().getDescription());
-        history.setField(price.getPriceType().name());
+        history.setTitle(String.format("%s (%s) was changed price", productVariant.getVariantName(), productVariant.getVariantCode()));
+        history.setField(String.format("%s (%s)", price.getPriceType().name(), price.getPriceType().getDescription()));
         history.setOldValue(pph.getOldPrice().toPlainString());
         history.setNewValue(pph.getNewPrice().toPlainString());
         history.setCreatedBy(pph.getChangedBy() != null ? pph.getChangedBy().getId() : -1);
@@ -103,7 +64,7 @@ public class ProductHistoryServiceImpl extends BaseService<ProductHistory, Produ
                     .oldValue("null".equals(oldValue) || ObjectUtils.isEmpty(oldValue) ? "-" : oldValue)
                     .newValue("null".equals(newValue) || ObjectUtils.isEmpty(newValue) ? "-" : newValue)
                     .build();
-            logSaved.add(mvEntityRepository.save(productHistory));
+            logSaved.add(mvProductHistoryRepository.save(productHistory));
         }
         return logSaved;
     }

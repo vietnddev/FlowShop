@@ -70,7 +70,7 @@ public class ConfigServiceImpl implements ConfigService {
         changeLog.setNewObject(lvConfigUpdated);
         changeLog.doAudit();
 
-        mvSystemLogService.writeLogUpdate(MODULE.SYSTEM, ACTION.SYS_CNF_U, MasterObject.SystemConfig, "Cập nhật cấu hình hệ thống", changeLog);
+        mvSystemLogService.writeLogUpdate(ACTION.SYS_CNF_U, MasterObject.SystemConfig, "Cập nhật cấu hình hệ thống", changeLog);
         log.info("Update config success! {}", lvConfigUpdated.getName());
 
         return mvModelMapper.map(lvConfigUpdated, SystemConfigDTO.class);
@@ -125,7 +125,7 @@ public class ConfigServiceImpl implements ConfigService {
             mvLanguageService.reloadMessage("en");
 
             if (StartUp.START_APP_TIME != null) {
-                mvSystemLogService.writeLog(MODULE.SYSTEM, ACTION.SYS_REFRESH_APP, MasterObject.Master, LogType.U, "Refresh application", SystemLog.EMPTY, SystemLog.EMPTY);
+                mvSystemLogService.writeLog(ACTION.SYS_REFRESH_APP, MasterObject.Master, LogType.U, "Refresh application", SystemLog.EMPTY, SystemLog.EMPTY);
             }
 
             int i = 1;

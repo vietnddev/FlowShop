@@ -25,7 +25,7 @@ public interface RoleService {
 
     boolean isAuthorized(long accountId, String module, String action);
 
-    String deleteAllRole(Long groupId, Long accountId);
+    boolean deleteAllRole(Long groupId, Long accountId);
 
     List<RoleModel> updateRightsOfGroup(List<RoleModel> rights, Long groupId);
 

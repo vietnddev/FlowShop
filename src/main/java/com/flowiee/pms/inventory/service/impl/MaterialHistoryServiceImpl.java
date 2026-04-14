@@ -49,7 +49,7 @@ public class MaterialHistoryServiceImpl extends BaseService<MaterialHistory, Mat
     }
 
     @Override
-    public String delete(Long pEntityId) {
+    public boolean delete(Long pEntityId) {
         if (pEntityId == null || pEntityId <= 0) {
             throw new BadRequestException();
         }

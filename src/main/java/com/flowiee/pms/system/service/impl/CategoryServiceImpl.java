@@ -6,6 +6,7 @@ import com.flowiee.pms.shared.exception.AppException;
 import com.flowiee.pms.shared.exception.BadRequestException;
 import com.flowiee.pms.shared.exception.DataInUseException;
 import com.flowiee.pms.shared.exception.EntityNotFoundException;
+import com.flowiee.pms.shared.util.CoreUtils;
 import com.flowiee.pms.system.enums.CATEGORY;
 import com.flowiee.pms.system.enums.CategoryStatus;
 import com.flowiee.pms.system.service.CategoryHistoryService;
@@ -16,10 +17,9 @@ import com.flowiee.pms.shared.util.ChangeLog;
 import com.flowiee.pms.system.repository.CategoryRepository;
 
 import com.flowiee.pms.system.service.SystemLogService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,10 +28,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, CategoryRepository> implements CategoryService {
-    private final Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
-
     private final CategoryRepository mvCategoryRepository;
     private final CategoryHistoryService mvCategoryHistoryService;
     private final SystemLogService mvSystemLogService;
@@ -57,13 +56,29 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
 
     @Transactional
     @Override
-    public CategoryDTO save(CategoryDTO pDto) {
+    public CategoryDTO create(CategoryDTO pDto) {
         if (pDto == null) {
             throw new BadRequestException();
         }
-        CategoryDTO categorySaved = super.save(pDto);
-        mvSystemLogService.writeLogCreate(MODULE.CATEGORY, ACTION.CTG_I, MasterObject.Category, "Thêm mới danh mục " + categorySaved.getType(), categorySaved.getName());
-        return categorySaved;
+
+        CategoryDTO lvDto = pDto;
+        String lvType = CoreUtils.trim(lvDto.getType());
+        String lvCode = CoreUtils.trim(lvDto.getCode());
+
+        if (CoreUtils.isNullStr(lvCode)) {
+            if (CATEGORY.PRODUCT_TYPE.getName().equals(lvType)) {
+                throw new BadRequestException("Category code can not be empty!");
+            }
+        } else {
+            if (mvCategoryRepository.existsByTypeAndCode(lvType, lvCode)) {
+                throw new BadRequestException("Category code already exists!");
+            }
+        }
+
+        CategoryDTO lvSavedCategory = super.save(lvDto);
+        mvSystemLogService.writeLogCreate(ACTION.CTG_I, MasterObject.Category, "Thêm mới danh mục " + lvSavedCategory.getType(), lvSavedCategory.getName());
+
+        return lvSavedCategory;
     }
 
     @Transactional
@@ -87,15 +102,15 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
         String logTitle = "Cập nhật thông tin danh mục " + categorySaved.getType() + ": " + categorySaved.getName();
         mvCategoryHistoryService.save(changeLog.getLogChanges(), logTitle, categoryId);
 
-        mvSystemLogService.writeLogUpdate(MODULE.CATEGORY, ACTION.CTG_U, MasterObject.Category, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
-        LOG.info("Update Category success! {}", categorySaved);
+        mvSystemLogService.writeLogUpdate(ACTION.CTG_U, MasterObject.Category, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
+        log.info("Update Category success! {}", categorySaved);
 
         return mvModelMapper.map(categorySaved, CategoryDTO.class);
     }
 
     @Transactional
     @Override
-    public String delete(Long categoryId) {
+    public boolean delete(Long categoryId) {
         Category lvCurrentCategory = this.findEntById(categoryId, true);
 
         if (categoryInUse(categoryId)) {
@@ -104,9 +119,9 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
 
         mvEntityRepository.deleteById(categoryId);
 
-        mvSystemLogService.writeLogDelete(MODULE.CATEGORY, ACTION.CTG_D, MasterObject.Category, "Xóa danh mục " + lvCurrentCategory.getType(), lvCurrentCategory.getName());
+        mvSystemLogService.writeLogDelete(ACTION.CTG_D, MasterObject.Category, "Xóa danh mục " + lvCurrentCategory.getType(), lvCurrentCategory.getName());
 
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Override
@@ -129,9 +144,9 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
     }
 
     @Override
-    public Page<Category> findSubCategory(CATEGORY categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum) {
+    public Page<Category> findSubCategory(CATEGORY categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum, String searchTxt) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("createdAt").descending());
-        Page<Category> categoryPage = mvCategoryRepository.findSubCategory(categoryType.name(), parentId, ignoreIds, pageable);
+        Page<Category> categoryPage = mvCategoryRepository.findSubCategory(searchTxt, categoryType.name(), parentId, ignoreIds, pageable);
         for (Category c : categoryPage.getContent()) {
             String statusName = CategoryStatus.I.getLabel();
             if (c.getStatus()) {
@@ -145,13 +160,8 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
     }
 
     @Override
-    public List<Category> findByIds(List<Long> pIds) {
-        return super.findByIds(pIds);
-    }
-
-    @Override
     public List<Category> findByType(CATEGORY pType) {
-        return findSubCategory(pType, null, null, -1, -1).getContent();
+        return findSubCategory(pType, null, null, -1, -1, null).getContent();
     }
 
     @Override

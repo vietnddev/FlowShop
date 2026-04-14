@@ -17,12 +17,14 @@ public interface CategoryRepository extends BaseRepository<Category, Long> {
 
     @Query("from Category c " +
            "where 1=1 " +
+           "and (:searchTxt is null or c.code is :searchTxt or c.name like %:searchTxt%) " +
            "and c.type=:type " +
            "and (c.code is null or c.code <> 'ROOT') " +
            "and (:parentId is null or c.parentId=:parentId) " +
            "and (coalesce(:ignoreId) is null or c.id not in (:ignoreId))" +
            "order by c.sort")
-    Page<Category> findSubCategory(@Param("type") String type,
+    Page<Category> findSubCategory(@Param("searchTxt") String searchTxt,
+                                   @Param("type") String type,
                                    @Param("parentId") Long parentId,
                                    @Param("ignoreId") List<Long> ignoreId,
                                    Pageable pageable);
@@ -54,6 +56,8 @@ public interface CategoryRepository extends BaseRepository<Category, Long> {
            "from Category c " +
            "where c.code = 'ROOT'")
     List<Object[]> totalRecordsOfEachType();
+
+    boolean existsByTypeAndCode(String type, String code);
 
     @Query("from Category c where c.type = :type and c.code = :code")
     Category findByTypeAndCode(@Param("type") String type, @Param("code") String code);

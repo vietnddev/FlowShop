@@ -1,11 +1,12 @@
 package com.flowiee.pms.system.service;
 
+import com.flowiee.pms.shared.base.DeleteService;
 import com.flowiee.pms.system.dto.AccountDTO;
 import com.flowiee.pms.system.entity.Account;
 
 import java.util.List;
 
-public interface AccountService {
+public interface AccountService extends DeleteService {
     Account findByUsername(String username);
 
     List<AccountDTO> find();
@@ -19,8 +20,6 @@ public interface AccountService {
     Account update(Account pAccount, Long pAccountId);
 
     Account updateProfile(Account pAccount);
-
-    String delete(Long pAccountId);
 
     AccountDTO getMyProfile();
 

@@ -31,21 +31,17 @@ import com.flowiee.pms.system.enums.ConfigCode;
 import com.flowiee.pms.system.service.CategoryService;
 import com.flowiee.pms.system.service.SendOperatorNotificationService;
 import com.flowiee.pms.system.service.SystemLogService;
-import com.flowiee.pms.cart.entity.Items;
-import com.flowiee.pms.cart.entity.OrderCart;
 import com.flowiee.pms.media.entity.FileStorage;
 import com.flowiee.pms.product.model.ProductVariantSearchRequest;
-import com.flowiee.pms.cart.repository.OrderCartRepository;
 import com.flowiee.pms.shared.base.GenerateBarcodeService;
-import com.flowiee.pms.cart.service.CartService;
 import com.flowiee.pms.product.repository.ProductDetailRepository;
 import com.flowiee.pms.product.repository.ProductDetailTempRepository;
 import com.flowiee.pms.product.mapper.ProductVariantConvert;
 import com.google.zxing.WriterException;
 import javax.persistence.EntityGraph;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -63,6 +59,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 public class ProductVariantServiceImpl extends BaseService<ProductDetail, ProductVariantDTO, ProductDetailRepository> implements ProductVariantService {
     private final SendOperatorNotificationService mvSendOperatorNotificationService;
@@ -73,23 +70,19 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     private final ProductHistoryService mvProductHistoryService;
     private final ProductPriceService mvProductPriceService;
     private final ProductImageService mvProductImageService;
-    private final ProductService mvProductService;
-    private final OrderCartRepository mvCartRepository;
     private final SystemLogService mvSystemLogService;
     private final CategoryService mvCategoryService;
     private final StorageService mvStorageService;
-    private final CartService mvCartService;
-
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private final ProductService mvProductService;
     private final ProductService productService;
 
     public ProductVariantServiceImpl(ProductDetailRepository pEntityRepository, ProductDetailTempRepository pProductVariantTempRepository,
                                      ProductGenerateQRCodeService pProductGenerateQRCodeService, ProductHistoryService pProductHistoryService,
                                      TransactionGoodsService pTransactionGoodsService, CategoryService pCategoryService,
-                                     StorageService pStorageService, OrderCartRepository pCartRepository,
-                                     GenerateBarcodeService pGenerateBarcodeService, @Lazy ProductPriceService pProductPriceService,
-                                     SystemLogService pSystemLogService, SendOperatorNotificationService pSendOperatorNotificationService,
-                                     @Lazy ProductService pProductService, @Lazy CartService pCartService, @Lazy ProductImageService pProductImageService, ProductService productService) {
+                                     StorageService pStorageService, GenerateBarcodeService pGenerateBarcodeService,
+                                     @Lazy ProductPriceService pProductPriceService, SystemLogService pSystemLogService,
+                                     SendOperatorNotificationService pSendOperatorNotificationService, @Lazy ProductService pProductService,
+                                     @Lazy ProductImageService pProductImageService, ProductService productService) {
         super(ProductDetail.class, ProductVariantDTO.class, pEntityRepository);
         this.mvSendOperatorNotificationService = pSendOperatorNotificationService;
         this.mvProductVariantTempRepository = pProductVariantTempRepository;
@@ -99,18 +92,16 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         this.mvProductHistoryService = pProductHistoryService;
         this.mvProductImageService = pProductImageService;
         this.mvProductPriceService = pProductPriceService;
-        this.mvProductService = pProductService;
         this.mvSystemLogService = pSystemLogService;
         this.mvCategoryService = pCategoryService;
         this.mvStorageService = pStorageService;
-        this.mvCartRepository = pCartRepository;
-        this.mvCartService = pCartService;
+        this.mvProductService = pProductService;
         this.productService = productService;
     }
 
     @Override
     public List<ProductVariantDTO>find(BaseParameter pParam) {
-        return this.findAll(ProductVariantSearchRequest.builder().checkInAnyCart(false).build()).getContent();
+        return this.findAll(ProductVariantSearchRequest.builder().build()).getContent();
     }
 
     @Override
@@ -127,19 +118,14 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
         List<Long> lvProductVariantIds = lvProductVariants.stream().map(ProductDetail::getId).toList();
 
         Map<Long, FileStorage> lvImageActiveList = mvProductImageService.getImageActiveOfProductVariants(lvProductVariantIds);
+        Map<Long, ProductPriceDTO> lvPriceMap = mvProductPriceService.getPrices(lvProductVariantIds);
 
-        OrderCart currentCart = Boolean.TRUE.equals(pRequest.getCheckInAnyCart()) ? getCurrentCart() : null;
-        List<Items> lvCartItems = currentCart != null ? mvCartService.getItems(currentCart.getId(), lvProductVariantIds) : List.of();
-        List<Long> lvCartItemIds = lvCartItems.isEmpty() ? List.of() : lvCartItems.stream().map(a -> a.getProductDetail().getId()).toList();
+        lvProductVariantDTOs.forEach(dto -> {
+            dto.setPrice(lvPriceMap.getOrDefault(dto.getId(), new ProductPriceDTO()));
 
-        for (ProductVariantDTO lvDto : lvProductVariantDTOs) {
-            ProductPriceDTO lvPrice = mvProductPriceService.getPrice(lvDto.getId());
-            lvDto.setPrice(lvPrice);
-
-            String lvImageUrl = FileUtils.getImageUrl(lvImageActiveList.get(lvDto.getId()), true);
-            lvDto.setImageSrc(lvImageUrl != null ? lvImageUrl : EndPoint.URL_MEDIA_DEFAULT_PRODUCT.getValue());
-            lvDto.setCurrentInCart(lvCartItemIds.contains(lvDto.getId()));
-        }
+            String lvImageUrl = FileUtils.getImageUrl(lvImageActiveList.get(dto.getId()), true);
+            dto.setImageSrc(lvImageUrl != null ? lvImageUrl : EndPoint.URL_MEDIA_DEFAULT_PRODUCT.getValue());
+        });
 
         return new PageImpl<>(lvProductVariantDTOs, lvPageable, lvTotalRecords);
     }
@@ -184,14 +170,6 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
                 .getResultList();
     }
 
-    private OrderCart getCurrentCart() {
-        List<OrderCart> cartList = mvCartRepository.findByAccountId(SecurityUtils.getCurrentUser().getId());
-        if (ObjectUtils.isNotEmpty(cartList)) {
-            return cartList.get(0);
-        }
-        return null;
-    }
-
     @Override
     public ProductVariantDTO findById(Long pProductVariantId, boolean pThrowException) {
         ProductDetail lvEntity = super.findEntById(pProductVariantId, pThrowException);
@@ -205,7 +183,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             }
         }
 
-        lvDto.setPrice(mvProductPriceService.getPrice(pProductVariantId));
+        lvDto.setPrice(mvProductPriceService.getPrices(pProductVariantId));
 
         return lvDto;
     }
@@ -253,20 +231,22 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             ProductDetail lvVariantEntity = buildEntity(pDto);
             ProductDetail lvProductVariantSaved = mvEntityRepository.save(lvVariantEntity);
 
-            mvProductPriceService.save(lvProductVariantSaved, pDto.getPrice());
+            ProductPriceDTO lvProductPriceDTO = pDto.getPrice();
+            lvProductPriceDTO.setProductVariantId(lvProductVariantSaved.getId());
+            mvProductPriceService.create(lvProductPriceDTO);
 
             //Make it async in next version
             try {
                 mvProductGenerateQRCodeService.generateProductVariantQRCode(lvProductVariantSaved.getId());
             } catch (IOException | WriterException e ) {
-                LOG.error(String.format("Can't generate QR Code for Product %s", lvProductVariantSaved.getVariantCode()), e);
+                log.error(String.format("Can't generate QR Code for Product %s", lvProductVariantSaved.getVariantCode()), e);
             }
 
             //Make it async in next version
             try {
                 mvGenerateBarcodeService.generateBarcode(lvProductVariantSaved.getId());
             } catch (IOException | WriterException e ) {
-                LOG.error(String.format("Can't generate Barcode for Product %s", lvProductVariantSaved.getVariantCode()), e);
+                log.error(String.format("Can't generate Barcode for Product %s", lvProductVariantSaved.getVariantCode()), e);
             }
 
             if (pDto.getStorageIdInitStorageQty() != null) {
@@ -279,8 +259,8 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
                 }
             }
 
-            mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Thêm mới biến thể sản phẩm", lvProductVariantSaved.toStringInsert());
-            LOG.info("Insert productVariant success! {}", lvProductVariantSaved);
+            mvSystemLogService.writeLogCreate(ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Thêm mới biến thể sản phẩm", lvProductVariantSaved.toStringInsert());
+            log.info("Insert productVariant success! {}", lvProductVariantSaved);
 
             return ProductVariantConvert.toDto(lvProductVariantSaved);
         } catch (RuntimeException ex) {
@@ -374,13 +354,13 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             changeLog.setNewObject(lvProductVariantUpdated);
             changeLog.doAudit();
 
-            mvProductPriceService.updatePrice(lvProductVariantUpdated, pDto.getPrice());
+            mvProductPriceService.updatePrice(lvProductVariantUpdated.getId(), pDto.getPrice());
 
             //Log
             String logTitle = "Cập nhật thông tin sản phẩm: " + lvProductVariantUpdated.getVariantName();
             mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, lvProductVariantUpdated.getProduct().getId(), lvProductVariantUpdated.getId(), null);
-            mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
-            LOG.info("Update productVariant success! {}", lvProductVariantUpdated);
+            mvSystemLogService.writeLogUpdate(ACTION.PRO_PRD_U, MasterObject.ProductVariant, logTitle, changeLog.getOldValues(), changeLog.getNewValues());
+            log.info("Update productVariant success! {}", lvProductVariantUpdated);
 
             return ProductVariantConvert.toDto(lvProductVariantUpdated);
         } catch (Exception e) {
@@ -390,7 +370,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
 
     @Transactional
     @Override
-    public String delete(Long productVariantId) {
+    public boolean delete(Long productVariantId) {
         ProductDetail productDetailToDelete = super.findEntById(productVariantId, true);
 
         //Validate here...
@@ -406,10 +386,10 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             throw new AppException("Database error", ex);
         }
 
-        mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Xóa biến thể sản phẩm", productDetailToDelete.getVariantName());
-        LOG.info("Delete productVariant success! {}", productDetailToDelete);
+        mvSystemLogService.writeLogDelete(ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Xóa biến thể sản phẩm", productDetailToDelete.getVariantName());
+        log.info("Delete productVariant success! {}", productDetailToDelete);
 
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Override
@@ -538,7 +518,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
                     mvEntityRepository.save(productDetailUpdated);
                 }
             }
-            mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Cập nhật số lượng sản phẩm", "productVariantId = " + pProductVariantId);
+            mvSystemLogService.writeLogUpdate(ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Cập nhật số lượng sản phẩm", "productVariantId = " + pProductVariantId);
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "product quantity"), ex);
         }

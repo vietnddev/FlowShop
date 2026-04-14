@@ -94,7 +94,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         mvLedgerReceiptService.create(lvLedgerTransactionDTO);
         logger.info("End generate receipt issued when completed an order");
 
-        systemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_ORD_U, MasterObject.Order, "Cập nhật trạng thái thanh toán đơn hàng", "Số tiền: " + CommonUtils.formatToVND(paymentAmount));
+        systemLogService.writeLogUpdate(ACTION.PRO_ORD_U, MasterObject.Order, "Cập nhật trạng thái thanh toán đơn hàng", "Số tiền: " + CommonUtils.formatToVND(paymentAmount));
 
         return MessageCode.UPDATE_SUCCESS.getDescription();
     }

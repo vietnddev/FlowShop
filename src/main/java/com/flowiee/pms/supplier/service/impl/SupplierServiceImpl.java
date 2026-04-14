@@ -9,7 +9,6 @@ import com.flowiee.pms.supplier.repository.SupplierRepository;
 import com.flowiee.pms.shared.base.BaseService;
 
 import com.flowiee.pms.shared.enums.ACTION;
-import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.shared.enums.MasterObject;
 import com.flowiee.pms.supplier.service.SupplierService;
 import com.flowiee.pms.system.service.SystemLogService;
@@ -70,13 +69,13 @@ public class SupplierServiceImpl extends BaseService<Supplier, SupplierDTO, Supp
         changeLog.setNewObject(lvSupplierUpdated);
         changeLog.doAudit();
 
-        mvSystemLogService.writeLogUpdate(MODULE.SALES, ACTION.PRO_SUP_U, MasterObject.Supplier, "Cập nhật thông tin nhà cung cấp: " + lvSupplierUpdated.getName(), changeLog);
+        mvSystemLogService.writeLogUpdate(ACTION.PRO_SUP_U, MasterObject.Supplier, "Cập nhật thông tin nhà cung cấp: " + lvSupplierUpdated.getName(), changeLog);
 
         return super.convertDTO(lvSupplierUpdated);
     }
 
     @Override
-    public String delete(Long pEntityId) {
+    public boolean delete(Long pEntityId) {
         if (pEntityId == null || pEntityId <= 0) {
             throw new BadRequestException();
         }

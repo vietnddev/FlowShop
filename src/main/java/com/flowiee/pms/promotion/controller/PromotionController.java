@@ -65,6 +65,6 @@ public class PromotionController extends BaseController {
     @DeleteMapping("/delete/{promotionId}")
     @PreAuthorize("@vldModuleSales.deletePromotion(true)")
     public AppResponse<String> deletePromotion(@PathVariable("promotionId") Long promotionId) {
-        return AppResponse.success(mvPromotionService.delete(promotionId));
+        return AppResponse.success("Success: " + mvPromotionService.delete(promotionId));
     }
 }

@@ -92,7 +92,7 @@ public class ProductComboServiceImpl extends BaseService<ProductCombo, ProductCo
                 }
             }
         }
-        mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_CBO_C, MasterObject.ProductCombo, "Thêm mới combo sản phẩm", comboSaved.getComboName());
+        mvSystemLogService.writeLogCreate(ACTION.PRO_CBO_C, MasterObject.ProductCombo, "Thêm mới combo sản phẩm", comboSaved.getComboName());
         return comboSaved;
     }
 
@@ -108,16 +108,16 @@ public class ProductComboServiceImpl extends BaseService<ProductCombo, ProductCo
         changeLog.setNewObject(comboUpdated);
         changeLog.doAudit();
 
-        mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_CBO_C, MasterObject.ProductCombo, "Cập nhật combo sản phẩm", changeLog);
+        mvSystemLogService.writeLogUpdate(ACTION.PRO_CBO_C, MasterObject.ProductCombo, "Cập nhật combo sản phẩm", changeLog);
 
         return convertDTO(comboUpdated);
     }
 
     @Override
-    public String delete(Long pComboId) {
+    public boolean delete(Long pComboId) {
         super.delete(pComboId);
-        mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_CBO_C, MasterObject.ProductCombo, "Cập nhật combo sản phẩm", "id: " + pComboId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        mvSystemLogService.writeLogDelete(ACTION.PRO_CBO_C, MasterObject.ProductCombo, "Cập nhật combo sản phẩm", "id: " + pComboId);
+        return true;
     }
 
     private void setProductIncludes(List<ProductCombo> productComboPage) {

@@ -5,12 +5,10 @@ import com.flowiee.pms.product.entity.Product;
 import com.flowiee.pms.product.entity.ProductAttribute;
 import com.flowiee.pms.shared.util.ChangeLog;
 import com.flowiee.pms.shared.enums.ACTION;
-import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.product.dto.ProductAttributeDTO;
 import com.flowiee.pms.product.repository.ProductAttributeRepository;
 import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.shared.enums.MasterObject;
-import com.flowiee.pms.shared.enums.MessageCode;
 import com.flowiee.pms.product.service.ProductAttributeService;
 import com.flowiee.pms.product.service.ProductHistoryService;
 import com.flowiee.pms.system.service.SystemLogService;
@@ -64,7 +62,7 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
 
         ProductAttribute lvAttributeCreated = mvEntityRepository.save(lvAttribute);
 
-        mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Thêm mới thuộc tính sản phẩm", lvAttributeCreated.getAttributeName());
+        mvSystemLogService.writeLogCreate(ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Thêm mới thuộc tính sản phẩm", lvAttributeCreated.getAttributeName());
 
         return convertDTO(lvAttribute);
     }
@@ -91,13 +89,8 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
         List<ProductAttribute> savedEntities = mvEntityRepository.saveAll(entities);
 
         savedEntities.forEach(attr ->
-                mvSystemLogService.writeLogCreate(
-                        MODULE.PRODUCT,
-                        ACTION.PRO_PRD_U,
-                        MasterObject.ProductAttribute,
-                        "Thêm mới thuộc tính sản phẩm",
-                        attr.getAttributeName()
-                )
+                mvSystemLogService.writeLogCreate(ACTION.PRO_PRD_U, MasterObject.ProductAttribute,
+                        "Thêm mới thuộc tính sản phẩm", attr.getAttributeName())
         );
 
         return convertDTOs(savedEntities);
@@ -120,15 +113,15 @@ public class ProductAttributeServiceImpl extends BaseService<ProductAttribute, P
         String logTitle = "Cập nhật thuộc tính sản phẩm";
 
         mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, lvAttributeUpdated.getProduct().getId(), lvAttributeUpdated.getProduct().getId(), lvAttributeUpdated.getId());
-        mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Cập nhật thuộc tính sản phẩm", changeLog);
+        mvSystemLogService.writeLogUpdate(ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Cập nhật thuộc tính sản phẩm", changeLog);
 
         return convertDTO(lvAttributeUpdated);
     }
 
     @Override
-    public String delete(Long pAttributeId) {
+    public boolean delete(Long pAttributeId) {
         super.delete(pAttributeId);
-        mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Xóa thuộc tính sản phẩm", "id: " + pAttributeId);
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        mvSystemLogService.writeLogDelete(ACTION.PRO_PRD_U, MasterObject.ProductAttribute, "Xóa thuộc tính sản phẩm", "id: " + pAttributeId);
+        return true;
     }
 }

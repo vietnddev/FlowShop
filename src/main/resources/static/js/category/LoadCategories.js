@@ -1,6 +1,10 @@
 function loadCategories(pageSize, pageNum) {
     let apiURL = mvHostURLCallApi + "/category/" + mvType;
-    let params = {pageSize: pageSize, pageNum: pageNum}
+    let params = {
+        pageSize: pageSize,
+        pageNum: pageNum,
+        searchText: $("#txtFilter").val()
+    }
     $.get(apiURL, params, function (response) {
         if (response.status === "OK") {
             let data = response.data;

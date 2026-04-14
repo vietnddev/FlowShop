@@ -14,11 +14,7 @@ public interface CartItemsService extends ICurdService<ItemsDTO> {
 
     Integer findQuantityOfItemProduct(Long cartId, Long productVariantId);
 
-    Integer findQuantityOfItemCombo(Long cartId, Long comboId);
-
     Items findItemByCartAndProductVariant(Long cartId, Long productVariantId);
-
-    void increaseItemQtyInCart(Long itemId, int quantity);
 
     void deleteAllItems(Long cartId);
 }

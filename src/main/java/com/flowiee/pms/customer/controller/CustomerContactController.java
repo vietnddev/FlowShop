@@ -80,7 +80,7 @@ public class CustomerContactController extends BaseController {
     @DeleteMapping("/contact/delete/{contactId}")
     @PreAuthorize("@vldModuleSales.updateCustomer(true)")
     public AppResponse<String> deleteContact(@PathVariable("contactId") Long contactId) {
-        return AppResponse.success(mvCustomerContactService.delete(contactId));
+        return AppResponse.success("Success: " + mvCustomerContactService.delete(contactId));
     }
 
     @Operation(summary = "Update contact use default")

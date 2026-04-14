@@ -6,19 +6,17 @@ import com.flowiee.pms.system.repository.SerialRepository;
 import com.flowiee.pms.system.service.SerialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class SerialServiceImpl implements SerialService {
-    SerialRepository mvSerialRepository;
+    private final SerialRepository mvSerialRepository;
 
-    @Transactional
     @Override
     public String getNextSerial(SerialCode serialCode) {
-        Serial lvSerial = mvSerialRepository.findById(serialCode);
+        Serial lvSerial = mvSerialRepository.findById(serialCode.name());
         if (lvSerial == null) {
-            throw  new RuntimeException("serial not found");
+            throw new RuntimeException("serial not found");
         }
 
         String lvPrefix = lvSerial.getPrefix();

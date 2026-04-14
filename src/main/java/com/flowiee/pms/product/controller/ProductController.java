@@ -118,7 +118,7 @@ public class ProductController extends BaseController {
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("@vldModuleProduct.deleteProduct(true)")
     public AppResponse<String> deleteProduct(@PathVariable("id") Long productId) {
-        return AppResponse.success(mvProductService.delete(productId));
+        return AppResponse.success("Success: " + mvProductService.delete(productId));
     }
 
     @Operation(summary = "Get histories of product")

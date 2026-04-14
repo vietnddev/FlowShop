@@ -15,7 +15,6 @@ import com.flowiee.pms.product.dto.ProductPriceDTO;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.product.model.ProductSearchRequest;
 import com.flowiee.pms.product.model.ProductSummaryModel;
-import com.flowiee.pms.product.repository.ProductPriceRepository;
 import com.flowiee.pms.system.dto.CategoryDTO;
 import com.flowiee.pms.system.enums.CATEGORY;
 import com.flowiee.pms.system.service.SystemLogService;
@@ -237,7 +236,7 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
                 lvReservedQty += lvVariantDto.getReservedQty();
                 lvVariantDto.setAvailableQty(lvVariantDto.getStorageQty() -  lvVariantDto.getReservedQty() - lvVariantDto.getDefectiveQty());
 
-                ProductPriceDTO lvPrice = mvProductPriceService.getPrice(lvVariantDto.getId());
+                ProductPriceDTO lvPrice = mvProductPriceService.getPrices(lvVariantDto.getId());
                 lvVariantDto.setPrice(lvPrice);
 
                 if (ProductStatus.ACT.equals(lvVariantDto.getStatus())) {
@@ -333,7 +332,7 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
                 mvProductAttributeService.saveAll(lvProductSaved.getId(), lvAttributes);
             }
 
-            mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_PRD_C, MasterObject.Product, "Thêm mới sản phẩm", lvProductSaved.getProductName());
+            mvSystemLogService.writeLogCreate(ACTION.PRO_PRD_C, MasterObject.Product, "Thêm mới sản phẩm", lvProductSaved.getProductName());
             log.info("Insert product success! {}", lvProductSaved);
             return ProductConvert.toDto(lvProductSaved);
         } catch (RuntimeException ex) {
@@ -375,7 +374,7 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
         String logTitle = "Cập nhật sản phẩm: " + productUpdated.getProductName();
 
         mvProductHistoryService.save(changeLog.getLogChanges(), logTitle, productUpdated.getId(), null, null);
-        mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_PRD_U, MasterObject.Product, logTitle, changeLog);
+        mvSystemLogService.writeLogUpdate(ACTION.PRO_PRD_U, MasterObject.Product, logTitle, changeLog);
         log.info("Update product success! productId={}", productId);
 
         return ProductConvert.toDto(productUpdated);
@@ -383,16 +382,16 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
 
     @Transactional
     @Override
-    public String delete(Long id) {
+    public boolean delete(Long id) {
         try {
             Product productToDelete = this.findEntById(id, true);
             if (productInUse(productToDelete.getId())) {
                 throw new DataInUseException(ErrorCode.ERROR_DATA_LOCKED.getDescription());
             }
             mvEntityRepository.deleteById(productToDelete.getId());
-            mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_PRD_D, MasterObject.Product, "Xóa sản phẩm", productToDelete.getProductName());
+            mvSystemLogService.writeLogDelete(ACTION.PRO_PRD_D, MasterObject.Product, "Xóa sản phẩm", productToDelete.getProductName());
             log.info("Delete product success! productId={}", id);
-            return MessageCode.DELETE_SUCCESS.getDescription();
+            return true;
         } catch (RuntimeException ex) {
             throw new AppException("Delete product fail! productId=" + id, ex);
         }
@@ -401,7 +400,6 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
     private boolean productInUse(Long productId) throws RuntimeException {//Update later
         return !mvProductVariantService.findAll(ProductVariantSearchRequest.builder()
                 .productId(productId)
-                .checkInAnyCart(false)
                 .build()
         ).getContent().isEmpty();
     }

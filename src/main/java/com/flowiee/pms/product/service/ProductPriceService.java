@@ -1,16 +1,15 @@
 package com.flowiee.pms.product.service;
 
 import com.flowiee.pms.product.dto.ProductPriceDTO;
-import com.flowiee.pms.product.entity.ProductDetail;
-import com.flowiee.pms.product.entity.ProductPrice;
-import com.flowiee.pms.shared.base.UpdateService;
+import com.flowiee.pms.shared.base.CreateService;
 
 import java.util.List;
+import java.util.Map;
 
-public interface ProductPriceService extends UpdateService<ProductPriceDTO> {
-    ProductPriceDTO getPrice(Long productVariantId);
+public interface ProductPriceService extends CreateService<ProductPriceDTO> {
+    ProductPriceDTO getPrices(Long productVariantId);
 
-    List<ProductPrice> save(ProductDetail productVariant, ProductPriceDTO pPriceDTO);
+    Map<Long, ProductPriceDTO> getPrices(List<Long> productVariantId);
 
-    ProductPriceDTO updatePrice(ProductDetail pProductVariant, ProductPriceDTO pRequestPrice);
+    ProductPriceDTO updatePrice(Long pProductVariantId, ProductPriceDTO pRequestPrice);
 }

@@ -1,5 +1,6 @@
 package com.flowiee.pms.customer.service.impl;
 
+import com.flowiee.pms.customer.entity.Customer;
 import com.flowiee.pms.customer.enums.ContactType;
 import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.shared.request.BaseParameter;
@@ -12,6 +13,7 @@ import com.flowiee.pms.customer.repository.CustomerContactRepository;
 import com.flowiee.pms.customer.repository.CustomerRepository;
 import com.flowiee.pms.customer.service.CustomerContactService;
 import com.flowiee.pms.shared.enums.*;
+import com.flowiee.pms.shared.util.CoreUtils;
 import com.flowiee.pms.system.service.SystemLogService;
 import org.springframework.stereotype.Service;
 
@@ -35,25 +37,59 @@ public class CustomerContactServiceImpl extends BaseService<CustomerContact, Cus
 
     @Override
     public CustomerContactDTO save(CustomerContactDTO pCustomerContact) {
-        if (pCustomerContact == null || pCustomerContact.getCustomer() == null) {
+        if (pCustomerContact == null) {
             throw new BadRequestException();
         }
-        if (mvCustomerRepository.findById(pCustomerContact.getCustomer().getId()).isEmpty()) {
-            throw new BadRequestException("Customer contact not found!");
-        }
+
         String lvContactType = pCustomerContact.getCode();
         String lvContactValue = pCustomerContact.getValue();
 
-        if (!ContactType.A.name().equals(pCustomerContact.getCode())) {
+        if (pCustomerContact.getCustomer() == null) {
+            throw new BadRequestException();
+        }
+
+        Long lvCustomerId = pCustomerContact.getCustomer().getId();
+        if (lvCustomerId == null) {
+            throw new BadRequestException();
+        }
+
+        if (CoreUtils.isNullStr(lvContactType) || CoreUtils.isNullStr(lvContactValue)) {
+            throw new BadRequestException();
+        }
+
+        if (ContactType.E.name().equals(lvContactType) && !CoreUtils.validateEmail(lvContactValue)) {
+            throw new BadRequestException("Email format is invalid!");
+        }
+
+        if (ContactType.P.name().equals(lvContactType) && !isValidPhoneNumber(lvContactValue)) {
+            throw new BadRequestException("Phone number format is invalid!");
+        }
+
+        // Check duplicate
+        if (mvEntityRepository.findByContactTypeAndValue(lvContactType, lvContactValue) != null) {
+            throw new BadRequestException(String.format("%s '%s' is already used by another customer!", lvContactType, lvContactValue));
+        }
+
+        if (mvCustomerRepository.findById(lvCustomerId).isEmpty()) {
+            throw new BadRequestException("Customer contact not found!");
+        }
+
+        if (!ContactType.A.name().equals(lvContactType)) {
             CustomerContact contactExists = mvEntityRepository.findByContactTypeAndValue(lvContactType, lvContactValue);
             if (contactExists != null) {
                 throw new BadRequestException(String.format("Customer contact %s existed!", lvContactType));
             }
         }
 
-        pCustomerContact.setUsed(false);
-
-        return super.save(pCustomerContact);
+        return super.convertDTO(mvEntityRepository.save(CustomerContact.builder()
+                .customer(new Customer(lvCustomerId))
+                .code(lvContactType)
+                .value(lvContactValue)
+                .note("N/A")
+                .isDefault("Y")
+                .status(true)
+                .isUsed(false)
+                .build()));
     }
 
     @Override
@@ -61,16 +97,17 @@ public class CustomerContactServiceImpl extends BaseService<CustomerContact, Cus
         if (pContact == null || pContact.getCustomer() == null) {
             throw new ResourceNotFoundException("Customer not found!");
         }
-        CustomerContact lvContact = super.findById(contactId).orElseThrow(() -> new BadRequestException());
+        CustomerContact lvContact = super.findEntById(contactId, true);
         lvContact.setCode(pContact.getCode());
         lvContact.setValue(pContact.getValue());
         lvContact.setNote(pContact.getNote());
+        lvContact.setStatus(pContact.isStatus());
         lvContact.setIsDefault(pContact.getIsDefault());
         return  convertDTO(mvEntityRepository.save(lvContact));
     }
 
     @Override
-    public String delete(Long contactId) {
+    public boolean delete(Long contactId) {
         CustomerContact customerContact = this.findEntById(contactId, true);
         if (customerContact.isUsed()) {
             throw new DataInUseException("This contact has been used!");
@@ -79,9 +116,9 @@ public class CustomerContactServiceImpl extends BaseService<CustomerContact, Cus
 
         String contactCode = customerContact.getCode();
         String customerName = customerContact.getCustomer().getCustomerName();
-        mvSystemLogService.writeLogDelete(MODULE.SALES, ACTION.PRO_CUS_D, MasterObject.CustomerContact, "Xóa %s của khách hàng %s".formatted(contactCode, customerName), customerContact.getValue());
+        mvSystemLogService.writeLogDelete(ACTION.PRO_CUS_D, MasterObject.CustomerContact, "Xóa %s của khách hàng %s".formatted(contactCode, customerName), customerContact.getValue());
 
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
     @Override
@@ -95,11 +132,6 @@ public class CustomerContactServiceImpl extends BaseService<CustomerContact, Cus
     @Override
     public CustomerContactDTO findById(Long pContactId, boolean pThrowException) {
         return super.findDtoById(pContactId, pThrowException);
-    }
-
-    @Override
-    public CustomerContactDTO findContactUseDefault(Long customerId, ContactType contactType) {
-        return super.convertDTO(mvEntityRepository.findContactDefault(customerId, contactType.name()));
     }
 
     @Override
@@ -130,5 +162,11 @@ public class CustomerContactServiceImpl extends BaseService<CustomerContact, Cus
         CustomerContact customerContact = super.findById(contactId).orElseThrow(() -> new BadRequestException());
         customerContact.setIsDefault("N");
         return convertDTO(mvEntityRepository.save(customerContact));
+    }
+
+    private boolean isValidPhoneNumber(String phone) {
+        // Basic validation: at least 8 digits, only numbers and maybe +, -
+        if (phone == null) return false;
+        return phone.matches("^[+]?[0-9\\-\\s]{8,20}$");
     }
 }

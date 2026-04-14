@@ -65,11 +65,11 @@ public class PromotionApplyServiceImpl implements PromotionApplyService {
     }
 
     @Override
-    public String delete(Long entityId) {
+    public boolean delete(Long entityId) {
         if (this.findById(entityId, true) == null) {
             mvPromotionApplyRepository.deleteById(entityId);
         }
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        return true;
     }
 
 //    private List<PromotionApplyDTO> extractDataQuery(List<Object[]> objects) {

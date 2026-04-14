@@ -136,7 +136,7 @@ public class VoucherInfoServiceImpl extends BaseService<VoucherInfo, VoucherInfo
             }
             VoucherInfoDTO dto = mvModelMapper.map(voucherSaved, VoucherInfoDTO.class);
             dto.setStatus(genVoucherStatus(dto.getStartTime(), dto.getEndTime()));
-            mvSystemLogService.writeLogCreate(MODULE.PRODUCT, ACTION.PRO_VOU_C, MasterObject.VoucherInfo, "Thêm mới voucher", dto.getTitle());
+            mvSystemLogService.writeLogCreate(ACTION.PRO_VOU_C, MasterObject.VoucherInfo, "Thêm mới voucher", dto.getTitle());
             return dto;
         } catch (RuntimeException ex) {
             throw new AppException(ex);
@@ -154,7 +154,7 @@ public class VoucherInfoServiceImpl extends BaseService<VoucherInfo, VoucherInfo
             changeLog.setNewObject(voucherInfoUpdated);
             changeLog.doAudit();
 
-            mvSystemLogService.writeLogUpdate(MODULE.PRODUCT, ACTION.PRO_VOU_U, MasterObject.VoucherInfo, "Cập nhật voucher " + voucherInfoUpdated.getTitle(), changeLog.getOldValues(), changeLog.getNewValues());
+            mvSystemLogService.writeLogUpdate(ACTION.PRO_VOU_U, MasterObject.VoucherInfo, "Cập nhật voucher " + voucherInfoUpdated.getTitle(), changeLog.getOldValues(), changeLog.getNewValues());
 
             return mvModelMapper.map(voucherInfoUpdated, VoucherInfoDTO.class);
         } catch (RuntimeException ex) {
@@ -163,15 +163,15 @@ public class VoucherInfoServiceImpl extends BaseService<VoucherInfo, VoucherInfo
     }
 
     @Override
-    public String delete(Long voucherId) {
+    public boolean delete(Long voucherId) {
         VoucherInfo voucherInfoBefore = this.findEntById(voucherId, true);
 
         if (!mvVoucherApplyService.findByVoucherId(voucherId).isEmpty()) {
             throw new DataInUseException(ErrorCode.ERROR_DATA_LOCKED.getDescription());
         }
         mvEntityRepository.deleteById(voucherId);
-        mvSystemLogService.writeLogDelete(MODULE.PRODUCT, ACTION.PRO_VOU_D, MasterObject.VoucherInfo, "Xóa voucher", voucherInfoBefore.getTitle());
-        return MessageCode.DELETE_SUCCESS.getDescription();
+        mvSystemLogService.writeLogDelete(ACTION.PRO_VOU_D, MasterObject.VoucherInfo, "Xóa voucher", voucherInfoBefore.getTitle());
+        return true;
     }
 
     private String generateRandomKeyVoucher(int lengthOfKey, String voucherType) {

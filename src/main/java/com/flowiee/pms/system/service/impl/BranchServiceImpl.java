@@ -47,7 +47,7 @@ public class BranchServiceImpl extends BaseService<Branch, BranchDTO, BranchRepo
     }
 
     @Override
-    public String delete(Long branchId) {
+    public boolean delete(Long branchId) {
         return super.delete(branchId);
     }
 }

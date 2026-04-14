@@ -1,7 +1,6 @@
 package com.flowiee.pms.system.service.impl;
 
 import com.flowiee.pms.shared.enums.ACTION;
-import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.shared.enums.MasterObject;
 import com.flowiee.pms.shared.enums.SystemDir;
 import com.flowiee.pms.shared.util.FileUtils;
@@ -44,7 +43,7 @@ public class FileBackupServiceImpl implements FileBackupService {
 
         File backedUpFile = zipPath.toFile();
 
-        systemLogService.writeLogCreate(MODULE.SYSTEM, ACTION.SYS_DATA_BACKUP, MasterObject.FileStorage, "Backup data", backedUpFile.getName());
+        systemLogService.writeLogCreate(ACTION.SYS_DATA_BACKUP, MasterObject.FileStorage, "Backup data", backedUpFile.getName());
 
         return backedUpFile;
     }

@@ -104,6 +104,7 @@
             loadCategories(getPageSize(), getPageNum());
             updateTableContentWhenOnClickPagination(loadCategories);
 
+            search();
             preCreateCategory();
             preUpdateCategory();
             submitInsertOrUpdate();
@@ -122,6 +123,13 @@
             $('#yesButton').on("click", function () {
                 let apiURL = mvHostURLCallApi + "/category/delete/" + mvId;
                 callApiDelete(apiURL);
+            });
+        }
+
+        function search() {
+            $("#btnSearch").on("click", function () {
+                loadCategories($('#paginationInfo').attr("pageSize"), 1);
+                //loadStorageItems($('#paginationInfo').attr("pageSize"), 1);
             });
         }
     </script>

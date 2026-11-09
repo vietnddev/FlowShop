@@ -13,6 +13,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Currency;
 import java.util.List;
 
 @Builder
@@ -59,6 +60,9 @@ public class ProductPrice extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "applicable_customer_group")
     Category applicableCustomerGroup; // Null = áp dụng chung
+
+    @Column(name = "currency")
+    String currency = "vnd";
 
     @Column(name = "note")
     String note;

@@ -2,6 +2,7 @@ package com.flowiee.pms.product.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.flowiee.pms.product.enums.ProductStatus;
 import com.flowiee.pms.shared.base.BaseEntity;
 
 import com.flowiee.pms.system.entity.Category;
@@ -33,8 +34,8 @@ public class Product extends BaseEntity implements Serializable {
     @Serial
 	static final long serialVersionUID = 1L;
 
-    @Column(name = "product_category")
-    String productCategory;
+    @Column(name = "product_code",length = 10, unique = true)
+    String productCode;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
@@ -75,6 +76,10 @@ public class Product extends BaseEntity implements Serializable {
 //    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    @LazyToOne(LazyToOneOption.PROXY)
 //    ProductDescription productDescription;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    ProductStatus status;
 
     @Column(name = "notes")
     String internalNotes;

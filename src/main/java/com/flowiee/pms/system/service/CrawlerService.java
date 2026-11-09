@@ -96,7 +96,6 @@ public class CrawlerService {
             BigDecimal discountPrice = p.getDiscountPrice();
 
             Product productSaved = productRepository.save(Product.builder()
-                    .productCategory(PID.CLOTHES.getId())
                     .productType(productType)
                     .brand(brand)
                     .unit(unit)

@@ -296,6 +296,7 @@
 
                         let lvImageBlock = getImageBlock(p.imageActive, p.productName);
                         let lvImageBlockDetail = getImageBlock(p.imageActive, p.productName, true);
+                        let statusColor = (p.status === 'INA' || p.statusCode === 'DIS') ? `badge-warning` : `badge-primary`;
 
                         contentTable.append(`
                             <tr aria-expanded="false" productId="${p.id}">
@@ -309,7 +310,7 @@
                                 <td data-widget="expandable-table" class="text-right">${p.reservedQty}</td>
                                 <td data-widget="expandable-table" class="text-right">${p.availableQty}</td>
                                 <td data-widget="expandable-table" class="text-right">${p.soldQty}</td>
-                                <td data-widget="expandable-table">${p.statusCode === 'ACT' ? `<span class="badge badge-primary">${p.statusName}</span>` : `${p.statusName}`}</td>
+                                <td data-widget="expandable-table"><span class="badge ${statusColor}">${p.statusName}</span></td>
                                 <td>
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popProductDetail"  name="btnViewDetail"         productId="${p.id}">
                                         <i class="fa-solid fa-circle-info"></i></i>
@@ -485,7 +486,31 @@
             let productTypeId = parseInt($("#productTypeField").val());
             let brandId = parseInt($("#brandField").val());
             let productName = $("#productNameField").val();
+            let productCode = $("#productCodeField").val().trim();
             let unitId = parseInt($("#unitField").val());
+            let productStatus = $("#statusField").val();
+
+            //Validate
+            if (!productCode) {
+                alert("Please enter product code!");
+                return;
+            }
+            if (!productTypeId) {
+                alert("Please enter product type!");
+                return;
+            }
+            if (!unitId) {
+                alert("Please enter product unit!");
+                return;
+            }
+            if (!brandId) {
+                alert("Please enter product brand!");
+                return;
+            }
+            if (productStatus) {
+                alert("Please enter product status!");
+                return;
+            }
 
             //Update variant's actual value
             $('#tblInsertVariants tr').each(function () {
@@ -546,6 +571,8 @@
                     id: unitId
                 },
                 productName: productName,
+                productCode: productCode,
+                status: productStatus,
                 variants: mvVariantAddedList,
                 attributes: mvAttributeAddedList
             };

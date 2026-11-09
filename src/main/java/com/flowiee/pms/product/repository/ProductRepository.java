@@ -33,4 +33,7 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
 
     @Query("select count(pd) > 0 from ProductDetail pd where pd.product.id = :productId and pd.status = 'ACT'")
     boolean hasActiveStatus(@Param("productId") Long productId);
+
+    @Query("select count(p) from Product p where p.productType.id = :productTypeId")
+    long countByProductType(@Param("productTypeId") Long productTypeId);
 }

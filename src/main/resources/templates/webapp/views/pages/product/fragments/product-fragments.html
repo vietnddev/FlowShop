@@ -26,20 +26,44 @@
                                 </div>
                                 <div class="col-3">
                                     <div class="form-group">
+                                        <label>Product code</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Product code" id="productCodeField">
+                                            <span class="input-group-append">
+                                                <button type="button" class="btn btn-secondary" id="btnGenerateProductCode">
+                                                    <i class="fa-solid fa-rotate-left"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
                                         <label>Loại sản phẩm</label>
                                         <select class="custom-select" id="productTypeField"></select>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-3">
                                     <div class="form-group">
                                         <label>Đơn vị tính</label>
                                         <select class="custom-select" id="unitField"></select>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-3">
                                     <div class="form-group">
                                         <label>Nhãn hiệu</label>
                                         <select class="custom-select" id="brandField"></select>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label>Status</label>
+                                        <select class="custom-select" id="statusField">
+                                            <option value="INA">Inactive</option>
+                                            <option value="ACT">Active</option>
+                                            <option value="DIS">Discontinued</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

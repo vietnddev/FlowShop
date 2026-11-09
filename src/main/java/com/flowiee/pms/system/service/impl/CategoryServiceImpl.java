@@ -31,14 +31,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, CategoryRepository> implements CategoryService {
-    private final CategoryRepository mvCategoryRepository;
     private final CategoryHistoryService mvCategoryHistoryService;
     private final SystemLogService mvSystemLogService;
     private final ModelMapper mvModelMapper;
 
-    public CategoryServiceImpl(CategoryRepository pEntityRepository, CategoryRepository mvCategoryRepository, CategoryHistoryService mvCategoryHistoryService, SystemLogService mvSystemLogService, ModelMapper mvModelMapper) {
+    public CategoryServiceImpl(CategoryRepository pEntityRepository, CategoryHistoryService mvCategoryHistoryService, SystemLogService mvSystemLogService, ModelMapper mvModelMapper) {
         super(Category.class, CategoryDTO.class, pEntityRepository);
-        this.mvCategoryRepository = mvCategoryRepository;
         this.mvCategoryHistoryService = mvCategoryHistoryService;
         this.mvSystemLogService = mvSystemLogService;
         this.mvModelMapper = mvModelMapper;
@@ -61,21 +59,31 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
             throw new BadRequestException();
         }
 
-        CategoryDTO lvDto = pDto;
-        String lvType = CoreUtils.trim(lvDto.getType());
-        String lvCode = CoreUtils.trim(lvDto.getCode());
+        String lvType = CoreUtils.trim(pDto.getType());
+        String lvCode = CoreUtils.trim(pDto.getCode());
+        String lvName = CoreUtils.trim(pDto.getName());
 
         if (CoreUtils.isNullStr(lvCode)) {
-            if (CATEGORY.PRODUCT_TYPE.getName().equals(lvType)) {
-                throw new BadRequestException("Category code can not be empty!");
+            List<CATEGORY> lvRequiredInputCode = List.of(CATEGORY.PRODUCT_TYPE, CATEGORY.COLOR, CATEGORY.SIZE);
+            if (lvRequiredInputCode.contains(CATEGORY.valueOf(lvType))) {
+                throw new BadRequestException(String.format("Category code of %s can not be empty!", lvType));
             }
         } else {
-            if (mvCategoryRepository.existsByTypeAndCode(lvType, lvCode)) {
-                throw new BadRequestException("Category code already exists!");
+            if (mvEntityRepository.existsByTypeAndCode(lvType, lvCode)) {
+                throw new BadRequestException(String.format("Category code '%s' already exists!", lvCode));
             }
         }
 
-        CategoryDTO lvSavedCategory = super.save(lvDto);
+        CategoryDTO lvSavedCategory = super.convertDTO(mvEntityRepository.save(Category.builder()
+                .type(lvType)
+                .code(lvCode)
+                .name(lvName)
+                .sort(pDto.getSort())
+                .isDefault(pDto.getIsDefault())
+                .note(pDto.getNote())
+                .status(pDto.getStatus())
+                .build()));
+
         mvSystemLogService.writeLogCreate(ACTION.CTG_I, MasterObject.Category, "Thêm mới danh mục " + lvSavedCategory.getType(), lvSavedCategory.getName());
 
         return lvSavedCategory;
@@ -127,8 +135,8 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
     @Override
     public List<Category> findRootCategory() {
         try {
-            List<Category> roots = mvCategoryRepository.findRootCategory();
-            List<Object[]> recordsOfEachType = mvCategoryRepository.totalRecordsOfEachType();
+            List<Category> roots = mvEntityRepository.findRootCategory();
+            List<Object[]> recordsOfEachType = mvEntityRepository.totalRecordsOfEachType();
             for (Category c : roots) {
                 for (Object[] o : recordsOfEachType) {
                     if (c.getType().equals(o[0])) {
@@ -146,7 +154,7 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
     @Override
     public Page<Category> findSubCategory(CATEGORY categoryType, Long parentId, List<Long> ignoreIds, int pageSize, int pageNum, String searchTxt) {
         Pageable pageable = getPageable(pageNum, pageSize, Sort.by("createdAt").descending());
-        Page<Category> categoryPage = mvCategoryRepository.findSubCategory(searchTxt, categoryType.name(), parentId, ignoreIds, pageable);
+        Page<Category> categoryPage = mvEntityRepository.findSubCategory(searchTxt, categoryType.name(), parentId, ignoreIds, pageable);
         for (Category c : categoryPage.getContent()) {
             String statusName = CategoryStatus.I.getLabel();
             if (c.getStatus()) {
@@ -240,7 +248,7 @@ public class CategoryServiceImpl extends BaseService<Category, CategoryDTO, Cate
         for (CATEGORY type : pCategoryTypeList) {
             categoryMap.put(type, new ArrayList<>());
         }
-        mvCategoryRepository.findSubCategory(pCategoryTypeList.stream().map(CATEGORY::name).toList())
+        mvEntityRepository.findSubCategory(pCategoryTypeList.stream().map(CATEGORY::name).toList())
                 .forEach(c -> categoryMap.get(CATEGORY.valueOf(c.getType())).add(c));
         return categoryMap;
     }

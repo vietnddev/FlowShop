@@ -92,7 +92,7 @@ public class ProductController extends BaseController {
         return AppResponse.success(mvProductService.findById(productId, true));
     }
 
-    @Operation(summary = "Create clothes product")
+    @Operation(summary = "Create product")
     @PostMapping("/create")
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
     public AppResponse<ProductDTO> createProduct(@RequestBody ProductDTO pDto) {
@@ -194,5 +194,11 @@ public class ProductController extends BaseController {
         } catch (RuntimeException ex) {
             throw new AppException(String.format(ErrorCode.SEARCH_ERROR_OCCURRED.getDescription(), "product"), ex);
         }
+    }
+
+    @GetMapping("/generate/code")
+    @PreAuthorize("@vldModuleProduct.insertProduct(true)")
+    public AppResponse<String> generateProductCode(@RequestParam("productTypeId") Long productTypeId) {
+        return AppResponse.success(mvProductService.generateProductCode(productTypeId));
     }
 }

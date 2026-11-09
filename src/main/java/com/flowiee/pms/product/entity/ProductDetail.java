@@ -3,6 +3,7 @@ package com.flowiee.pms.product.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.flowiee.pms.promotion.entity.LoyaltyTransaction;
 import com.flowiee.pms.shared.base.BaseEntity;
 
 import com.flowiee.pms.cart.entity.Items;
@@ -138,6 +139,9 @@ public class ProductDetail extends BaseEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     ProductStatus status;
+
+    @OneToOne(mappedBy = "variant", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    ProductInventory productInventory;
 
     @JsonIgnore
     @OneToMany(mappedBy = "productDetail", fetch = FetchType.LAZY)

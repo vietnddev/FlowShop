@@ -209,6 +209,23 @@ function createListener() {
             alert("Error: " + $.parseJSON(xhr.responseText).message);
         });
     });
+
+    $('#btnGenerateProductCode').on('click', function () {
+        let productTypeId = $("#productTypeField").val();
+        if (!productTypeId) {
+            alert("Please select a type of product!");
+            return;
+        }
+
+        $.get(`${mvHostURLCallApi}/product/generate/code`, {productTypeId: parseInt(productTypeId)}, function (response) {
+            if (response.status === "OK") {
+                let productCodeTmp = response.data;
+                $("#productCodeField").val(productCodeTmp);
+            }
+        }).fail(function (xhr) {
+            alert("Error: " + $.parseJSON(xhr.responseText).message);
+        });
+    })
 }
 
 function addVariant() {

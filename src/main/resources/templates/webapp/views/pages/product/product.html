@@ -215,6 +215,7 @@
         <div th:replace="~{header :: scripts}"></div>
         <script th:src="@{/js/product/Products.js}"></script>
         <script th:src="@{/js/product/ProductHistory.js}"></script>
+        <script th:src="@{/js/product/CreateProduct.js}"></script>
     </div>
 
     <script type="text/javascript">
@@ -296,6 +297,7 @@
 
                         let lvImageBlock = getImageBlock(p.imageActive, p.productName);
                         let lvImageBlockDetail = getImageBlock(p.imageActive, p.productName, true);
+                        let statusColor = (p.status === 'INA' || p.statusCode === 'DIS') ? `badge-warning` : `badge-primary`;
 
                         contentTable.append(`
                             <tr aria-expanded="false" productId="${p.id}">
@@ -309,7 +311,7 @@
                                 <td data-widget="expandable-table" class="text-right">${p.reservedQty}</td>
                                 <td data-widget="expandable-table" class="text-right">${p.availableQty}</td>
                                 <td data-widget="expandable-table" class="text-right">${p.soldQty}</td>
-                                <td data-widget="expandable-table">${p.statusCode === 'ACT' ? `<span class="badge badge-primary">${p.statusName}</span>` : `${p.statusName}`}</td>
+                                <td data-widget="expandable-table"><span class="badge ${statusColor}">${p.statusName}</span></td>
                                 <td>
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#popProductDetail"  name="btnViewDetail"         productId="${p.id}">
                                         <i class="fa-solid fa-circle-info"></i></i>
@@ -476,112 +478,6 @@
             downloadSelectionCategory(colorSelect, 'Chọn color', "color");
             downloadSelectionCategory(sizeSelect, 'Chọn size', "size");
             downloadSelectionCategory(fabricTypeSelect, 'Chọn chất vải', "fabric-type");
-        }
-
-        function createProduct() {
-            let creationType = $('#createProductSubmit').attr('creationType');
-
-            let apiURL = mvHostURLCallApi + "/product/create";
-            let productTypeId = parseInt($("#productTypeField").val());
-            let brandId = parseInt($("#brandField").val());
-            let productName = $("#productNameField").val();
-            let unitId = parseInt($("#unitField").val());
-
-            //Update variant's actual value
-            $('#tblInsertVariants tr').each(function () {
-                let $row = $(this);
-
-                let colorId       = $row.find('td[colorId]').attr('colorId');
-                let sizeId        = $row.find('td[sizeId]').attr('sizeId');
-                let fabricTypeId  = $row.find('td[fabricTypeId]').attr('fabricTypeId');
-
-                let retailPrice = parseFloat($row.find('input[name="txtVariantRetailPrice"]').val().replaceAll(',', '')) || 0;
-                let wholesalePrice = retailPrice;
-                let costPrice   = parseFloat($row.find('input[name="txtVariantCostPrice"]').val().replaceAll(',', ''))   || 0;
-                let soldQty     = parseInt($row.find('input[name="txtSoldQty"]').val())    || 0;
-                let storageQty  = parseInt($row.find('input[name="txtStorageQty"]').val()) || 0;
-
-                let key = colorId + "-" + sizeId + "-" + fabricTypeId;
-
-                let variant = mvVariantAddedList.find(item => item.key === key);
-                if (variant) {
-                    variant.retailPrice = retailPrice;
-                    variant.costPrice   = costPrice;
-                    variant.soldQty     = soldQty;
-                    variant.storageQty  = storageQty;
-                    variant.price = {
-                        retailPrice: retailPrice,
-                        wholesalePrice: wholesalePrice,
-                        costPrice: costPrice
-                    };
-                }
-            });
-
-            //Update attribute's actual value
-            $('#tblInsertAttributes tr').each(function () {
-                let $row = $(this);
-
-                let attributeName = $row.find('.attribute-name').text();
-                let attributeValue = $row.find('.attribute-value').text();
-                let attributeSort = $row.find('.attribute-sort').text();
-
-                let key = attributeName;
-
-                let attribute = mvAttributeAddedList.find(item => item.key === key);
-                if (attribute) {
-                    attribute.attributeName = attributeName;
-                    attribute.attributeValue = attributeValue;
-                    attribute.sort = attributeSort;
-                }
-            });
-
-            let body = {
-                productType: {
-                    id: productTypeId
-                },
-                brand: {
-                    id: brandId
-                },
-                unit: {
-                    id: unitId
-                },
-                productName: productName,
-                variants: mvVariantAddedList,
-                attributes: mvAttributeAddedList
-            };
-
-            if (creationType === 'variantOnly') {
-                let productId = Number($('#createProductSubmit').attr('productId'));
-                apiURL = `${mvHostURLCallApi}/product/${productId}/variant/create`;
-                body = {
-                    productId: productId,
-                    variants: mvVariantAddedList
-                };
-            } else if (creationType === 'attributeOnly') {
-                let productId = Number($('#createProductSubmit').attr('productId'));
-                apiURL = `${mvHostURLCallApi}/product/${productId}/attribute/create`;
-                body = {
-                    productId: productId,
-                    attributes: mvAttributeAddedList
-                };
-            }
-
-            $.ajax({
-                url: apiURL,
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(body),
-                success: function (response, textStatus, jqXHR) {
-                    if (response.status === "OK") {
-                        alert("Create successfully")
-                        window.location.reload();
-                    }
-                },
-                error: function (xhr, textStatus, errorThrown) {
-                    //showErrorModal("Could not connect to the server");
-                    showErrorModal($.parseJSON(xhr.responseText).message);
-                }
-            });
         }
     </script>
 </body>

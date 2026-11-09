@@ -93,6 +93,10 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
 
         //Convert to DTO
         List<ProductDTO> lvResultListDto = super.convertDTOs(lvResultList);
+        for (ProductDTO productDTO : lvResultListDto) {
+            productDTO.setStatusCode(productDTO.getStatus().name());
+            productDTO.setStatusName(productDTO.getStatus().getLabel());
+        }
 
         if (pFullInformation) {// Default is true for list of products page
             setImages(lvResultListDto);
@@ -114,10 +118,10 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
                     lvDto.setDefectiveQty(prdSummaryMdl.getDefectiveQty());
                     lvDto.setReservedQty(prdSummaryMdl.getReservedQty());
                     lvDto.setAvailableQty(lvDto.getStockQty() - lvDto.getReservedQty() - lvDto.getDefectiveQty());
-                    if (prdSummaryMdl.isActive()) {
-                        lvDto.setStatusCode(ProductStatus.ACT.name());
-                        lvDto.setStatusName(ProductStatus.ACT.getLabel());
-                    }
+//                    if (prdSummaryMdl.isActive()) {
+//                        lvDto.setStatusCode(ProductStatus.ACT.name());
+//                        lvDto.setStatusName(ProductStatus.ACT.getLabel());
+//                    }
                 }
             }
         }
@@ -293,12 +297,12 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
 
             Product lvProduct = new Product();
             lvProduct.setProductName(pProduct.getProductName());
+            lvProduct.setProductCode(pProduct.getProductCode());
             lvProduct.setBrand(lvBrand);
             lvProduct.setProductType(lvProductType);
             lvProduct.setUnit(lvUnit);
-            lvProduct.setProductCategory(pProduct.getProductCategory());
             lvProduct.setInternalNotes(pProduct.getInternalNotes());
-            //productToSave.setStatus(ProductStatus.ACT);
+            lvProduct.setStatus(pProduct.getStatus());
 
             Product lvProductSaved = mvEntityRepository.save(lvProduct);
 
@@ -426,5 +430,11 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
         return mvProductDescriptionRepository.save(ProductDescription.builder()
                 .productId(lvProduct.getId())
                 .description(pDescription).build()).getDescription();
+    }
+
+    @Override
+    public String generateProductCode(Long pProductTypeId) {
+        Category lvProductType = mvCategoryService.findEntById(pProductTypeId, true);
+        return lvProductType.getCode() + (mvEntityRepository.countByProductType(pProductTypeId) + 1);
     }
 }

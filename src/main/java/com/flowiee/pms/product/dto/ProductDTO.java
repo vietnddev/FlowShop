@@ -20,6 +20,7 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDTO extends BaseDTO implements Serializable {
+    String productCode;
     String productCategory;
     CategoryDTO productType;
     CategoryDTO brand;
@@ -40,8 +41,9 @@ public class ProductDTO extends BaseDTO implements Serializable {
     Integer reservedQty = 0;
     Integer availableQty = 0;
     String description;
-    String statusCode = ProductStatus.INA.name();
-    String statusName = ProductStatus.INA.getLabel();
+    ProductStatus status;
+    String statusCode;
+    String statusName;
     List<VoucherInfoDTO> listVoucherInfoApply;
 
     List<ProductVariantDTO> variants;

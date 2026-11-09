@@ -19,4 +19,6 @@ public interface ProductService extends ICurdService<ProductDTO> {
     ProductDescription findDescription(Long pProductId);
 
     String updateDescription(Long pProductId, String pDescription);
+
+    String generateProductCode(Long pProductTypeId);
 }

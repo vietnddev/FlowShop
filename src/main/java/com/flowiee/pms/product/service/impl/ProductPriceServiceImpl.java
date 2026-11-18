@@ -33,6 +33,11 @@ public class ProductPriceServiceImpl extends BaseService<ProductPrice, ProductPr
     }
 
     @Override
+    public ProductPrice initializePrice(ProductDetail productVariant) {
+        return null;
+    }
+
+    @Override
     public ProductPriceDTO getPrices(Long productVariantId) {
         return mvEntityRepository.findPricesByVariantIds(List.of(productVariantId))
                 .stream()

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
-@RequestMapping("/san-pham/voucher")
+@RequestMapping("/product/voucher")
 @Tag(name = "Voucher API", description = "Quản lý voucher")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -46,13 +46,13 @@ public class VoucherControllerView extends BaseController {
             throw new ResourceNotFoundException("VoucherId invalid!");
         }
         mvVoucherService.update(voucherInfo ,voucherInfoId);
-        return new ModelAndView("redirect:/san-pham/voucher");
+        return new ModelAndView("redirect:/product/voucher");
     }
 
     @PostMapping("/delete/{id}")
     @PreAuthorize("@vldModuleSales.deleteVoucher(true)")
     public ModelAndView deleteVoucher(@PathVariable("id") Long voucherInfoId) {
         mvVoucherService.delete(voucherInfoId);
-        return new ModelAndView("redirect:/san-pham/voucher");
+        return new ModelAndView("redirect:/product/voucher");
     }
 }

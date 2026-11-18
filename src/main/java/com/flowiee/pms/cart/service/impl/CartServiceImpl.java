@@ -1,8 +1,11 @@
 package com.flowiee.pms.cart.service.impl;
 
 import com.flowiee.pms.product.dto.ProductPriceDTO;
+import com.flowiee.pms.product.entity.ProductInventory;
 import com.flowiee.pms.product.enums.SalesType;
+import com.flowiee.pms.product.service.ProductInventoryService;
 import com.flowiee.pms.product.service.ProductPriceService;
+import com.flowiee.pms.product.service.ProductStockMovementService;
 import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.shared.request.BaseParameter;
 import com.flowiee.pms.shared.util.CoreUtils;
@@ -46,8 +49,10 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
     ProductPriceService mvProductPriceService;
     ModelMapper mvModelMapper;
     SystemLogService systemLogService;
+    ProductInventoryService productInventoryService;
 
-    public CartServiceImpl(OrderCartRepository pCartRepository, CartItemsService pCartItemsService, CartItemsRepository pCartItemsRepository, ProductVariantService pProductVariantService, ProductPriceService pProductPriceService, ModelMapper pModelMapper, SystemLogService pSystemLogService) {
+    public CartServiceImpl(OrderCartRepository pCartRepository, CartItemsService pCartItemsService, CartItemsRepository pCartItemsRepository, ProductVariantService pProductVariantService, ProductPriceService pProductPriceService, ModelMapper pModelMapper, SystemLogService pSystemLogService,
+                           ProductInventoryService productInventoryService) {
         super(OrderCart.class, OrderCartDTO.class, pCartRepository);
         this.mvCartItemsService = pCartItemsService;
         this.mvCartRepository = pCartRepository;
@@ -56,6 +61,7 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
         this.mvProductPriceService = pProductPriceService;
         this.mvModelMapper = pModelMapper;
         this.systemLogService = pSystemLogService;
+        this.productInventoryService = productInventoryService;
     }
 
     @Override
@@ -91,7 +97,9 @@ public class CartServiceImpl extends BaseService<OrderCart, OrderCartDTO, OrderC
                     item.setPrice(lvWholesalePrice);
                 }
 
-                item.getProductDetail().setAvailableSalesQty(item.getProductDetail().getStorageQty() - item.getProductDetail().getDefectiveQty());//Enhance later
+                ProductInventory productInventory = productInventoryService.getByVariantId(item.getProductDetail().getId());
+
+                item.getProductDetail().setAvailableSalesQty(productInventory.getOnHandQuantity() - productInventory.getDefectiveQuantity());//Enhance later
             }
         }
         return listCart;

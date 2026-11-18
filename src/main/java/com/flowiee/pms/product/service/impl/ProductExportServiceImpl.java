@@ -1,5 +1,6 @@
 package com.flowiee.pms.product.service.impl;
 
+import com.flowiee.pms.product.repository.ProductDetailRepository;
 import com.flowiee.pms.system.enums.CATEGORY;
 import com.flowiee.pms.product.enums.ProductEximKeyField;
 import com.flowiee.pms.product.enums.ProductStatus;
@@ -27,6 +28,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class ProductExportServiceImpl extends BaseExportService {
+    private final ProductDetailRepository mvProductVariantRepository;
     private final CategoryService mvCategoryService;
     private final EntityManager mvEntityManager;
 
@@ -42,9 +44,13 @@ public class ProductExportServiceImpl extends BaseExportService {
             mvDataExport = List.of(ProductDetail.builder()
                     .variantName("Áo thun form boxy thêu hình Xích đu trái tim")
                     .variantCode("JNATH069")
-                    .storageQty(5)
-                    .soldQty(1)
-                    .defectiveQty(0)
+
+                    //.storageQty(5)
+                    //.soldQty(1)
+                    //.defectiveQty(0)
+
+                    //call init method
+
                     .product(Product.builder()
                             .brand(new Category(null, "brand..."))
                             .productType(new Category(null, "product type..."))
@@ -150,11 +156,11 @@ public class ProductExportServiceImpl extends BaseExportService {
                     case fabric_type_code ->
                             lvCell.setCellValue(lvProductVariant.getFabricType().getName());
                     case storage_qty ->
-                            lvCell.setCellValue(lvProductVariant.getStorageQty());
+                            lvCell.setCellValue(lvProductVariant.getProductInventory().getOnHandQuantity());
                     case sold_qty ->
-                            lvCell.setCellValue(lvProductVariant.getSoldQty());
+                            lvCell.setCellValue(mvProductVariantRepository.getTotalSoldQuantity(lvProductVariant.getId()));
                     case defective_qty ->
-                            lvCell.setCellValue(lvProductVariant.getDefectiveQty());
+                            lvCell.setCellValue(lvProductVariant.getProductInventory().getDefectiveQuantity());
                     case retail_price ->
                             lvCell.setCellValue(CoreUtils.coalesce(lvProductPrice.getPriceValue()).toPlainString());
                     case wholesale_price ->

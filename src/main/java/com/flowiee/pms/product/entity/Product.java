@@ -114,10 +114,6 @@ public class Product extends BaseEntity implements Serializable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     List<ProductAttribute> attributeList;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    List<ProductDamaged> productDamagedList;
-
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     List<ProductRelated> ProductRelatedList;
 

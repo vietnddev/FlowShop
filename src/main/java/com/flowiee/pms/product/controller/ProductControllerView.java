@@ -3,7 +3,6 @@ package com.flowiee.pms.product.controller;
 import com.flowiee.pms.product.service.ProductAttributeService;
 import com.flowiee.pms.product.service.ProductImageService;
 import com.flowiee.pms.product.service.ProductService;
-import com.flowiee.pms.product.service.ProductVariantService;
 import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.product.entity.ProductDescription;
 import com.flowiee.pms.system.model.EximResult;
@@ -30,13 +29,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
-@RequestMapping("/san-pham")
+@RequestMapping("/product")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class ProductControllerView extends BaseController {
     ProductService mvProductService;
     ProductImageService mvProductImageService;
-    ProductVariantService mvProductVariantService;
     ProductAttributeService mvProductAttributeService;
     @Autowired
     @Qualifier("productExportServiceImpl")
@@ -50,6 +48,15 @@ public class ProductControllerView extends BaseController {
         return baseView(new ModelAndView(Pages.PRO_PRODUCT.getTemplate()));
     }
 
+    @GetMapping("/add")
+    @PreAuthorize("@vldModuleProduct.insertProduct(true)")
+    public ModelAndView addProductPage() {
+        ModelAndView modelAndView = new ModelAndView(Pages.PRO_PRODUCT_ADD.getTemplate());
+        modelAndView.addObject("pageMode", "ADD");
+        modelAndView.addObject("productId", null);
+        return baseView(modelAndView);
+    }
+
     @GetMapping(value = "/{id}")
     @PreAuthorize("@vldModuleProduct.readProduct(true)")
     public ModelAndView viewGeneralProduct(@PathVariable("id") Long productId) {
@@ -59,7 +66,25 @@ public class ProductControllerView extends BaseController {
             product.setDescription(lvProductDescription.getDescription());
         }
 
-        ModelAndView modelAndView = new ModelAndView(Pages.PRO_PRODUCT_INFO.getTemplate());
+        //ModelAndView modelAndView = new ModelAndView(Pages.PRO_PRODUCT_INFO.getTemplate());
+        ModelAndView modelAndView = new ModelAndView(Pages.PRO_PRODUCT_ADD.getTemplate());
+        modelAndView.addObject("pageMode", "VIEW");
+        modelAndView.addObject("productId", productId);
+        modelAndView.addObject("detailProducts", product);
+        return baseView(modelAndView);
+    }
+
+    @GetMapping(value = "/{id}/edit")
+    @PreAuthorize("@vldModuleProduct.readProduct(true)")
+    public ModelAndView editProduct(@PathVariable("id") Long productId) {
+        ProductDTO product = mvProductService.findById(productId, true);
+        ProductDescription lvProductDescription = mvProductService.findDescription(productId);
+        if (lvProductDescription != null) {
+            product.setDescription(lvProductDescription.getDescription());
+        }
+
+        ModelAndView modelAndView = new ModelAndView(Pages.PRO_PRODUCT_ADD.getTemplate());
+        modelAndView.addObject("pageMode", "EDIT");
         modelAndView.addObject("productId", productId);
         modelAndView.addObject("detailProducts", product);
         return baseView(modelAndView);

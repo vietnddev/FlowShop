@@ -14,7 +14,7 @@ import com.flowiee.pms.shared.enums.Pages;
 import com.flowiee.pms.supplier.service.SupplierService;
 
 @Controller
-@RequestMapping("/san-pham/supplier")
+@RequestMapping("/product/supplier")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class SupplierControllerView extends BaseController {

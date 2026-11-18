@@ -6,7 +6,6 @@ import com.flowiee.pms.inventory.entity.Material;
 import com.flowiee.pms.inventory.entity.TransactionGoods;
 import com.flowiee.pms.product.entity.Product;
 import com.flowiee.pms.product.entity.ProductCombo;
-import com.flowiee.pms.product.entity.ProductDamaged;
 import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.shared.base.BaseEntity;
 
@@ -118,10 +117,6 @@ public class FileStorage extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "product_combo_id")
     ProductCombo productCombo;
-
-    @ManyToOne
-    @JoinColumn(name = "product_damaged_id")
-    ProductDamaged productDamaged;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)

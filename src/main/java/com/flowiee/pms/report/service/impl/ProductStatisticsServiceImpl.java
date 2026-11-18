@@ -23,10 +23,14 @@ public class ProductStatisticsServiceImpl implements ProductStatisticsService {
         List<ProductDetail> lvProducts = productVariantRepository.findDefective();
         for (ProductDetail p : lvProducts) {
             String lvProductName = p.getVariantName();
-            BigDecimal defectiveQuantity = new BigDecimal(p.getDefectiveQty());
-            BigDecimal lvTotalQuantity = new BigDecimal(p.getStorageQty());
+            //BigDecimal defectiveQuantity = new BigDecimal(p.getDefectiveQty());
+            BigDecimal defectiveQuantity = new BigDecimal(p.getProductInventory().getDefectiveQuantity());
+
+            //BigDecimal lvTotalQuantity = new BigDecimal(p.getStorageQty());
+            BigDecimal lvTotalQuantity = new BigDecimal(p.getProductInventory().getOnHandQuantity());
+
             BigDecimal lvRate = lvTotalQuantity.compareTo(BigDecimal.ZERO) > 0
-                    ? defectiveQuantity.divide(lvTotalQuantity).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP)
+                    ? lvTotalQuantity.divide(defectiveQuantity).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP)
                     : BigDecimal.ZERO;
 
             lvReturnList.add(DefectiveProductStatisticsModel.builder()

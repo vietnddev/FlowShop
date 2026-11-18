@@ -32,8 +32,8 @@ public class SendOperatorNotificationServiceImpl implements SendOperatorNotifica
         Map<String, Object> lvNotificationParameter = new HashMap<>();
         lvNotificationParameter.put(NotificationType.LowStockAlert.name(), lvDestination);
         lvNotificationParameter.put("productName", pProductDetail.getVariantName());
-        lvNotificationParameter.put("currentQuantity", pProductDetail.getStorageQty());
-        lvNotificationParameter.put("threshold", pProductDetail.getLowStockThreshold());
+        lvNotificationParameter.put("currentQuantity", pProductDetail.getProductInventory().getOnHandQuantity());
+        lvNotificationParameter.put("threshold", pProductDetail.getProductInventory().getReorderLevel());
 
         mvMailMediaService.send(NotificationType.LowStockAlert, lvNotificationParameter);
     }

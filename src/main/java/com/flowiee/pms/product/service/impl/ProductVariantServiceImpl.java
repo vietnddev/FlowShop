@@ -1,11 +1,5 @@
 package com.flowiee.pms.product.service.impl;
 
-import com.flowiee.pms.inventory.dto.StorageDTO;
-import com.flowiee.pms.inventory.dto.TransactionGoodsDTO;
-import com.flowiee.pms.inventory.entity.Storage;
-import com.flowiee.pms.inventory.enums.TransactionGoodsType;
-import com.flowiee.pms.inventory.service.StorageService;
-import com.flowiee.pms.inventory.service.TransactionGoodsService;
 import com.flowiee.pms.product.dto.ProductPriceDTO;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
 import com.flowiee.pms.product.dto.ProductVariantTempDTO;
@@ -23,12 +17,10 @@ import com.flowiee.pms.shared.exception.DataInUseException;
 import com.flowiee.pms.shared.jpa.JpaHints;
 import com.flowiee.pms.shared.request.BaseParameter;
 import com.flowiee.pms.shared.util.*;
-import com.flowiee.pms.inventory.enums.TransactionGoodsStatus;
 import com.flowiee.pms.system.entity.Category;
 import com.flowiee.pms.system.enums.CATEGORY;
 import com.flowiee.pms.system.enums.ConfigCode;
 import com.flowiee.pms.system.service.CategoryService;
-import com.flowiee.pms.system.service.SendOperatorNotificationService;
 import com.flowiee.pms.system.service.SystemLogService;
 import com.flowiee.pms.media.entity.FileStorage;
 import com.flowiee.pms.product.model.ProductVariantSearchRequest;
@@ -60,12 +52,11 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class ProductVariantServiceImpl extends BaseService<ProductDetail, ProductVariantDTO, ProductDetailRepository> implements ProductVariantService {
-    private final SendOperatorNotificationService mvSendOperatorNotificationService;
+public class ProductVariantServiceImpl extends BaseService<ProductDetail, ProductVariantDTO, ProductDetailRepository>
+        implements ProductVariantService {
     private final ProductGenerateQRCodeService mvProductGenerateQRCodeService;
     private final ProductDetailTempRepository mvProductVariantTempRepository;
     private final ProductStockMovementService mvProductStockMovementService;
-    private final TransactionGoodsService mvTransactionGoodsService;
     private final ProductInventoryService mvProductInventoryService;
     private final GenerateBarcodeService mvGenerateBarcodeService;
     private final ProductHistoryService mvProductHistoryService;
@@ -73,32 +64,27 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
     private final ProductImageService mvProductImageService;
     private final SystemLogService mvSystemLogService;
     private final CategoryService mvCategoryService;
-    private final StorageService mvStorageService;
     private final ProductService mvProductService;
     private final ProductService productService;
 
     public ProductVariantServiceImpl(ProductDetailRepository pEntityRepository, ProductDetailTempRepository pProductVariantTempRepository,
                                      ProductGenerateQRCodeService pProductGenerateQRCodeService, ProductHistoryService pProductHistoryService,
-                                     TransactionGoodsService pTransactionGoodsService, CategoryService pCategoryService,
-                                     StorageService pStorageService, GenerateBarcodeService pGenerateBarcodeService,
+                                     CategoryService pCategoryService, GenerateBarcodeService pGenerateBarcodeService,
                                      @Lazy ProductPriceService pProductPriceService, SystemLogService pSystemLogService,
-                                     SendOperatorNotificationService pSendOperatorNotificationService, @Lazy ProductService pProductService,
-                                     @Lazy ProductImageService pProductImageService, ProductService productService,
-                                     ProductInventoryService pProductInventoryService, ProductStockMovementService pProductStockMovementService) {
+                                     @Lazy ProductService pProductService, @Lazy ProductImageService pProductImageService,
+                                     ProductService productService, ProductInventoryService pProductInventoryService,
+                                     ProductStockMovementService pProductStockMovementService) {
         super(ProductDetail.class, ProductVariantDTO.class, pEntityRepository);
-        this.mvSendOperatorNotificationService = pSendOperatorNotificationService;
         this.mvProductVariantTempRepository = pProductVariantTempRepository;
         this.mvProductGenerateQRCodeService = pProductGenerateQRCodeService;
         this.mvProductStockMovementService = pProductStockMovementService;
         this.mvProductInventoryService = pProductInventoryService;
-        this.mvTransactionGoodsService = pTransactionGoodsService;
         this.mvGenerateBarcodeService = pGenerateBarcodeService;
         this.mvProductHistoryService = pProductHistoryService;
         this.mvProductImageService = pProductImageService;
         this.mvProductPriceService = pProductPriceService;
         this.mvSystemLogService = pSystemLogService;
         this.mvCategoryService = pCategoryService;
-        this.mvStorageService = pStorageService;
         this.mvProductService = pProductService;
         this.productService = productService;
     }
@@ -235,7 +221,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             ProductDetail lvProductVariantSaved = mvEntityRepository.save(buildEntity(pDto));
 
             //Inventory
-            ProductInventory lvProductInventory = mvProductInventoryService.initializeInventory(lvProductVariantSaved, 10);
+            ProductInventory lvProductInventory = mvProductInventoryService.initializeInventory(lvProductVariantSaved);
             Integer openingQty = pDto.getStorageQty();
             if (openingQty != null && openingQty > 0) {
                 mvProductStockMovementService.createMovement(
@@ -246,6 +232,20 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
                         "product_detail",
                         lvProductVariantSaved.getId(),
                         "Initial stock when creating product variant",
+                        SecurityUtils.getCurrentUser().getId()
+                );
+            }
+
+            Integer reorderLevel = pDto.getReorderLevel();
+            if (reorderLevel != null && reorderLevel > 0) {
+                mvProductStockMovementService.createMovement(
+                        lvProductVariantSaved.getId(),
+                        StockMovementType.OPENING_STOCK,
+                        StockQuantityType.REORDER_LEVEL,
+                        reorderLevel,
+                        "product_detail",
+                        lvProductVariantSaved.getId(),
+                        "Initial reorder level when creating product variant",
                         SecurityUtils.getCurrentUser().getId()
                 );
             }
@@ -266,16 +266,6 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
                 mvGenerateBarcodeService.generateBarcode(lvProductVariantSaved.getId());
             } catch (IOException | WriterException e ) {
                 log.error(String.format("Can't generate Barcode for Product %s", lvProductVariantSaved.getVariantCode()), e);
-            }
-
-            if (pDto.getStorageIdInitStorageQty() != null) {
-                if (lvProductVariantSaved.getStorageQty() > 0) {
-                    initInventoryQuantity(lvProductVariantSaved, pDto);
-                }
-
-                if (lvProductVariantSaved.getSoldQty() > 0) {
-                    initSoldQuantity(lvProductVariantSaved, pDto);
-                }
             }
 
             mvSystemLogService.writeLogCreate(ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Thêm mới biến thể sản phẩm", lvProductVariantSaved.toStringInsert());
@@ -307,54 +297,11 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
                 .fabricType(lvFabricType)
                 .variantCode(genProductCode(pDto.getVariantCode()))
                 .variantName(pDto.getVariantName())
-                .soldQty(CoreUtils.coalesce(pDto.getSoldQty()))
-                .storageQty(CoreUtils.coalesce(pDto.getStorageQty()))
-                .defectiveQty(CoreUtils.coalesce(pDto.getDefectiveQty()))
                 .weight(pDto.getWeight())
                 .note(pDto.getNote())
                 .status(ProductStatus.ACT)
                 .sku(generateSKUCode(lvProduct, lvColor, lvSize, lvFabricType))
                 .build();
-    }
-
-    private void initInventoryQuantity(ProductDetail pProductVariantSaved, ProductVariantDTO pDto) {
-        Storage lvStorage = mvStorageService.findEntById(pDto.getStorageIdInitStorageQty(), true);
-        String initMessage = "Initialize storage quantity when create new products";
-
-        TransactionGoodsDTO lvTransactionGoodsDto = mvTransactionGoodsService.createExportTransaction(TransactionGoodsDTO.builder()
-                .title("Initialize storage")
-                .transactionType(TransactionGoodsType.EXPORT)
-                .warehouse(new StorageDTO(lvStorage.getId()))
-                .transactionStatus(TransactionGoodsStatus.APPROVED)
-                .description(initMessage)
-                .build());
-
-        mvProductVariantTempRepository.save(ProductVariantExim.builder()
-                //.ticketImport(new TicketImport(lvTransactionGoodsDto.getId()))
-                .productVariant(pProductVariantSaved)
-                .quantity(pProductVariantSaved.getStorageQty())
-                .note(initMessage)
-                .build());
-    }
-
-    private void initSoldQuantity(ProductDetail pProductVariantSaved, ProductVariantDTO pDto) {
-        Storage lvStorage = mvStorageService.findEntById(pDto.getStorageIdInitStorageQty(), true);
-        String initMessage = "Initialize storage quantity when create new products";
-
-        TransactionGoodsDTO lvTransactionGoodsDto = mvTransactionGoodsService.createExportTransaction(TransactionGoodsDTO.builder()
-                .title("Initialize storage")
-                .transactionType(TransactionGoodsType.EXPORT)
-                .warehouse(new StorageDTO(lvStorage.getId()))
-                .transactionStatus(TransactionGoodsStatus.APPROVED)
-                .description(initMessage)
-                .build());
-
-        mvProductVariantTempRepository.save(ProductVariantExim.builder()
-                //.ticketExport(new TicketExport(lvTransactionGoodsDto.getId()))
-                .productVariant(pProductVariantSaved)
-                .quantity(pProductVariantSaved.getStorageQty())
-                .note(initMessage)
-                .build());
     }
 
     @Transactional
@@ -365,7 +312,7 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             ChangeLog changeLog = new ChangeLog(ObjectUtils.clone(lvVariant));
 
             lvVariant.setVariantName(pDto.getVariantName());
-            lvVariant.setDefectiveQty(pDto.getDefectiveQty());
+            //lvVariant.setDefectiveQty(pDto.getDefectiveQty());
             lvVariant.setWeight(pDto.getWeight());
             lvVariant.setNote(pDto.getNote());
             ProductDetail lvProductVariantUpdated = mvEntityRepository.save(lvVariant);
@@ -499,48 +446,6 @@ public class ProductVariantServiceImpl extends BaseService<ProductDetail, Produc
             tempDTO.setBranchName(branchName);
         }
         return storageHistoryDTOs;
-    }
-
-    @Override
-    public void updateLowStockThreshold(Long pProductId, int pThreshold) {
-        ProductDetail lvProduct = super.findEntById(pProductId, true);
-        lvProduct.setLowStockThreshold(pThreshold);
-        mvEntityRepository.save(lvProduct);
-    }
-
-    @Override
-    public void updateStockQuantity(Long pProductVariantId, Integer pQuantity, String pUpdateType) {
-        ProductDetail lvProductDetail = super.findEntById(pProductVariantId, true);
-        Integer lvLowStockThreshold = lvProductDetail.getLowStockThreshold();
-        int lvCurrentQuantity = lvProductDetail.getStorageQty();
-        try {
-            if ("I".equals(pUpdateType)) {
-                mvEntityRepository.updateQuantityIncrease(pQuantity, pProductVariantId);
-            } else if ("D".equals(pUpdateType)) {
-                if (lvCurrentQuantity < pQuantity)
-                    throw new BadRequestException("Hàng tồn kho không đủ số lượng!");
-
-                lvProductDetail.setStorageQty(lvCurrentQuantity - pQuantity);
-                lvProductDetail.setSoldQty(lvProductDetail.getSoldQty() + pQuantity);
-                ProductDetail productDetailUpdated = mvEntityRepository.save(lvProductDetail);
-
-                if (lvLowStockThreshold != null && productDetailUpdated.getStorageQty() <= lvLowStockThreshold) {
-                    if (SysConfigUtils.isYesOption(ConfigCode.lowStockAlert)) {
-                        mvSendOperatorNotificationService.notifyWarningLowStock(productDetailUpdated);
-                    }
-                }
-
-                //Hết hàng
-                if (productDetailUpdated.getAvailableSalesQty() == 0) {
-                    productDetailUpdated.setStatus(ProductStatus.OOS);
-                    productDetailUpdated.setOutOfStockDate(LocalDateTime.now());
-                    mvEntityRepository.save(productDetailUpdated);
-                }
-            }
-            mvSystemLogService.writeLogUpdate(ACTION.PRO_PRD_U, MasterObject.ProductVariant, "Cập nhật số lượng sản phẩm", "productVariantId = " + pProductVariantId);
-        } catch (RuntimeException ex) {
-            throw new AppException(String.format(ErrorCode.UPDATE_ERROR_OCCURRED.getDescription(), "product quantity"), ex);
-        }
     }
 
     @Override

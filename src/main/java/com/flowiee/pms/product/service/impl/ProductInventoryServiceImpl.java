@@ -2,7 +2,6 @@ package com.flowiee.pms.product.service.impl;
 
 import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.product.entity.ProductInventory;
-import com.flowiee.pms.product.repository.ProductDetailRepository;
 import com.flowiee.pms.product.repository.ProductInventoryRepository;
 import com.flowiee.pms.product.service.ProductInventoryService;
 import com.flowiee.pms.shared.exception.EntityNotFoundException;
@@ -15,10 +14,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProductInventoryServiceImpl implements ProductInventoryService {
     private final ProductInventoryRepository productInventoryRepository;
-    private final ProductDetailRepository variantRepository;
 
     @Override
-    public ProductInventory initializeInventory(ProductDetail variant, Integer reorderLevel) {
+    public ProductInventory initializeInventory(ProductDetail variant) {
         log.info("initializeInventory for this variantId is {}", variant.getId());
         if (productInventoryRepository.existsByVariantId(variant.getId())) {
             log.warn("Product Inventory already exists for this variant with id {}", variant.getId());
@@ -30,7 +28,9 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
         inventory.setOnHandQuantity(0);
         inventory.setReservedQuantity(0);
         inventory.setDefectiveQuantity(0);
-        inventory.setReorderLevel(reorderLevel != null ? reorderLevel : 10);
+        inventory.setReorderLevel(0);
+
+        variant.setProductInventory(inventory);
 
         return productInventoryRepository.save(inventory);
     }

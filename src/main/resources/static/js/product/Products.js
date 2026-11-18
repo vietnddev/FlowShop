@@ -264,8 +264,8 @@ function addVariant() {
             <td fabricTypeId="${lvFabricTypeId}">${lvFabricTypeName}</td>
             <td><input type="text"   class="form-control" style="width: 120px" name="txtVariantRetailPrice" value="${lvRetailPrice}"></td>
             <td><input type="text"   class="form-control" style="width: 120px" name="txtVariantCostPrice"   value="${lvCostPrice}"></td>
-            <td><input type="number" class="form-control" style="width: 60px"  name="txtSoldQty"            value="${lvSoldQty}"></td>
-            <td><input type="number" class="form-control" style="width: 60px"  name="txtStorageQty"         value="${lvStorageQty}"></td>
+            <td><input type="number" class="form-control" style="width: 60px"  name="txtSoldQty"           value="${lvSoldQty}" disabled></td>
+            <td><input type="number" class="form-control" style="width: 60px"  name="txtStorageQty"        value="${lvStorageQty}"></td>
             <td><button type="button" class="btn btn-sm btn-secondary" name="btnRemoveVariant">X</button></td>
         </tr>
     `);

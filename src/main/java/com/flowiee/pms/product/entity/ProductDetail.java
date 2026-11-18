@@ -3,7 +3,6 @@ package com.flowiee.pms.product.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import com.flowiee.pms.promotion.entity.LoyaltyTransaction;
 import com.flowiee.pms.shared.base.BaseEntity;
 
 import com.flowiee.pms.cart.entity.Items;
@@ -67,14 +66,14 @@ public class ProductDetail extends BaseEntity implements Serializable {
     @JoinColumn(name = "fabric_id")
     Category fabricType;
 
-    @Column(name = "quantity_stg", nullable = false)
-    Integer storageQty;
+//    @Column(name = "quantity_stg", nullable = false)
+//    Integer storageQty;
 
-    @Column(name = "quantity_sold", nullable = false)
-    Integer soldQty;
+//    @Column(name = "quantity_sold", nullable = false)
+//    Integer soldQty;
 
-    @Column(name = "quantity_defective", nullable = false)
-    Integer defectiveQty;
+//    @Column(name = "quantity_defective", nullable = false)
+//    Integer defectiveQty;
 
     @Column(name = "weight")
     String weight;
@@ -109,8 +108,8 @@ public class ProductDetail extends BaseEntity implements Serializable {
     @Column(name = "pattern")
     String pattern;
 
-    @Column(name = "low_stock_threshold")
-    Integer lowStockThreshold;
+//    @Column(name = "low_stock_threshold")
+//    Integer lowStockThreshold;
 
     @Column(name = "out_of_stock_date")
     LocalDateTime outOfStockDate;
@@ -171,10 +170,6 @@ public class ProductDetail extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
     List<ProductPrice> priceList;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
-    List<ProductDamaged> productDamagedList;
-
 //    @JsonIgnore
 //    @OneToMany(mappedBy = "productVariant", fetch = FetchType.LAZY)
 //    List<TransactionGoodsItem> transactionGoodsItemList;
@@ -184,10 +179,6 @@ public class ProductDetail extends BaseEntity implements Serializable {
 
     public ProductDetail(long id) {
         super.id = id;
-    }
-
-    public int getAvailableSalesQty() {
-        return storageQty == null ? 0 : storageQty - defectiveQty;
     }
 
 	@Override

@@ -35,7 +35,11 @@ function downloadSelectionCategory(element, optionDefault, type) {
     $.get(endpoint, function (response) {
         if (response.status === "OK") {
             $.each(response.data, function (index, d) {
-                element.append(`<option value="${d.id}">${d.name}</option>`);
+                let selected = optionDefault == null && index === 0
+                    ? 'selected'
+                    : '';
+
+                element.append(`<option value="${d.id}" ${selected}>${d.name}</option>`);
             });
         }
     }).fail(function () {

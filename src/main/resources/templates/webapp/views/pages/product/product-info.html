@@ -122,7 +122,7 @@
     previewNode.parentNode.removeChild(previewNode)
 
     var myDropzone = new Dropzone(document.body, { // Make the whole body a dropzone
-        url: "/uploads/san-pham/[[${detailProducts.id}]]", // Gọi tới API trong spring để xử lý file
+        url: "/uploads/product/[[${detailProducts.id}]]", // Gọi tới API trong spring để xử lý file
         thumbnailWidth: 80,
         thumbnailHeight: 80,
         parallelUploads: 20,

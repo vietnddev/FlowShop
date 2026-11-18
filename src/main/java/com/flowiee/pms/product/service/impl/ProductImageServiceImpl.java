@@ -3,7 +3,6 @@ package com.flowiee.pms.product.service.impl;
 import com.flowiee.pms.inventory.entity.TransactionGoods;
 import com.flowiee.pms.inventory.service.TransactionGoodsService;
 import com.flowiee.pms.product.entity.ProductCombo;
-import com.flowiee.pms.product.entity.ProductDamaged;
 import com.flowiee.pms.product.entity.ProductDetail;
 import com.flowiee.pms.product.service.ProductComboService;
 import com.flowiee.pms.product.service.ProductImageService;
@@ -12,7 +11,6 @@ import com.flowiee.pms.shared.base.StartUp;
 import com.flowiee.pms.media.entity.FileStorage;
 import com.flowiee.pms.shared.exception.BadRequestException;
 import com.flowiee.pms.product.dto.ProductComboDTO;
-import com.flowiee.pms.product.repository.ProductDamagedRepository;
 import com.flowiee.pms.media.service.FileStorageService;
 import com.flowiee.pms.shared.enums.MODULE;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
@@ -49,7 +47,6 @@ public class ProductImageServiceImpl implements ProductImageService {
     ProductComboService mvProductComboService;
     ProductVariantService mvProductVariantService;
     FileStorageRepository mvFileStorageRepository;
-    ProductDamagedRepository mvProductDamagedRepository;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -88,19 +85,6 @@ public class ProductImageServiceImpl implements ProductImageService {
 
         FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), null);
         fileInfo.setProductCombo(new ProductCombo(productCombo.getId()));
-
-        return mvFileStorageService.create(fileInfo);
-    }
-
-    @Override
-    public FileStorage saveImageProductDamaged(MultipartFile fileUpload, long productDamagedId) throws IOException {
-        Optional<ProductDamaged> productDamaged = mvProductDamagedRepository.findById(productDamagedId);
-        if (productDamaged.isEmpty()) {
-            throw new BadRequestException();
-        }
-
-        FileStorage fileInfo = new FileStorage(fileUpload, MODULE.PRODUCT.name(), null);
-        fileInfo.setProductDamaged(productDamaged.get());
 
         return mvFileStorageService.create(fileInfo);
     }

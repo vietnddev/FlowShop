@@ -161,7 +161,8 @@ public class ProductServiceImpl extends BaseService<Product, ProductDTO, Product
         List<ProductSummaryModel> allSummaries = new ArrayList<>();
         for (int i = 0; i < productIds.size(); i += 500) {
             List<Long> batch = productIds.subList(i, Math.min(i + 500, productIds.size()));
-            allSummaries.addAll(mvEntityRepository.getSummariesQty(batch));
+            //allSummaries.addAll(mvEntityRepository.getSummariesQty(batch));
+            allSummaries.addAll(mvEntityRepository.getInventorySummaryByProductIds(batch));
         }
 
         return allSummaries.stream()

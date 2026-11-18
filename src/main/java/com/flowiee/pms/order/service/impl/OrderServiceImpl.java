@@ -11,6 +11,9 @@ import com.flowiee.pms.order.repository.OrderRepository;
 import com.flowiee.pms.order.repository.OrderReturnItemRepository;
 import com.flowiee.pms.order.repository.OrderReturnRepository;
 import com.flowiee.pms.order.service.*;
+import com.flowiee.pms.product.enums.StockMovementType;
+import com.flowiee.pms.product.enums.StockQuantityType;
+import com.flowiee.pms.product.service.ProductStockMovementService;
 import com.flowiee.pms.promotion.entity.LoyaltyTransaction;
 import com.flowiee.pms.promotion.service.LoyaltyProgramService;
 import com.flowiee.pms.promotion.service.VoucherTicketService;
@@ -63,6 +66,7 @@ import java.util.stream.Collectors;
 @Service
 public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderRepository> implements OrderService {
     private final SendCustomerNotificationService mvSendCustomerNotificationService;
+    private final ProductStockMovementService mvProductStockMovementService;
     private final OrderGenerateQRCodeService mvOrderGenerateQRCodeService;
     private final OrderReturnItemRepository mvOrderReturnItemRepository;
     private final TransactionGoodsService mvTransactionGoodsService;
@@ -79,9 +83,11 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
     private final SerialService mvSerialService;
     private final ModelMapper mvModelMapper;
 
-    public OrderServiceImpl(OrderRepository pOrderRepository, SendCustomerNotificationService pSendCustomerNotificationService, OrderItemsService pOrderItemsService, OrderGenerateQRCodeService pOrderGenerateQRCodeService, OrderHistoryService pOrderHistoryService, VoucherTicketService pVoucherTicketService, LoyaltyProgramService pLoyaltyProgramService, SystemLogService pSystemLogService, OrderReturnRepository pOrderReturnRepository, OrderReturnItemRepository pOrderReturnItemRepository, ProductVariantService pProductVariantService, ModelMapper pModelMapper, TransactionGoodsService pTransactionGoodsService, OrderValidatorService pOrderValidatorService, OrderCartRepository pCartRepository, OrderDetailRepository pOrderDetailRepository, SerialService pSerialService) {
+    public OrderServiceImpl(OrderRepository pOrderRepository, SendCustomerNotificationService pSendCustomerNotificationService, OrderItemsService pOrderItemsService, OrderGenerateQRCodeService pOrderGenerateQRCodeService, OrderHistoryService pOrderHistoryService, VoucherTicketService pVoucherTicketService, LoyaltyProgramService pLoyaltyProgramService, SystemLogService pSystemLogService, OrderReturnRepository pOrderReturnRepository, OrderReturnItemRepository pOrderReturnItemRepository, ProductVariantService pProductVariantService, ModelMapper pModelMapper, TransactionGoodsService pTransactionGoodsService, OrderValidatorService pOrderValidatorService, OrderCartRepository pCartRepository, OrderDetailRepository pOrderDetailRepository, SerialService pSerialService,
+                            ProductStockMovementService pProductStockMovementService) {
         super(Order.class, OrderDTO.class, pOrderRepository);
         this.mvSendCustomerNotificationService = pSendCustomerNotificationService;
+        this.mvProductStockMovementService = pProductStockMovementService;
         this.mvOrderGenerateQRCodeService = pOrderGenerateQRCodeService;
         this.mvOrderReturnItemRepository = pOrderReturnItemRepository;
         this.mvTransactionGoodsService = pTransactionGoodsService;
@@ -430,7 +436,18 @@ public class OrderServiceImpl extends BaseService<Order, OrderDTO, OrderReposito
                 for (OrderReturnItem lvItem : lvRecordedItems) {
                     ProductDetail lvProductInfoItem = mvProductVariantService.findEntById(lvItem.getItemId(), false);
                     if (lvProductInfoItem != null) {
-                        mvProductVariantService.updateStockQuantity(lvProductInfoItem.getId(), lvItem.getQuantity(), "I");
+                        //mvProductVariantService.updateStockQuantity(lvProductInfoItem.getId(), lvItem.getQuantity(), "I");
+
+                        mvProductStockMovementService.createMovement(
+                                lvProductInfoItem.getId(),
+                                StockMovementType.CUSTOMER_RETURN,
+                                StockQuantityType.ON_HAND,
+                                lvItem.getQuantity(),
+                                null,
+                                null,
+                                "Increase stock"
+                        );
+
                         if (OrderReturnCondition.DAMAGED.equals(lvItem.getCondition())) {
                             mvProductVariantService.updateDefectiveQuantity(lvProductInfoItem.getId(), lvItem.getQuantity(), "I");
                         }

@@ -17,19 +17,23 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
 
     @Query("""
         select new com.flowiee.pms.product.model.ProductSummaryModel(
-            pd.product.id,
-            cast(coalesce(sum(pd.storageQty),0) as integer),
-            cast(coalesce(sum(pd.soldQty),0) as integer),
-            cast(coalesce(sum(pd.defectiveQty),0) as integer),
-            cast((select coalesce(sum(od.quantity),0) from OrderDetail od
-                where od.productDetail.product.id in (:productId)
-                     and od.order.orderStatus = 'PROCESSING') as integer),
-            (select count(pd_) > 0 from ProductDetail pd_ where pd_.product.id in (:productId) and pd_.status = 'ACT'))
-        from com.flowiee.pms.product.entity.ProductDetail pd
-        where pd.product.id in (:productId) and pd.deletedAt is null
-        group by pd.product.id
+            p.id,
+            cast(coalesce(sum(inv.onHandQuantity), 0) as integer),
+            cast((select coalesce(sum(od.quantity), 0)
+                from OrderDetail od
+                where od.productDetail.product.id = p.id
+                    and od.order.orderStatus = 'COMPLETED')as integer),
+            cast(coalesce(sum(inv.defectiveQuantity), 0) as integer),
+            cast(coalesce(sum(inv.reservedQuantity), 0) as integer)
+        )
+        from Product p
+        left join p.productVariantList pv
+            on pv.deletedAt is null
+        left join pv.productInventory inv
+        where p.id in (:productIds)
+        group by p.id
     """)
-    List<ProductSummaryModel> getSummariesQty(@Param("productId") List<Long> productId);
+    List<ProductSummaryModel> getInventorySummaryByProductIds(@Param("productIds") List<Long> productIds);
 
     @Query("select count(pd) > 0 from ProductDetail pd where pd.product.id = :productId and pd.status = 'ACT'")
     boolean hasActiveStatus(@Param("productId") Long productId);

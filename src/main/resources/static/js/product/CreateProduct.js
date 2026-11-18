@@ -53,7 +53,10 @@ function createProduct() {
         if (variant) {
             variant.retailPrice = retailPrice;
             variant.costPrice   = costPrice;
-            variant.soldQty     = soldQty;
+
+            //variant.soldQty     = soldQty;
+            variant.soldQty     = 0;
+
             variant.storageQty  = storageQty;
             variant.price = {
                 retailPrice: retailPrice,

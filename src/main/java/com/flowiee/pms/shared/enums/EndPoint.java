@@ -10,13 +10,13 @@ public enum EndPoint {
     URL_NOTIFICATION("/sys/notification", "HEADER", true),
 
     URL_CATEGORY("/system/category", "SIDEBAR", true),
-    URL_PRODUCT("/san-pham", "SIDEBAR", true),
+    URL_PRODUCT("/product", "SIDEBAR", true),
     URL_PRODUCT_ORDER("/sls/order", "SIDEBAR", true),
     URL_PRODUCT_CREATE_ORDER("/sls/order/ban-hang", "SIDEBAR", true),
     URL_PRODUCT_CUSTOMER("/customer", "SIDEBAR", true),
-    URL_PRODUCT_SUPPLIER("/san-pham/supplier", "SIDEBAR", true),
+    URL_PRODUCT_SUPPLIER("/product/supplier", "SIDEBAR", true),
     URL_PRODUCT_GALLERY("/gallery", "SIDEBAR", true),
-    URL_PRODUCT_VOUCHER("/san-pham/voucher", "SIDEBAR", true),
+    URL_PRODUCT_VOUCHER("/product/voucher", "SIDEBAR", true),
     URL_PRODUCT_PROMOTION("/promotion", "SIDEBAR", true),
     URL_PRODUCT_COMBO("/product/combo", "SIDEBAR", true),
 

@@ -268,14 +268,14 @@
                     $.each(mvVouchers, function (index, d) {
                         let productApplyBlock = '';
                         $.each(d.applicableProducts, function (applyIndex, applyInfo) {
-                            productApplyBlock += `<span class="mr-2">${applyIndex + 1}</span><a href="/san-pham/${applyInfo.productId}"><span>${applyInfo.productName}</span></a><br>`;
+                            productApplyBlock += `<span class="mr-2">${applyIndex + 1}</span><a href="/product/${applyInfo.productId}"><span>${applyInfo.productName}</span></a><br>`;
                         });
 
                         contentTable.append(`
                             <tr>
                                 <td>${(((pageNum - 1) * pageSize + 1) + index)}</td>
                                 <td>
-                                    <a href="/san-pham/voucher/detail/${d.id}"><span>${d.title}</span></a>
+                                    <a href="/product/voucher/detail/${d.id}"><span>${d.title}</span></a>
                                 </td>
                                 <td>
                                     ${productApplyBlock}

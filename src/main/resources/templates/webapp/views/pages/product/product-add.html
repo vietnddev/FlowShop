@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<div th:replace="~{header :: stylesheets(title='New product')}"></div>
+
+<link rel="stylesheet" th:href="@{/css/product/ProductCreation.css}">
+
+<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse"
+      id="productPage" th:attr="data-page-mode=${pageMode}, data-product-id=${productId}">
+    <div class="wrapper">
+        <div th:replace="~{header :: header}"></div>
+        <div th:replace="~{sidebar :: sidebar}"></div>
+
+        <div class="content-wrapper" style="padding-top: 10px; padding-bottom: 1px;">
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Page Header -->
+                    <div class="row mb-3">
+                        <div class="col-12 d-flex align-items-center justify-content-between">
+                            <div>
+                                <h4 class="mb-1">
+                                    <i class="fas fa-arrow-left mr-2 text-secondary"
+                                       style="cursor: pointer;"
+                                       onclick="history.back()"></i>
+                                    Add Product
+                                </h4>
+                                <!--<small class="text-muted">Create a new product and manage its variants and inventory.</small>-->
+                            </div>
+
+                            <div>
+                                <button type="button" class="btn btn-sm btn-default mr-2"
+                                        onclick="history.back()">
+                                    Cancel
+                                </button>
+                                <button type="button" class="btn btn-sm btn-primary" id="btnCreateProduct">
+                                    <i class="fa-solid fa-floppy-disk mr-1"></i> Create
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger" id="btnDeleteProduct">
+                                    <i class="fa-solid fa-trash mr-1"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Basic Information -->
+                    <div class="card card-outline card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title font-weight-bold">
+                                <i class="fas fa-box mr-2 text-primary"></i>
+                                Basic Information
+                            </h3>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+
+                                <!-- Product Image -->
+                                <div class="col-lg-3">
+                                    <div class="image-preview-container">
+                                        <div id="imagePreviewEmpty" class="image-preview-empty">
+                                            <i class="fas fa-image"></i>
+                                            <div>No image selected</div>
+                                        </div>
+
+                                        <img id="productImagePreview" class="d-none" alt="Product preview">
+
+                                        <button type="button" id="btnChangeProductImage"
+                                                class="btn btn-sm btn-light image-change-btn d-none">
+                                            <i class="fas fa-sync-alt mr-1"></i>Change
+                                        </button>
+                                    </div>
+
+                                    <div id="productImageGallery" class="image-gallery mt-3">
+                                        <div id="btnAddProductImage" class="image-add-box">
+                                            <i class="fas fa-plus"></i>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" id="productImageInput" accept="image/*" class="d-none" multiple>
+                                </div>
+
+                                <!-- Product Fields -->
+                                <div class="col-lg-5 border-left border-secondary">
+                                    <div class="row">
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Product Name <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control"
+                                                       id="productNameField"
+                                                       placeholder="Enter product name">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Product Code <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Product code" id="productCodeField">
+                                                    <span class="input-group-append">
+                                                        <button type="button" class="btn btn-secondary" id="btnGenerateProductCode">
+                                                            <i class="fa-solid fa-rotate-left"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Category</label>
+                                                <select class="custom-select" id="productTypeField"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Unit</label>
+                                                <select class="custom-select" id="unitField"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Brand</label>
+                                                <select class="custom-select" id="brandField"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Status</label>
+                                                <select class="custom-select" id="statusField">
+                                                    <option value="INA">Inactive</option>
+                                                    <option value="ACT">Active</option>
+                                                    <option value="DIS">Discontinued</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label>Internal note</label>
+                                                <textarea class="form-control"
+                                                          rows="3"
+                                                          placeholder="Enter internal note"></textarea>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="supplierField">Supplier</label>
+                                                <select class="custom-select" id="supplierField"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="releaseDateField">Release date</label>
+                                                <input type="date" class="form-control" id="releaseDateField">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="genderField">Gender</label>
+                                                <select class="custom-select" id="genderField">
+                                                    <option value="M">Men</option>
+                                                    <option value="W">Women</option>
+                                                    <option value="U">Unisex</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label for="returnPolicyField">Return policy</label>
+                                                <textarea class="form-control" id="returnPolicyField" rows="3"
+                                                          placeholder="Enter return policy"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Variants -->
+                    <div class="card card-outline card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title font-weight-bold">
+                                <i class="fas fa-layer-group mr-2 text-primary"></i>
+                                Product Variants
+                            </h3>
+
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        id="btnAddVariant">
+                                    <i class="fas fa-plus mr-1"></i> Add Variant
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover mb-0" id="variantTable">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th style="min-width: 120px;">Color</th>
+                                            <th style="min-width: 120px;">Size</th>
+                                            <th style="min-width: 120px;">Fabric type</th>
+                                            <th style="min-width: 150px;">SKU</th>
+                                            <th style="min-width: 150px;">Barcode</th>
+                                            <th style="min-width: 120px;">Price</th>
+                                            <th style="min-width: 120px;">Opening Stock</th>
+                                            <th style="min-width: 120px;">Reorder Level</th>
+                                            <th style="min-width: 80px;">Status</th>
+                                            <th style="min-width: 60px;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="variantTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-footer text-muted">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Each variant will have its own SKU, price and inventory record.
+                        </div>
+                    </div>
+
+                    <!-- Attributes -->
+                    <div class="card card-outline card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title font-weight-bold">
+                                <i class="fas fa-layer-group mr-2 text-primary"></i>
+                                Product Attributes
+                            </h3>
+
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        id="btnAddAttribute">
+                                    <i class="fas fa-plus mr-1"></i> Add Attribute
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover mb-0" id="attributeTable">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Value</th>
+                                            <th>Note</th>
+                                            <th>Sort</th>
+                                            <th style="min-width: 60px;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attributeTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-footer text-muted">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Extra information.
+                        </div>
+                    </div>
+
+                    <!-- Note and Summary -->
+                    <div class="row mb-3">
+
+                        <!-- Note -->
+                        <div class="col-lg-6 mb-3">
+                            <div class="card card-outline card-primary h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title font-weight-bold">
+                                        <i class="fas fa-boxes mr-2 text-primary"></i>
+                                        Description
+                                    </h3>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="form-group mb-0">
+                                        <label>Description</label>
+                                        <textarea class="form-control"
+                                                  rows="5"
+                                                  placeholder="Enter description"></textarea>
+                                        <small class="form-text text-muted">
+                                            Optional..
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Summary -->
+                        <div class="col-lg-6">
+                            <div class="card card-outline card-primary h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title font-weight-bold">
+                                        <i class="fas fa-clipboard-list mr-2 text-primary"></i>
+                                        Additional Information
+                                    </h3>
+                                </div>
+
+                                <div class="card-body">
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                  <!--  &lt;!&ndash; Bottom Actions &ndash;&gt;
+                    <div class="row mb-4">
+                        <div class="col-12 text-right">
+                            <button type="button" class="btn btn-default mr-2"
+                                    onclick="history.back()">
+                                Cancel
+                            </button>
+
+                            <button type="button" class="btn btn-primary"
+                                    id="btnCreateProductBottom">
+                                <i class="fas fa-check mr-1"></i> Create Product
+                            </button>
+                        </div>
+                    </div>-->
+
+                </div>
+
+            </section>
+        </div>
+
+        <div th:replace="~{modal_fragments :: confirm_modal}"></div>
+        <div th:replace="~{modal_fragments :: dialog_modal}"></div>
+
+        <div th:replace="~{footer :: footer}"></div>
+
+        <aside class="control-sidebar control-sidebar-dark"></aside>
+
+        <div th:replace="~{header :: scripts}"></div>
+        <script th:src="@{/js/product/ProductImageCreation.js}"></script>
+    </div>
+
+    <script type="text/javascript">
+        let colorCategories = [];
+        let sizeCategories = [];
+        let fabricTypeCategories = [];
+
+        let mvVariantAddedList = [];
+        let mvAttributeAddedList = [];
+
+        const PAGE_MODE = {
+            ADD: "ADD",
+            VIEW: "VIEW",
+            EDIT: "EDIT"
+        };
+        let currentPageMode = PAGE_MODE.ADD;
+
+        $(document).ready(function () {
+            const pageMode = $("#productPage").data("page-mode");
+            const productId = $("#productPage").data("product-id");
+
+            setPageMode(pageMode);
+            if (pageMode === PAGE_MODE.VIEW || pageMode === PAGE_MODE.EDIT) {
+                loadProduct(productId);
+            }
+
+            loadGeneralCategories();
+            loadVariantCategories();
+
+            createListener();
+        });
+
+        function createListener() {
+            $('#btnAddVariant').on('click', function () {
+                addVariantRow();
+            });
+
+            $('#btnAddAttribute').on('click', function () {
+                addAttributeRow();
+            });
+
+            $('#btnGenerateProductCode').on('click', function () {
+                generateProductCode();
+            });
+
+            $('#btnCreateProduct').on('click', function () {
+                submit();
+            });
+
+            $('#variantTableBody').on('click', '.btn-remove-variant', function () {
+                $(this).closest('tr').remove();
+            });
+
+            $('#attributeTableBody').on('click', '.btn-remove-attribute', function () {
+                $(this).closest('tr').remove();
+            });
+        }
+
+        function loadGeneralCategories() {
+            downloadSelectionCategory($('#productTypeField'), null, "product-type");
+            downloadSelectionCategory($('#unitField'), null, "unit");
+            downloadSelectionCategory($('#brandField'), null, "brand");
+        }
+
+        function loadVariantCategories() {
+            $.get(mvHostURLCallApi + "/category/color", function (response) {
+                if (response.status === "OK") {
+                    colorCategories = response.data;
+                }
+            });
+
+            $.get(mvHostURLCallApi + "/category/size", function (response) {
+                if (response.status === "OK") {
+                    sizeCategories = response.data;
+                }
+            });
+
+            $.get(mvHostURLCallApi + "/category/fabric-type", function (response) {
+                if (response.status === "OK") {
+                    fabricTypeCategories = response.data;
+                }
+            });
+        }
+
+        function buildCategorySelect(categories, className) {
+            let select = $('<select>', {
+                class: 'form-control ' + className
+            });
+
+            $.each(categories, function (index, item) {
+                select.append(
+                    $('<option>', {
+                        value: item.id,
+                        text: item.name,
+                        selected: index === 0
+                    })
+                );
+            });
+
+            return select;
+        }
+
+        function addVariantRow(data = null) {
+            let row = $('<tr>');
+
+            let colorSelect = buildCategorySelect(colorCategories, 'colorId');
+            let sizeSelect = buildCategorySelect(sizeCategories, 'sizeId');
+            let fabricTypeSelect = buildCategorySelect(fabricTypeCategories, 'fabricTypeId');
+
+            row.append($('<td>').append(colorSelect));
+            row.append($('<td>').append(sizeSelect));
+            row.append($('<td>').append(fabricTypeSelect));
+
+            row.append($('<td>')
+                .append(`<input type="text" class="form-control form-control-sm variant-sku" placeholder="SKU">`)
+                .append(`</td>`));
+
+            row.append($('<td>')
+                .append(`<input type="text" class="form-control form-control-sm variant-barcode" placeholder="Barcode">`)
+                .append(`</td>`));
+
+            row.append($('<td>')
+                .append(`<div class="input-group input-group-sm">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input type="number" class="form-control variant-price" value="00.00" min="0" step="0.01">
+                         </div>`)
+                .append(`</td>`));
+
+            row.append($('<td>')
+                .append(`<input type="number" class="form-control form-control-sm variant-opening-stock" value="0" min="0">`)
+                .append(`</td>`));
+
+            row.append($('<td>')
+                .append(`<input type="number" class="form-control form-control-sm variant-reorder-level" value="20" min="0">`)
+                .append(`</td>`));
+
+            row.append($('<td class="text-center">')
+                .append(`<input type="checkbox" class="variant-status" checked/>`)
+                .append(`</td>`));
+
+            row.append($('<td class="text-center">')
+                .append(`<button type="button" class="btn btn-sm btn-outline-danger btn-remove-variant" title="Remove variant">
+                            <i class="fas fa-trash"></i>
+                         </button>`)
+                .append(`</td>`));
+
+            $('#variantTableBody').append(row);
+        }
+
+        function addVariantRow(data = null) {
+            let row = $('<tr>');
+
+            let colorSelect = buildCategorySelect(colorCategories, 'colorId');
+            let sizeSelect = buildCategorySelect(sizeCategories, 'sizeId');
+            let fabricTypeSelect = buildCategorySelect(fabricTypeCategories, 'fabricTypeId');
+
+            // Color
+            row.append($('<td>').append(colorSelect));
+
+            // Size
+            row.append($('<td>').append(sizeSelect));
+
+            // Fabric Type
+            row.append($('<td>').append(fabricTypeSelect));
+
+            // SKU
+            row.append($('<td>').append(
+                `<input type="text" class="form-control form-control-sm variant-sku" placeholder="SKU">`
+            ));
+
+            // Barcode
+            row.append($('<td>').append(
+                `<input type="text" class="form-control form-control-sm variant-barcode" placeholder="Barcode">`
+            ));
+
+            // Price
+            row.append($('<td>').append(
+                `<div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">$</span>
+                    </div>
+                    <input type="number" class="form-control variant-price" value="0.00" min="0" step="0.01">
+                </div>`
+            ));
+
+            // Opening Stock
+            row.append($('<td>').append(
+                `<input type="number" class="form-control form-control-sm variant-opening-stock" value="0" min="0">`
+            ));
+
+            // Reorder Level
+            row.append($('<td>').append(
+                `<input type="number" class="form-control form-control-sm variant-reorder-level" value="20" min="0">`
+            ));
+
+            // Status
+            row.append($('<td class="text-center">').append(
+                `<input type="checkbox" class="variant-status" checked>`
+            ));
+
+            // Remove
+            row.append($('<td class="text-center">').append(
+                `<button type="button" class="btn btn-sm btn-outline-danger btn-remove-variant" title="Remove variant">
+                    <i class="fas fa-trash" aria-hidden="true"></i>
+                </button>`
+            ));
+
+            // Fill data when editing/viewing
+            if (data) {
+                row.find('.variant-sku').val(data.sku || '');
+                row.find('.variant-barcode').val(data.barcode || '');
+                row.find('.variant-price').val(data.price ?? 0);
+                row.find('.variant-opening-stock').val(data.storageQty ?? 0);
+                row.find('.variant-reorder-level').val(data.reorderLevel ?? 0);
+
+                // Category selects use category IDs
+                row.find('[id="colorId"]').val(data.color?.id ?? '');
+                row.find('[id="sizeId"]').val(data.size?.id ?? '');
+                row.find('[id="fabricTypeId"]').val(data.fabricType?.id ?? '');
+
+                // Status
+                row.find('.variant-status').prop('checked', data.status === true || data.status === 'ACT');
+            }
+
+            $('#variantTableBody').append(row);
+
+            return row;
+        }
+
+        function addAttributeRow(data = null) {
+            let row = $('<tr>');
+
+            // Name
+            row.append($('<td>').append(
+                `<input type="text" class="form-control form-control-sm attribute-name" placeholder="Name">`
+            ));
+
+            // Value
+            row.append($('<td>').append(
+                `<input type="text" class="form-control form-control-sm attribute-value" placeholder="Value">`
+            ));
+
+            // Note
+            row.append($('<td>').append(
+                `<input type="text" class="form-control form-control-sm attribute-note" placeholder="Note">`
+            ));
+
+            // Sort
+            row.append($('<td>').append(
+                `<input type="number" class="form-control form-control-sm attribute-sort" value="0" min="0">`
+            ));
+
+            // Remove
+            row.append($('<td class="text-center">').append(
+                `<button type="button" class="btn btn-sm btn-outline-danger btn-remove-attribute" title="Remove attribute">
+                    <i class="fas fa-trash" aria-hidden="true"></i>
+                </button>`
+            ));
+
+            // Fill data
+            if (data) {
+                row.find('.attribute-name').val(data.attributeName || '');
+                row.find('.attribute-value').val(data.attributeValue || '');
+                row.find('.attribute-note').val(data.note || '');
+                row.find('.attribute-sort').val(data.sort ?? 0);
+            }
+
+            $('#attributeTableBody').append(row);
+
+            return row;
+        }
+
+        function generateProductCode() {
+            let productTypeId = $("#productTypeField").val();
+            if (!productTypeId) {
+                alert("Please select a type of product!");
+                return;
+            }
+
+            $.get(`${mvHostURLCallApi}/product/generate/code`, {productTypeId: parseInt(productTypeId)}, function (response) {
+                if (response.status === "OK") {
+                    let productCodeTmp = response.data;
+                    $("#productCodeField").val(productCodeTmp);
+                }
+            }).fail(function (xhr) {
+                alert("Error: " + $.parseJSON(xhr.responseText).message);
+            });
+        }
+
+        function collectVariantList() {
+            let variants = [];
+            let keys = [];
+
+            $('#variantTableBody tr').each(function () {
+                let row = $(this);
+
+                let colorId = row.find('.colorId').val();
+                let sizeId = row.find('.sizeId').val();
+                let fabricTypeId = row.find('.fabricTypeId').val();
+
+                let sku = row.find('.variant-sku').val().trim();
+                let barcode = row.find('.variant-barcode').val().trim();
+
+                let retailPrice = parseFloat(row.find('.variant-price').val()) || 0;
+                let openingStock = parseInt(row.find('.variant-opening-stock').val()) || 0;
+                let reorderLevel = parseInt(row.find('.variant-reorder-level').val()) || 0;
+
+                let status = row.find('.variant-status').is(':checked') ? 'ACT' : 'INA';
+
+                // Validate required fields
+                if (!colorId || !sizeId || !fabricTypeId) {
+                    alert('Please select Color, Size and Fabric Type!');
+                    variants = null;
+                    return false;
+                }
+
+                // Check duplicate variant
+                let key = colorId + '-' + sizeId + '-' + fabricTypeId;
+
+                if (keys.includes(key)) {
+                    alert('Duplicate variant found!');
+                    variants = null;
+                    return false;
+                }
+
+                keys.push(key);
+
+                // Add variant to list
+                variants.push({
+                    color: {
+                        id: Number(colorId)
+                    },
+                    size: {
+                        id: Number(sizeId)
+                    },
+                    fabricType: {
+                        id: Number(fabricTypeId)
+                    },
+                    sku: sku,
+                    barcode: barcode,
+                    price: {
+                        retailPrice: retailPrice,
+                        wholesalePrice: retailPrice,
+                        costPrice: 0
+                    },
+                    storageQty: openingStock,
+                    reorderLevel: reorderLevel,
+                    status: status
+                });
+            });
+
+            return variants;
+        }
+
+        function collectAttributeList() {
+            let attributes = [];
+            let keys = [];
+
+            $('#attributeTableBody tr').each(function () {
+                let row = $(this);
+
+                let name = row.find('.attribute-name').val().trim();
+                let value = row.find('.attribute-value').val().trim();
+                let note = row.find('.attribute-note').val().trim();
+                let sort = parseInt(row.find('.attribute-sort').val()) || 0;
+
+                // Validate required fields
+                if (!name) {
+                    alert('Please input attribute name!');
+                    attributes = null;
+                    return false;
+                }
+
+                // Check duplicate attribute
+                let key = name;
+
+                if (keys.includes(key)) {
+                    alert('Duplicate name found!');
+                    attributes = null;
+                    return false;
+                }
+
+                keys.push(key);
+
+                // Add variant to list
+                attributes.push({
+                    attributeName: name,
+                    attributeValue: value,
+                    sort: sort
+                });
+            });
+
+            return attributes;
+        }
+
+        function submit() {
+            let apiURL = mvHostURLCallApi + "/product/create";
+
+            let productTypeId = parseInt($("#productTypeField").val());
+            let brandId = parseInt($("#brandField").val());
+            let productName = $("#productNameField").val();
+            let productCode = $("#productCodeField").val().trim();
+            let unitId = parseInt($("#unitField").val());
+            let productStatus = $("#statusField").val();
+            let variants = collectVariantList();
+            let attributes = collectAttributeList();
+
+            if (variants === null) {
+                return;
+            }
+
+            if (variants.length === 0) {
+                alert('Please add at least one variant!');
+                return;
+            }
+
+            let body = {
+                productType: {
+                    id: productTypeId
+                },
+                brand: {
+                    id: brandId
+                },
+                unit: {
+                    id: unitId
+                },
+                productName: productName,
+                productCode: productCode,
+                status: productStatus,
+                variants: variants,
+                attributes: attributes
+            };
+
+            // Build multipart request
+            let formData = new FormData();
+
+            // Product JSON
+            formData.append(
+                "product",
+                new Blob(
+                    [JSON.stringify(body)],
+                    { type: "application/json" }
+                )
+            );
+
+            // Product images
+            getProductImages().forEach(function (file) {
+                formData.append("images", file);
+            });
+
+            $.ajax({
+                url: apiURL,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+
+                success: function (response) {
+                    if (response.status === "OK") {
+                        alert("Create successfully");
+                        window.location = mvHostURL + '/product';
+                    }
+                },
+
+                error: function (xhr) {
+                    let message = "Could not connect to the server";
+
+                    try {
+                        message = JSON.parse(xhr.responseText).message || message;
+                    } catch (e) {
+                        // Keep default message
+                    }
+
+                    showErrorModal(message);
+                }
+            });
+        }
+
+        function loadProduct(productId) {
+            $.get(mvHostURLCallApi + "/product/" + productId, function (response) {
+                if (response.status !== "OK") {
+                    return;
+                }
+                let product = response.data;
+                //fillProductInformation(product);
+                renderVariants(product.variants);
+                renderAttributes(product.attributes);
+                //renderProductImages(product.images);
+            }).fail(function (xhr) {
+                alert("Error: " + $.parseJSON(xhr.responseText).message);
+            });
+        }
+
+        function renderVariants(variants) {
+            $('#variantTableBody').empty();
+
+            if (!variants || variants.length === 0) {
+                return;
+            }
+
+            variants.forEach(function(variant) {
+                addVariantRow(variant);
+            });
+        }
+
+        function renderAttributes(attributes) {
+            $('#attributeTableBody').empty();
+
+            if (!attributes || attributes.length === 0) {
+                return;
+            }
+
+            attributes.forEach(function(attribute) {
+                addAttributeRow(attribute);
+            });
+        }
+
+        function setPageMode(mode) {
+            currentPageMode = mode;
+
+            const isAdd = mode === PAGE_MODE.ADD;
+            const isView = mode === PAGE_MODE.VIEW;
+            const isEdit = mode === PAGE_MODE.EDIT;
+            const isEditable = !isView;
+
+            // // Page title
+            // if (isAdd) {
+            //     $("#productPageTitle").text("Add Product");
+            // } else if (isView) {
+            //     $("#productPageTitle").text("Product Detail");
+            // } else {
+            //     $("#productPageTitle").text("Edit Product");
+            // }
+            //
+            // // Enable / Disable form fields
+            // $("#productForm .product-field").prop("disabled", !isEditable);
+            //
+            // // Main action buttons
+            // $("#btnCreateProduct").toggle(isAdd);
+            // $("#btnEditProduct").toggle(isView);
+            // $("#editActions").toggle(isEdit);
+            //
+            // // Variant controls
+            // $(".btn-add-variant").toggle(isEditable);
+            // $(".btn-remove-variant").toggle(isEditable);
+            //
+            // // Attribute controls
+            // $(".btn-add-attribute").toggle(isEditable);
+            // $(".btn-remove-attribute").toggle(isEditable);
+            //
+            // // Product Image controls
+            // if (typeof setProductImageEditable === "function") {
+            //     setProductImageEditable(isEditable);
+            // }
+            //
+            // // Other edit-only controls
+            // $(".product-edit-control").toggle(isEditable);
+        }
+    </script>
+</body>
+</html>

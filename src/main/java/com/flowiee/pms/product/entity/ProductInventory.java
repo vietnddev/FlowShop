@@ -34,7 +34,7 @@ public class ProductInventory extends BaseEntity implements Serializable {
     Integer defectiveQuantity = 0; //hàng bị lỗi/hỏng
 
     @Column(name = "reorder_level", nullable = false)
-    Integer reorderLevel = 10; //mức cảnh báo cần nhập thêm
+    Integer reorderLevel = 0; //mức cảnh báo cần nhập thêm
 
     @JsonIgnore
     @OneToMany(mappedBy = "productInventory", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

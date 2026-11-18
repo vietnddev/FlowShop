@@ -196,7 +196,7 @@ public class DashboardServiceImpl implements DashboardService {
         log.info("Finished loadDashboard(): " + CommonUtils.now("YYYY/MM/dd HH:mm:ss"));
 
         return DashboardModel.builder()
-                .totalProducts(mvProductVariantRepository.countTotalQuantity())
+                .totalProducts(mvProductVariantRepository.getTotalOnHandQuantity())
                 .revenueToday(revenueToday)
                 .revenueThisMonth(revenueThisMonth)
                 .ordersNewTodayQty(ordersToday.size())

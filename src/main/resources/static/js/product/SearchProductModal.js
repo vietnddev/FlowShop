@@ -53,7 +53,7 @@ function getListOfProductsOnSearchModal(pageSize, pageNum) {
                              style="width: 60px; height: 34px">
                         </td>
                         <td><img src="${d.imageSrc != null ? d.imageSrc : '#'}" style="width: 50px; height: 50px; border-radius: 5px"></td>
-                        <td><a href="/san-pham/variant/${d.id}">${d.variantCode}</a></td>
+                        <td><a href="/product/variant/${d.id}">${d.variantCode}</a></td>
                         <td>
                             <span class="productVariantNameRowTbl" productVariantId="${d.id}" id="productVariantName-${d.id}">${d.variantName}</span>
                         </td>

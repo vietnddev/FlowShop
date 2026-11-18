@@ -76,7 +76,7 @@
                                                 <th>Status</th>
                                                 <th>
                                                     <a th:href="@{/api/v1/product/export}" class="btn btn-sm btn-info"><i class="fa-solid fa-cloud-arrow-down mr-2"></i>Export</a>
-                                                    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#insert" id="createProduct"><i class="fa-solid fa-circle-plus mr-2"></i>New</button>
+                                                    <a th:href="@{/product/add}" class="btn btn-sm btn-success"><i class="fa-solid fa-circle-plus mr-2"></i>New</a>
                                                 </th>
                                             </tr>
                                         </thead>
@@ -289,7 +289,7 @@
 
                         let voucherBlock = '';
                         $.each(p.listVoucherInfoApply, function (voucherIndex, voucherInfo) {
-                            voucherBlock += `<span>${voucherIndex + 1} </span><a href="/san-pham/voucher/detail/${voucherInfo.id}"><span>${voucherInfo.title}</span></a><br>`;
+                            voucherBlock += `<span>${voucherIndex + 1} </span><a href="/product/voucher/detail/${voucherInfo.id}"><span>${voucherInfo.title}</span></a><br>`;
                         });
 
                         let variantsBlock = '';
@@ -329,7 +329,7 @@
                                     <div class="card-body pl-2 pt-2">
                                         <dl class="row">
                                             <dt class="col-sm-12 text-center">${lvImageBlockDetail}</dt>
-                                            <dt class="col-sm-12 text-center"><a href="/san-pham/${p.id}">${p.productName}</a></dt>
+                                            <dt class="col-sm-12 text-center"><a href="/product/${p.id}">${p.productName}</a></dt>
                                             <dt class="col-sm-4 mb-0">Created at</dt>
                                             <dd class="col-sm-8 mb-0">${p.createdAt}</dd>
                                             <dt class="col-sm-4 mb-0">Created by</dt>

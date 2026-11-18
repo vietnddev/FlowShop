@@ -6,6 +6,9 @@ import com.flowiee.pms.inventory.entity.Storage;
 import com.flowiee.pms.inventory.entity.TransactionGoods;
 import com.flowiee.pms.inventory.entity.TransactionGoodsItem;
 import com.flowiee.pms.product.entity.ProductDetail;
+import com.flowiee.pms.product.enums.StockMovementType;
+import com.flowiee.pms.product.enums.StockQuantityType;
+import com.flowiee.pms.product.service.ProductStockMovementService;
 import com.flowiee.pms.shared.base.BaseService;
 import com.flowiee.pms.shared.exception.AppException;
 import com.flowiee.pms.shared.exception.BadRequestException;
@@ -40,6 +43,7 @@ import java.util.*;
 @Service
 public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, TransactionGoodsDTO, TransactionGoodsRepository> implements TransactionGoodsService {
     private final TransactionGoodsItemRepository transactionGoodsItemRepository;
+    private final ProductStockMovementService productStockMovementService;
     private final ProductDetailRepository productVariantRepository;
     private final FileStorageRepository fileStorageRepository;
     private final SystemLogService systemLogService;
@@ -49,8 +53,9 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
     private static final String PREFIX_TRANSACTION_IMPORT_CODE = "I";
     private static final String PREFIX_TRANSACTION_EXPORT_CODE = "E";
 
-    public TransactionGoodsServiceImpl(TransactionGoodsRepository pTransactionGoodsRepository,
-                                       TransactionGoodsItemRepository pTransactionGoodsItemRepository,
+    public TransactionGoodsServiceImpl(TransactionGoodsItemRepository pTransactionGoodsItemRepository,
+                                       ProductStockMovementService productStockMovementService,
+                                       TransactionGoodsRepository pTransactionGoodsRepository,
                                        ProductDetailRepository pProductVariantRepository,
                                        FileStorageRepository pFileStorageRepository,
                                        SystemLogService pSystemLogService,
@@ -58,6 +63,7 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
                                        StorageService pStorageService) {
         super(TransactionGoods.class, TransactionGoodsDTO.class, pTransactionGoodsRepository);
         this.transactionGoodsItemRepository = pTransactionGoodsItemRepository;
+        this.productStockMovementService = productStockMovementService;
         this.productVariantRepository = pProductVariantRepository;
         this.fileStorageRepository = pFileStorageRepository;
         this.systemLogService = pSystemLogService;
@@ -123,7 +129,15 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
                 if (lvProductVariant != null) {
                     Long lvProductVariantId = lvProductVariant.getId();
                     int lvQuantity = lvItem.getQuantity();
-                    productVariantRepository.updateQuantityIncrease(lvQuantity, lvProductVariantId);
+                    //productVariantRepository.updateQuantityIncrease(lvQuantity, lvProductVariantId);
+
+                    productStockMovementService.createMovement(lvProductVariantId,
+                            StockMovementType.PURCHASE,
+                            StockQuantityType.ON_HAND,
+                            lvQuantity,
+                            null,
+                            null,
+                            "Increase stock");
                 }
             }
         }
@@ -161,7 +175,17 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
             for (TransactionGoodsItem lvItem : lvTransactionGoods.getItems()) {
                 long lvProductVariantId = lvItem.getProductVariant().getId();
                 int lvStockQuantity = lvItem.getQuantity();
-                productVariantRepository.updateQuantityIncrease(lvStockQuantity, lvProductVariantId);
+                //productVariantRepository.updateQuantityIncrease(lvStockQuantity, lvProductVariantId);
+
+                productStockMovementService.createMovement(
+                        lvProductVariantId,
+                        StockMovementType.CUSTOMER_RETURN,
+                        StockQuantityType.ON_HAND,
+                        lvStockQuantity,
+                        null,
+                        null,
+                        "Increase stock"
+                );
             }
         }
     }
@@ -200,7 +224,17 @@ public class TransactionGoodsServiceImpl extends BaseService<TransactionGoods, T
                 if (lvProductVariant != null) {
                     Long lvProductVariantId = lvProductVariant.getId();
                     int lvQuantity = lvItem.getQuantity();
-                    productVariantRepository.updateQuantityDecrease(lvQuantity, lvProductVariantId);
+                    //productVariantRepository.updateQuantityDecrease(lvQuantity, lvProductVariantId);
+
+                    productStockMovementService.createMovement(
+                            lvProductVariantId,
+                            StockMovementType.SALE,
+                            StockQuantityType.ON_HAND,
+                            lvQuantity,
+                            null,
+                            null,
+                            "Decrease stock"
+                    );
                 }
             }
         }

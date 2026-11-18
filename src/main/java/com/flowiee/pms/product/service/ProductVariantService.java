@@ -23,10 +23,6 @@ public interface ProductVariantService extends ICurdService<ProductVariantDTO> {
 
     List<ProductVariantTempDTO> findStorageHistoryByVariantId(Long productVariantId);
 
-    void updateLowStockThreshold(Long productId, int threshold);
-
-    void updateStockQuantity(Long pProductVariantId, Integer pQuantity, String pUpdateType);
-
     void updateDefectiveQuantity(Long pProductVariantId, Integer pQuantity, String pUpdateType);
 
     void updateStatus(Long pProductVariantId, ProductStatus pStatus);

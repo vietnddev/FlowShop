@@ -1,20 +1,17 @@
 package com.flowiee.pms.product.controller;
 
+import com.flowiee.pms.product.service.*;
 import com.flowiee.pms.shared.base.BaseController;
 import com.flowiee.pms.shared.constant.Constants;
 import com.flowiee.pms.product.dto.ProductVariantTempDTO;
 import com.flowiee.pms.product.entity.ProductHistory;
 import com.flowiee.pms.shared.response.AppResponse;
 import com.flowiee.pms.product.model.ProductSearchRequest;
-import com.flowiee.pms.product.service.ProductVariantService;
 import com.flowiee.pms.system.model.EximResult;
 import com.flowiee.pms.product.dto.ProductDTO;
 import com.flowiee.pms.shared.exception.AppException;
 import com.flowiee.pms.product.dto.ProductRelatedDTO;
 import com.flowiee.pms.product.dto.ProductVariantDTO;
-import com.flowiee.pms.product.service.ProductHistoryService;
-import com.flowiee.pms.product.service.ProductService;
-import com.flowiee.pms.product.service.ProductRelatedService;
 import com.flowiee.pms.system.service.ExportService;
 import com.flowiee.pms.system.service.ImportService;
 import com.flowiee.pms.shared.enums.ErrorCode;
@@ -29,11 +26,14 @@ import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -54,6 +54,7 @@ public class ProductController extends BaseController {
     ProductHistoryService mvProductHistoryService;
     ProductRelatedService mvProductRelatedService;
     ProductVariantService mvProductVariantService;
+    ProductImageService mvProductImageService;
 
     @Operation(summary = "Find all products")
     @GetMapping("/all")
@@ -93,10 +94,17 @@ public class ProductController extends BaseController {
     }
 
     @Operation(summary = "Create product")
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("@vldModuleProduct.insertProduct(true)")
-    public AppResponse<ProductDTO> createProduct(@RequestBody ProductDTO pDto) {
-        return AppResponse.success(mvProductService.save(pDto));
+    public AppResponse<ProductDTO> createProduct(@RequestPart("product") ProductDTO pDto,
+                                                 @RequestPart(value = "images", required = false) List<MultipartFile> pImages) throws IOException {
+        ProductDTO lvCreatedProduct = mvProductService.save(pDto);
+        if (!CollectionUtils.isEmpty(pImages)) {
+            for (MultipartFile image : pImages) {
+                mvProductImageService.saveImageProduct(image, lvCreatedProduct.getId(), false);
+            }
+        }
+        return AppResponse.success(lvCreatedProduct);
     }
 
     @Operation(summary = "Update product")

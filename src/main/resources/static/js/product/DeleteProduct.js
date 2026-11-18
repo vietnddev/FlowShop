@@ -46,7 +46,7 @@ function updateDeleteAction() {
         }
 
         if (entity === "product") {
-            callApiDelete(apiURL, "/san-pham");
+            callApiDelete(apiURL, "/product");
         } else {
             callApiDelete(apiURL);
         }

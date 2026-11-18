@@ -30,6 +30,7 @@ public class ProductVariantDTO extends BaseDTO implements Serializable {
     Integer availableQty = 0;
     Integer soldQty = 0;
     Integer defectiveQty = 0;
+    Integer reorderLevel = 0;
     String weight;
     String dimensions;
     String sku;
@@ -40,7 +41,7 @@ public class ProductVariantDTO extends BaseDTO implements Serializable {
     LocalDate discontinuedDate;
     Boolean isLimitedEdition;
     String pattern;
-    Integer lowStockThreshold;
+    Integer lowStockThreshold;//will be remote
     LocalDateTime outOfStockDate;
     String manufacturingCountry;
     LocalDate manufacturingDate;

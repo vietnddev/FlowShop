@@ -23,6 +23,7 @@ public enum Pages {
     PRO_DASHBOARD("dashboard", "",              MODULE.PRODUCT),
     PRO_GALLERY("gallery", "",                  MODULE.PRODUCT),
     PRO_PRODUCT("product", "",                  MODULE.PRODUCT),
+    PRO_PRODUCT_ADD("product-add", "",          MODULE.PRODUCT),
     PRO_PRODUCT_INFO("product-info", "",        MODULE.PRODUCT),
     PRO_PRODUCT_DAMAGED("product-damaged", "",  MODULE.PRODUCT),
     PRO_VOUCHER("vouchers", "",                 MODULE.PRODUCT),

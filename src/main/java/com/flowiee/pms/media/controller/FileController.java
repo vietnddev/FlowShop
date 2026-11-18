@@ -47,11 +47,10 @@ public class FileController extends BaseController {
     ProductImageService productImageService;
     ProductComboService productComboService;
     ProductVariantService productVariantService;
-    ProductDamagedService productDamagedService;
     FileBackupService fileBackupService;
     FileRestoreService fileRestoreService;
 
-    @PostMapping("/uploads/san-pham/{id}")
+    @PostMapping("/uploads/product/{id}")
     @PreAuthorize("@vldModuleProduct.updateImage(true)")
     public ModelAndView uploadImageOfProductBase(@RequestParam("file") MultipartFile file, HttpServletRequest request, @PathVariable("id") Long productId) throws Exception {
         if (productId <= 0 || productService.findById(productId, true) == null) {
@@ -113,19 +112,6 @@ public class FileController extends BaseController {
             throw new ResourceNotFoundException("File attach doesn't empty!");
         }
         productImageService.saveImageProductCombo(file, productComboId);
-        return refreshPage(request);
-    }
-
-    @PostMapping("/uploads/product-damaged/{id}")
-    @PreAuthorize("@vldModuleProduct.updateImage(true)")
-    public ModelAndView uploadImageOfProductDamaged(@RequestParam("file") MultipartFile file, HttpServletRequest request, @PathVariable("id") Long productDamagedId) throws Exception {
-        if (productDamagedService.findById(productDamagedId, true) == null) {
-            throw new ResourceNotFoundException("Product damaged not found!");
-        }
-        if (file.isEmpty()) {
-            throw new ResourceNotFoundException("File attach doesn't empty!");
-        }
-        productImageService.saveImageProductDamaged(file, productDamagedId);
         return refreshPage(request);
     }
 

@@ -14,4 +14,14 @@ public interface ProductStockMovementService {
             String note,
             Long createdBy
     );
+
+    void createMovement(
+            Long variantId,
+            StockMovementType movementType,
+            StockQuantityType quantityType,
+            Integer quantityChange,
+            String referenceType,
+            Long referenceId,
+            String note
+    );
 }

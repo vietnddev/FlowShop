@@ -30,9 +30,6 @@ public class ProductVariantConvert {
         dto.setId(pInput.getId());
         dto.setVariantCode(pInput.getVariantCode());
         dto.setVariantName(pInput.getVariantName());
-        dto.setStorageQty(pInput.getStorageQty());
-        dto.setSoldQty(pInput.getSoldQty());
-        dto.setLowStockThreshold(pInput.getLowStockThreshold());
         dto.setStatus(pInput.getStatus());
 
         Product lvProduct = pInput.getProduct();
@@ -75,7 +72,7 @@ public class ProductVariantConvert {
         }
 
         dto.setUnitCurrency(null);
-        dto.setDefectiveQty(pInput.getDefectiveQty());
+        //dto.setDefectiveQty(pInput.getDefectiveQty());
         dto.setAvailableSalesQty(CoreUtils.coalesce(dto.getStorageQty(), 0) - CoreUtils.coalesce(dto.getReservedQty(), 0) - CoreUtils.coalesce(dto.getDefectiveQty(), 0));
         dto.setWeight(pInput.getWeight());
         dto.setNote(pInput.getNote());

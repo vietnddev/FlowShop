@@ -1,0 +1,119 @@
+/* Preview container */
+.image-preview-container {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    max-height: 180px;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.image-preview-container img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.image-preview-empty {
+    text-align: center;
+    color: #adb5bd;
+}
+
+.image-preview-empty i {
+    display: block;
+    font-size: 40px;
+    margin-bottom: 8px;
+}
+
+.image-change-btn {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    z-index: 2;
+}
+
+/* Thumbnail gallery: exactly 3 columns */
+#productImageGallery.image-gallery {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px;
+
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* Thumbnail and add button */
+#productImageGallery .image-thumbnail-box,
+#productImageGallery .image-add-box {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 6px;
+}
+
+#productImageGallery .image-thumbnail-box {
+    border: 1px solid #dee2e6;
+    cursor: pointer;
+}
+
+#productImageGallery .image-thumbnail-box img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#productImageGallery .image-thumbnail-box.active {
+    border: 2px solid #007bff;
+}
+
+/* Add image button */
+#productImageGallery .image-add-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px dashed #adb5bd;
+    background: #f8f9fa;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+#productImageGallery .image-add-box i {
+    font-size: 28px;
+}
+
+#productImageGallery .image-add-box:hover {
+    border-color: #007bff;
+    color: #007bff;
+    background: #f1f7ff;
+}
+
+/* Remove button */
+#productImageGallery .btn-remove-image {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 50%;
+    z-index: 2;
+}

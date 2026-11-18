@@ -1,6 +1,7 @@
 package com.flowiee.pms.system.service;
 
 import com.flowiee.pms.product.enums.ProductStatus;
+import com.flowiee.pms.product.service.ProductInventoryService;
 import com.flowiee.pms.shared.enums.*;
 import com.flowiee.pms.shared.util.SecurityUtils;
 import com.flowiee.pms.system.entity.Category;
@@ -49,12 +50,13 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CrawlerService {
     private final ProductCrawlerRepository productCrawlerRepository;
+    private final ProductInventoryService productInventoryService;
     private final ImageCrawlerRepository imageCrawlerRepository;
     private final ProductRepository productRepository;
     private final ProductDetailRepository productVariantRepository;
     private final CategoryRepository categoryRepository;
     private final ProductPriceRepository productPriceRepository;
-    private final ProductPriceService mvProductPriceService;
+    private final ProductPriceService productPriceService;
     private final ProductImageService productImageService;
     private final SystemLogService systemLogService;
 
@@ -130,11 +132,12 @@ public class CrawlerService {
                             .size(sizeMdl)
                             .color(colorMdl)
                             .fabricType(fabric)
-                            .storageQty(100)
-                            .soldQty(0)
-                            .defectiveQty(0)
                             .status(ProductStatus.ACT)
                             .build());
+
+                    productInventoryService.initializeInventory(productVariantSaved);
+
+                    productPriceService.initializePrice(productVariantSaved);
 
 //                    productPriceRepository.save(ProductPrice.builder()
 //                            .productVariant(productVariantSaved)

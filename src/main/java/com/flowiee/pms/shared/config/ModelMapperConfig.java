@@ -9,6 +9,8 @@ public class ModelMapperConfig {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+                .setPreferNestedProperties(false);
         return modelMapper;
     }
 }

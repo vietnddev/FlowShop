@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum PriceType {
-    //STD("Standard Price"),
+    STD("Standard Price"),
 
     RTL("Retail Price"),
     WHO("Wholesale Price"),

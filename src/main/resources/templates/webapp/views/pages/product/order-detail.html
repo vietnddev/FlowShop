@@ -69,7 +69,7 @@
                                                                 <td th:text="${index.index + 1}" style="font-weight: bold"></td>
                                                                 <td>
                                                                     <a th:text="${list.productVariantDTO.variantName}"
-                                                                       th:href="@{/san-pham/variant/{id}(id=${list.productVariantDTO.id})}"></a>
+                                                                       th:href="@{/product/variant/{id}(id=${list.productVariantDTO.id})}"></a>
                                                                 </td>
                                                                 <td th:text="${list.productVariantDTO.unitName}"></td>
                                                                 <td th:text="${list.priceType == 'L' ? 'Lẻ' : 'Sỉ'}"></td>

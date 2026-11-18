@@ -11,14 +11,16 @@ public class ProductSummaryModel {
     private int soldQty;
     private int defectiveQty;
     private int reservedQty;
-    private boolean isActive;
+    //private boolean isActive;
 
-    public ProductSummaryModel(long productId, int stockQty, int soldQty, int defectiveQty, int reservedQty, boolean isActive) {
+    public ProductSummaryModel(long productId, int stockQty, int soldQty, int defectiveQty, int reservedQty
+            //, boolean isActive
+    ) {
         this.productId = productId;
         this.stockQty = stockQty;
         this.soldQty = soldQty;
         this.defectiveQty = defectiveQty;
         this.reservedQty = reservedQty;
-        this.isActive = isActive;
+        //this.isActive = isActive;
     }
 }
